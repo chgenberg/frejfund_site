@@ -957,7 +957,14 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const handleLinkedinProfilesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const profiles = e.target.value.split('\n').filter(profile => profile.trim() !== '');
     setLinkedinProfiles(profiles);
-    setAnswers(a => ({ ...a, team: e.target.value || "" }));
+    setAnswers(a => ({
+      ...a,
+      team: {
+        key_people: e.target.value || "",
+        roles: a.team?.roles || "",
+        expertise: a.team?.expertise || ""
+      }
+    }));
   };
 
   const analyzeLinkedinProfiles = async () => {
