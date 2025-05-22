@@ -131,7 +131,7 @@ const getOr = (val: ReactNode, fallback: ReactNode): ReactNode => {
 };
 
 export default function BusinessPlanResult({ score: _score, answers, subscriptionLevel = 'silver' }: ResultProps) {
-  const safeAnswers = answers as Record<string, any>;
+  const safeAnswers = answers as Record<string, Record<string, string>>;
   const [aiScore, setAiScore] = useState<number | null>(null);
   const [motivation, setMotivation] = useState('');
   const [strengths, setStrengths] = useState('');
@@ -183,7 +183,7 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
     sectionKeys.forEach(({ key, label }) => {
       fetchSectionFeedback(key, label);
     });
-  }, [safeAnswers]);
+  }, [safeAnswers, sectionKeys]);
 
   useEffect(() => {
     setLoadingScore(true);
@@ -198,6 +198,9 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
         setMotivation(data.motivation);
         setStrengths(data.strengths);
         setWeaknesses(data.weaknesses);
+      })
+      .catch(error => {
+        console.error('Error fetching score:', error);
       })
       .finally(() => setLoadingScore(false));
   }, [answers]);
@@ -214,14 +217,14 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
         });
         const data = await res.json();
         setCompetitorAnalysis(data.competitors || []);
-      } catch (e) {
+      } catch (error) {
         setCompetitorError('Kunde inte hämta konkurrensanalys.');
       } finally {
         setLoadingCompetitors(false);
       }
     }
     fetchCompetitors();
-  }, [JSON.stringify(answers)]);
+  }, [answers]);
 
   return (
     <div className="relative min-h-screen w-full">

@@ -560,18 +560,22 @@ interface FundingDetails {
   exit_strategy: string;
 }
 
-type BusinessPlanSection = BusinessIdea | CustomerSegments | ProblemSolution | MarketAnalysis | BusinessModel | Team | FundingDetails;
+interface BusinessPlanSection {
+  [key: string]: string | Record<string, string>;
+}
 
 interface BusinessPlanAnswers {
   company_name: string;
-  business_idea: BusinessIdea;
-  customer_segments: CustomerSegments;
-  problem_solution: ProblemSolution;
-  market_analysis: MarketAnalysis;
-  business_model: BusinessModel;
-  team: Team;
-  funding_details: FundingDetails;
-  [key: string]: string | BusinessPlanSection;
+  business_idea: BusinessPlanSection;
+  customer_segments: BusinessPlanSection;
+  problem_solution: BusinessPlanSection;
+  market_analysis: BusinessPlanSection;
+  business_model: BusinessPlanSection;
+  team: BusinessPlanSection;
+  funding_details: BusinessPlanSection;
+  market_potential?: BusinessPlanSection;
+  competition?: BusinessPlanSection;
+  [key: string]: string | BusinessPlanSection | undefined;
 }
 
 const initialAnswers: BusinessPlanAnswers = {
@@ -613,44 +617,8 @@ const initialAnswers: BusinessPlanAnswers = {
   }
 };
 
-const [answers, setAnswers] = useState<BusinessPlanAnswers>(initialAnswers);
-
-// Helper function to safely update nested state
-const updateNestedState = (section: keyof BusinessPlanAnswers, field: string, value: string) => {
-  setAnswers(prev => {
-    const sectionData = prev[section];
-    if (typeof sectionData === 'object' && sectionData !== null) {
-      return {
-        ...prev,
-        [section]: {
-          ...sectionData,
-          [field]: value
-        }
-      };
-    }
-    return prev;
-  });
-};
-
-// Helper function to safely get nested state
-const getNestedState = (section: keyof BusinessPlanAnswers, field: string): string => {
-  const sectionData = answers[section];
-  if (typeof sectionData === 'object' && sectionData !== null) {
-    return (sectionData as any)[field] || '';
-  }
-  return '';
-};
-
-// Helper function to check if a section is valid
-const isSectionValid = (section: keyof BusinessPlanAnswers): boolean => {
-  const sectionData = answers[section];
-  if (typeof sectionData === 'object' && sectionData !== null) {
-    return Object.values(sectionData).every(value => value !== '');
-  }
-  return false;
-};
-
 export default function BusinessPlanWizard({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [answers, setAnswers] = useState<BusinessPlanAnswers>(initialAnswers);
   const [step, setStep] = useState(0);
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
@@ -668,7 +636,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const [isMarketLoading, setIsMarketLoading] = useState(false);
   const [competitionSuggestions, setCompetitionSuggestions] = useState<string[]>([]);
   const [isCompetitionLoading, setIsCompetitionLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{ score: number; subscriptionLevel?: 'silver' | 'gold' | 'platinum' } | null>(null);
   const [isAnalyzingPlan, setIsAnalyzingPlan] = useState(false);
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
@@ -1051,6 +1019,57 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     }
   };
 
+  const handleAnswerChange = (section: keyof BusinessPlanAnswers, field: string, value: string) => {
+    setAnswers(prev => {
+      const sectionData = prev[section];
+      if (typeof sectionData === 'string') {
+        return {
+          ...prev,
+          [section]: value
+        };
+      }
+      return {
+        ...prev,
+        [section]: {
+          ...sectionData,
+          [field]: value
+        }
+      };
+    });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setIsAnalyzingPlan(true);
+      setAnalyzeError(null);
+
+      const response = await fetch('/api/analyze-plan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          answers,
+          company,
+          email,
+          bransch: customBransch || bransch,
+          omrade: customOmrade || omrade
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze business plan');
+      }
+
+      const data = await response.json();
+      setResult(data);
+    } catch (error) {
+      setAnalyzeError(error instanceof Error ? error.message : 'An error occurred');
+    } finally {
+      setIsAnalyzingPlan(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-[#f5f7fa] text-[#16475b] rounded-3xl shadow-2xl border border-[#16475b] max-w-xl min-h-[700px] w-full p-8 relative animate-fade-in flex flex-col justify-between">
@@ -1102,10 +1121,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                   type="text"
                   className="w-full rounded-lg border border-[#16475b] bg-white/80 px-4 py-2 text-[#16475b] focus:outline-none focus:border-[#16475b]"
                   value={answers.team?.[sub.id] || ""}
-                  onChange={e => setAnswers(a => ({
-                    ...a,
-                    team: { ...(a.team || {}), [sub.id]: e.target.value }
-                  }))}
+                  onChange={e => handleAnswerChange('team', sub.id, e.target.value)}
                   placeholder="Skriv ditt svar här..."
                 />
                 <button
@@ -1124,12 +1140,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                           key={i}
                           className="bg-[#16475b] text-white rounded-full px-3 py-1 text-xs font-semibold hover:bg-[#7edcff] hover:text-[#04121d] transition-colors mr-2 mb-2"
                           type="button"
-                          onClick={() =>
-                            setAnswers(a => ({
-                              ...a,
-                              team: { ...(a.team || {}), [sub.id]: ex }
-                            }))
-                          }
+                          onClick={() => handleAnswerChange('team', sub.id, ex)}
                         >
                           {ex}
                         </button>
@@ -1191,10 +1202,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 <textarea
                   className="w-full min-h-[60px] rounded-lg border border-[#16475b] bg-white/80 px-4 py-2 text-[#16475b] focus:outline-none focus:border-[#16475b]"
                   value={answers[current.id]?.[sub.id] || ""}
-                  onChange={e => setAnswers(a => ({
-                    ...a,
-                    [current.id]: { ...(a[current.id] || {}), [sub.id]: e.target.value }
-                  }))}
+                  onChange={e => handleAnswerChange(current.id as keyof BusinessPlanAnswers, sub.id, e.target.value)}
                   placeholder="Skriv ditt svar här..."
                 />
                 <button
@@ -1213,12 +1221,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                           key={i}
                           className="bg-[#16475b] text-white rounded-full px-3 py-1 text-xs font-semibold hover:bg-[#7edcff] hover:text-[#04121d] transition-colors mr-2 mb-2"
                           type="button"
-                          onClick={() =>
-                            setAnswers(a => ({
-                              ...a,
-                              [current.id]: { ...(a[current.id] || {}), [sub.id]: ex }
-                            }))
-                          }
+                          onClick={() => handleAnswerChange(current.id as keyof BusinessPlanAnswers, sub.id, ex)}
                         >
                           {ex}
                         </button>
@@ -1264,14 +1267,8 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                           })
                         });
                         const data = await res.json();
-                        setAnswers(a => ({
-                          ...a,
-                          market_potential: {
-                            ...(a.market_potential || {}),
-                            market_value: data.estimate || '',
-                            market_source: data.source || ''
-                          }
-                        }));
+                        handleAnswerChange('market_potential', 'market_value', data.estimate || '');
+                        handleAnswerChange('market_potential', 'market_source', data.source || '');
                       } finally {
                         setIsMarketLoading(false);
                       }
@@ -1299,13 +1296,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                         })
                       });
                       const data = await res.json();
-                      setAnswers(a => ({
-                        ...a,
-                        competition: {
-                          ...(a.competition || {}),
-                          main_competitors: data.suggestions || []
-                        }
-                      }));
+                      handleAnswerChange('competition', 'main_competitors', data.suggestions || []);
                     } finally {
                       setIsCompetitionLoading(false);
                     }
