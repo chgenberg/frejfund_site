@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
+import { Element } from 'cheerio';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -49,7 +50,7 @@ export async function scrapeAndAnalyze(url: string) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText()}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
     const html = await response.text();
@@ -64,7 +65,7 @@ export async function scrapeAndAnalyze(url: string) {
       ogType: $('meta[property="og:type"]').attr('content') || '',
       ogImage: $('meta[property="og:image"]').attr('content') || '',
       schema: $('script[type="application/ld+json"]')
-        .map((_, el) => $(el).html() || '')
+        .map((_: number, el: Element) => $(el).html() || '')
         .get()
         .filter(Boolean),
       visibleText: $('body').text().replace(/\s+/g, ' ').trim()
