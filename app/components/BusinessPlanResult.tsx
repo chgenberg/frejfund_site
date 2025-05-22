@@ -1,5 +1,7 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import Image from 'next/image';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 interface ResultProps {
   score: number;
@@ -226,6 +228,19 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
     fetchCompetitors();
   }, [answers]);
 
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return '#7edc7a'; // Grön
+    if (score >= 60) return '#ffd700'; // Gul
+    return '#ff6b6b'; // Röd
+  };
+
+  const getScoreLabel = (score: number) => {
+    if (score >= 80) return 'Utmärkt';
+    if (score >= 60) return 'Bra';
+    if (score >= 40) return 'Acceptabelt';
+    return 'Behöver förbättras';
+  };
+
   return (
     <div className="relative min-h-screen w-full">
       {/* SCORE HEADER ALLRA HÖGST UPP */}
@@ -239,7 +254,17 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
           ) : (
             <>
               <div className="flex flex-col items-center justify-center mb-2">
-                <div className="text-7xl font-extrabold text-[#16475b] leading-none">{aiScore ?? '-'}</div>
+                <div className="w-48 h-48">
+                  <CircularProgressbar
+                    value={_score}
+                    text={`${_score}`}
+                    styles={buildStyles({
+                      pathColor: getScoreColor(_score),
+                      textColor: '#16475b',
+                      trailColor: '#eaf6fa',
+                    })}
+                  />
+                </div>
               </div>
               <div className="text-lg text-[#16475b] font-semibold mt-2 mb-1">{motivation}</div>
               <div className="flex flex-col gap-2 w-full mt-2">
@@ -254,9 +279,9 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
           >
             Vad betyder score?
           </button>
-          <div className="mt-4 text-lg text-[#16475b] text-center font-medium max-w-2xl">{getScoreLabel(_score).summary}</div>
+          <div className="mt-4 text-lg text-[#16475b] text-center font-medium max-w-2xl">{getScoreLabel(_score)}</div>
           <div className="mt-4 bg-[#eaf6fa] rounded-xl p-4 text-[#16475b] text-base text-center max-w-xl">
-            <b>Nästa steg:</b> {weaknesses && weaknesses.length > 0 ? weaknesses[0] : 'Fortsätt utveckla din affärsplan!'}
+            {getScoreLabel(_score)}
           </div>
         </div>
       </div>
