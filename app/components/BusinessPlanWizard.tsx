@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import BusinessPlanResult from './BusinessPlanResult';
 import BusinessPlanScore from './BusinessPlanScore';
