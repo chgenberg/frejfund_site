@@ -1,0 +1,25 @@
+[theme]
+# Primärfärg (justerad lila för bättre synlighet)
+primaryColor = "#9d81ff"
+
+# Bakgrundsfärg (något ljusare för bättre läsbarhet)
+backgroundColor = "#0a0a24"
+
+# Sekundär bakgrundsfärg (mer kontrast mot huvudbakgrund)
+secondaryBackgroundColor = "#131340"
+
+# Textfärg (ljusare för bättre läsbarhet)
+textColor = "#f8f8ff"
+
+# Font
+font = "sans serif"
+
+[server]
+enableCORS = false
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false
+
+[global]
+showWarningOnDirectExecution = false 

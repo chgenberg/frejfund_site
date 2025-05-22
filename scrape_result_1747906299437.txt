@@ -1,0 +1,22 @@
+URL: https://www.byhvit.se
+
+Scraped data:
+
+{
+  "title": "",
+  "description": "",
+  "ogTitle": "",
+  "ogDescription": "",
+  "ogType": "",
+  "ogImage": "",
+  "schema": [],
+  "visibleText": "Den här webbsidan använder cookies\nDen här webbplatsen (By HVIT) använder cookies till att analysera trafik och till annonsmätning. Läs mer.\nBy HVIT använder cookies. Dessa cookies raderas när du stänger din webbläsare. Om du öppnar ett nytt webbläsarfönster kommer då nya cookies att skapas. Vi sparar information i cookien såsom ett slumpmässigt värde som används för att skapa anonym statistik i vår webshop.\nTILLÅT ALLA COOKIESTILLÅT BARA NÖDVÄNDIGA COOKIESCOOKIE-INSTÄLLNINGAR\n\nLivsstilsbutik med noggrant utvalt sortiment. Handplockat på riktigt!\n\nFrakt 69 kr. Fraktfritt från 500 kr\n\n0VARUKORG\nDIN VARUKORG ÄR TOM\nNYHETER\nREA\nMORSDAG\nINREDNING\nKÖK\nBAD\nBÖCKER\nKLÄDER\nSKOR OCH TOFFLOR\nVÄSKOR\nSMYCKEN\nLÄSGLASÖGON\nKORT & PAPPER\nPRESENTKORT\nVARUMÄRKEN\nSÖK\nNYHETER\nKknekki\n35 SEK\nKÖP…\nLinneduk\n1 499 SEK\nKÖP…\nVäska Leobumbag\n399 SEK\nKÖP…\nPipol örhänge Steph\n299 SEK\nKÖP…\nPipol örhänge Mira\n299 SEK\nKÖP…\nGaia multi mobilarmband\n349 SEK\nKÖP…\nPom mobilarmband svart\n299 SEK\nKÖP\nMio Mobilband In sunny mood\n349 SEK\nKÖP…\nFÖLJ OSS PÅ INSTAGRAM OCH FACEBOOK @byhvit\nTillbaka till toppen\nBy HVIT\nÅsa Stationsväg 3\n439 55 ÅSA\nSverige\ninfo@byhvit.se\n\t\n\nKöpvillkor\n\nOm oss\n\nButiken i Åsa\n\n\t\n\t\n\t\n"
+}
+
+
+OpenAI-resultat:
+
+{
+  "raw": "",
+  "error": "Kunde inte tolka analysen som JSON"
+}

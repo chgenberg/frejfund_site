@@ -1,0 +1,70 @@
+URL: https://www.dg97.se
+
+Scraped data:
+
+{
+  "title": "DG97 - Kontorshotell i Stockholm",
+  "description": "Hyr eget kontorsrum på Drottninggatan mitt i Stockholm. Vi har rum i alla storlekar och för alla behov. Allt ingår!",
+  "ogTitle": "DG97 - Kontorshotell i Stockholm",
+  "ogDescription": "Hyr eget kontorsrum på Drottninggatan mitt i Stockholm. Vi har rum i alla storlekar och för alla behov. Allt ingår!",
+  "ogType": "website",
+  "ogImage": "",
+  "schema": [
+    "{\"@context\":\"https://schema.org\",\"@graph\":[{\"@type\":\"WebPage\",\"@id\":\"https://www.dg97.se/kontorshotell-i-stockholm/\",\"url\":\"https://www.dg97.se/kontorshotell-i-stockholm/\",\"name\":\"DG97 - Kontorshotell i Stockholm\",\"isPartOf\":{\"@id\":\"https://www.dg97.se/#website\"},\"about\":{\"@id\":\"https://www.dg97.se/#organization\"},\"datePublished\":\"2015-07-14T14:50:10+00:00\",\"dateModified\":\"2024-08-28T07:20:25+00:00\",\"description\":\"Hyr eget kontorsrum på Drottninggatan mitt i Stockholm. Vi har rum i alla storlekar och för alla behov. Allt ingår!\",\"breadcrumb\":{\"@id\":\"https://www.dg97.se/kontorshotell-i-stockholm/#breadcrumb\"},\"inLanguage\":\"sv-SE\",\"potentialAction\":[{\"@type\":\"ReadAction\",\"target\":[\"https://www.dg97.se/kontorshotell-i-stockholm/\"]}]},{\"@type\":\"BreadcrumbList\",\"@id\":\"https://www.dg97.se/kontorshotell-i-stockholm/#breadcrumb\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Hem\"}]},{\"@type\":\"WebSite\",\"@id\":\"https://www.dg97.se/#website\",\"url\":\"https://www.dg97.se/\",\"name\":\"DG97 - Kontorshotell\",\"description\":\"\",\"publisher\":{\"@id\":\"https://www.dg97.se/#organization\"},\"potentialAction\":[{\"@type\":\"SearchAction\",\"target\":{\"@type\":\"EntryPoint\",\"urlTemplate\":\"https://www.dg97.se/?s={search_term_string}\"},\"query-input\":{\"@type\":\"PropertyValueSpecification\",\"valueRequired\":true,\"valueName\":\"search_term_string\"}}],\"inLanguage\":\"sv-SE\"},{\"@type\":\"Organization\",\"@id\":\"https://www.dg97.se/#organization\",\"name\":\"DG97 - Kontorshotell\",\"url\":\"https://www.dg97.se/\",\"logo\":{\"@type\":\"ImageObject\",\"inLanguage\":\"sv-SE\",\"@id\":\"https://www.dg97.se/#/schema/logo/image/\",\"url\":\"https://www.dg97.se/wp-content/uploads/2022/12/LOGGA2-min.jpg\",\"contentUrl\":\"https://www.dg97.se/wp-content/uploads/2022/12/LOGGA2-min.jpg\",\"width\":616,\"height\":281,\"caption\":\"DG97 - Kontorshotell\"},\"image\":{\"@id\":\"https://www.dg97.se/#/schema/logo/image/\"}}]}"
+  ],
+  "visibleText": "OM OSS\nGALLERI\nCO-LOCATE\nKONTAKT\nLOGIN\nEget kontorsrum mitt i Stockholm\n\nVi har rum i alla storlekar och för alla behov\n\nTA KONTAKT\n\t\nDG97 ligger mitt i Vasastans hjärta. Mellan Odenplan och Rådmansgatan,\nmed utsikt över Observatorielunden – högst upp på Drottninggatan.\n\nOmgivning är lugn och trevlig, med gym ett stenkast från kontoret, stans bästa lunchrestauranger åt alla riktningar och nära till kollektivtrafik.\n\n\t\n\t\nHyr kontorsrum på DG97\n\nVi erbjuder egna kontorsrum i olika storlekar, på vecko- eller månadsbasis.\n\nVi har rum för 2-6 personer på kontorshotellet, men är flexibla och hjälper er gärna att komma i ordning.\n\nI hyran ingår allt övrigt ni kan tänkas behöva på kontoret.\n\nNi kan också boka en visning direkt på hemsidan, genom att klicka på knappen nedanför.\n\nBOKA EN VISNING\nKonferensrum på DG97\n\nVi har fina konferensrum som ingår när ni hyr ett rum hos oss.\n\nVi erbjuder även externa gäster att boka våra konferensrum per timme.\n\nÄr ni intresserade av att hyra ett kontorsrum hos oss, eller bara titta förbi för ett kortare möte?\n\nVarmt välkomna att kontakta oss med frågor eller funderingar.\n\nKONTAKTA OSS\n\t\nAllt detta ingår på Kontorshotellet DG97\nKaffe, frukt & läsk\nKonferensrum\nTelefonbås\nCopy & print\nDusch\nInnergård\nFrukost & AW\nReception & Lounge\nPosthantering\nFöretagsadress\nLåsbara kontorsrum\nCybersäkerhet\n\t\nVanliga frågor om Kontorshotellet\n\nAlla undrar något, vad undrar du?\n\nVilka öppettider erbjuder ni?\n\nÄr hundar välkomna?\n\nHur stora är era mötesrum?\n\nIngår konferensrum i hyran av kontorsrum?\n\nErbjuder ni bara privata kontorsrum?\n\nFinns det parkeringsmöjligheter?\n\nErbjuder ni Kundfrukost / AW?\n\nHar ni virtual office-lösningar?\n\nHur ser de kollektiva förbindelserna ut?\n\nLåt dig inspireras av vår blogg!\nFrukost och AW viktigt på Kontorshotell\nArbetsmiljön viktig för kunder, kollegor och besökare\nTrevlig arbetsmiljö banar väg för framgång\nSå nätverkar du bättre under 2023\n5 anledningar att välja kontorshotell 2023\nHur fungerar ett kontorshotell?\nVad kostar ett kontorshotell i Stockholm?\nHitta det perfekta kontorshotellet i Stockholm som matchar era önskemål\n\nLetar du efter en flexibel och inspirerande arbetsplats i Stockholm? Vårt kontorshotell erbjuder moderna kontorsrum och arbetsplatser anpassade för dina behov. Med ett centralt läge i Stockholm får du tillgång till allt från privata kontor till coworking-ytor, perfekt för företag i alla storlekar. Här kombineras stilrena kontorsrum med toppmodern teknik och en gemenskap som främjar nätverkande och tillväxt. Upplev den bästa arbetsmiljön i Stockholm – boka din plats hos oss idag och ta din verksamhet till nästa nivå!\n\nDG 97 KONTORSHOTELL\n\nDrottninggatan 97\nSE-113 60 STOCKHOLM\nSWEDEN\n+46 (0)708 86 22 79\nhej@dg97.se\n\nSENASTE NYHETERNA\nHitta rätt kontorshotell för er i Vasastan, Stockholm\nFlexibla avtal viktigt för mindre bolag\nFrukost och AW viktigt på Kontorshotell\nOm oss\nGalleri\nCO-LOCATE\nKontakt\nLogin\n© Copyright - DG97 - 2018-2025 web by Redkite AB"
+}
+
+
+OpenAI-resultat:
+
+{
+  "company_name": "DG97 - Kontorshotell",
+  "industry": "Fastighets- och kontorshotellbranschen",
+  "area": "Stockholm, Sverige",
+  "sku_count": "Ej tillämpligt (tjänstebaserat företag)",
+  "business_idea": "Erbjuda flexibla och moderna kontorslösningar i centrala Stockholm, inklusive privata kontorsrum och coworking-ytor, med fokus på att skapa en inspirerande arbetsmiljö och främja nätverkande.",
+  "customer_segments": "Företag i alla storlekar som söker flexibla och centralt belägna kontorslösningar i Stockholm.",
+  "team": "Information om team/grundare saknas i den tillgängliga datan.",
+  "revenue_model": "Intäkter genereras genom uthyrning av kontorsrum och konferensrum, samt eventuella tilläggstjänster som erbjuds inom kontorshotellet.",
+  "market_size": "Information om marknadsstorlek saknas i den tillgängliga datan.",
+  "competition": "Information om konkurrens saknas i den tillgängliga datan.",
+  "funding_details": "Information om finansiering saknas i den tillgängliga datan.",
+  "contact_info": {
+    "address": "Drottninggatan 97, SE-113 60 Stockholm, Sweden",
+    "phone": "+46 (0)708 86 22 79",
+    "email": "hej@dg97.se"
+  },
+  "news_articles": [
+    "Hitta rätt kontorshotell för er i Vasastan, Stockholm",
+    "Flexibla avtal viktigt för mindre bolag",
+    "Frukost och AW viktigt på Kontorshotell"
+  ],
+  "testimonials": "Information om kundrecensioner eller testimonials saknas i den tillgängliga datan.",
+  "övrigt": {
+    "faciliteter": [
+      "Kaffe, frukt & läsk",
+      "Konferensrum",
+      "Telefonbås",
+      "Copy & print",
+      "Dusch",
+      "Innergård",
+      "Frukost & AW",
+      "Reception & Lounge",
+      "Posthantering",
+      "Företagsadress",
+      "Låsbara kontorsrum",
+      "Cybersäkerhet"
+    ],
+    "bloggämnen": [
+      "Frukost och AW viktigt på Kontorshotell",
+      "Arbetsmiljön viktig för kunder, kollegor och besökare",
+      "Trevlig arbetsmiljö banar väg för framgång",
+      "Så nätverkar du bättre under 2023",
+      "5 anledningar att välja kontorshotell 2023",
+      "Hur fungerar ett kontorshotell?",
+      "Vad kostar ett kontorshotell i Stockholm?",
+      "Hitta det perfekta kontorshotellet i Stockholm som matchar era önskemål"
+    ]
+  }
+}

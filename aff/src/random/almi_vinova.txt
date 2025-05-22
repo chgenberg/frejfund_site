@@ -1,0 +1,176 @@
+Utformning av ansökningar till Almi och Vinnova för startup-finansiering
+Att söka finansiering från Almi respektive Vinnova ställer liknande krav på en genomarbetad ansökan med tydlig struktur. Nedan följer en genomgång av vad som krävs och efterfrågas i ansökningar till vardera organisation, inklusive vilka dokument som behövs, hur ansökan bör struktureras (rubriker, format, längd) samt vilka nyckelområden ansökan ska täcka (affärsidé/innovationshöjd, marknadspotential och skalbarhet, teamets kompetens, budget/finansieringsplan och eventuella hållbarhetsaspekter eller samhällsnytta). Officiella guider och mallar nämns där sådana finns tillgängliga.
+Almi – Ansökan om lån och riskkapital
+Almi erbjuder både företagslån (inklusive Innovationslån för tidiga projekt) och riskkapital via Almi Invest. Ansökningsprocessen och fokus kan variera något beroende på om du söker lån eller riskkapital, men i båda fall är en tydlig affärsplan, budget och pitch centrala.
+Obligatoriska dokument och underlag (Almi)
+Affärsplan: En skriftlig affärsplan krävs vid ansökan om Almi-lån. I Almis e-tjänst för låneansökan laddar man upp sin affärsplan tillsammans med budgeten
+almi.se
+. Affärsplanen bör ge en helhetsbild av verksamheten och planen framåt. Almi tillhandahåller en mall för affärsplan som vägledning (kostnadsfritt att ladda ner)
+almi.se
+. Mallen hjälper till att täcka alla relevanta områden (se mer under Struktur nedan).
+Budget: En detaljerad budget eller finansieringsplan är också obligatorisk vid Almi-ansökningar
+almi.se
+. Den ska visa förväntade intäkter, kostnader och likviditet, ofta månadsvis och på årsbasis. Almi erbjuder en budgetmall i Excel som stöd, anpassad för olika bolagsformer
+almi.se
+almi.se
+. Budgeten används både för att planera företagets ekonomi och för att visa Almi hur lånet/kapitalet är tänkt att användas och hur det påverkar företagets finanser.
+Pitchdeck (endast för riskkapital): Om du söker riskkapital från Almi Invest (Almis VC-verksamhet) ska du skicka in ett pitchdeck (en pitch-presentation) istället för en traditionell affärsplan. Almi Invest har ett online pitch-formulär där bolaget laddar upp sitt pitchdeck (PDF/PPT) och fyller i nödvändig företagsinformation
+almi.se
+. Pitchdeck’et bör tydligt täcka er affärsidé, innovationens unikhet, affärsmodell och hur bolaget ska växa, gärna på ca 10–15 överskådliga slides. (Almi Invest uppmanar till en övertygande pitch där affärsidé, unika innovation och hållbarhetsbidrag framgår
+almi.se
+.)
+Officiella mallar: Almi erbjuder flera mallar och guider på sin webbplats, bland annat för affärsplan och budget
+almi.se
+. Dessa kan laddas ner och användas som utgångspunkt för att utforma ansökningsunderlaget i enlighet med Almis förväntningar.
+Struktur och format för Almi-ansökan
+Almis låneansökan görs via deras e-tjänst och omfattar dels ifyllnad av ett formulär online, dels uppladdning av ovanstående dokument. Själva affärsplanen bör vara tydligt strukturerad med logiska rubriker som täcker alla viktiga aspekter av affären. Enligt Almis affärsplansmall rekommenderas att planen disponeras i ett antal sektioner som gör det lätt för läsaren (och Almis rådgivare) att utvärdera företaget. Centrala rubriker i affärsplanen inkluderar bland annat
+almi.se
+:
+Affärsidé, vision och mål: Beskriv kärnan i företagets verksamhet (vad ni erbjuder och vilken kundnytta det ger) samt er vision (vad ni vill uppnå långsiktigt) och konkreta mål på 3–5 års sikt. Detta sätter kontexten för ansökan.
+Marknad och kunder: Definiera er målmarknad – t.ex. bransch och geografiskt område – och beskriv era kunder/ användare och deras behov
+almi.se
+. Almi vill förstå marknadens storlek och karaktär samt att ni har identifierat en tydlig målgrupp.
+Konkurrens: Redogör för konkurrenssituationen – vilka alternativa lösningar eller konkurrenter finns och hur skiljer ni er från dessa
+almi.se
+? Visa på er innovationshöjd eller unika fördelar gentemot existerande lösningar.
+Erbjudande och affärsmodell: Beskriv er produkt eller tjänst och hur ni tjänar pengar på den (affärsmodellen)
+almi.se
+. Inkludera hur ni kommer att sälja/prissätta erbjudandet, hur kunder betalar, och hur leverans sker (affärsprocessen)
+almi.se
+. Detta visar att ni har en genomtänkt plan för skalpbarhet – att verksamheten kan växa och generera intäkter.
+Marknadsförings- och säljstrategi: Förklara hur ni ska nå ut till kunderna – er marknadsbearbetning och försäljningskanaler
+almi.se
+. Almi vill se att ni har en plan för att skapa efterfrågan och växa på marknaden.
+Resurser och nyckelförutsättningar: Identifiera vilka resurser (t.ex. nyckelpersonal, teknik, patent, kapital) eller andra förutsättningar som är kritiska för företagets framgång
+almi.se
+.
+Hållbarhet och samhällsnytta: Almi lägger vikt vid hållbart företagande. I affärsplanen bör ni beskriva hur affärsidén tar ansvar för miljömässiga och sociala aspekter samt eventuell cirkularitet i er produkt/tjänst
+almi.se
+. Även om hållbarhet inte är kärnan i alla affärsidéer, ser Almi gärna att ni adresserar t.ex. miljöpåverkan, socialt ansvar eller andra samhällsnyttiga effekter av er verksamhet.
+Team: Presentera teamets kompetens och erfarenheter
+almi.se
+. Almi vill veta vilka personer som driver företaget, deras roller, samt hur teamets sammansättning täcker de kompetensområden som behövs (t.ex. teknisk kunskap, affärsutveckling, branscherfarenhet). Ett starkt och komplett team ökar trovärdigheten i ansökan.
+Analys (SWOT): Många affärsplaner innehåller en ärlig analys av företagets styrkor, svagheter, möjligheter och hot. Detta visar att ni förstår både utmaningar och potential. Almis mall inkluderar en sådan analys under rubriken "Analys"
+almi.se
+.
+Affärsplanen bör skrivas på ett koncist men informativt sätt – ofta omfattar den i storleksordningen 10–20 sidor. Använd gärna tydliga underrubriker (enligt ovan) och punktlistor där det passar, så att informationen blir lättöverskådlig. Undvik onödig utfyllnad; fokusera på det som är relevant för att bedöma affärens bärkraft och tillväxtpotential. Om Almis egna mall används som utgångspunkt säkerställer ni att samtliga viktiga områden täcks
+almi.se
+. Almi Invest-pitch: För riskkapitalansökan via Almi Invest är formatet mer fokuserat på en kort pitch istället för en lång affärsplan. Pitchdeck-presentationen ska vara visuellt tilltalande och rakt på sak. En vanlig rekommendation är att inkludera ~10 slides som täcker problem, lösning, marknad, affärsmodell, team, konkurrenter, och finansieringsbehov. Almi Invest betonar att pitchdeck’et tydligt ska beskriva affärsidén, innovationens unicitet samt affärsmodellen, och gärna hur bolaget bidrar till t.ex. klimat- eller miljönytta om det är relevant
+almi.se
+. Längden bör hållas kort (ca 10–15 slides) – det viktiga är att ni väcker intresse och får fram kärninformationen. I Almi Invests formulär fyller man även i grundläggande fakta (bolagsnamn, kontaktuppgifter, sektor, m.m.) i samband med uppladdningen av pitchdeck
+almi.se
+.
+Vad Almi efterfrågar (innehåll och bedömningskriterier)
+När Almi utvärderar en ansökan – vare sig det gäller lån eller en potentiell investering – tittar de på flera nyckelfaktorer som bör framgå tydligt i ansökningsmaterialet:
+Affärsidé och innovationshöjd: Hur pass nyskapande och unik är affärsidén? Löser ni ett verkligt problem eller behov på ett nytt och bättre sätt än vad som redan finns på marknaden? Almi (särskilt via Almi Invest) letar efter nya, unika och innovativa idéer som kan ta position på en större marknad
+almi.se
+. Ni bör i ansökan framhäva er värdeerbjudande – vad som gör er produkt eller tjänst speciell och vilken kundnytta/effekt den skapar.
+Marknadspotential och skalbarhet: Almi vill se att det finns en betydande marknadspotential och att affären går att skala upp. Beskriv storleken på er potentiella marknad samt hur ni kan växa (gärna även internationellt på sikt). För Almi Invest är det viktigt att bolaget adresserar stora marknadsmöjligheter och har en skalbar affärsmodell, gärna baserad på unika teknologier eller nischar
+almi.se
+. Ansökan bör förmedla att om finansiering beviljas kan företaget växa betydligt.
+Konkurrensfördelar: Kopplat till ovanstående vill Almi förstå varaktiga konkurrensfördelar. Har ni några skyddade/unika tillgångar – t.ex. patent, specialistkompetens, eller andra ”moats” – som ger bolaget en edge? Beskriv sådana tillgångar i affärsplanen (t.ex. under avsnitt om viktiga resurser eller innovation).
+Teamets kompetens: Ett kompetent och engagerat team är avgörande. Almi bedömer om teamet bakom idén har rätt mix av erfarenheter, kunskaper och driv för att genomföra planen
+almi.se
+. I ansökan ska det framgå vilka nyckelpersonerna är, deras bakgrund och roller. Poängtera hur teammedlemmarnas kompetenser kompletterar varandra och täcker företagets behov (t.ex. teknisk utveckling, marknadsföring, ledarskap). Om ni har rådgivare eller partners som stöttar er, kan det också nämnas.
+Finansiering och budget: Almi granskar företagets budget och finansieringsplan noga. De vill se att ni har kontroll på siffrorna och att budgeten är realistisk. Inkludera en plan för hur lånet eller investeringen ska användas och hur ni tänker finansiera verksamheten framöver. För lån innebär det att Almi bedömer företagets återbetalningsförmåga över tid – affärsplanen och budgeten bör visa när ni väntas gå med vinst eller åtminstone generera kassaflöde. För riskkapital är fokus mer på tillväxt – visa hur investeringen ska accelerera utvecklingen (t.ex. produktutveckling, rekrytering, marknadsföring) och när nästa finansieringsrunda eller break-even kan ske. Notera att Almi oftast inte finansierar 100% av ett projekt; egen insats eller medfinansiering är vanligt. Detta bör framgå i finansieringsplanen (t.ex. att grundarna skjutit till kapital, att banklån eller andra investerare står för en del, etc.).
+Hållbarhet och samhällsnytta: Även om inte alla Almi-finansierade projekt är inriktade på miljö eller samhälle, har Almi en uttalad målsättning att främja hållbar tillväxt
+almi.se
+almi.se
+. Man förväntar sig därför att företag åtminstone reflekterar över hållbarhetsaspekter. I affärsplanen finns som nämnt särskilda avsnitt för hållbart företagande och cirkularitet
+almi.se
+ där ni bör beskriva om och hur ert företag tar miljömässigt och socialt ansvar. Om er innovation direkt bidrar till samhällsnytta – t.ex. en miljöteknik som minskar klimatpåverkan eller en tjänst med positiva sociala effekter – betona detta tydligt. Almi Invest har t.o.m. en särskild GreenTech-fond för klimatsmarta bolag, där man explicit vill se hur lösningen minskar CO2-utsläpp eller främjar en hållbar miljö
+almi.se
+, vilket indikerar hur viktigt området är. Sammanfattningsvis: adressera hållbarhet och samhällsnytta i ansökan, särskilt om det är en framträdande del av er affärsidé.
+Tips: Efter att ni skickat in en låneansökan till Almi kommer en rådgivare att kontakta er för ett personligt möte
+almi.se
+. Var därför beredd att presentera er affär muntligt och svara på följdfrågor. Det kan vara klokt att ha ett pitchdeck eller presentation även för lånet (även om det inte krävdes vid inskickandet), eftersom mötet ofta liknar en investerarpresentation där ni behöver övertyga om idé och planer. Almis återkoppling kan också inkludera råd eller krav på kompletteringar, så se ansökan som ett underlag för dialog.
+Vinnova – Ansökan om innovationsfinansiering
+Vinnova är Sveriges innovationsmyndighet och finansierar projekt baserat på utlysningar (calls) med specifika syften – exempelvis Innovativa Startups, Forska&Väx, strategiska innovationsprogram m.m. Ansökan till Vinnova skiljer sig något från Almis genom att den är mer formaliserad kring själva projektet som ska genomföras. Varje utlysning har en detaljerad utlysningstext som beskriver vad som ska bifogas och vilka kriterier som gäller, så första steget är alltid att läsa den noggrant
+vinnova.se
+. Nedan är generella riktlinjer för Vinnova-ansökningar och vad de brukar innehålla.
+Obligatoriska delar och dokument (Vinnova)
+Online ansökningsformulär: Vinnovas ansökningar görs via deras digitala e-tjänst. Man loggar in och fyller i ett webbaserat formulär steg för steg
+vinnova.se
+. Formuläret inkluderar frågor om projektets grundinformation, projektparter (medverkande organisationer/personer) samt budgeten
+vinnova.se
+. Exempel på information som fylls i direkt i systemet är projekttitel, projektsammanfattning på svenska och engelska, projektets mål, start- och slutdatum, ev. uppgifter om genusperspektiv, m.m
+vinnova.se
+. Det är viktigt att noggrant fylla i alla fält enligt anvisningarna – systemet guidar genom de sektioner som krävs.
+Projektbeskrivning (bilaga): Nästan alla Vinnova-utlysningar kräver en skriftlig projektbeskrivning som bilaga. Denna skrivs utanför systemet (ofta i Word) enligt en mall som Vinnova tillhandahåller för respektive utlysning
+vinnova.se
+vinnova.se
+. Mallen anger vilka rubriker som ska finnas med i projektbeskrivningen och kan ha fasta frågor att besvara. Vanligen omfattar projektbeskrivningen cirka 5–10 sidor (maxgräns anges i utlysningen) där ni utförligt beskriver vad ni ska göra, hur, varför och med vilka resurser. Exakt struktur varierar, men typiskt ingår delar som bakgrund/problem, mål, metod/aktiviteter, förväntade resultat, nytta/impact, genomförandeplan och teamets roller. Det är obligatoriskt att använda Vinnovas mallar när de finns – det säkerställer att ni tar upp rätt punkter
+vinnova.se
+. Ladda alltså ner aktuell projektbeskrivningsmall från utlysningens webbsida, och skriv er text utifrån dess rubriker.
+CV för nyckelpersoner: Ofta efterfrågas också kortfattade CV eller meritförteckningar för projektets nyckelpersoner (projektledare och eventuell annan nyckelkompetens). Vinnova kan tillhandahålla en CV-mall som ska fyllas i som bilaga
+vinnova.se
+. Där brukar man ange personernas utbildning, erfarenhet och roll i projektet, koncentrerat till kanske en halv sida per person.
+Budgetspecifikation: Utöver att fylla i budgetposter i själva formuläret kan vissa utlysningar kräva en detaljerad budgetbilaga (t.ex. en mall i Excel eller fördjupad kostnadsspecifikation). Detta framgår i så fall av utlysningstexten. I de flesta fall räcker dock formulärets budgetdel där man anger kostnader per kategori (personal, resor, tjänster osv.) och hur mycket bidrag som söks. Vinnova har tydliga regler för stödberättigande kostnader, så följ anvisningarna noga.
+Övriga bilagor: Beroende på utlysning kan ytterligare bilagor krävas. Exempel: Intyg/blankett om de minimis-stöd (om ert företag fått visst offentligt stöd tidigare, relevant i vissa företagsutlysningar)
+vinnova.se
+vinnova.se
+, Letter of Intent från samarbetspartners (i samverkansprojekt), eller Etik-/säkerhetsformulär (vid forskningsprojekt). Utlysningstexten specificerar exakt vad som ska bifogas. En tumregel är att enbart skicka in de bilagor som efterfrågas – Vinnova vill inte ha extramaterial utöver det begärda
+vinnova.se
+. På utlysningens webbsida finns en sektion "Mallar och bilagor för ansökan" där alla nödvändiga mallar/blanketter kan laddas ner
+vinnova.se
+.
+Format: Alla texter bör hålla sig inom angivna sid- eller teckengränser och använda eventuella formatkrav (t.ex. teckenstorlek, marginaler) som Vinnova specificerar i mallen. Projektbeskrivningen skrivs vanligtvis på svenska (om inte utlysningen kräver engelska). Tänk på att skriva kortfattat men innehållsrikt – använd gärna punkter och tydliga rubriker även inne i projektbeskrivningen för att svara strukturerat på Vinnovas frågor. Vinnova påpekar att bara att fylla i alla mallar kan ta flera dagar för sökanden, eftersom det kräver analys och planering
+vinnova.se
+. Börja alltså förberedelserna i god tid och lämna inte in i sista stund. Systemet tillåter att man sparar och justerar ansökan löpande fram till deadline
+vinnova.se
+.
+Struktur på Vinnovas ansökan
+En Vinnova-ansökan är i praktiken uppdelad i ett antal sektioner, bland annat:
+Formulärets delar: I e-tjänsten fyller man vanligen i Projektinformation (grundläggande fakta om projektet). Här ingår t.ex. projektsammanfattning på både svenska och engelska, projektets mål, projektets tidsram (start- och slutdatum)
+vinnova.se
+, samt vissa övergripande frågor. I många utlysningar ställs en fråga om jämställdhet eller genusperspektiv i projektet (exempel: ”Finns det köns- eller genusperspektiv i projektet?” – här ska man ange om och hur projektet beaktar olika köns behov eller om projektgruppen är jämställd)
+vinnova.se
+. Formuläret kommer också be er fylla i projektdeltagare: oftast listas alla parter (organisationer) och en kontaktperson per part, samt att man utser en koordinator (den huvudansvariga organisationen) och projektledare
+vinnova.se
+. Slutligen fylls budget i direkt i systemet, fördelat per kostnadsslag och år. Systemet genererar automatiskt totaler och kontrollerar att bidragsandelar följer reglerna.
+Projektbeskrivningens struktur: Mallen för projektbeskrivning är knuten till utlysningens bedömningskriterier (se nästa avsnitt). Det betyder att rubrikerna i projektbeskrivningen ofta motsvarar kriterier som Potential, Genomförande/Genomförbarhet och Aktörer/Team. Ni bör därför strukturera texten så att den tydligt adresserar varje kriterium. Till exempel kan strukturen innefatta: Bakgrund/problem och mål (vad vill ni uppnå och vilket behov/problem löser ni), Projektets upplägg (hur ni ska gå till väga, aktiviteter, metod, tidsplan, milstolpar), Innovation och nyhetsvärde (vad som är nytt eller bättre jämfört med state-of-the-art – detta kan ingå i bakgrund), Marknad eller samhällsbehov (vem gagnas av lösningen, potentiell marknad eller användarbas, och storleken på denna), Effektmål/nytta (vilken nytta eller vilket resultat projektet förväntas leda till – t.ex. kommersiell potential eller samhällseffekt, gärna kopplat till utlysningens syfte), Konsortium/Team (presentation av projektmedlemmarna, roller, erfarenhet), Genomförbarhet (resurser och riskhantering – varför är planen trovärdig och realistisk att genomföra inom tids- och budgetram) samt Budget och finansiering (sammanfattning hur pengarna kommer användas och eventuell medfinansiering). Var noga med att följa mallen; använda dess rubriker i samma ordning och besvara alla frågor som ställs under varje avsnitt. Detta underlättar både för er (så inget missas) och för Vinnovas granskare som lättare hittar informationen.
+Språk och ton: Skriv tydligt och fokuserat på hur ert projekt uppfyller utlysningens mål. Undvik internt jargong; anta att åtminstone en av granskarna inte är expert exakt på ert område, så förklara koncept som kan vara nya. Samtidigt, var konkret – kvantifiera mål och resultat om möjligt (t.ex. ”Målet är att prototypen ska öka prestandan med 50%” eller ”nå X antal användare efter 1 år”). Håll en saklig och övertygande ton. Ni konkurrerar oftast med många andra ansökningar, så lyft fram det som gör just ert projekt lovande och unikt.
+Vad Vinnova efterfrågar (innehåll och bedömningskriterier)
+Vinnova beviljar finansiering i konkurrens mellan ansökningar, utifrån fasta bedömningskriterier för varje utlysning
+vinnova.se
+vinnova.se
+. Det är därför strategiskt att strukturera sin ansökan så att den tydligt besvarar kriterierna. Även om formuleringar kan variera per program, brukar kriterierna delas in i kategorier som täcker följande huvudområden
+vinnova.se
+vinnova.se
+vinnova.se
+:
+Potential (Innovationshöjd, nytta och marknadspotential): Vinnova vill veta vad det nya och innovativa är i ert projekt och vilken potential det har. Ansökan ska klart beskriva problemet/behovet i samhället eller på marknaden som projektet adresserar, och förklara på vilket sätt er lösning löser detta bättre än existerande alternativ
+vinnova.se
+. Innovationshöjd innebär att idén inte bara är en marginell förbättring – förklara det unika med er teknik eller koncept. Vidare bedöms nyttan och tillväxtpotentialen: Hur stora effekter kan projektet ge om det lyckas? Detta kan inkludera kommersiell potential (marknadens storlek, kundernas betalningsvilja, internationell skalbarhet) såväl som samhällsnytta (t.ex. miljövinster, bättre hälsa, nya jobb). I ett program som Innovativa Startups betonas t.ex. om lösningen kan skapa betydande nytta och hållbar tillväxt i Sverige samt har potential globalt
+vinnova.se
+. Om utlysningen har ett särskilt tema (t.ex. klimat, digitalisering, life science) måste ni tydligt koppla projektets mål till det området. Sammanfattningsvis: lyft fram varför ert projekt är viktigt, vilken skillnad det kan göra och hur det kan växa.
+Genomförande och genomförbarhet: Här bedöms hur väl planerat och realistiskt projektet är. En stark ansökan ger förtroende för att ni kan genomföra det ni föreslår. Ni ska presentera en konkret plan: vilka aktiviteter som ska utföras, i vilken ordning, och vilka resurser som krävs. Tidsplanen och milstolparna bör vara rimliga. Budgeten måste hänga ihop med planen – kostnaderna ska vara relevanta och motiverade av de aktiviteter ni beskriver
+vinnova.se
+. Vinnova utvärderar om budget och plan är relevanta och realistiska i förhållande till projektmålen
+vinnova.se
+. Det är viktigt att även visa att ni har tänkt på risker och hur ni ska hantera dem (t.ex. alternativa vägar om något försenas eller inte fungerar). En annan aspekt är fortsättningen efter projektet: Har ni en trovärdig plan för kommersialisering eller fortsatt utveckling efter att Vinnovas finansiering är slut? Vinnova vill se att investeringen kan leda vidare till verklig nytta, inte stanna vid ett avslutat projekt
+vinnova.se
+. Detta inkluderar hur ni planerar att finansiera verksamheten efter projektperioden – t.ex. via intäkter, investeringar eller annan finansiering. Slutligen tas behovet av Vinnovas finansiering i beaktande: ni bör motivera varför ni söker bidrag och att projektet inte skulle kunna genomföras (lika snabbt eller alls) utan detta stöd
+vinnova.se
+.
+Team och aktörer: Vinnova granskar vilka som ska utföra projektet och om de har kompetensen som krävs. Beskriv tydligt projektgruppen: vilka huvudpersoner/organisationer som deltar och vilka roller de har. Lyft fram relevant erfarenhet och kunskap hos varje part – t.ex. tidigare projekt, branschkännedom eller teknisk expertis – som visar att ni tillsammans förmår leverera resultat
+vinnova.se
+. För företagsinriktade program är det viktigt att grundarna/ledningens engagemang framgår (t.ex. att de arbetar aktivt i projektet och driver bolaget framåt)
+vinnova.se
+. Om ni är flera samarbetsparter, poängtera hur ni kompletterar varandra och varför just denna konstellation är optimal. Vinnova uppskattar även om teamet har tillgång till relevanta nätverk eller extern expertis (t.ex. mentorer, industriella partners, forskare) som stärker projektets chanser
+vinnova.se
+. En särskild aspekt Vinnova ofta väger in är jämställdhet i projektgruppen – man vill se att makt och inflytande fördelas jämställt mellan kvinnor och män i projektet
+vinnova.se
+. Om ert team är blandat, nämn det och eventuella initiativ för att öka jämställdhet; om teamet är ensidigt kan ni åtminstone visa medvetenhet och kanske planer att förbättra detta.
+Notera att Vinnova också gör en formell kontroll av organisationens status (för företagsstöd). Till exempel kollas att ni inte är i ekonomiska svårigheter, har obetalda skatteskulder eller liknande
+vinnova.se
+. Aktiebolag får inte ha förbrukat över halva aktiekapitalet vid ansökningstillfället
+vinnova.se
+. Dessa är grundkrav – uppfylls de inte kan ansökan falla bort oavsett idéns kvalitet. Se därför till att ha ordning på företagets registrering (F-skatt, moms etc.) och ekonomi innan ni ansöker. Sammanfattningsvis: En framgångsrik Vinnova-ansökan är tydligt strukturerad utifrån kriterierna och innehåller konkreta, välunderbyggda svar. Den visar att projektet både är innovativt och genomförbart, att teamet är kompetent och att det finns en stor potential/nytta med resultatet om projektet lyckas. All information bör stödja dessa huvudbudskap. Det kan vara bra att låta någon utomstående läsa igenom ansökan mot kriterierna – har ni förklarat hur projektet uppfyller dem? Om inte, justera innan inlämning. Officiella guider och stöd: Vinnova har en utförlig steg-för-steg-guide på sin hemsida om hur man fyller i ansökan i e-tjänsten
+vinnova.se
+vinnova.se
+. På varje utlysningswebbsida finns dessutom all specifik information, inklusive mallar/blanketter
+vinnova.se
+ och kontaktuppgifter ifall ni har frågor. Det kan även vara värdefullt att läsa utlysningens FAQ (om sådan finns) eller att kontakta Vinnovas handläggare för klargöranden i god tid före deadline. Vinnova poängterar att det är viktigt att börja ansökan i god tid och planera arbetet, eftersom insamling av information och samordning med eventuella partner tar tid
+vinnova.se
+. Genom att följa de officiella anvisningarna och tydligt adressera allt som efterfrågas ökar ni chansen att er startup får det stöd ni söker.

@@ -1,0 +1,11 @@
+streamlit run ide.py --server.port=8502
+streamlit run app.py
+
+
+---
+
+DÖDA STEAM:
+
+Stop-Process -Id (Get-NetTCPConnection -LocalPort 8501).OwningProcess -Force
+
+-----

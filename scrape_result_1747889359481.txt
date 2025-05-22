@@ -1,0 +1,21 @@
+URL: http://www.1753skincare.com
+
+Scraped data:
+
+{
+  "title": "1753 SKINCARE || CBD & CBG + medicinska svampextrakt",
+  "description": "Upplev en helt ny nivå av hudvård med vår banbrytande kombination av CBD, CBG och medicinska svampextrakt – chaga, reishi, lion's mane och cordyceps. Ge din hud ökad fasthet, lyster och glow. Upptäck kort- och långsiktiga fördelar för en frisk och strålande hy 😍!",
+  "ogTitle": "1753 SKINCARE || CBD & CBG + medicinska svampextrakt",
+  "ogDescription": "Upplev en helt ny nivå av hudvård med vår banbrytande kombination av CBD, CBG och medicinska svampextrakt – chaga, reishi, lion's mane och cordyceps. Ge din hud ökad fasthet, lyster och glow. Upptäck kort- och långsiktiga fördelar för en frisk och strålande hy 😍!",
+  "ogType": "website",
+  "ogImage": "http://www.1753skincare.com/cdn/shop/files/Beskrivning_e49f0e35-d9d7-4742-95f8-ebf200f6454f.jpg?v=1708432247",
+  "schema": [],
+  "visibleText": "100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\n100% Nöjd-Kund Garanti\nHEM\nHUDTILLSTÅND\nOM OSS\nPRODUKTER\nBLOGG\nKONTAKTA OSS\nSVENSKA\nSVENSKA\nLet customers speak for us\nfrom 778 reviews\nLÄS MER\n\n1753 SKINCARE\nSödra Skjutbanevägen 10\n439 55, Åsa\nSverige\n\nTelefon - 0732 - 30 55 21\nE-post - hej@1753skincare.com\n\nOM OSS\n\n2025 © Floranie International AB\n\nVi vill förbättra din självkänsla – på både kort- och på lång sikt.\n\nMENU\nOm oss\nVåra ingredienser\nQ&A\nProdukter\nAffiliate program\nKontakta oss\nHudtillstånd\nUndersökning\nBIOHACK\nÅterbetalningspolicy\nIntegritetspolicy\nAnvändarvillkor\nKontaktinformation\nCookieinställningar\nSNABBLÄNKAR\nSök\nQUIZ\nAnvändarvillkor\nIntegritetspolicy\nÅterbetalningspolicy\nNöjd-kund-garanti\nSleep\nsvenska\nSVENSKA\nPOWERED BY SHOPIFY\nChatta här 💬\nsvenska"
+}
+
+
+OpenAI-resultat:
+
+{
+  "raw": "```json\n{\n  \"company_name\": \"1753 SKINCARE\",\n  \"industry\": \"Hudvård\",\n  \"area\": \"Åsa, Sverige\",\n  \"sku_count\": \"Ej specificerat\",\n  \"business_idea\": \"Erbjuda hudvårdsprodukter med en unik kombination av CBD, CBG och medicinska svampextrakt för att förbättra hudens fasthet, lyster och glow.\",\n  \"customer_segments\": \"Personer intresserade av avancerad hudvård och naturliga ingredienser.\",\n  \"team\": \"Ej specificerat\",\n  \"revenue_model\": \"Försäljning av hudvårdsprodukter via e-handel.\",\n  \"market_size\": \"Ej specificerat\",\n  \"competition\": \"Ej specificerat\",\n  \"funding_details\": \"Ej specificerat\",\n  \"contact_info\": {\n    \"address\": \"Södra Skjutbanevägen 10, 439 55, Åsa, Sverige\",\n    \"phone\": \"0732 - 30 55 21\",\n    \"email\": \"hej@1753skincare.com\"\n  },\n  \"news_articles\": \"Ej specificerat\",\n  \"testimonials\": \"778 kundrecensioner tillgängliga\",\n  \"övrigt\": {\n    \"garanti\": \"100% Nöjd-Kund Garanti\",\n    \"plattform\": \"Powered by Shopify\",\n    \"språk\": \"Svenska\"\n  }\n}\n```"
+}

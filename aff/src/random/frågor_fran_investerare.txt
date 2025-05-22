@@ -1,0 +1,128 @@
+Sammanfattning – vilka frågor återkommer?
+Affärsidén + vision: Vad gör ni, för vem och varför är det unikt? 
+almi.se
+almi.se
+
+Marknad & kunder: Storlek, segment, problem och betalningsvilja. 
+almi.se
+svb.com
+
+Lösning & innovation: Teknik, IP-skydd, TRL/nuläge och hur den löser kundens problem bättre än alternativen. 
+vinnova.se
+vinnova.se
+
+Team & styrning: Kompetenser, roller, incitament, styrelse, jämställdhet. 
+almi.se
+vinnova.se
+
+Affärsmodell & intäkter: Hur tjänar ni pengar, viktigaste nyckeltal och prislogik. 
+almi.se
+svb.com
+
+Traction & validering: Proof-of-concept, pilotkunder, KPI:er. 
+almi.se
+
+Budget & finansieringsbehov: Kapitalbehov, burn-rate, användning av medlen. 
+vinnova.se
+
+Risker & mitigering: Tekniska, marknad, regulatoriska, ESG-risker. 
+K&L Gates Files
+Cooley GO
+
+Effekter & hållbarhet: Agenda 2030-mål, klimat-/samhällsnytta, cirkularitet. 
+vinnova.se
+almi.se
+
+Exit/återbetalning: Återbetalningsförmåga (Almi-lån) eller exit-scenario (riskkapital). 
+almi.se
+almi.se
+
+1. Frågebank för Almi (lån och riskkapital)
+Källa: Almis affärsplan-mall (15 frågor) och pitch-deck-guide. 
+almi.se
+almi.se
+
+Affärsidé & historik
+
+Vision & långsiktiga mål (SMART)
+
+Kundsegment & problem
+
+Marknad (geografi/bransch) & konkurrens
+
+Produkten/tjänsten + IP
+
+Sälj-, betal- & leveransflöden
+
+Marknadsbearbetning/go-to-market
+
+Affärsmodell (intäktsströmmar)
+
+Nyckelresurser & partners
+
+Hållbart företagande (ESG)
+
+Cirkularitet
+
+Team & ägarstruktur
+
+Styrkor/svagheter (SWOT)
+
+Kapitalbehov och kapitalanvändning
+
+Exit/återbetalningsplan
+
+2. Frågebank för Vinnova (bidrag)
+Källor: Vinnovas steg-för-steg-guide och mallar (kriterier: potential, genomförande, aktörer). 
+vinnova.se
+vinnova.se
+vinnova.se
+
+Syfte & mål – hur projektet adresserar utlysningens syfte
+
+Potential – nyhetsgrad, marknads- eller samhällseffekt, skalbarhet
+
+Genomförandeplan – arbetspaket, tidplan, milstolpar, riskhantering
+
+Aktörskonstellation – partners, roller, fördelning av kostnader/intäkter
+
+Budget & medfinansiering – per part, stödintensitet, sekretessmarkeringar
+
+Agenda 2030 / jämställdhetsanalys – relevanta globala mål, motivering
+
+Spridning & nyttiggörande – hur resultaten kommer ut i samhället
+
+IP-strategi & open innovation-principer
+
+Etiska/regulatoriska aspekter
+
+Mätbara effekter efter projektet (KPI:er)
+
+3. Frågebank för privata investerare / VC & änglar
+Källor: Silicon Valley Bank, Cooley GO, K&L Gates, allmän DD-checklistor. 
+svb.com
+Cooley GO
+K&L Gates Files
+
+Problem & värdeerbjudande – “Varför nu, varför ni?”
+
+Marknadens storlek (TAM/SAM/SOM)
+
+Konkurrens & moat – differentiatorer, inlåsning, regleringar
+
+Affärsmodell & prissättning
+
+Traktion & tillväxt-KPI:er – MRR, churn, CAC/LTV …
+
+Team & ägarkap – erfarenhet, cap-table, incitament, styrelse
+
+Finansiell historik & prognos – P&L, balansräkning, kassaflöde
+
+IP & juridik – avtal, patent, varumärken, pågående tvister
+
+Kunder & leverantörer – topp-10 listor, kontrakt, referenser
+
+Regelefterlevnad & ESG-risk – GDPR, miljö, anti-korruption
+
+Funding ask & runway – belopp, användning, milstolpar för nästa runda
+
