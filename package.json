@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "npx puppeteer browsers install chrome"
+    "postinstall": "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npx puppeteer browsers install chrome@stable"
   },
   "dependencies": {
     "next": "15.3.2",
@@ -21,6 +21,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
+    "@types/puppeteer": "^7.0.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",

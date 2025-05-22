@@ -44,7 +44,7 @@ export async function scrapeAndAnalyze(url: string) {
         '--disable-features=site-per-process'
       ],
       headless: true,
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/opt/render/.cache/puppeteer/chrome/stable/chrome',
       ignoreHTTPSErrors: true
     });
     
@@ -115,7 +115,7 @@ export async function scrapeAndAnalyze(url: string) {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'gpt-4-1106-preview',
         messages: [
           { role: 'system', content: 'Du är en expert på affärsplaner.' },
           { role: 'user', content: prompt }
