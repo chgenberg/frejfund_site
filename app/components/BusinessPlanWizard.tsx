@@ -563,7 +563,7 @@ interface FundingDetails {
 type BusinessPlanValue = string | string[] | Record<string, string>;
 
 interface BusinessPlanSection {
-  [key: string]: BusinessPlanValue;
+  [key: string]: string;
 }
 
 interface BusinessPlanAnswers {
@@ -957,7 +957,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const handleLinkedinProfilesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const profiles = e.target.value.split('\n').filter(profile => profile.trim() !== '');
     setLinkedinProfiles(profiles);
-    // @ts-ignore
     setAnswers(a => ({
       ...a,
       team: {
@@ -1031,8 +1030,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     }
   };
 
-  const handleAnswerChange = (section: keyof BusinessPlanAnswers, field: string, value: BusinessPlanValue) => {
-    // @ts-ignore
+  const handleAnswerChange = (section: keyof BusinessPlanAnswers, field: string, value: string) => {
     setAnswers(prev => {
       const sectionData = prev[section];
       if (typeof sectionData === 'string') {
@@ -1052,38 +1050,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
       }
       return prev;
     });
-  };
-
-  const handleSubmit = async () => {
-    try {
-      setIsAnalyzingPlan(true);
-      setAnalyzeError(null);
-
-      const response = await fetch('/api/analyze-plan', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          answers,
-          company,
-          email,
-          bransch: customBransch || bransch,
-          omrade: customOmrade || omrade
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to analyze business plan');
-      }
-
-      const data = await response.json();
-      setResult(data);
-    } catch (error) {
-      setAnalyzeError(error instanceof Error ? error.message : 'An error occurred');
-    } finally {
-      setIsAnalyzingPlan(false);
-    }
   };
 
   return (
@@ -1212,12 +1178,14 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             <h2 className="text-xl font-bold mb-2">{current.question}</h2>
             <p className="mb-4 text-sm text-[#16475b]">{current.help}</p>
             {/* Visa 3 sub-questions per sida */}
-            {current.subQuestions.slice(subStep * SUBS_PER_PAGE, (subStep + 1) * SUBS_PER_PAGE).map((sub: any) => (
+            {current.subQuestions.slice(subStep * SUBS_PER_PAGE, (subStep + 1) * SUBS_PER_PAGE).map((sub: BranschQuestion) => (
               <div key={sub.id} className="mb-4">
                 <label className="block font-semibold mb-1">{sub.label}</label>
                 <textarea
                   className="w-full min-h-[60px] rounded-lg border border-[#16475b] bg-white/80 px-4 py-2 text-[#16475b] focus:outline-none focus:border-[#16475b]"
-                  value={answers[current.id]?.[sub.id] || ""}
+                  value={typeof answers[current.id] === 'object' && answers[current.id] !== null 
+                    ? (answers[current.id] as BusinessPlanSection)[sub.id] || ""
+                    : ""}
                   onChange={e => handleAnswerChange(current.id as keyof BusinessPlanAnswers, sub.id, e.target.value)}
                   placeholder="Skriv ditt svar här..."
                 />
@@ -1387,7 +1355,11 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         {current.id === 'market_potential' && (
           <div className="mb-4">
             {answers.market_potential?.market_source && (
-              <div className="text-xs mt-2 text-[#16475b]">{answers.market_potential.market_source}</div>
+              <div className="text-xs mt-2 text-[#16475b]">
+                {typeof answers.market_potential.market_source === 'string' 
+                  ? answers.market_potential.market_source 
+                  : ''}
+              </div>
             )}
           </div>
         )}
