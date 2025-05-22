@@ -785,7 +785,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                     const data = await res.json();
                     if (data && typeof data === 'object') {
                       // Mappa den skrapade datan till rätt fält
-                      const mappedData = {
+                      const mappedData: BusinessPlanAnswers = {
                         company_name: data.company_name,
                         business_idea: {
                           what_you_do: data.business_idea,
@@ -801,23 +801,25 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                           problem: data.övrigt?.problem || '',
                           solution: data.business_idea
                         },
+                        market_analysis: {
+                          market_size: data.market_size || '',
+                          competitors: data.competition || '',
+                          market_trends: data.övrigt?.market_trends || ''
+                        },
+                        business_model: {
+                          revenue_model: data.revenue_model || '',
+                          pricing_strategy: data.övrigt?.pricing_strategy || '',
+                          sales_channels: data.övrigt?.sales_channels || ''
+                        },
                         team: {
-                          founders: data.team,
-                          key_team: data.övrigt?.key_team || ''
+                          key_people: data.team || '',
+                          roles: data.övrigt?.roles || '',
+                          expertise: data.övrigt?.expertise || ''
                         },
-                        revenue_model: {
-                          model: data.revenue_model,
-                          other_revenue: data.övrigt?.other_revenue || ''
-                        },
-                        market_size: {
-                          market_value: data.market_size,
-                          growth: data.övrigt?.market_growth || ''
-                        },
-                        competition: data.competition || '',
                         funding_details: {
-                          amount: data.övrigt?.funding_amount || '',
-                          usage: data.övrigt?.funding_usage || '',
-                          period: data.övrigt?.funding_period || ''
+                          funding_needed: data.övrigt?.funding_amount || '',
+                          use_of_funds: data.övrigt?.funding_usage || '',
+                          exit_strategy: data.övrigt?.funding_period || ''
                         }
                       };
                       
