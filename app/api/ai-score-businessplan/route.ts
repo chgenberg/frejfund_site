@@ -27,11 +27,12 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: 'gpt-4-1106-preview',
         messages: [
-          { role: 'system', content: 'Du är en erfaren investerare och pedagogisk affärscoach.' },
+          { role: 'system', content: 'Du är en erfaren investerare och pedagogisk affärscoach. Svara ENDAST med JSON-objektet som efterfrågas, utan någon annan text eller förklaringar.' },
           { role: 'user', content: prompt }
         ],
         max_tokens: 300,
-        temperature: 0.7
+        temperature: 0.7,
+        response_format: { type: "json_object" }
       })
     });
 

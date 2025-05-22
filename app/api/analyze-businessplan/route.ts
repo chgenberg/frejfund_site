@@ -68,11 +68,12 @@ summary, strengths, weaknesses, improvements, investment_potential, recommendati
       body: JSON.stringify({
         model: 'gpt-4-1106-preview',
         messages: [
-          { role: 'system', content: 'Du är en expert på affärsplaner och investeringsanalys.' },
+          { role: 'system', content: 'Du är en expert på affärsplaner och investeringsanalys. Svara ENDAST med JSON-objektet som efterfrågas, utan någon annan text eller förklaringar.' },
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,
-        max_tokens: 2000
+        max_tokens: 2000,
+        response_format: { type: "json_object" }
       })
     });
 
