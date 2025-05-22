@@ -137,7 +137,6 @@ export default function TestResultPage() {
       <div className="max-w-4xl mx-auto">
         <BusinessPlanResult 
           score={testData.score}
-          details={testData.details}
           answers={testData.answers}
           subscriptionLevel={subscriptionLevel}
         />
