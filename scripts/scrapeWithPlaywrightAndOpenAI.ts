@@ -71,12 +71,39 @@ export async function scrapeAndAnalyze(url: string) {
     };
 
     console.log('Skickar data till OpenAI...');
-    const prompt = `Du är en expert på att analysera företagssajter. Här är data från en hemsida:\nTitel: ${data.title}\nMeta description: ${data.description}\nOpenGraph: ${JSON.stringify({
+    const prompt = `Du är en expert på att analysera företagssajter. Analysera följande data från en hemsida och returnera SVARET ENDAST SOM ETT JSON-OBJEKT utan någon annan text eller förklaringar:
+
+Titel: ${data.title}
+Meta description: ${data.description}
+OpenGraph: ${JSON.stringify({
       ogTitle: data.ogTitle,
       ogDescription: data.ogDescription,
       ogType: data.ogType,
       ogImage: data.ogImage
-    }, null, 2)}\nSchema.org: ${data.schema.join('\n')}\nText: ${data.visibleText.slice(0, 4000)}\n\nExtrahera och sammanfatta:\n- Företagsnamn\n- Bransch\n- Område\n- Antal SKUs idag\n- Affärsidé\n- Målgrupp/kundsegment\n- Team/grundare\n- Erbjudande/produkt/tjänst\n- Kontaktinfo\n- Nyhetsartiklar eller pressmeddelanden\n- Kundrecensioner eller testimonials\n- Annat relevant för en affärsplan\nReturnera som ett JSON-objekt med nycklar: company_name, industry, area, sku_count, business_idea, customer_segments, team, revenue_model, market_size, competition, funding_details, contact_info, news_articles, testimonials, och övrigt. Svara på svenska.`;
+    }, null, 2)}
+Schema.org: ${data.schema.join('\n')}
+Text: ${data.visibleText.slice(0, 4000)}
+
+Extrahera och sammanfatta följande information i JSON-format:
+{
+  "company_name": "företagsnamn",
+  "industry": "bransch",
+  "area": "område",
+  "sku_count": "antal SKUs idag",
+  "business_idea": "affärsidé",
+  "customer_segments": "målgrupp/kundsegment",
+  "team": "team/grundare",
+  "revenue_model": "affärsmodell/intäkter",
+  "market_size": "marknadsstorlek",
+  "competition": "konkurrens",
+  "funding_details": "finansiering",
+  "contact_info": "kontaktinfo",
+  "news_articles": "nyhetsartiklar eller pressmeddelanden",
+  "testimonials": "kundrecensioner eller testimonials",
+  "other": "annat relevant för en affärsplan"
+}
+
+Svara ENDAST med JSON-objektet ovan, utan någon annan text eller förklaringar.`;
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -87,11 +114,12 @@ export async function scrapeAndAnalyze(url: string) {
       body: JSON.stringify({
         model: 'gpt-4-1106-preview',
         messages: [
-          { role: 'system', content: 'Du är en expert på affärsplaner.' },
+          { role: 'system', content: 'Du är en expert på affärsplaner. Svara ENDAST med JSON-objektet som efterfrågas, utan någon annan text eller förklaringar.' },
           { role: 'user', content: prompt }
         ],
         max_tokens: 1000,
-        temperature: 0.2
+        temperature: 0.2,
+        response_format: { type: "json_object" }
       })
     });
 
