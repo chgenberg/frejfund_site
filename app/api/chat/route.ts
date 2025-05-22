@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No message provided' }, { status: 400 });
   }
 
-  const apiKey = '***REMOVED***Qcn0TpQ3ewkWHR-b3HScwXJAchrAZG3QrmwXRwwF2mL8MsVZcApZyn37sVNBE95uCIH5UyG1BbT3BlbkFJKUcYQM5uJtbU7Q7bQdK0qxJ-iJz5ywDN22tpgZ-xXEcIEb6U2LBEwQgQ2PsPpXP7jNZxvli_cA';
+  const apiKey = process.env.OPENAI_API_KEY;
 
   try {
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {

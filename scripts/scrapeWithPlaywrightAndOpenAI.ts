@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import fetch from 'node-fetch';
 import fs from 'fs';
 
-const OPENAI_API_KEY = '***REMOVED***Qcn0TpQ3ewkWHR-b3HScwXJAchrAZG3QrmwXRwwF2mL8MsVZcApZyn37sVNBE95uCIH5UyG1BbT3BlbkFJKUcYQM5uJtbU7Q7bQdK0qxJ-iJz5ywDN22tpgZ-xXEcIEb6U2LBEwQgQ2PsPpXP7jNZxvli_cA';
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 function validateAndFormatUrl(url: string): string {
   try {

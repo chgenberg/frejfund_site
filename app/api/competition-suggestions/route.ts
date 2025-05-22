@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   const { business_idea, bransch, omrade, customer_segments, answers } = await req.json();
 
   // Compose a detailed OpenAI prompt
-  const apiKey = '***REMOVED***Qcn0TpQ3ewkWHR-b3HScwXJAchrAZG3QrmwXRwwF2mL8MsVZcApZyn37sVNBE95uCIH5UyG1BbT3BlbkFJKUcYQM5uJtbU7Q7bQdK0qxJ-iJz5ywDN22tpgZ-xXEcIEb6U2LBEwQgQ2PsPpXP7jNZxvli_cA';
+  const apiKey = process.env.OPENAI_API_KEY;
   const prompt = `Du är en expert på marknadsanalys. Baserat på denna affärsidé, bransch, område och kundgrupp, lista 3–5 faktiska konkurrenter på svenska marknaden. Svara ENDAST med en JSON-array med företagsnamn, inga förklaringar eller text.\n\nAffärsidé: ${business_idea}\nBransch: ${bransch}\nOmråde: ${omrade}\nKundgrupp: ${customer_segments}\n`;
 
   let aiSuggestions: string[] = [];
