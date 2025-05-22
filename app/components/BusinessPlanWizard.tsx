@@ -560,8 +560,10 @@ interface FundingDetails {
   exit_strategy: string;
 }
 
+type BusinessPlanValue = string | string[] | Record<string, string>;
+
 interface BusinessPlanSection {
-  [key: string]: string | Record<string, string>;
+  [key: string]: BusinessPlanValue;
 }
 
 interface BusinessPlanAnswers {
@@ -682,27 +684,27 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
 
   // Fetch AI suggestions for certain questions (must be after 'current' is defined)
   useEffect(() => {
-    if (!current) return;
-    if (['customer_segments', 'problem_solution'].includes(current.id) && answers[current.id]?.length > 1) {
+    if (!current?.id) return;
+    const currentAnswers = answers[current.id];
+    if (['customer_segments', 'problem_solution'].includes(current.id) && currentAnswers && Array.isArray(currentAnswers) && currentAnswers.length > 1) {
       setIsFetchingSuggestions(true);
       fetch('/api/ai-suggest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          questionId: current.id,
-          questionText: current.question,
-          currentAnswer: answers[current.id],
-          context: answers
-        })
+        body: JSON.stringify({ section: current.id, answers: currentAnswers })
       })
         .then(res => res.json())
-        .then(data => setAiSuggestions(data.suggestions || []))
-        .catch(() => setAiSuggestions([]))
-        .finally(() => setIsFetchingSuggestions(false));
-    } else {
-      setAiSuggestions([]);
+        .then(data => {
+          setAiSuggestions(data.suggestions);
+        })
+        .catch(error => {
+          console.error('Error fetching suggestions:', error);
+        })
+        .finally(() => {
+          setIsFetchingSuggestions(false);
+        });
     }
-  }, [current, answers[current?.id]]);
+  }, [current, answers]);
 
   useEffect(() => {
     if (isScraping) {
@@ -1019,7 +1021,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     }
   };
 
-  const handleAnswerChange = (section: keyof BusinessPlanAnswers, field: string, value: string) => {
+  const handleAnswerChange = (section: keyof BusinessPlanAnswers, field: string, value: BusinessPlanValue) => {
     setAnswers(prev => {
       const sectionData = prev[section];
       if (typeof sectionData === 'string') {
@@ -1028,13 +1030,16 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
           [section]: value
         };
       }
-      return {
-        ...prev,
-        [section]: {
-          ...sectionData,
-          [field]: value
-        }
-      };
+      if (sectionData) {
+        return {
+          ...prev,
+          [section]: {
+            ...sectionData,
+            [field]: value
+          }
+        };
+      }
+      return prev;
     });
   };
 
