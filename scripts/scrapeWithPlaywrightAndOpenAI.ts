@@ -1,6 +1,5 @@
 import { chromium } from 'playwright';
 import fetch from 'node-fetch';
-import fs from 'fs';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -22,6 +21,10 @@ function validateAndFormatUrl(url: string): string {
 export async function scrapeAndAnalyze(url: string) {
   let browser;
   try {
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY is not configured');
+    }
+
     // Validera och formatera URL
     const formattedUrl = validateAndFormatUrl(url);
     console.log('Validerad URL:', formattedUrl);
@@ -107,6 +110,12 @@ export async function scrapeAndAnalyze(url: string) {
         temperature: 0.2
       })
     });
+
+    if (!openaiRes.ok) {
+      const errorData = await openaiRes.json();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+    }
     
     console.log('Får svar från OpenAI...');
     const openaiData = await openaiRes.json();
@@ -123,18 +132,6 @@ export async function scrapeAndAnalyze(url: string) {
         error: 'Kunde inte tolka analysen som JSON'
       };
     }
-
-    // Spara all information i en .txt-fil
-    const fileContent = [
-      `URL: ${formattedUrl}`,
-      `Scraped data:`,
-      JSON.stringify(data, null, 2),
-      `\nOpenAI-resultat:`,
-      JSON.stringify(result, null, 2)
-    ].join('\n\n');
-    const filePath = `./scrape_result_${Date.now()}.txt`;
-    fs.writeFileSync(filePath, fileContent);
-    console.log(`Resultat sparat i ${filePath}`);
 
     return result;
   } catch (e) {
