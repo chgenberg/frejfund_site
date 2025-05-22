@@ -1,7 +1,18 @@
-import puppeteer from 'puppeteer';
 import fetch from 'node-fetch';
+import * as cheerio from 'cheerio';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+interface ScrapedData {
+  title: string;
+  description: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogType: string;
+  ogImage: string;
+  schema: string[];
+  visibleText: string;
+}
 
 function validateAndFormatUrl(url: string): string {
   try {
@@ -19,7 +30,6 @@ function validateAndFormatUrl(url: string): string {
 }
 
 export async function scrapeAndAnalyze(url: string) {
-  let browser;
   try {
     if (!OPENAI_API_KEY) {
       throw new Error('OPENAI_API_KEY is not configured');
@@ -29,76 +39,36 @@ export async function scrapeAndAnalyze(url: string) {
     const formattedUrl = validateAndFormatUrl(url);
     console.log('Validerad URL:', formattedUrl);
 
-    console.log('Startar Puppeteer...');
-    browser = await puppeteer.launch({
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-extensions',
-        '--disable-software-rasterizer',
-        '--disable-features=site-per-process'
-      ],
-      headless: true,
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/opt/render/.cache/puppeteer/chrome/stable/chrome',
-      ignoreHTTPSErrors: true
+    console.log('Hämtar webbsida...');
+    const response = await fetch(formattedUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; FrejFundBot/1.0; +https://frejfund.se)',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'sv-SE,sv;q=0.9,en-US;q=0.8,en;q=0.7',
+      }
     });
-    
-    console.log('Öppnar ny sida...');
-    const page = await browser.newPage();
-    
-    console.log('Navigerar till:', formattedUrl);
-    try {
-      const response = await page.goto(formattedUrl, { 
-        waitUntil: 'domcontentloaded', 
-        timeout: 30000 
-      });
-      
-      if (!response) {
-        throw new Error('Inget svar från servern');
-      }
-      
-      if (!response.ok()) {
-        throw new Error(`HTTP ${response.status()}: ${response.statusText()}`);
-      }
-      
-      console.log('Sidan laddad, status:', response.status());
-    } catch (navigationError: any) {
-      console.error('Fel vid navigation:', navigationError);
-      throw new Error(`Kunde inte ladda sidan: ${navigationError.message || 'Okänt fel'}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText()}`);
     }
 
-    console.log('Extraherar data från sidan...');
-    const data = await page.evaluate(() => {
-      const getMeta = (name: string) => {
-        const el = document.querySelector(`meta[name='${name}']`) as HTMLMetaElement;
-        return el ? el.content : '';
-      };
-      const getOG = (property: string) => {
-        const el = document.querySelector(`meta[property='${property}']`) as HTMLMetaElement;
-        return el ? el.content : '';
-      };
-      const schema = Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map(s => s.textContent);
-      const visibleText = document.body.innerText;
-      return {
-        title: document.title,
-        description: getMeta('description'),
-        ogTitle: getOG('og:title'),
-        ogDescription: getOG('og:description'),
-        ogType: getOG('og:type'),
-        ogImage: getOG('og:image'),
-        schema,
-        visibleText
-      };
-    });
+    const html = await response.text();
+    const $ = cheerio.load(html);
 
-    console.log('Stänger webbläsaren...');
-    await browser.close();
-    browser = null;
+    console.log('Extraherar data från sidan...');
+    const data: ScrapedData = {
+      title: $('title').text().trim(),
+      description: $('meta[name="description"]').attr('content') || '',
+      ogTitle: $('meta[property="og:title"]').attr('content') || '',
+      ogDescription: $('meta[property="og:description"]').attr('content') || '',
+      ogType: $('meta[property="og:type"]').attr('content') || '',
+      ogImage: $('meta[property="og:image"]').attr('content') || '',
+      schema: $('script[type="application/ld+json"]')
+        .map((_, el) => $(el).html() || '')
+        .get()
+        .filter(Boolean),
+      visibleText: $('body').text().replace(/\s+/g, ' ').trim()
+    };
 
     console.log('Skickar data till OpenAI...');
     const prompt = `Du är en expert på att analysera företagssajter. Här är data från en hemsida:\nTitel: ${data.title}\nMeta description: ${data.description}\nOpenGraph: ${JSON.stringify({
@@ -106,7 +76,7 @@ export async function scrapeAndAnalyze(url: string) {
       ogDescription: data.ogDescription,
       ogType: data.ogType,
       ogImage: data.ogImage
-    }, null, 2)}\nSchema.org: ${data.schema.join('\\n')}\nText: ${data.visibleText.slice(0, 4000)}\n\nExtrahera och sammanfatta:\n- Företagsnamn\n- Bransch\n- Område\n- Antal SKUs idag\n- Affärsidé\n- Målgrupp/kundsegment\n- Team/grundare\n- Erbjudande/produkt/tjänst\n- Kontaktinfo\n- Nyhetsartiklar eller pressmeddelanden\n- Kundrecensioner eller testimonials\n- Annat relevant för en affärsplan\nReturnera som ett JSON-objekt med nycklar: company_name, industry, area, sku_count, business_idea, customer_segments, team, revenue_model, market_size, competition, funding_details, contact_info, news_articles, testimonials, och övrigt. Svara på svenska.`;
+    }, null, 2)}\nSchema.org: ${data.schema.join('\n')}\nText: ${data.visibleText.slice(0, 4000)}\n\nExtrahera och sammanfatta:\n- Företagsnamn\n- Bransch\n- Område\n- Antal SKUs idag\n- Affärsidé\n- Målgrupp/kundsegment\n- Team/grundare\n- Erbjudande/produkt/tjänst\n- Kontaktinfo\n- Nyhetsartiklar eller pressmeddelanden\n- Kundrecensioner eller testimonials\n- Annat relevant för en affärsplan\nReturnera som ett JSON-objekt med nycklar: company_name, industry, area, sku_count, business_idea, customer_segments, team, revenue_model, market_size, competition, funding_details, contact_info, news_articles, testimonials, och övrigt. Svara på svenska.`;
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -150,13 +120,6 @@ export async function scrapeAndAnalyze(url: string) {
     return result;
   } catch (e) {
     console.error('Fel i scrapeAndAnalyze:', e);
-    if (browser) {
-      try {
-        await browser.close();
-      } catch (closeError) {
-        console.error('Fel vid stängning av browser:', closeError);
-      }
-    }
     throw e;
   }
 } 
