@@ -1,10 +1,29 @@
 import React from 'react';
 
 interface ScoreProps {
-  answers: Record<string, unknown>;
+  answers: {
+    team?: {
+      founders?: string | string[];
+      key_team?: string[];
+    };
+    problem_solution?: {
+      problem?: string;
+      solution?: string;
+    };
+    business_idea?: {
+      why_unique?: string;
+    };
+    market_size?: {
+      market_value?: string;
+      growth?: string;
+    };
+    competition?: {
+      main_competitors?: string;
+    };
+  };
 }
 
-const calculateScore = (answers: Record<string, unknown>) => {
+const calculateScore = (answers: ScoreProps['answers']) => {
   // Baspoäng per kategori (0-25)
   const teamScore = calculateTeamScore(answers);
   const problemSolutionScore = calculateProblemSolutionScore(answers);
@@ -26,7 +45,7 @@ const calculateScore = (answers: Record<string, unknown>) => {
   };
 };
 
-const calculateTeamScore = (answers: Record<string, unknown>) => {
+const calculateTeamScore = (answers: ScoreProps['answers']) => {
   let score = 0;
   
   // Team experience and background
@@ -52,7 +71,7 @@ const calculateTeamScore = (answers: Record<string, unknown>) => {
   return Math.min(25, score);
 };
 
-const calculateProblemSolutionScore = (answers: Record<string, unknown>) => {
+const calculateProblemSolutionScore = (answers: ScoreProps['answers']) => {
   let score = 0;
 
   // Problem definition
@@ -78,7 +97,7 @@ const calculateProblemSolutionScore = (answers: Record<string, unknown>) => {
   return Math.min(25, score);
 };
 
-const calculateMarketScore = (answers: Record<string, unknown>) => {
+const calculateMarketScore = (answers: ScoreProps['answers']) => {
   let score = 0;
 
   // Market size
