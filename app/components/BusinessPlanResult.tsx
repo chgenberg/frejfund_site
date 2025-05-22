@@ -6,6 +6,7 @@ import 'react-circular-progressbar/dist/styles.css';
 interface ResultProps {
   score: number;
   answers: Record<string, unknown>;
+  feedback?: Record<string, string>;
   subscriptionLevel?: 'silver' | 'gold' | 'platinum';
 }
 
@@ -132,7 +133,7 @@ const getOr = (val: ReactNode, fallback: ReactNode): ReactNode => {
   return fallback;
 };
 
-export default function BusinessPlanResult({ score: _score, answers, subscriptionLevel = 'silver' }: ResultProps) {
+export default function BusinessPlanResult({ score: _score, answers, feedback = {}, subscriptionLevel = 'silver' }: ResultProps) {
   const safeAnswers = answers as Record<string, Record<string, string>>;
   const [aiScore, setAiScore] = useState<number | null>(null);
   const [motivation, setMotivation] = useState('');
@@ -149,7 +150,7 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
   const scoreComparison = getScoreComparison(_score);
   const marketData = getMarketSizeData(safeAnswers.market_size?.market_value || '0');
 
-  // --- AI feedback hooks ---
+  // Sektioner att visa feedback för
   const sectionKeys = [
     { key: 'business_idea', label: 'Affärsidé' },
     { key: 'market_analysis', label: 'Marknadsanalys' },
@@ -157,35 +158,6 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
     { key: 'team', label: 'Team' },
     { key: 'funding_details', label: 'Finansiering' }
   ];
-
-  const [sectionFeedback, setSectionFeedback] = useState<Record<string, string>>({});
-  const [sectionLoading, setSectionLoading] = useState<Record<string, boolean>>({});
-
-  useEffect(() => {
-    const fetchSectionFeedback = async (key: string, label: string) => {
-      const text = JSON.stringify(safeAnswers[key] || '');
-      if (!text || text === '""') return;
-      
-      setSectionLoading(f => ({ ...f, [key]: true }));
-      try {
-        const res = await fetch('/api/ai-section-feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ section: key, text, label })
-        });
-        const data = await res.json();
-        setSectionFeedback(f => ({ ...f, [key]: data.feedback }));
-      } catch (error) {
-        console.error(`Error fetching feedback for ${key}:`, error);
-      } finally {
-        setSectionLoading(f => ({ ...f, [key]: false }));
-      }
-    };
-
-    sectionKeys.forEach(({ key, label }) => {
-      fetchSectionFeedback(key, label);
-    });
-  }, [safeAnswers, sectionKeys]);
 
   useEffect(() => {
     setLoadingScore(true);
@@ -235,22 +207,10 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 80) return { 
-      emoji: '🏆',
-      label: 'Utmärkt'
-    };
-    if (score >= 60) return { 
-      emoji: '⭐',
-      label: 'Bra'
-    };
-    if (score >= 40) return { 
-      emoji: '⚡',
-      label: 'Acceptabelt'
-    };
-    return { 
-      emoji: '🚧',
-      label: 'Behöver förbättras'
-    };
+    if (score >= 80) return { emoji: '🏆', label: 'Utmärkt' };
+    if (score >= 60) return { emoji: '⭐', label: 'Bra' };
+    if (score >= 40) return { emoji: '⚡', label: 'Acceptabelt' };
+    return { emoji: '🚧', label: 'Behöver förbättras' };
   };
 
   return (
@@ -346,7 +306,7 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
                   <span>🚀</span> Executive Summary
                 </h1>
                 <div className="text-lg text-[#16475b] mb-2">
-                  {getOr(safeAnswers.executive_summary?.summary, 'Ingen sammanfattning angiven.')}
+                  {safeAnswers.executive_summary?.summary || 'Ingen sammanfattning angiven.'}
                 </div>
                 {safeAnswers.executive_summary?.demo_link && (
                   <div className="mt-2">
@@ -360,6 +320,16 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
                 <div className="text-lg text-[#16475b] font-semibold">{getScoreLabel(_score).label}</div>
               </div>
             </div>
+          </div>
+
+          {/* AI-feedback för sektioner */}
+          <div className="space-y-4">
+            {sectionKeys.map(({ key, label }) => (
+              <div key={key} className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
+                <div className="font-bold text-[#16475b] mb-1">AI-feedback för {label}:</div>
+                <div className="text-[#16475b] text-sm">{feedback[key] || 'Ingen feedback tillgänglig.'}</div>
+              </div>
+            ))}
           </div>
 
           {/* Problem & Lösning */}
@@ -393,14 +363,6 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
                 </svg>
               </div>
             </div>
-            {/* AI-feedback för marknad */}
-            <div className="mt-4">
-              {sectionLoading['market_analysis'] ? (
-                <div className="text-[#16475b] text-sm flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></span> AI analyserar marknaden...</div>
-              ) : sectionFeedback['market_analysis'] ? (
-                <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>AI-feedback:</b> {sectionFeedback['market_analysis']}</div>
-              ) : null}
-            </div>
           </div>
 
           {/* Affärsmodell & Prissättning */}
@@ -409,27 +371,11 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
               <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>💰</span> Affärsmodell</h2>
               <div>{getOr(safeAnswers.revenue_model?.model, 'Ej angivet')}</div>
               <div className="text-xs text-[#2a6b8a]">Övriga intäkter: {getOr(safeAnswers.revenue_model?.other_revenue, 'Ej angivet')}</div>
-              {/* AI-feedback för affärsmodell */}
-              <div className="mt-4">
-                {sectionLoading['revenue_model'] ? (
-                  <div className="text-[#16475b] text-sm flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></span> AI analyserar affärsmodellen...</div>
-                ) : sectionFeedback['revenue_model'] ? (
-                  <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>AI-feedback:</b> {sectionFeedback['revenue_model']}</div>
-                ) : null}
-              </div>
             </div>
             <div>
               <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🏷️</span> Prissättning</h2>
               <div>{getOr(safeAnswers.pricing?.price_model, 'Ej angivet')}</div>
               <div className="text-xs text-[#2a6b8a]">Prisintervall: {getOr(safeAnswers.pricing?.price_range, 'Ej angivet')}</div>
-              {/* AI-feedback för prissättning */}
-              <div className="mt-4">
-                {sectionLoading['funding_details'] ? (
-                  <div className="text-[#16475b] text-sm flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></span> AI analyserar prissättningen...</div>
-                ) : sectionFeedback['funding_details'] ? (
-                  <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>AI-feedback:</b> {sectionFeedback['funding_details']}</div>
-                ) : null}
-              </div>
             </div>
           </div>
 
@@ -444,14 +390,6 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
                 <div><b>KPI/Traction:</b> {getOr(safeAnswers.milestones?.traction_kpi, 'Ej angivet')}</div>
               </div>
             </div>
-            {/* AI-feedback för traction */}
-            <div className="mt-4">
-              {sectionLoading['team'] ? (
-                <div className="text-[#16475b] text-sm flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></span> AI analyserar traction...</div>
-              ) : sectionFeedback['team'] ? (
-                <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>AI-feedback:</b> {sectionFeedback['team']}</div>
-              ) : null}
-            </div>
           </div>
 
           {/* Team & Founders' DNA */}
@@ -464,14 +402,6 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
               <div className="flex-1">
                 <div><b>Styrkor:</b> {getOr(safeAnswers.founders_dna?.dna_strengths, 'Ej angivet')}</div>
               </div>
-            </div>
-            {/* AI-feedback för founders_dna */}
-            <div className="mt-4">
-              {sectionLoading['team'] ? (
-                <div className="text-[#16475b] text-sm flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></span> AI analyserar teamets DNA...</div>
-              ) : sectionFeedback['team'] ? (
-                <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>AI-feedback:</b> {sectionFeedback['team']}</div>
-              ) : null}
             </div>
           </div>
 
@@ -486,14 +416,6 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
                 <div><b>Kundcitat:</b> {getOr(safeAnswers.customer_cases?.customer_quotes, 'Ej angivet')}</div>
               </div>
             </div>
-            {/* AI-feedback för kundcase */}
-            <div className="mt-4">
-              {sectionLoading['team'] ? (
-                <div className="text-[#16475b] text-sm flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></span> AI analyserar kundcase...</div>
-              ) : sectionFeedback['team'] ? (
-                <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>AI-feedback:</b> {sectionFeedback['team']}</div>
-              ) : null}
-            </div>
           </div>
 
           {/* Konkurrent-matris */}
@@ -505,14 +427,6 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
                 <div><b>Funktioner vs pris:</b> {getOr(safeAnswers.competition_matrix?.features_vs_price, 'Ej angivet')}</div>
                 <div><b>Egen position:</b> {getOr(safeAnswers.competition_matrix?.positioning, 'Ej angivet')}</div>
               </div>
-            </div>
-            {/* AI-feedback för konkurrenter */}
-            <div className="mt-4">
-              {sectionLoading['team'] ? (
-                <div className="text-[#16475b] text-sm flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></span> AI analyserar konkurrenssituationen...</div>
-              ) : sectionFeedback['team'] ? (
-                <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>AI-feedback:</b> {sectionFeedback['team']}</div>
-              ) : null}
             </div>
           </div>
 
@@ -556,14 +470,6 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
                 <div><b>Scenario:</b> {getOr(safeAnswers.budget_forecast?.scenario, 'Ej angivet')}</div>
               </div>
             </div>
-            {/* AI-feedback för budget */}
-            <div className="mt-4">
-              {sectionLoading['funding_details'] ? (
-                <div className="text-[#16475b] text-sm flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></span> AI analyserar budgeten...</div>
-              ) : sectionFeedback['funding_details'] ? (
-                <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>AI-feedback:</b> {sectionFeedback['funding_details']}</div>
-              ) : null}
-            </div>
           </div>
 
           {/* Cap Table & Dilution */}
@@ -584,14 +490,6 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
                 </svg>
               </div>
             </div>
-            {/* AI-feedback för cap table */}
-            <div className="mt-4">
-              {sectionLoading['funding_details'] ? (
-                <div className="text-[#16475b] text-sm flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></span> AI analyserar ägarstrukturen...</div>
-              ) : sectionFeedback['funding_details'] ? (
-                <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>AI-feedback:</b> {sectionFeedback['funding_details']}</div>
-              ) : null}
-            </div>
           </div>
 
           {/* Teknik/IP */}
@@ -603,14 +501,6 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
                 <div><b>Tech-stack:</b> {getOr(safeAnswers.tech_ip?.tech_stack, 'Ej angivet')}</div>
                 <div><b>Unika algoritmer:</b> {getOr(safeAnswers.tech_ip?.unique_algorithms, 'Ej angivet')}</div>
               </div>
-            </div>
-            {/* AI-feedback för teknik/ip */}
-            <div className="mt-4">
-              {sectionLoading['team'] ? (
-                <div className="text-[#16475b] text-sm flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></span> AI analyserar teknik/IP...</div>
-              ) : sectionFeedback['team'] ? (
-                <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>AI-feedback:</b> {sectionFeedback['team']}</div>
-              ) : null}
             </div>
           </div>
 
@@ -631,28 +521,12 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
                 </svg>
               </div>
             </div>
-            {/* AI-feedback för esg/impact */}
-            <div className="mt-4">
-              {sectionLoading['team'] ? (
-                <div className="text-[#16475b] text-sm flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></span> AI analyserar ESG/impact...</div>
-              ) : sectionFeedback['team'] ? (
-                <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>AI-feedback:</b> {sectionFeedback['team']}</div>
-              ) : null}
-            </div>
           </div>
 
           {/* Exit/Övrigt */}
           <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🏁</span> Exit & Övrigt</h2>
             <div><b>Exit-plan:</b> {getOr(safeAnswers.exit_strategy?.exit_plan, 'Ej angivet')}</div>
-            {/* AI-feedback för exit */}
-            <div className="mt-4">
-              {sectionLoading['team'] ? (
-                <div className="text-[#16475b] text-sm flex items-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></span> AI analyserar exit-strategin...</div>
-              ) : sectionFeedback['team'] ? (
-                <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>AI-feedback:</b> {sectionFeedback['team']}</div>
-              ) : null}
-            </div>
           </div>
         </div>
       </div>
