@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
   }
 
-  const apiKey = '***REMOVED***Qcn0TpQ3ewkWHR-b3HScwXJAchrAZG3QrmwXRwwF2mL8MsVZcApZyn37sVNBE95uCIH5UyG1BbT3BlbkFJKUcYQM5uJtbU7Q7bQdK0qxJ-iJz5ywDN22tpgZ-xXEcIEb6U2LBEwQgQ2PsPpXP7jNZxvli_cA';
+  const apiKey = process.env.OPENAI_API_KEY;
 
   const prompt = `Du är en kreativ startup-generator. Kombinera målgruppen "${target}", tekniken "${tech}" och affärsmodellen "${model}" till en galen, inspirerande startup-idé. Svara med:
 1. En micro-pitch (max 140 tecken, på svenska)
