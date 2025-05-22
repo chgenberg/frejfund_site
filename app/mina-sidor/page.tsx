@@ -3,14 +3,26 @@ import { useAuth } from "../context/AuthContext";
 import Image from "next/image";
 import { useState } from "react";
 
+interface Report {
+  title: string;
+  updated: string;
+  percent: number;
+  date: string;
+}
+
+interface InboxMessage {
+  msg: string;
+  date: string;
+}
+
 export default function MinaSidor() {
   const { user, logout } = useAuth();
   // Mock data
   const analyser = [
     { title: "AI för e-handel", updated: "2024-05-20", percent: 60 },
   ];
-  const rapporter = [];
-  const inbox = [
+  const rapporter: Report[] = [];
+  const inbox: InboxMessage[] = [
     { msg: "Tips: färdigställ analysen för att få din första score!", date: "2024-05-21" },
   ];
   const [pitchCount] = useState(1);
