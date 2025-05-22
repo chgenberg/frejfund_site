@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -958,6 +957,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const handleLinkedinProfilesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const profiles = e.target.value.split('\n').filter(profile => profile.trim() !== '');
     setLinkedinProfiles(profiles);
+    // @ts-ignore
     setAnswers(a => ({
       ...a,
       team: {
@@ -1032,6 +1032,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   };
 
   const handleAnswerChange = (section: keyof BusinessPlanAnswers, field: string, value: BusinessPlanValue) => {
+    // @ts-ignore
     setAnswers(prev => {
       const sectionData = prev[section];
       if (typeof sectionData === 'string') {
