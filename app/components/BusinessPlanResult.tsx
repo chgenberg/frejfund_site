@@ -235,10 +235,22 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 80) return 'Utmärkt';
-    if (score >= 60) return 'Bra';
-    if (score >= 40) return 'Acceptabelt';
-    return 'Behöver förbättras';
+    if (score >= 80) return { 
+      emoji: '🏆',
+      label: 'Utmärkt'
+    };
+    if (score >= 60) return { 
+      emoji: '⭐',
+      label: 'Bra'
+    };
+    if (score >= 40) return { 
+      emoji: '⚡',
+      label: 'Acceptabelt'
+    };
+    return { 
+      emoji: '🚧',
+      label: 'Behöver förbättras'
+    };
   };
 
   return (
@@ -279,9 +291,11 @@ export default function BusinessPlanResult({ score: _score, answers, subscriptio
           >
             Vad betyder score?
           </button>
-          <div className="mt-4 text-lg text-[#16475b] text-center font-medium max-w-2xl">{getScoreLabel(_score)}</div>
+          <div className="mt-4 text-lg text-[#16475b] text-center font-medium max-w-2xl">
+            {getScoreLabel(_score).label}
+          </div>
           <div className="mt-4 bg-[#eaf6fa] rounded-xl p-4 text-[#16475b] text-base text-center max-w-xl">
-            {getScoreLabel(_score)}
+            {getScoreLabel(_score).label}
           </div>
         </div>
       </div>
