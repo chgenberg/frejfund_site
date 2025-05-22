@@ -6,4 +6,7 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY;
 
   // Compose a detailed prompt
-  const prompt = `
+  // const prompt = ``;
+
+  // ... existing code ...
+}
