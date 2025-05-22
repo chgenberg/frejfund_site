@@ -7,13 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "npx playwright install chromium --with-deps=false"
+    "postinstall": "npx puppeteer browsers install chrome"
   },
   "dependencies": {
     "next": "15.3.2",
     "node-fetch": "^2.7.0",
     "openai": "^4.102.0",
-    "playwright": "^1.52.0",
+    "puppeteer": "^22.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^2.15.3"

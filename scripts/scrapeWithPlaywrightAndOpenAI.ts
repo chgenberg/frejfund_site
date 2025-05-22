@@ -1,4 +1,4 @@
-import { chromium } from 'playwright';
+import puppeteer from 'puppeteer';
 import fetch from 'node-fetch';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -29,8 +29,8 @@ export async function scrapeAndAnalyze(url: string) {
     const formattedUrl = validateAndFormatUrl(url);
     console.log('Validerad URL:', formattedUrl);
 
-    console.log('Startar Playwright...');
-    browser = await chromium.launch({
+    console.log('Startar Puppeteer...');
+    browser = await puppeteer.launch({
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -40,7 +40,7 @@ export async function scrapeAndAnalyze(url: string) {
         '--no-zygote',
         '--single-process'
       ],
-      headless: true
+      headless: 'new'
     });
     
     console.log('Öppnar ny sida...');
@@ -110,7 +110,7 @@ export async function scrapeAndAnalyze(url: string) {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4',
         messages: [
           { role: 'system', content: 'Du är en expert på affärsplaner.' },
           { role: 'user', content: prompt }
