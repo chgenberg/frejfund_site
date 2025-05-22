@@ -17,33 +17,44 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('Startar scraping av:', url);
-    const result = await scrapeAndAnalyze(url);
-    console.log('Scraping klar, resultat:', result);
-    
-    return NextResponse.json(result);
+    try {
+      const result = await scrapeAndAnalyze(url);
+      console.log('Scraping klar, resultat:', result);
+      return NextResponse.json(result);
+    } catch (scrapeError: any) {
+      console.error('Fel vid scraping:', scrapeError);
+      
+      // Kontrollera om felet är relaterat till Puppeteer
+      if (scrapeError.message?.includes('puppeteer') || 
+          scrapeError.message?.includes('browser') || 
+          scrapeError.message?.includes('chrome')) {
+        return NextResponse.json({ 
+          error: 'Web scraping service is not available',
+          details: 'Browser service is not properly configured',
+          debug: scrapeError.message
+        }, { status: 503 });
+      }
+      
+      // Kontrollera om felet är relaterat till OpenAI
+      if (scrapeError.message?.includes('OpenAI') || 
+          scrapeError.message?.includes('API')) {
+        return NextResponse.json({ 
+          error: 'AI service is not available',
+          details: 'OpenAI service is not properly configured',
+          debug: scrapeError.message
+        }, { status: 503 });
+      }
+      
+      throw scrapeError; // Rethrow för att hanteras av den yttre catch-blocket
+    }
   } catch (e) {
-    console.error('Fel vid scraping:', e);
+    console.error('Fel i scrape-website route:', e);
     const errorMessage = e instanceof Error ? e.message : 'Okänt fel';
-    
-    // Kontrollera om felet är relaterat till Playwright
-    if (errorMessage.includes('playwright') || errorMessage.includes('browser')) {
-      return NextResponse.json({ 
-        error: 'Web scraping service is not available',
-        details: 'Please try again later'
-      }, { status: 503 });
-    }
-    
-    // Kontrollera om felet är relaterat till OpenAI
-    if (errorMessage.includes('OpenAI') || errorMessage.includes('API')) {
-      return NextResponse.json({ 
-        error: 'AI service is not available',
-        details: 'Please try again later'
-      }, { status: 503 });
-    }
     
     return NextResponse.json({ 
       error: 'Kunde inte skrapa eller analysera hemsidan',
-      details: errorMessage
+      details: errorMessage,
+      debug: process.env.NODE_ENV === 'development' ? e : undefined
     }, { status: 500 });
   }
 } 

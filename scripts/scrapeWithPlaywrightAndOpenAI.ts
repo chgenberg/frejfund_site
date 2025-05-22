@@ -38,9 +38,14 @@ export async function scrapeAndAnalyze(url: string) {
         '--disable-gpu',
         '--no-first-run',
         '--no-zygote',
-        '--single-process'
+        '--single-process',
+        '--disable-extensions',
+        '--disable-software-rasterizer',
+        '--disable-features=site-per-process'
       ],
-      headless: true
+      headless: true,
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+      ignoreHTTPSErrors: true
     });
     
     console.log('Öppnar ny sida...');
