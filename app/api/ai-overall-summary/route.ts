@@ -29,7 +29,5 @@ export async function POST(req: NextRequest) {
     const data = await openaiRes.json();
     const summary = data.choices?.[0]?.message?.content || '';
     return NextResponse.json({ summary });
-  } catch (e) {
-    return NextResponse.json({ error: 'OpenAI error' }, { status: 500 });
-  }
+  } catch {}
 } 

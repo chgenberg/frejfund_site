@@ -24,13 +24,12 @@ async function searchCompetitorsOnWeb(query: string): Promise<string[]> {
       }
     }
     return competitors.slice(0, 5);
-  } catch (e) {
-    return [];
-  }
+  } catch {}
+  return [];
 }
 
 export async function POST(req: NextRequest) {
-  const { business_idea, bransch, omrade, customer_segments, answers } = await req.json();
+  const { business_idea, bransch, omrade, customer_segments } = await req.json();
 
   // Compose a detailed OpenAI prompt
   const apiKey = process.env.OPENAI_API_KEY;
@@ -65,17 +64,12 @@ export async function POST(req: NextRequest) {
     try {
       aiSuggestions = JSON.parse(text);
       if (!Array.isArray(aiSuggestions)) aiSuggestions = [text];
-    } catch (e) {
-      aiSuggestions = text.split('\n').map((s: string) => s.replace(/^[-*\d.\s]+/, '').trim()).filter(Boolean);
-    }
+    } catch {}
 
     // 2. Get suggestions from Bing Web Search
     const webQuery = `${bransch} ${omrade} konkurrenter företag ${business_idea} ${customer_segments || ''}`;
     webSuggestions = await searchCompetitorsOnWeb(webQuery);
-  } catch (e) {
-    aiSuggestions = [];
-    webSuggestions = [];
-  }
+  } catch {}
 
   // Merge and deduplicate
   const allSuggestions = Array.from(new Set([...aiSuggestions, ...webSuggestions])).filter(Boolean);

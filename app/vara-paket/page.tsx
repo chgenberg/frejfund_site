@@ -5,21 +5,6 @@ import { useState } from 'react';
 import { useLoginModal } from '../components/LoginModal';
 import { useRouter } from 'next/navigation';
 
-const AVERAGES = {
-  silver: 0.7,
-  gold: 2.0,
-  black: 3.0,
-};
-
-function getChance(requested: number, average: number) {
-  if (requested <= average) return 80;
-  if (requested > average * 2.5) return 5;
-  if (requested > average * 2) return 15;
-  if (requested > average * 1.5) return 30;
-  if (requested > average * 1.2) return 50;
-  return 65;
-}
-
 // Feature explanations
 const FEATURE_EXPLANATIONS: { [key: string]: string } = {
   "PDF light": "En grundläggande PDF-rapport med dina analysresultat och rekommendationer. Perfekt för att få en första bild av ditt företags potential.",
@@ -40,11 +25,6 @@ export default function Pricing() {
   const [activePopup, setActivePopup] = useState<string | null>(null);
   const openLoginModal = useLoginModal();
   const router = useRouter();
-  const [input, setInput] = useState(1500000);
-  const requestedMSEK = input / 1_000_000;
-  const chanceSilver = getChance(requestedMSEK, AVERAGES.silver);
-  const chanceGold = getChance(requestedMSEK, AVERAGES.gold);
-  const chanceBlack = getChance(requestedMSEK, AVERAGES.black);
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center px-4 py-12">
@@ -66,7 +46,7 @@ export default function Pricing() {
           <div className="bg-white/95 rounded-[2.5rem] shadow-xl border border-gray-100 p-8 backdrop-blur-sm">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-extrabold text-[#16475b] mb-2">SILVER</h2>
-              <div className="text-3xl font-bold text-[#16475b] mb-2">"Explorer"</div>
+              <div className="text-3xl font-bold text-[#16475b] mb-2">&quot;Explorer&quot;</div>
               <div className="text-4xl font-black text-[#16475b] mb-2">0 kr</div>
               <div className="text-sm text-gray-600">(konto krävs)</div>
             </div>
@@ -98,7 +78,7 @@ export default function Pricing() {
             
             <div className="text-center mb-8">
               <h2 className="text-2xl font-extrabold text-[#16475b] mb-2">GOLD</h2>
-              <div className="text-3xl font-bold text-[#16475b] mb-2">"Builder"</div>
+              <div className="text-3xl font-bold text-[#16475b] mb-2">&quot;Builder&quot;</div>
               <div className="text-4xl font-black text-[#16475b] mb-2">990 kr</div>
               <div className="text-sm text-gray-600">/ analys eller 5 990 kr / år</div>
             </div>
@@ -130,7 +110,7 @@ export default function Pricing() {
           <div className="bg-black rounded-[2.5rem] shadow-xl border border-gray-900 p-8 backdrop-blur-sm">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-extrabold text-white mb-2">BLACK</h2>
-              <div className="text-3xl font-bold text-white mb-2">"Partner"</div>
+              <div className="text-3xl font-bold text-white mb-2">&quot;Partner&quot;</div>
               <div className="text-4xl font-black text-white mb-2">24 900 kr</div>
               <div className="text-sm text-white/80">/ år + 2 % success-fee</div>
             </div>

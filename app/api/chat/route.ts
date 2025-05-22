@@ -28,9 +28,9 @@ export async function POST(req: NextRequest) {
     const data = await openaiRes.json();
     const answer = data.choices?.[0]?.message?.content || 'Jag är ledsen, men jag kunde inte generera ett svar just nu.';
     return NextResponse.json({ answer });
-  } catch (e) {
-    return NextResponse.json({ error: 'Fel vid kontakt med OpenAI.' }, { status: 500 });
-  }
+  } catch {}
+
+  return NextResponse.json({ error: 'Fel vid kontakt med OpenAI.' }, { status: 500 });
 }
 
 export function GET() {

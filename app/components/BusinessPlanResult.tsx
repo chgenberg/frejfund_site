@@ -1,14 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import Image from 'next/image';
 
 interface ResultProps {
   score: number;
-  details: {
-    team: number;
-    problemSolution: number;
-    market: number;
-  };
-  answers: any;
+  answers: Record<string, unknown>;
   subscriptionLevel?: 'silver' | 'gold' | 'platinum';
 }
 
@@ -120,31 +115,30 @@ const getMarketSizeData = (marketValue: string) => {
 };
 
 // Helper för dummy-data
-const getOr = (val: any, fallback: any) => {
-  if (val && val.length > 0) return val;
-  // Om fallback är 'Ej angivet' eller liknande, wrappa i span med mörkblå färg
+const getOr = (val: ReactNode, fallback: ReactNode): ReactNode => {
+  if (val && (typeof val === 'string' ? val.length > 0 : true)) return val;
   if (typeof fallback === 'string' && fallback.toLowerCase().includes('ej angiv')) {
     return <span style={{ color: '#16475b' }}>{fallback}</span>;
   }
   return fallback;
 };
 
-export default function BusinessPlanResult({ score: _score, details, answers, subscriptionLevel = 'silver' }: ResultProps) {
+export default function BusinessPlanResult({ score: _score, answers, subscriptionLevel = 'silver' }: ResultProps) {
+  const safeAnswers = answers as Record<string, any>;
   const [aiScore, setAiScore] = useState<number | null>(null);
   const [motivation, setMotivation] = useState('');
   const [strengths, setStrengths] = useState('');
   const [weaknesses, setWeaknesses] = useState('');
   const [loadingScore, setLoadingScore] = useState(true);
-  const [marketShare, setMarketShare] = useState(1);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
-  const [competitorAnalysis, setCompetitorAnalysis] = useState<any[]>([]);
+  const [competitorAnalysis, setCompetitorAnalysis] = useState<unknown[]>([]);
   const [loadingCompetitors, setLoadingCompetitors] = useState(false);
   const [competitorError, setCompetitorError] = useState<string | null>(null);
   const [showScoreInfo, setShowScoreInfo] = useState(false);
   
   const scoreComparison = getScoreComparison(_score);
-  const marketData = getMarketSizeData(answers.market_size?.market_value || '0');
+  const marketData = getMarketSizeData(safeAnswers.market_size?.market_value || '0');
 
   // --- AI feedback hooks ---
   const sectionKeys = [
@@ -205,7 +199,7 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
 
   useEffect(() => {
     sectionKeys.forEach(({ key, label }) => {
-      const text = JSON.stringify(answers[key] || '');
+      const text = JSON.stringify(safeAnswers[key] || '');
       if (!text || text === '""') return;
       setSectionLoading(f => ({ ...f, [key]: true }));
       fetch('/api/ai-section-feedback', {
@@ -218,19 +212,7 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
         .finally(() => setSectionLoading(f => ({ ...f, [key]: false })));
     });
     // eslint-disable-next-line
-  }, [JSON.stringify(answers)]);
-
-  const renderUpgradeButton = (feature: string) => (
-    <button
-      onClick={() => {
-        setSelectedFeature(feature);
-        setShowUpgradeModal(true);
-      }}
-      className="bg-[#16475b] text-white text-sm px-3 py-1 rounded-full hover:bg-[#2a6b8a] transition-colors"
-    >
-      Lås upp i {subscriptionLevel === 'silver' ? 'Gold' : 'Platinum'}
-    </button>
-  );
+  }, [JSON.stringify(safeAnswers)]);
 
   return (
     <div className="relative min-h-screen w-full">
@@ -313,11 +295,11 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
                   <span>🚀</span> Executive Summary
                 </h1>
                 <div className="text-lg text-[#16475b] mb-2">
-                  {getOr(answers.executive_summary?.summary, 'Ingen sammanfattning angiven.')}
+                  {getOr(safeAnswers.executive_summary?.summary, 'Ingen sammanfattning angiven.')}
                 </div>
-                {answers.executive_summary?.demo_link && (
+                {safeAnswers.executive_summary?.demo_link && (
                   <div className="mt-2">
-                    <a href={answers.executive_summary.demo_link} target="_blank" rel="noopener noreferrer" className="underline text-[#2a6b8a] font-semibold">Se demo/video</a>
+                    <a href={safeAnswers.executive_summary.demo_link} target="_blank" rel="noopener noreferrer" className="underline text-[#2a6b8a] font-semibold">Se demo/video</a>
                   </div>
                 )}
               </div>
@@ -333,11 +315,11 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
           <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] flex flex-col md:flex-row gap-6 text-[#04121d]">
             <div className="flex-1">
               <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>❓</span> Problem</h2>
-              <div className="text-[#16475b] mb-2">{getOr(answers.business_idea?.what_you_do, 'Ej angivet.')}</div>
+              <div className="text-[#16475b] mb-2">{getOr(safeAnswers.business_idea?.what_you_do, 'Ej angivet.')}</div>
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>💡</span> Lösning</h2>
-              <div className="text-[#16475b] mb-2">{getOr(answers.business_idea?.why_unique, 'Ej angivet.')}</div>
+              <div className="text-[#16475b] mb-2">{getOr(safeAnswers.business_idea?.why_unique, 'Ej angivet.')}</div>
             </div>
           </div>
 
@@ -346,10 +328,10 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
             <h2 className="text-xl font-bold text-[#16475b] mb-4 flex items-center gap-2"><span>📊</span> Marknad</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1 space-y-2">
-                <div className="text-[#04121d]"><b>TAM:</b> {getOr(answers.market_details?.tam, 'Ej angivet')}</div>
-                <div className="text-[#04121d]"><b>SAM:</b> {getOr(answers.market_details?.sam, 'Ej angivet')}</div>
-                <div className="text-[#04121d]"><b>SOM:</b> {getOr(answers.market_details?.som, 'Ej angivet')}</div>
-                <div className="text-xs text-[#2a6b8a]">Källa: {getOr(answers.market_details?.market_source, 'Ej angiven')}</div>
+                <div className="text-[#04121d]"><b>TAM:</b> {getOr(safeAnswers.market_details?.tam, 'Ej angivet')}</div>
+                <div className="text-[#04121d]"><b>SAM:</b> {getOr(safeAnswers.market_details?.sam, 'Ej angivet')}</div>
+                <div className="text-[#04121d]"><b>SOM:</b> {getOr(safeAnswers.market_details?.som, 'Ej angivet')}</div>
+                <div className="text-xs text-[#2a6b8a]">Källa: {getOr(safeAnswers.market_details?.market_source, 'Ej angiven')}</div>
               </div>
               {/* Dummy funnel-graf */}
               <div className="flex-1 flex items-center justify-center">
@@ -374,8 +356,8 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
           <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] grid grid-cols-1 md:grid-cols-2 gap-6 text-[#04121d]">
             <div>
               <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>💰</span> Affärsmodell</h2>
-              <div>{getOr(answers.revenue_model?.model, 'Ej angivet')}</div>
-              <div className="text-xs text-[#2a6b8a]">Övriga intäkter: {getOr(answers.revenue_model?.other_revenue, 'Ej angivet')}</div>
+              <div>{getOr(safeAnswers.revenue_model?.model, 'Ej angivet')}</div>
+              <div className="text-xs text-[#2a6b8a]">Övriga intäkter: {getOr(safeAnswers.revenue_model?.other_revenue, 'Ej angivet')}</div>
               {/* AI-feedback för affärsmodell */}
               <div className="mt-4">
                 {sectionLoading['revenue_model'] ? (
@@ -387,8 +369,8 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
             </div>
             <div>
               <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🏷️</span> Prissättning</h2>
-              <div>{getOr(answers.pricing?.price_model, 'Ej angivet')}</div>
-              <div className="text-xs text-[#2a6b8a]">Prisintervall: {getOr(answers.pricing?.price_range, 'Ej angivet')}</div>
+              <div>{getOr(safeAnswers.pricing?.price_model, 'Ej angivet')}</div>
+              <div className="text-xs text-[#2a6b8a]">Prisintervall: {getOr(safeAnswers.pricing?.price_range, 'Ej angivet')}</div>
               {/* AI-feedback för prissättning */}
               <div className="mt-4">
                 {sectionLoading['pricing'] ? (
@@ -405,10 +387,10 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>📈</span> Traction & Milstolpar</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <div><b>Milstolpar:</b> {getOr(answers.milestones?.milestones_list, 'Ej angivet')}</div>
+                <div><b>Milstolpar:</b> {getOr(safeAnswers.milestones?.milestones_list, 'Ej angivet')}</div>
               </div>
               <div className="flex-1">
-                <div><b>KPI/Traction:</b> {getOr(answers.milestones?.traction_kpi, 'Ej angivet')}</div>
+                <div><b>KPI/Traction:</b> {getOr(safeAnswers.milestones?.traction_kpi, 'Ej angivet')}</div>
               </div>
             </div>
             {/* AI-feedback för traction */}
@@ -426,10 +408,10 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🧬</span> Team & Founders' DNA</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <div><b>Roller:</b> {getOr(answers.founders_dna?.team_roles, 'Ej angivet')}</div>
+                <div><b>Roller:</b> {getOr(safeAnswers.founders_dna?.team_roles, 'Ej angivet')}</div>
               </div>
               <div className="flex-1">
-                <div><b>Styrkor:</b> {getOr(answers.founders_dna?.dna_strengths, 'Ej angivet')}</div>
+                <div><b>Styrkor:</b> {getOr(safeAnswers.founders_dna?.dna_strengths, 'Ej angivet')}</div>
               </div>
             </div>
             {/* AI-feedback för founders_dna */}
@@ -447,10 +429,10 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🤝</span> Kundcase & LOI</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <div><b>LOI/länk:</b> {getOr(answers.customer_cases?.loi_links, 'Ej angivet')}</div>
+                <div><b>LOI/länk:</b> {getOr(safeAnswers.customer_cases?.loi_links, 'Ej angivet')}</div>
               </div>
               <div className="flex-1">
-                <div><b>Kundcitat:</b> {getOr(answers.customer_cases?.customer_quotes, 'Ej angivet')}</div>
+                <div><b>Kundcitat:</b> {getOr(safeAnswers.customer_cases?.customer_quotes, 'Ej angivet')}</div>
               </div>
             </div>
             {/* AI-feedback för kundcase */}
@@ -468,9 +450,9 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>⚔️</span> Konkurrenter & Matris</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <div><b>Konkurrenter:</b> {getOr(answers.competition_matrix?.competitors, 'Ej angivet')}</div>
-                <div><b>Funktioner vs pris:</b> {getOr(answers.competition_matrix?.features_vs_price, 'Ej angivet')}</div>
-                <div><b>Egen position:</b> {getOr(answers.competition_matrix?.positioning, 'Ej angivet')}</div>
+                <div><b>Konkurrenter:</b> {getOr(safeAnswers.competition_matrix?.competitors, 'Ej angivet')}</div>
+                <div><b>Funktioner vs pris:</b> {getOr(safeAnswers.competition_matrix?.features_vs_price, 'Ej angivet')}</div>
+                <div><b>Egen position:</b> {getOr(safeAnswers.competition_matrix?.positioning, 'Ej angivet')}</div>
               </div>
             </div>
             {/* AI-feedback för konkurrenter */}
@@ -490,7 +472,7 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
             {competitorError && <div className="text-red-600">{competitorError}</div>}
             {!loadingCompetitors && !competitorError && competitorAnalysis.length > 0 && (
               <div className="space-y-6">
-                {competitorAnalysis.map((c, i) => (
+                {competitorAnalysis.map((c: any, i) => (
                   <div key={i} className="border-b border-[#eaf6fa] pb-4 mb-4 last:border-b-0 last:mb-0">
                     <div className="flex items-center gap-4 mb-2">
                       <div className="font-bold text-lg">{c.name}</div>
@@ -516,11 +498,11 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>📑</span> Budget & Prognos</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <div><b>Budget/prognos:</b> {getOr(answers.budget_forecast?.forecast_table, 'Ej angivet')}</div>
-                <div><b>ARPU:</b> {getOr(answers.budget_forecast?.arpu, 'Ej angivet')}</div>
-                <div><b>CAC:</b> {getOr(answers.budget_forecast?.cac, 'Ej angivet')}</div>
-                <div><b>Churn:</b> {getOr(answers.budget_forecast?.churn, 'Ej angivet')}</div>
-                <div><b>Scenario:</b> {getOr(answers.budget_forecast?.scenario, 'Ej angivet')}</div>
+                <div><b>Budget/prognos:</b> {getOr(safeAnswers.budget_forecast?.forecast_table, 'Ej angivet')}</div>
+                <div><b>ARPU:</b> {getOr(safeAnswers.budget_forecast?.arpu, 'Ej angivet')}</div>
+                <div><b>CAC:</b> {getOr(safeAnswers.budget_forecast?.cac, 'Ej angivet')}</div>
+                <div><b>Churn:</b> {getOr(safeAnswers.budget_forecast?.churn, 'Ej angivet')}</div>
+                <div><b>Scenario:</b> {getOr(safeAnswers.budget_forecast?.scenario, 'Ej angivet')}</div>
               </div>
             </div>
             {/* AI-feedback för budget */}
@@ -538,9 +520,9 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🥧</span> Cap Table & Dilution</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <div><b>Ägare och andel:</b> {getOr(answers.cap_table?.owners, 'Ej angivet')}</div>
-                <div><b>Planerade rundor:</b> {getOr(answers.cap_table?.planned_rounds, 'Ej angivet')}</div>
-                <div><b>Pro-forma:</b> {getOr(answers.cap_table?.pro_forma, 'Ej angivet')}</div>
+                <div><b>Ägare och andel:</b> {getOr(safeAnswers.cap_table?.owners, 'Ej angivet')}</div>
+                <div><b>Planerade rundor:</b> {getOr(safeAnswers.cap_table?.planned_rounds, 'Ej angivet')}</div>
+                <div><b>Pro-forma:</b> {getOr(safeAnswers.cap_table?.pro_forma, 'Ej angivet')}</div>
               </div>
               {/* Dummy pie chart */}
               <div className="flex-1 flex items-center justify-center">
@@ -566,9 +548,9 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🛠️</span> Teknik & IP</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <div><b>Patentstatus:</b> {getOr(answers.tech_ip?.patent_status, 'Ej angivet')}</div>
-                <div><b>Tech-stack:</b> {getOr(answers.tech_ip?.tech_stack, 'Ej angivet')}</div>
-                <div><b>Unika algoritmer:</b> {getOr(answers.tech_ip?.unique_algorithms, 'Ej angivet')}</div>
+                <div><b>Patentstatus:</b> {getOr(safeAnswers.tech_ip?.patent_status, 'Ej angivet')}</div>
+                <div><b>Tech-stack:</b> {getOr(safeAnswers.tech_ip?.tech_stack, 'Ej angivet')}</div>
+                <div><b>Unika algoritmer:</b> {getOr(safeAnswers.tech_ip?.unique_algorithms, 'Ej angivet')}</div>
               </div>
             </div>
             {/* AI-feedback för teknik/ip */}
@@ -586,9 +568,9 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🌱</span> ESG & Impact</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <div><b>KPI för impact:</b> {getOr(answers.esg_impact?.kpi, 'Ej angivet')}</div>
-                <div><b>FN-SDG:</b> {getOr(answers.esg_impact?.sdg, 'Ej angivet')}</div>
-                <div><b>Jämförelse med bransch:</b> {getOr(answers.esg_impact?.industry_comparison, 'Ej angivet')}</div>
+                <div><b>KPI för impact:</b> {getOr(safeAnswers.esg_impact?.kpi, 'Ej angivet')}</div>
+                <div><b>FN-SDG:</b> {getOr(safeAnswers.esg_impact?.sdg, 'Ej angivet')}</div>
+                <div><b>Jämförelse med bransch:</b> {getOr(safeAnswers.esg_impact?.industry_comparison, 'Ej angivet')}</div>
               </div>
               {/* Dummy radar chart */}
               <div className="flex-1 flex items-center justify-center">
@@ -611,7 +593,7 @@ export default function BusinessPlanResult({ score: _score, details, answers, su
           {/* Exit/Övrigt */}
           <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🏁</span> Exit & Övrigt</h2>
-            <div><b>Exit-plan:</b> {getOr(answers.exit_strategy?.exit_plan, 'Ej angivet')}</div>
+            <div><b>Exit-plan:</b> {getOr(safeAnswers.exit_strategy?.exit_plan, 'Ej angivet')}</div>
             {/* AI-feedback för exit */}
             <div className="mt-4">
               {sectionLoading['exit_strategy'] ? (

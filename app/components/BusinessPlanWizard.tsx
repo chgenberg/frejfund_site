@@ -451,8 +451,16 @@ const EXAMPLES: { [key: string]: string[] } = {
   ]
 };
 
-// 1. Define extra questions for each bransch
-const BRANSCH_SPECIFIC_QUESTIONS: { [key: string]: any[] } = {
+interface BranschQuestion {
+  id: string;
+  text?: string;
+  type?: 'text' | 'textarea' | 'select' | 'radio';
+  options?: string[];
+  label?: string;
+  exampleAnswers?: string[];
+}
+
+const BRANSCH_SPECIFIC_QUESTIONS: { [key: string]: BranschQuestion[] } = {
   SaaS: [
     {
       id: 'saas_churn',
@@ -508,6 +516,140 @@ const selectArrow = (
 const radioOuter = "w-5 h-5 rounded-full border-2 border-[#7edcff] bg-white/10 shadow-inner flex items-center justify-center transition-all duration-200 group-focus:ring-2 group-focus:ring-[#7edcff] group-hover:border-[#7edcff]";
 const radioInner = "w-3 h-3 rounded-full bg-[#7edcff] scale-0 group-checked:scale-100 transition-transform duration-200";
 
+interface BusinessIdea {
+  what_you_do: string;
+  for_whom: string;
+  why_unique: string;
+}
+
+interface CustomerSegments {
+  customer_group: string;
+  customer_needs: string;
+  customer_location: string;
+}
+
+interface ProblemSolution {
+  problem: string;
+  solution: string;
+  unique_value: string;
+}
+
+interface MarketAnalysis {
+  market_size: string;
+  competitors: string;
+  market_trends: string;
+  market_source?: string;
+}
+
+interface BusinessModel {
+  revenue_model: string;
+  pricing_strategy: string;
+  sales_channels: string;
+}
+
+interface Team {
+  key_people: string;
+  roles: string;
+  expertise: string;
+  [key: string]: string;
+}
+
+interface FundingDetails {
+  funding_needed: string;
+  use_of_funds: string;
+  exit_strategy: string;
+}
+
+type BusinessPlanSection = BusinessIdea | CustomerSegments | ProblemSolution | MarketAnalysis | BusinessModel | Team | FundingDetails;
+
+interface BusinessPlanAnswers {
+  company_name: string;
+  business_idea: BusinessIdea;
+  customer_segments: CustomerSegments;
+  problem_solution: ProblemSolution;
+  market_analysis: MarketAnalysis;
+  business_model: BusinessModel;
+  team: Team;
+  funding_details: FundingDetails;
+  [key: string]: string | BusinessPlanSection;
+}
+
+const initialAnswers: BusinessPlanAnswers = {
+  company_name: '',
+  business_idea: {
+    what_you_do: '',
+    for_whom: '',
+    why_unique: ''
+  },
+  customer_segments: {
+    customer_group: '',
+    customer_needs: '',
+    customer_location: ''
+  },
+  problem_solution: {
+    problem: '',
+    solution: '',
+    unique_value: ''
+  },
+  market_analysis: {
+    market_size: '',
+    competitors: '',
+    market_trends: ''
+  },
+  business_model: {
+    revenue_model: '',
+    pricing_strategy: '',
+    sales_channels: ''
+  },
+  team: {
+    key_people: '',
+    roles: '',
+    expertise: ''
+  },
+  funding_details: {
+    funding_needed: '',
+    use_of_funds: '',
+    exit_strategy: ''
+  }
+};
+
+const [answers, setAnswers] = useState<BusinessPlanAnswers>(initialAnswers);
+
+// Helper function to safely update nested state
+const updateNestedState = (section: keyof BusinessPlanAnswers, field: string, value: string) => {
+  setAnswers(prev => {
+    const sectionData = prev[section];
+    if (typeof sectionData === 'object' && sectionData !== null) {
+      return {
+        ...prev,
+        [section]: {
+          ...sectionData,
+          [field]: value
+        }
+      };
+    }
+    return prev;
+  });
+};
+
+// Helper function to safely get nested state
+const getNestedState = (section: keyof BusinessPlanAnswers, field: string): string => {
+  const sectionData = answers[section];
+  if (typeof sectionData === 'object' && sectionData !== null) {
+    return (sectionData as any)[field] || '';
+  }
+  return '';
+};
+
+// Helper function to check if a section is valid
+const isSectionValid = (section: keyof BusinessPlanAnswers): boolean => {
+  const sectionData = answers[section];
+  if (typeof sectionData === 'object' && sectionData !== null) {
+    return Object.values(sectionData).every(value => value !== '');
+  }
+  return false;
+};
+
 export default function BusinessPlanWizard({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [step, setStep] = useState(0);
   const [company, setCompany] = useState("");
@@ -519,8 +661,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const [linkedinProfiles, setLinkedinProfiles] = useState<string[]>([]);
   const [profileAnalysis, setProfileAnalysis] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [answers, setAnswers] = useState<{ [key: string]: any }>({});
-  const router = useRouter();
   const [showExamples, setShowExamples] = useState<string | null>(null);
   const [showMarketPopup, setShowMarketPopup] = useState(false);
   const [marketEstimate, setMarketEstimate] = useState<string>("");
@@ -612,7 +752,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         scrapeIntervalRef.current = null;
       }
     };
-  }, [isScraping]);
+  }, [isScraping, scrapingMessages.length]);
 
   // När vi byter huvudfråga, nollställ subStep
   useEffect(() => { setSubStep(0); }, [step]);
@@ -626,7 +766,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     return (
       <BusinessPlanResult
         score={result.score}
-        details={result.details}
         answers={answers}
         subscriptionLevel={result.subscriptionLevel || 'silver'}
       />
@@ -882,73 +1021,16 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     return analyses[Math.floor(Math.random() * analyses.length)];
   };
 
-  const handleRevenueChange = (option: string) => {
-    if (option === "Annat") {
-      setAnswers(a => ({ ...a, revenue_model: { ...a.revenue_model, other: "" } }));
-    } else {
-      setAnswers(a => ({ ...a, revenue_model: { ...a.revenue_model, selected: option, other: a.revenue_model?.other || "" } }));
+  const handleNext = () => {
+    if (step < questions.length) {
+      setStep(step + 1);
+    } else if (step === questions.length) {
+      handleFinish();
     }
   };
 
-  const handleRevenueOtherChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAnswers(a => ({ ...a, revenue_model: { ...a.revenue_model, other: e.target.value } }));
-  };
-
-  const fetchMarketEstimate = async () => {
-    setIsMarketLoading(true);
-    setShowMarketPopup(false);
-    try {
-      const res = await fetch("/api/market-estimate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bransch: bransch === "Annat" ? customBransch : bransch,
-          omrade: omrade === "Annat" ? customOmrade : omrade
-        })
-      });
-      const data = await res.json();
-      setMarketEstimate(data.estimate || "");
-      setMarketSource(data.source || "");
-    } catch (e) {
-      setMarketEstimate("Kunde inte hämta marknadsdata.");
-      setMarketSource("");
-    } finally {
-      setIsMarketLoading(false);
-    }
-  };
-
-  const fetchCompetitionSuggestions = async () => {
-    setIsCompetitionLoading(true);
-    try {
-      const res = await fetch("/api/competition-suggestions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          business_idea: answers.business_idea,
-          bransch: bransch === "Annat" ? customBransch : bransch,
-          omrade: omrade === "Annat" ? customOmrade : omrade
-        })
-      });
-      const data = await res.json();
-      setCompetitionSuggestions(data.suggestions || []);
-      setAnswers(a => ({ ...a, competition: data.suggestions || [] }));
-    } catch (e) {
-      setCompetitionSuggestions([]);
-    } finally {
-      setIsCompetitionLoading(false);
-    }
-  };
-
-  const handleCompetitionChange = (idx: number, value: string) => {
-    setAnswers(a => ({ ...a, competition: a.competition.map((c: string, i: number) => i === idx ? value : c) }));
-  };
-
-  const handleRemoveCompetition = (idx: number) => {
-    setAnswers(a => ({ ...a, competition: a.competition.filter((_: string, i: number) => i !== idx) }));
-  };
-
-  const handleAddCompetition = () => {
-    setAnswers(a => ({ ...a, competition: [...(a.competition || []), ""] }));
+  const handleBack = () => {
+    if (step > 1) setStep(step - 1);
   };
 
   const handleFinish = async () => {
@@ -967,30 +1049,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     } finally {
       setIsAnalyzingPlan(false);
     }
-  };
-
-  const handleSuggestionClick = (suggestion: string) => {
-    setAnswers(a => ({ ...a, [current.id]: (a[current.id] || '') + (a[current.id] ? ' ' : '') + suggestion }));
-  };
-
-  // Funding details as budget posts
-  const handleBudgetPostChange = (idx: number, field: 'amount' | 'purpose', value: string) => {
-    setBudgetPosts(posts => posts.map((p, i) => i === idx ? { ...p, [field]: value } : p));
-    setAnswers(a => ({ ...a, funding_details: budgetPosts || [] }));
-  };
-  const addBudgetPost = () => setBudgetPosts(posts => [...posts, { amount: '', purpose: '' }]);
-  const removeBudgetPost = (idx: number) => setBudgetPosts(posts => posts.filter((_, i) => i !== idx));
-
-  const handleNext = () => {
-    if (step < questions.length) {
-      setStep(step + 1);
-    } else if (step === questions.length) {
-      handleFinish();
-    }
-  };
-
-  const handleBack = () => {
-    if (step > 1) setStep(step - 1);
   };
 
   return (

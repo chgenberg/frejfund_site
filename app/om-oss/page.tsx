@@ -64,7 +64,7 @@ export default function About() {
               Nu har han bytt pipetter mot prompt-ingenjörskap. Han älskar hur AI kan massera fram smartare beslut och jämna ut start-up-smärtan för fler grundare. Passionen? Göra komplicerad finans-jargong lika klar och återfuktande som en bra serumformula.
             </p>
             <p className="text-gray-800 leading-relaxed mt-4">
-              Han bor numera, liksom Jakob, på soliga Mallorca med fru, två barn och en osund mängd prototyp-slides i Google Drive. Hos oss är Christopher historiens berättare, marknadsstrategen och den som alltid frågar: "Hur känns det för användaren?" – oavsett om det gäller hudkräm eller AI-dashboard.
+              Han bor numera, liksom Jakob, på soliga Mallorca med fru, två barn och en osund mängd prototyp-slides i Google Drive. Hos oss är Christopher historiens berättare, marknadsstrategen och den som alltid frågar: &quot;Hur känns det för användaren?&quot; – oavsett om det gäller hudkräm eller AI-dashboard.
             </p>
           </div>
 

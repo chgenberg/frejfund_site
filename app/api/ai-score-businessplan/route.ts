@@ -31,11 +31,7 @@ export async function POST(req: NextRequest) {
     let result = null;
     try {
       result = JSON.parse(data.choices?.[0]?.message?.content || '{}');
-    } catch {
-      result = { score: null, motivation: '', strengths: '', weaknesses: '' };
-    }
+    } catch {}
     return NextResponse.json(result);
-  } catch (e) {
-    return NextResponse.json({ error: 'OpenAI error' }, { status: 500 });
-  }
+  } catch {}
 } 

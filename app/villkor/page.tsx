@@ -44,7 +44,7 @@ export default function Terms() {
 
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">
             <h2 className="text-xl font-bold mb-4 text-[#16475b]">Ansvarsbegränsning</h2>
-            <p className="leading-relaxed">Tjänsten tillhandahålls "i befintligt skick". FrejFund ansvarar inte för indirekta skador eller utebliven vinst. Ansvars taket motsvarar avgifter du betalat senaste 12 månaderna.</p>
+            <p className="leading-relaxed">Tjänsten tillhandahålls &quot;i befintligt skick&quot;. FrejFund ansvarar inte för indirekta skador eller utebliven vinst. Ansvars taket motsvarar avgifter du betalat senaste 12 månaderna.</p>
           </section>
 
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">

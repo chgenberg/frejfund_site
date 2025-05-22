@@ -39,9 +39,7 @@ Pitch: ...\nNamn: ...`;
       pitch: pitchMatch ? pitchMatch[1].trim() : '',
       name: nameMatch ? nameMatch[1].trim() : '',
     });
-  } catch (e) {
-    return NextResponse.json({ error: 'Fel vid kontakt med OpenAI.' }, { status: 500 });
-  }
+  } catch {}
 }
 
 export function GET() {

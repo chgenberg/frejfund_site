@@ -39,10 +39,7 @@ Marknadsstorlek: [siffra] SEK\nKälla: [kort källa eller förklaring]\nInga met
       estimate = text.trim();
       source = '';
     }
-  } catch (e) {
-    estimate = 'Kunde inte hämta marknadsdata.';
-    source = '';
-  }
+  } catch {}
 
   return NextResponse.json({ estimate, source });
 } 

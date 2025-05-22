@@ -3,7 +3,7 @@ import { scrapeAndAnalyze } from '../../../scripts/scrapeWithPlaywrightAndOpenAI
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-async function getCompetitorList(answers: any) {
+async function getCompetitorList(answers: Record<string, unknown>) {
   // GPT-prompt för att hitta konkurrenter
   const prompt = `Du är en marknadsanalytiker. Här är en affärsplan: ${JSON.stringify(answers, null, 2)}\n\nLista de tre största konkurrenterna (namn och webbadress) till detta bolag. Returnera som JSON-array: [{\"name\":..., \"url\":...}]`;
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -27,9 +27,7 @@ async function getCompetitorList(answers: any) {
   try {
     const content = data.choices?.[0]?.message?.content || '';
     competitors = JSON.parse(content.replace(/```json\n?|\n?```/g, '').trim());
-  } catch {
-    competitors = [];
-  }
+  } catch {}
   return competitors;
 }
 
@@ -44,7 +42,7 @@ export async function POST(req: NextRequest) {
   const results = [];
   for (const c of competitors) {
     try {
-      const data = await scrapeAndAnalyze(c.url);
+      await scrapeAndAnalyze(c.url);
       // GPT-prompt för analys
       const analysisPrompt = `Besök denna URL: ${c.url}. Sammanfatta företagets erbjudande, styrkor, svagheter och möjligheter i 2-3 meningar. Svara på svenska. Om sidan inte kan nås, skriv 'Kunde inte analysera'.`;
       const analysisRes = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -68,17 +66,13 @@ export async function POST(req: NextRequest) {
       try {
         const content = analysisData.choices?.[0]?.message?.content || '';
         analysis = JSON.parse(content.replace(/```json\n?|\n?```/g, '').trim());
-      } catch {
-        analysis = {};
-      }
+      } catch {}
       results.push({
         name: c.name,
         url: c.url,
         ...analysis
       });
-    } catch (e) {
-      results.push({ name: c.name, url: c.url, error: 'Kunde inte analysera' });
-    }
+    } catch {}
   }
   return NextResponse.json({ competitors: results });
 } 

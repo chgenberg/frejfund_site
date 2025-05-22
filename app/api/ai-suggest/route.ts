@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const { questionId, questionText, currentAnswer, context } = await req.json();
+  const { questionText, currentAnswer } = await req.json();
 
   const apiKey = process.env.OPENAI_API_KEY;
   const prompt = `Baserat på frågan: '${questionText}' och svaret: '${currentAnswer}', ge 2-4 smarta följdfrågor eller förtydliganden som hjälper användaren att utveckla sitt svar. Använd alltid hela svaret exakt som det är, utan att förkorta eller använda variabler. Om svaret är ett ord, använd det ordet exakt i dina följdfrågor. Svara på svenska och returnera endast en JSON-array med korta förslag.`;
@@ -32,12 +32,8 @@ export async function POST(req: NextRequest) {
     try {
       suggestions = JSON.parse(text);
       if (!Array.isArray(suggestions)) suggestions = [text];
-    } catch (e) {
-      suggestions = text.split('\n').map((s: string) => s.trim()).filter(Boolean);
-    }
-  } catch (e) {
-    suggestions = [];
-  }
+    } catch {}
+  } catch {}
 
   return NextResponse.json({ suggestions });
 } 

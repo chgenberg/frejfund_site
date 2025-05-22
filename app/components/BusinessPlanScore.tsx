@@ -1,10 +1,10 @@
 import React from 'react';
 
 interface ScoreProps {
-  answers: any;
+  answers: Record<string, unknown>;
 }
 
-const calculateScore = (answers: any) => {
+const calculateScore = (answers: Record<string, unknown>) => {
   // Baspoäng per kategori (0-25)
   const teamScore = calculateTeamScore(answers);
   const problemSolutionScore = calculateProblemSolutionScore(answers);
@@ -26,7 +26,7 @@ const calculateScore = (answers: any) => {
   };
 };
 
-const calculateTeamScore = (answers: any) => {
+const calculateTeamScore = (answers: Record<string, unknown>) => {
   let score = 0;
   
   // Team experience and background
@@ -52,7 +52,7 @@ const calculateTeamScore = (answers: any) => {
   return Math.min(25, score);
 };
 
-const calculateProblemSolutionScore = (answers: any) => {
+const calculateProblemSolutionScore = (answers: Record<string, unknown>) => {
   let score = 0;
 
   // Problem definition
@@ -78,7 +78,7 @@ const calculateProblemSolutionScore = (answers: any) => {
   return Math.min(25, score);
 };
 
-const calculateMarketScore = (answers: any) => {
+const calculateMarketScore = (answers: Record<string, unknown>) => {
   let score = 0;
 
   // Market size
