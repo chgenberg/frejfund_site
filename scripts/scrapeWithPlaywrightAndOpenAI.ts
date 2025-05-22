@@ -1,6 +1,5 @@
 import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
-import type { Element as CheerioElement } from 'cheerio';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -65,7 +64,7 @@ export async function scrapeAndAnalyze(url: string) {
       ogType: $('meta[property="og:type"]').attr('content') || '',
       ogImage: $('meta[property="og:image"]').attr('content') || '',
       schema: $('script[type="application/ld+json"]')
-        .map((_: number, el: CheerioElement) => $(el).html() || '')
+        .map((_: number, el: any) => $(el).html() || '')
         .get()
         .filter(Boolean),
       visibleText: $('body').text().replace(/\s+/g, ' ').trim()
