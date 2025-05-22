@@ -6,14 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npx puppeteer browsers install chrome@stable"
+    "lint": "next lint"
   },
   "dependencies": {
     "next": "15.3.2",
     "node-fetch": "^2.7.0",
     "openai": "^4.102.0",
-    "puppeteer": "^22.3.0",
+    "cheerio": "^1.0.0-rc.12",
     "react": "^19.0.0",
     "react-circular-progressbar": "^2.1.0",
     "react-dom": "^19.0.0",
@@ -22,7 +21,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
-    "@types/puppeteer": "^7.0.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
@@ -30,5 +28,8 @@
     "eslint-config-next": "15.3.2",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
