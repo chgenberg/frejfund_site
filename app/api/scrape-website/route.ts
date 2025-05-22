@@ -5,56 +5,37 @@ export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json();
     if (!url) {
-      return NextResponse.json({ error: 'URL saknas' }, { status: 400 });
+      return NextResponse.json({ error: 'URL saknas i förfrågan' }, { status: 400 });
     }
 
     if (!process.env.OPENAI_API_KEY) {
-      console.error('OPENAI_API_KEY is not configured');
-      return NextResponse.json({ 
-        error: 'AI service is not configured properly',
-        details: 'Please contact support'
-      }, { status: 500 });
+      console.error('OPENAI_API_KEY saknas i miljövariablerna');
+      return NextResponse.json({ error: 'OpenAI API-nyckel saknas' }, { status: 500 });
     }
 
-    console.log('Startar scraping av:', url);
-    try {
-      const result = await scrapeAndAnalyze(url);
-      console.log('Scraping klar, resultat:', result);
-      return NextResponse.json(result);
-    } catch (scrapeError: any) {
-      console.error('Fel vid scraping:', scrapeError);
-      
-      // Kontrollera om felet är relaterat till Puppeteer
-      if (scrapeError.message?.includes('puppeteer') || 
-          scrapeError.message?.includes('browser') || 
-          scrapeError.message?.includes('chrome')) {
-        return NextResponse.json({ 
-          error: 'Web scraping service is not available',
-          details: 'Browser service is not properly configured',
-          debug: scrapeError.message
-        }, { status: 503 });
-      }
-      
-      // Kontrollera om felet är relaterat till OpenAI
-      if (scrapeError.message?.includes('OpenAI') || 
-          scrapeError.message?.includes('API')) {
-        return NextResponse.json({ 
-          error: 'AI service is not available',
-          details: 'OpenAI service is not properly configured',
-          debug: scrapeError.message
-        }, { status: 503 });
-      }
-      
-      throw scrapeError; // Rethrow för att hanteras av den yttre catch-blocket
-    }
-  } catch (e) {
-    console.error('Fel i scrape-website route:', e);
-    const errorMessage = e instanceof Error ? e.message : 'Okänt fel';
+    console.log('Startar skrapning av:', url);
+    const result = await scrapeAndAnalyze(url);
     
-    return NextResponse.json({ 
-      error: 'Kunde inte skrapa eller analysera hemsidan',
-      details: errorMessage,
-      debug: process.env.NODE_ENV === 'development' ? e : undefined
-    }, { status: 500 });
+    return NextResponse.json(result);
+  } catch (error: any) {
+    console.error('Fel vid skrapning:', error);
+    
+    // Mer specifik felhantering
+    if (error.message.includes('OPENAI_API_KEY')) {
+      return NextResponse.json({ error: 'OpenAI API-nyckel saknas eller är ogiltig' }, { status: 500 });
+    }
+    
+    if (error.message.includes('Ogiltig URL')) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    // Generellt fel
+    return NextResponse.json(
+      { 
+        error: error.message || 'Ett fel uppstod vid skrapning',
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
+      { status: 500 }
+    );
   }
 } 
