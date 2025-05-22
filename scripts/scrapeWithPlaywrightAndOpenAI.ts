@@ -40,7 +40,7 @@ export async function scrapeAndAnalyze(url: string) {
         '--no-zygote',
         '--single-process'
       ],
-      headless: 'new'
+      headless: true
     });
     
     console.log('Öppnar ny sida...');
