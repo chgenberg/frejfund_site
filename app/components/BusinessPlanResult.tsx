@@ -2,6 +2,7 @@ import React, { useState, useEffect, ReactNode } from 'react';
 import Image from 'next/image';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import SectionFeedback from './SectionFeedback';
 
 interface ResultProps {
   score: number;
@@ -327,7 +328,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
             {sectionKeys.map(({ key, label }) => (
               <div key={key} className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
                 <div className="font-bold text-[#16475b] mb-1">AI-feedback för {label}:</div>
-                <div className="text-[#16475b] text-sm">{feedback[key] || 'Ingen feedback tillgänglig.'}</div>
+                <SectionFeedback section={key} text={safeAnswers[key] ? JSON.stringify(safeAnswers[key]) : ''} />
               </div>
             ))}
           </div>
