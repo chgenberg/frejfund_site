@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const { questionText, currentAnswer } = await req.json();
+  const { questionText, currentAnswer, businessDomain } = await req.json();
 
   const apiKey = process.env.OPENAI_API_KEY;
-  const prompt = `Baserat på frågan: '${questionText}' och svaret: '${currentAnswer}', ge 2-4 smarta följdfrågor eller förtydliganden som hjälper användaren att utveckla sitt svar. Använd alltid hela svaret exakt som det är, utan att förkorta eller använda variabler. Om svaret är ett ord, använd det ordet exakt i dina följdfrågor. Svara på svenska och returnera endast en JSON-array med korta förslag.`;
+  const prompt = `Baserat på frågan: '${questionText}', svaret: '${currentAnswer}', och företagets domän/beskrivning: '${businessDomain}', ge EXAKT 2 smarta följdfrågor eller förtydliganden som är relevanta för detta företag. Använd alltid hela svaret exakt som det är, utan att förkorta eller använda variabler. Om svaret är ett ord, använd det ordet exakt i dina följdfrågor. Svara på svenska och returnera endast en JSON-array med exakt 2 förslag.`;
 
   let suggestions = [];
   try {
@@ -32,6 +32,9 @@ export async function POST(req: NextRequest) {
     try {
       suggestions = JSON.parse(text);
       if (!Array.isArray(suggestions)) suggestions = [text];
+      // Säkerställ att vi alltid har exakt 2 förslag
+      if (suggestions.length > 2) suggestions = suggestions.slice(0, 2);
+      while (suggestions.length < 2) suggestions.push('Inget ytterligare förslag tillgängligt.');
     } catch {}
   } catch {}
 

@@ -1001,10 +1001,35 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   };
 
   const handleNext = () => {
-    if (step < questions.length) {
+    // Validera obligatoriska fält för nuvarande sektion
+    const currentAnswers = answers[current.id] as Record<string, string>;
+    const requiredFields = getRequiredFields(current.id);
+    const missingFields = requiredFields.filter(field => !currentAnswers[field]);
+    if (missingFields.length > 0) {
+      alert(`Vänligen fyll i alla obligatoriska fält: ${missingFields.join(', ')}`);
+      return;
+    }
+    if (step < questions.length - 1) {
       setStep(step + 1);
-    } else if (step === questions.length) {
+    } else {
       handleFinish();
+    }
+  };
+
+  const getRequiredFields = (sectionId: string): string[] => {
+    switch (sectionId) {
+      case 'business_idea':
+        return ['what_you_do', 'why_unique'];
+      case 'market_analysis':
+        return ['market_size', 'customer_segments'];
+      case 'revenue_model':
+        return ['model', 'price_model'];
+      case 'team':
+        return ['team_roles', 'dna_strengths'];
+      case 'funding_details':
+        return ['funding_need', 'use_of_funds'];
+      default:
+        return [];
     }
   };
 
@@ -1033,13 +1058,8 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const handleAnswerChange = (section: keyof BusinessPlanAnswers, field: string, value: string) => {
     setAnswers(prev => {
       const sectionData = prev[section];
-      if (typeof sectionData === 'string') {
-        return {
-          ...prev,
-          [section]: value
-        };
-      }
-      if (sectionData) {
+      // Om sectionData är ett objekt, uppdatera bara det fältet
+      if (typeof sectionData === 'object' && sectionData !== null) {
         return {
           ...prev,
           [section]: {
@@ -1048,7 +1068,13 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
           }
         };
       }
-      return prev;
+      // Om sectionData är en sträng (felaktigt), konvertera till objekt
+      return {
+        ...prev,
+        [section]: {
+          [field]: value
+        }
+      };
     });
   };
 
