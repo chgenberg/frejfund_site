@@ -718,8 +718,8 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     'Sammanställer din investeringsprofil...'
   ];
 
-  const current: Question = QUESTIONS[step - 1];
-  const progress = Math.round((step / QUESTIONS.length) * 100);
+  const current: Question = INVESTOR_QUESTIONS[step - 1];
+  const progress = Math.round((step / INVESTOR_QUESTIONS.length) * 100);
 
   const isPreStep1Valid =
     company.trim().length > 1 &&
@@ -988,7 +988,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         >×</button>
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[#16475b] font-bold text-sm">Fråga {step} av {QUESTIONS.length}</span>
+            <span className="text-[#16475b] font-bold text-sm">Fråga {step} av {INVESTOR_QUESTIONS.length}</span>
             <div className="flex items-center gap-2">
               <span className="text-[#16475b] font-bold text-sm">{progress}%</span>
               <button
@@ -1287,6 +1287,30 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               {fileError && <div className="text-red-600 mt-1">{fileError}</div>}
             </div>
           )}
+          {isMilestoneQuestion(current) && (
+            <MilestoneList 
+              value={JSON.parse(answers[current.id] || '[]')}
+              onChange={(val) => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
+            />
+          )}
+          {isCapitalQuestion(current) && (
+            <CapitalMatrix 
+              value={JSON.parse(answers[current.id] || '{"amount":"","product":"","sales":"","team":"","other":"","probability":"3"}')}
+              onChange={(val) => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
+            />
+          )}
+          {isESGQuestion(current) && (
+            <ESGCheckbox 
+              value={JSON.parse(answers[current.id] || '{"miljö":false,"socialt":false,"governance":false,"text":""}')}
+              onChange={(val) => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
+            />
+          )}
+          {isFounderMarketFitQuestion(current) && (
+            <FounderMarketFit 
+              value={JSON.parse(answers[current.id] || '{"score":"","text":""}')}
+              onChange={(val) => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
+            />
+          )}
           <div className="flex justify-between mt-6">
             <button
               onClick={() => setStep(s => Math.max(s - 1, 1))}
@@ -1299,10 +1323,33 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                   alert('Fältet är obligatoriskt');
                   return;
                 }
-                setStep(s => Math.min(s + 1, QUESTIONS.length));
+                
+                if (step === INVESTOR_QUESTIONS.length) {
+                  // Sista frågan - visa resultat
+                  setShowFinalLoader(true);
+                  let loaderIndex = 0;
+                  const loaderInterval = setInterval(() => {
+                    loaderIndex++;
+                    if (loaderIndex < finalLoaderMessages.length) {
+                      setFinalLoaderText(finalLoaderMessages[loaderIndex]);
+                    } else {
+                      clearInterval(loaderInterval);
+                      // Simulera ett score baserat på svaren
+                      const score = Math.floor(Math.random() * 30) + 70; // 70-100
+                      setResult({ 
+                        score, 
+                        subscriptionLevel: score >= 80 ? 'gold' : 'silver',
+                        answers
+                      });
+                      setShowFinalLoader(false);
+                    }
+                  }, 2000);
+                } else {
+                  setStep(s => Math.min(s + 1, INVESTOR_QUESTIONS.length));
+                }
               }}
               className="px-4 py-2 rounded bg-[#16475b] text-white"
-            >Nästa</button>
+            >{step === INVESTOR_QUESTIONS.length ? 'Slutför' : 'Nästa'}</button>
           </div>
         </div>
         {showExample === current.id && (
