@@ -158,7 +158,7 @@ const EXAMPLES: { [key: string]: string[] } = {
 interface BranschQuestion {
   id: string;
   text?: string;
-  type?: 'text' | 'textarea' | 'select' | 'radio';
+  type?: 'text' | 'textarea' | 'select' | 'radio' | 'number' | 'file' | 'milestone_list' | 'capital_matrix' | 'esg_checkbox' | 'founder_market_fit';
   options?: string[];
   label?: string;
   exampleAnswers?: string[];
