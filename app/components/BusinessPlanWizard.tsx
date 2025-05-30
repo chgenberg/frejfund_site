@@ -474,7 +474,7 @@ const INVESTOR_QUESTIONS = [
 
 // Funktion för att dynamiskt lägga till branschspecifika frågor
 function getAllQuestions(selectedIndustry: string) {
-  let industrySpecific: any[] = [];
+  const industrySpecific: any[] = [];
   // Här kan du lägga till logik för att hämta branschspecifika frågor baserat på selectedIndustry
   // Exempel:
   // if (selectedIndustry === 'SaaS') industrySpecific = [...];

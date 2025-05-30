@@ -1,4 +1,4 @@
-// @ts-expect-error
+// @ts-expect-error: pdf-parse saknar typer, kräver ignore
 // eslint-disable-next-line
 declare module 'pdf-parse';
 import { NextApiRequest, NextApiResponse } from 'next';
