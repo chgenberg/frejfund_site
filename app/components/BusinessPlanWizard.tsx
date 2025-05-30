@@ -1801,23 +1801,88 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 if (step === INVESTOR_QUESTIONS.length) {
                   // Sista frågan - visa resultat
                   setShowFinalLoader(true);
+                  setFinalLoaderText(finalLoaderMessages[0]);
                   let loaderIndex = 0;
                   const loaderInterval = setInterval(() => {
                     loaderIndex++;
                     if (loaderIndex < finalLoaderMessages.length) {
                       setFinalLoaderText(finalLoaderMessages[loaderIndex]);
-                    } else {
-                      clearInterval(loaderInterval);
-                      // Simulera ett score baserat på svaren
-                      const score = Math.floor(Math.random() * 30) + 70; // 70-100
-                      setResult({ 
-                        score, 
-                        subscriptionLevel: score >= 80 ? 'gold' : 'silver',
-                        answers
-                      });
-                      setShowFinalLoader(false);
                     }
                   }, 2000);
+
+                  // Formatera svaren för API:et
+                  const formattedAnswers = {
+                    company_name: company,
+                    business_idea: {
+                      what_you_do: answers.company_value || '',
+                      for_whom: answers.target_customer || '',
+                      why_unique: answers.unique_solution || ''
+                    },
+                    customer_segments: {
+                      customer_group: answers.target_customer || '',
+                      customer_needs: answers.customer_problem || '',
+                      customer_location: omrade || ''
+                    },
+                    problem_solution: {
+                      problem: answers.customer_problem || '',
+                      solution: answers.solution || '',
+                      unique_value: answers.unique_solution || ''
+                    },
+                    market_analysis: {
+                      market_size: answers.market_size || '',
+                      competitors: answers.competitors || '',
+                      market_trends: answers.market_trends || ''
+                    },
+                    business_model: {
+                      revenue_model: answers.revenue_block || '',
+                      pricing_strategy: answers.revenue_block || '',
+                      sales_channels: answers.revenue_block || ''
+                    },
+                    team: {
+                      key_people: answers.team || '',
+                      roles: answers.team || '',
+                      expertise: answers.team_skills || ''
+                    },
+                    funding_details: {
+                      funding_needed: answers.capital_block || '',
+                      use_of_funds: answers.capital_block || '',
+                      exit_strategy: answers.exit_strategy || ''
+                    }
+                  };
+
+                  // Anropa API:et för att analysera affärsplanen
+                  fetch('/api/analyze-businessplan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                      answers: formattedAnswers,
+                      applicationType: 'investor'
+                    })
+                  })
+                    .then(res => res.json())
+                    .then(data => {
+                      clearInterval(loaderInterval);
+                      if (data.error) {
+                        alert('Ett fel uppstod vid analysen. Försök igen.');
+                        setShowFinalLoader(false);
+                      } else {
+                        // Visa resultatet
+                        const score = data.total_score || 75;
+                        setResult({ 
+                          score, 
+                          subscriptionLevel: score >= 80 ? 'gold' : 'silver',
+                          answers: formattedAnswers,
+                          feedback: data
+                        });
+                        setShowFinalLoader(false);
+                      }
+                    })
+                    .catch(error => {
+                      clearInterval(loaderInterval);
+                      console.error('Error analyzing business plan:', error);
+                      alert('Ett fel uppstod vid analysen. Försök igen.');
+                      setShowFinalLoader(false);
+                    });
                 } else {
                   setStep(s => Math.min(s + 1, INVESTOR_QUESTIONS.length));
                 }
