@@ -217,7 +217,6 @@ Fyll i så mycket information som möjligt baserat på webbsidans innehåll. Om 
       // Ta bort markdown-formatering om den finns
       const jsonContent = content.replace(/```json\n?|\n?```/g, '').trim();
       result = JSON.parse(jsonContent);
-      
       // Lägg till metainformation
       result._metadata = {
         scraped_at: new Date().toISOString(),
@@ -225,12 +224,13 @@ Fyll i så mycket information som möjligt baserat på webbsidans innehåll. Om 
         title: data.title,
         raw_text_length: data.visibleText.length
       };
-      
-    } catch (e) {
+      result.success = true;
+    } catch (e: any) {
       console.error('Fel vid parsning av JSON:', e);
-      result = { 
+      result = {
         raw: content,
         error: 'Kunde inte tolka analysen som JSON',
+        success: false,
         _metadata: {
           scraped_at: new Date().toISOString(),
           source_url: formattedUrl,
@@ -238,10 +238,16 @@ Fyll i så mycket information som möjligt baserat på webbsidans innehåll. Om 
         }
       };
     }
-
     return result;
-  } catch (e) {
+  } catch (e: any) {
     console.error('Fel i scrapeAndAnalyze:', e);
-    throw e;
+    return {
+      success: false,
+      error: e.message || 'Ett fel uppstod vid skrapning',
+      _metadata: {
+        scraped_at: new Date().toISOString(),
+        error: true
+      }
+    };
   }
 } 
