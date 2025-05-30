@@ -601,26 +601,127 @@ function MilestoneList({ value, onChange }: { value: { milestone: string; date: 
 
 function CapitalMatrix({ value, onChange }: { value: { amount: string; product: string; sales: string; team: string; other: string; probability: string }; onChange: (val: any) => void }) {
   const handleField = (field: string, val: string) => onChange({ ...value, [field]: val });
+  
   return (
-    <div className="space-y-2">
-      <div className="flex gap-2 items-center">
-        <label className="w-32">Belopp (MSEK)</label>
-        <input type="number" min="0" step="0.1" className="flex-1 px-3 py-2 rounded-lg border border-[#16475b] bg-white/80 text-[#16475b]" value={value.amount} onChange={e => handleField('amount', e.target.value)} />
+    <div className="space-y-4">
+      {/* Kapitalbehov */}
+      <div className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
+        <label className="block font-semibold mb-3 text-[#16475b]">Totalt kapitalbehov</label>
+        <div className="flex items-center gap-3">
+          <input 
+            type="number" 
+            min="0" 
+            step="0.5" 
+            className="w-24 px-3 py-2 rounded-xl border border-[#7edcff] bg-white/80 text-[#16475b] text-center font-bold focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all" 
+            value={value.amount} 
+            onChange={e => handleField('amount', e.target.value)}
+            placeholder="8" 
+          />
+          <span className="text-[#16475b] font-medium">MSEK</span>
+        </div>
       </div>
-      <div className="flex gap-2 items-center">
-        <label className="w-32">Produkt (%)</label>
-        <input type="number" min="0" max="100" className="w-20 px-3 py-2 rounded-lg border border-[#16475b] bg-white/80 text-[#16475b]" value={value.product} onChange={e => handleField('product', e.target.value)} />
-        <label className="w-20">Försäljning (%)</label>
-        <input type="number" min="0" max="100" className="w-20 px-3 py-2 rounded-lg border border-[#16475b] bg-white/80 text-[#16475b]" value={value.sales} onChange={e => handleField('sales', e.target.value)} />
-        <label className="w-20">Team (%)</label>
-        <input type="number" min="0" max="100" className="w-20 px-3 py-2 rounded-lg border border-[#16475b] bg-white/80 text-[#16475b]" value={value.team} onChange={e => handleField('team', e.target.value)} />
-        <label className="w-20">Övrigt (%)</label>
-        <input type="number" min="0" max="100" className="w-20 px-3 py-2 rounded-lg border border-[#16475b] bg-white/80 text-[#16475b]" value={value.other} onChange={e => handleField('other', e.target.value)} />
+
+      {/* Fördelning */}
+      <div className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
+        <label className="block font-semibold mb-3 text-[#16475b]">Hur ska kapitalet användas? (%)</label>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-[#16475b]">Produktutveckling</label>
+            <div className="flex items-center gap-2">
+              <input 
+                type="number" 
+                min="0" 
+                max="100" 
+                className="w-16 px-2 py-1 rounded-lg border border-[#7edcff] bg-white/80 text-[#16475b] text-center text-sm focus:ring-1 focus:ring-[#7edcff] transition-all" 
+                value={value.product} 
+                onChange={e => handleField('product', e.target.value)}
+                placeholder="40" 
+              />
+              <span className="text-xs text-gray-500">%</span>
+            </div>
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-[#16475b]">Försäljning & Marknad</label>
+            <div className="flex items-center gap-2">
+              <input 
+                type="number" 
+                min="0" 
+                max="100" 
+                className="w-16 px-2 py-1 rounded-lg border border-[#7edcff] bg-white/80 text-[#16475b] text-center text-sm focus:ring-1 focus:ring-[#7edcff] transition-all" 
+                value={value.sales} 
+                onChange={e => handleField('sales', e.target.value)}
+                placeholder="30" 
+              />
+              <span className="text-xs text-gray-500">%</span>
+            </div>
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-[#16475b]">Personal & Rekrytering</label>
+            <div className="flex items-center gap-2">
+              <input 
+                type="number" 
+                min="0" 
+                max="100" 
+                className="w-16 px-2 py-1 rounded-lg border border-[#7edcff] bg-white/80 text-[#16475b] text-center text-sm focus:ring-1 focus:ring-[#7edcff] transition-all" 
+                value={value.team} 
+                onChange={e => handleField('team', e.target.value)}
+                placeholder="25" 
+              />
+              <span className="text-xs text-gray-500">%</span>
+            </div>
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-[#16475b]">Övrigt</label>
+            <div className="flex items-center gap-2">
+              <input 
+                type="number" 
+                min="0" 
+                max="100" 
+                className="w-16 px-2 py-1 rounded-lg border border-[#7edcff] bg-white/80 text-[#16475b] text-center text-sm focus:ring-1 focus:ring-[#7edcff] transition-all" 
+                value={value.other} 
+                onChange={e => handleField('other', e.target.value)}
+                placeholder="5" 
+              />
+              <span className="text-xs text-gray-500">%</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Total check */}
+        {(() => {
+          const total = (parseInt(value.product) || 0) + (parseInt(value.sales) || 0) + (parseInt(value.team) || 0) + (parseInt(value.other) || 0);
+          return total > 0 ? (
+            <div className={`mt-3 text-sm text-center font-medium ${total === 100 ? 'text-green-600' : 'text-orange-600'}`}>
+              Totalt: {total}% {total !== 100 && '(bör vara 100%)'}
+            </div>
+          ) : null;
+        })()}
       </div>
-      <div className="flex gap-2 items-center">
-        <label className="w-48">Sannolikhet att mer kapital behövs (1–5)</label>
-        <input type="range" min="1" max="5" value={value.probability || '3'} onChange={e => handleField('probability', e.target.value)} className="flex-1" />
-        <span className="ml-2 font-bold">{value.probability || '3'}</span>
+
+      {/* Sannolikhet för mer kapital */}
+      <div className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
+        <label className="block font-semibold mb-3 text-[#16475b]">Sannolikhet att ni behöver mer kapital inom 18 månader</label>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-gray-600">Låg</span>
+          <input 
+            type="range" 
+            min="1" 
+            max="5" 
+            value={value.probability || '3'} 
+            onChange={e => handleField('probability', e.target.value)} 
+            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+            style={{
+              background: `linear-gradient(to right, #7edcff 0%, #7edcff ${((parseInt(value.probability) || 3) - 1) * 25}%, #e5e7eb ${((parseInt(value.probability) || 3) - 1) * 25}%, #e5e7eb 100%)`
+            }}
+          />
+          <span className="text-sm text-gray-600">Hög</span>
+          <div className="w-8 h-8 rounded-full bg-[#7edcff] text-[#16475b] flex items-center justify-center font-bold text-sm">
+            {value.probability || '3'}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -642,17 +743,45 @@ function ESGCheckbox({ value, onChange }: { value: { miljö: boolean; socialt: b
 
 function FounderMarketFit({ value, onChange }: { value: { score: string; text: string }; onChange: (val: any) => void }) {
   return (
-    <div className="space-y-2">
-      <div className="flex gap-2 items-center">
-        <label className="w-48">Matchning (1–5):</label>
-        {[1,2,3,4,5].map(n => (
-          <label key={n} className="flex items-center gap-1 cursor-pointer">
-            <input type="radio" name="founder_market_fit_score" value={n} checked={value.score === String(n)} onChange={() => onChange({ ...value, score: String(n) })} />
-            <span>{n}</span>
-          </label>
-        ))}
+    <div className="space-y-4">
+      <div className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
+        <label className="block font-semibold mb-3 text-[#16475b]">Matchning (1–5):</label>
+        <div className="flex gap-3 justify-center">
+          {[1,2,3,4,5].map(n => (
+            <label key={n} className="flex flex-col items-center gap-2 cursor-pointer group">
+              <div className={`w-12 h-12 rounded-full border-2 border-[#7edcff] flex items-center justify-center font-bold text-lg transition-all duration-200 ${
+                value.score === String(n) 
+                  ? 'bg-[#7edcff] text-[#16475b] shadow-lg scale-110' 
+                  : 'bg-white/80 text-[#7edcff] hover:bg-[#7edcff]/20 hover:scale-105'
+              }`}>
+                {n}
+              </div>
+              <input
+                type="radio"
+                name="founder_market_fit_score"
+                value={n}
+                checked={value.score === String(n)}
+                onChange={() => onChange({ ...value, score: String(n) })}
+                className="hidden"
+              />
+              <span className={`text-xs font-medium transition-colors ${
+                value.score === String(n) ? 'text-[#16475b]' : 'text-gray-500'
+              }`}>
+                {n === 1 ? 'Ingen' : n === 3 ? 'Bra' : n === 5 ? 'Expert' : ''}
+              </span>
+            </label>
+          ))}
+        </div>
       </div>
-      <textarea className="w-full min-h-[40px] rounded-lg border border-[#16475b] bg-white/80 px-4 py-2 text-[#16475b]" value={value.text} onChange={e => onChange({ ...value, text: e.target.value })} placeholder="Motivera kort..." />
+      <div className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
+        <label className="block font-semibold mb-2 text-[#16475b]">Motivering:</label>
+        <textarea 
+          className="w-full min-h-[80px] rounded-xl border border-[#7edcff] bg-white/80 px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none" 
+          value={value.text} 
+          onChange={e => onChange({ ...value, text: e.target.value })} 
+          placeholder="Beskriv kort teamets relevanta erfarenhet och expertis..."
+        />
+      </div>
     </div>
   );
 }
@@ -819,7 +948,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               Om du får en score på över 80/100, vill du då att vi förmedlar din information vidare?</p>
             <div className="flex justify-center gap-6 mb-6">
               <button 
-                className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg" 
+                className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg hover:bg-[#7edcff] hover:text-[#16475b] transition-all" 
                 onClick={() => {
                   setInvestorConsent(true);
                   // Uppdatera sparad data med investorConsent
@@ -842,7 +971,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 Ja, förmedla gärna min information
               </button>
               <button 
-                className="bg-gray-200 text-[#16475b] font-bold rounded-full px-8 py-3 shadow-lg" 
+                className="bg-gray-200 text-[#16475b] font-bold rounded-full px-8 py-3 shadow-lg hover:bg-[#16475b] hover:text-white transition-all" 
                 onClick={() => setInvestorConsent(false)}
               >
                 Nej, tack
@@ -853,8 +982,8 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
       );
     }
     
-    // Visa vanliga resultatet när allt är sparat
-    if (submissionSaved) {
+    // Visa vanliga resultatet när allt är sparat OCH investorConsent är bestämt (eller score <= 80)
+    if (submissionSaved && (investorConsent !== null || result.score <= 80)) {
       return (
         <BusinessPlanResult
           score={result.score}
