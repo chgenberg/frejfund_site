@@ -31,6 +31,11 @@ type SelectQuestion = BaseQuestion & {
 
 type Question = TextQuestion | SelectQuestion;
 
+// Type guard to check if a question is a SelectQuestion
+function isSelectQuestion(question: Question): question is SelectQuestion {
+  return question.type === 'select' || question.type === 'radio';
+}
+
 // Steg 1-5: Inledande frågor
 const INTRO_QUESTIONS: Question[] = [];
 
@@ -987,7 +992,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               style={{ minHeight: '8rem', maxHeight: '8rem', resize: 'none' }}
             />
           )}
-          {current.type === "select" && (
+          {current.type === "select" && isSelectQuestion(current) && (
             <div className="relative mb-4">
               <select
                 className="w-full p-3 border rounded-xl pr-10 text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all min-h-32"
@@ -996,7 +1001,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 style={{ minHeight: '8rem', maxHeight: '8rem' }}
               >
                 <option value="">Välj...</option>
-                {current.options?.map((opt: string) => (
+                {current.options.map((opt: string) => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
@@ -1007,9 +1012,9 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               </span>
             </div>
           )}
-          {current.type === "radio" && (
+          {current.type === "radio" && isSelectQuestion(current) && (
             <div className="flex flex-col gap-2 mb-4">
-              {current.options?.map((opt: string) => (
+              {current.options.map((opt: string) => (
                 <label key={opt} className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
