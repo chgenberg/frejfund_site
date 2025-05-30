@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import SectionFeedback from './SectionFeedback';
+import PitchDeckCustomization, { PitchDeckConfig } from './PitchDeckCustomization';
 
 interface ResultProps {
   score: number;
@@ -151,6 +152,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
   const [pitchDeckLoading, setPitchDeckLoading] = useState(false);
   const [allAiFeedback, setAllAiFeedback] = useState<Record<string, string>>({});
   const [loadingAiFeedback, setLoadingAiFeedback] = useState(true);
+  const [showPitchDeckCustomization, setShowPitchDeckCustomization] = useState(false);
   
   const scoreComparison = getScoreComparison(_score);
   const marketData = getMarketSizeData(safeAnswers.market_size?.market_value || '0');
@@ -288,13 +290,26 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
     fetchCompetitors();
   }, [answers]);
 
-  const handlePitchDeckGeneration = async () => {
+  const handlePitchDeckGeneration = async (config?: PitchDeckConfig) => {
+    setShowPitchDeckCustomization(false);
     setPitchDeckLoading(true);
+    
     try {
+      const formData = new FormData();
+      formData.append('answers', JSON.stringify(answers));
+      formData.append('score', String(_score));
+      
+      if (config) {
+        if (config.logo) {
+          formData.append('logo', config.logo);
+        }
+        formData.append('colors', JSON.stringify(config.colors));
+        formData.append('fontFamily', config.fontFamily);
+      }
+      
       const response = await fetch('/api/generate-pitchdeck', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers, score: _score })
+        body: formData
       });
       
       if (response.ok) {
@@ -406,57 +421,6 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
               </div>
             </div>
           )}
-
-          {/* Executive Summary & Demo */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-[#16475b] mb-8">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold text-[#16475b] mb-2 flex items-center gap-2">
-                  <span>🚀</span> Executive Summary
-                </h1>
-                <div className="text-lg text-[#16475b] mb-2">
-                  {safeAnswers.executive_summary?.summary || 'Ingen sammanfattning angiven.'}
-                </div>
-                {safeAnswers.executive_summary?.demo_link && (
-                  <div className="mt-2">
-                    <a href={safeAnswers.executive_summary.demo_link} target="_blank" rel="noopener noreferrer" className="underline text-[#2a6b8a] font-semibold">Se demo/video</a>
-                  </div>
-                )}
-              </div>
-              <div className="flex-shrink-0 flex flex-col items-center">
-                <div className="text-6xl mb-2">{scoreInfo.emoji}</div>
-                <div className="text-5xl font-bold text-[#16475b]">{_score}</div>
-                <div className="text-lg text-[#16475b] font-semibold">{scoreInfo.label}</div>
-              </div>
-            </div>
-            
-            {/* Pitch Deck Generation Button */}
-            <div className="mt-6 pt-6 border-t border-[#16475b]/20">
-              <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-                <button
-                  onClick={handlePitchDeckGeneration}
-                  disabled={pitchDeckLoading}
-                  className="bg-gradient-to-r from-[#16475b] to-[#2a6b8a] text-white font-bold rounded-full px-8 py-4 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
-                >
-                  {pitchDeckLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Genererar pitch deck...
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-xl">📊</span>
-                      Generera AI Pitch Deck (PDF)
-                    </>
-                  )}
-                </button>
-                <div className="text-sm text-[#16475b] text-center">
-                  <div className="font-semibold">Professionell pitch deck</div>
-                  <div>Baserad på dina svar • Redo för investerare</div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* AI-feedback för sektioner */}
           <div className="space-y-4">
@@ -741,14 +705,14 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
             <div><b>Exit-plan:</b> {getOr(safeAnswers.exit_strategy?.exit_plan, 'Ej angivet')}</div>
           </div>
 
-          {/* Second Pitch Deck Button */}
+          {/* Pitch Deck Generation Section */}
           <div className="bg-gradient-to-br from-[#16475b] to-[#2a6b8a] rounded-3xl p-8 shadow-xl text-white text-center">
             <h2 className="text-2xl font-bold mb-4">Redo för nästa steg?</h2>
             <p className="text-lg mb-6 opacity-90">
               Skapa en professionell pitch deck baserad på din analys
             </p>
             <button
-              onClick={handlePitchDeckGeneration}
+              onClick={() => setShowPitchDeckCustomization(true)}
               disabled={pitchDeckLoading}
               className="bg-white text-[#16475b] font-bold rounded-full px-10 py-4 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 mx-auto"
             >
@@ -760,10 +724,14 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
               ) : (
                 <>
                   <span className="text-xl">🎯</span>
-                  Ladda ner Pitch Deck (PDF)
+                  Generera AI Pitch Deck (PDF)
                 </>
               )}
             </button>
+            <div className="text-sm text-white/80 mt-4">
+              <div className="font-semibold">Professionell pitch deck</div>
+              <div>Baserad på dina svar • Redo för investerare</div>
+            </div>
           </div>
         </div>
       </div>
@@ -808,6 +776,14 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
             </div>
           </div>
         </div>
+      )}
+
+      {/* Pitch Deck Customization Modal */}
+      {showPitchDeckCustomization && (
+        <PitchDeckCustomization
+          onGenerate={handlePitchDeckGeneration}
+          onClose={() => setShowPitchDeckCustomization(false)}
+        />
       )}
     </div>
   );

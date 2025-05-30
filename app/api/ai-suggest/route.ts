@@ -48,12 +48,12 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           model: 'gpt-4o',
           messages: [
-            { role: 'system', content: 'Du är en expert på affärsplaner och företagsanalys. Ge ENDAST konkreta, specifika svar direkt utan förklaringar om hur du kom fram till svaret. Svara kort och koncist men informativt. Inga långa utläggningar eller pedagogiska förklaringar.' },
+            { role: 'system', content: 'Du är en expert på affärsplaner och företagsanalys. Ge ENDAST konkreta, specifika svar direkt utan förklaringar om hur du kom fram till svaret. Svara kort och koncist men informativt. Inga långa utläggningar eller pedagogiska förklaringar. Fokusera på värdeskapande insikter som är relevanta för investerare.' },
             { role: 'user', content: contextualPrompt }
           ],
-          max_tokens: 300,
-          temperature: 0.3
-        })
+          max_tokens: 800,
+          temperature: 0.7,
+        }),
       });
       
       const data = await openaiRes.json();

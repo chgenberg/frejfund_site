@@ -1205,256 +1205,35 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   useOnClickOutside(competitorRef, () => setShowCompetitorPopup(false));
 
   if (!open) return null;
-  if (result) {
-    // Automatiskt spara submission när resultat finns (görs en gång)
-    if (!submissionSaved) {
-      fetch('/api/save-submission', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          answers,
-          company,
-          email,
-          bransch,
-          omrade,
-          score: result.score,
-          timestamp: new Date().toISOString()
-        })
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            setSubmissionSaved(true);
-          } else {
-            setSubmissionError('Kunde inte spara din information.');
-          }
-        })
-        .catch(() => setSubmissionError('Kunde inte spara din information.'));
-      
-      // Visa loading medan vi sparar
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#7edcff] mb-6 mx-auto"></div>
-            <h2 className="text-2xl font-bold mb-6">Sparar din information...</h2>
-          </div>
-        </div>
-      );
-    }
-
-    // Om sparning misslyckades
-    if (submissionError) {
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center">
-            <h2 className="text-2xl font-bold mb-6">Ett fel uppstod</h2>
-            <p className="mb-6">{submissionError}</p>
-            <button 
-              className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg"
-              onClick={onClose}
-            >
-              Stäng
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    // Om score > 80 och samtycke ej givet, visa investerarfråga
-    if (result.score > 80 && investorConsent === null && submissionSaved) {
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center">
-            <h2 className="text-2xl font-bold mb-6">Grattis till en hög poäng!</h2>
-            <p className="mb-6">Vi är i kontakt med några av de största investeringsbolagen i Sverige.<br />
-              Om du får en score på över 80/100, vill du då att vi förmedlar din information vidare?</p>
-            <div className="flex justify-center gap-6 mb-6">
-              <button 
-                className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg hover:bg-[#7edcff] hover:text-[#16475b] transition-all" 
-                onClick={() => {
-                  setInvestorConsent(true);
-                  // Uppdatera sparad data med investorConsent
-                  fetch('/api/save-submission', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      answers,
-                      company,
-                      email,
-                      bransch,
-                      omrade,
-                      score: result.score,
-                      investorConsent: true,
-                      timestamp: new Date().toISOString()
-                    })
-                  });
-                }}
-              >
-                Ja, förmedla gärna min information
-              </button>
-              <button 
-                className="bg-gray-200 text-[#16475b] font-bold rounded-full px-8 py-3 shadow-lg hover:bg-[#16475b] hover:text-white transition-all" 
-                onClick={() => setInvestorConsent(false)}
-              >
-                Nej, tack
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    
-    // Visa vanliga resultatet när allt är sparat OCH investorConsent är bestämt (eller score <= 80)
-    if (submissionSaved && (investorConsent !== null || result.score <= 80)) {
-      return (
-        <BusinessPlanResult
-          score={result.score}
-          answers={answers}
-          subscriptionLevel={result.subscriptionLevel || 'silver'}
-        />
-      );
-    }
+  
+  // Lägg till CSS för animeringar
+  if (typeof window !== 'undefined' && !document.getElementById('wizard-animations')) {
+    const style = document.createElement('style');
+    style.id = 'wizard-animations';
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes spin-reverse {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(-360deg); }
+      }
+      .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+      .animate-slideIn { animation: slideIn 0.4s ease-out; }
+      .animate-spin-reverse { animation: spin-reverse 1s linear infinite; }
+      .delay-150 { animation-delay: 150ms; }
+      .delay-300 { animation-delay: 300ms; }
+    `;
+    document.head.appendChild(style);
   }
-  if (preStep) {
-    if (preStepPage === 1) {
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative">
-            <h2 className="text-2xl font-bold mb-6 text-center">Starta din affärsplan-analys</h2>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Företagsnamn</label>
-              <input
-                type="text"
-                className="w-full p-3 border rounded-xl mb-2 text-[#16475b] bg-white"
-                value={company}
-                onChange={e => setCompany(e.target.value)}
-                placeholder="Ex: FrejFund AB"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">E-post</label>
-              <input
-                type="email"
-                className="w-full p-3 border rounded-xl mb-2 text-[#16475b] bg-white"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="din@email.se"
-              />
-            </div>
-            <div className="mb-4 flex items-center gap-2">
-              <input
-                id="privacy"
-                type="checkbox"
-                checked={privacyChecked}
-                onChange={e => setPrivacyChecked(e.target.checked)}
-              />
-              <label htmlFor="privacy" className="text-sm">Jag godkänner <a href="/privacy" target="_blank" className="underline">privacy policy</a></label>
-            </div>
-            <div className="mb-6">
-              <label className="block font-semibold mb-2">Har du en hemsida?</label>
-              <div className="flex gap-4 mb-2">
-                <button
-                  className={`px-6 py-2 rounded-full font-bold ${hasWebsite === true ? 'bg-[#16475b] text-white' : 'bg-gray-200 text-[#16475b]'}`}
-                  onClick={() => setHasWebsite(true)}
-                  type="button"
-                >JA</button>
-                <button
-                  className={`px-6 py-2 rounded-full font-bold ${hasWebsite === false ? 'bg-[#16475b] text-white' : 'bg-gray-200 text-[#16475b]'}`}
-                  onClick={() => setHasWebsite(false)}
-                  type="button"
-                >NEJ</button>
-              </div>
-              {hasWebsite && (
-                <div className="mt-2">
-                  <input
-                    type="url"
-                    className="w-full p-3 border rounded-xl mb-2 text-[#16475b] bg-white"
-                    value={websiteUrl}
-                    onChange={e => setWebsiteUrl(e.target.value)}
-                    placeholder="www.dittforetag.se"
-                  />
-                  <button
-                    className="w-full bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg mt-2 disabled:opacity-50"
-                    onClick={async () => {
-                      setIsScraping(true);
-                      setScrapeError(null);
-                      try {
-                        console.log('Startar skrapning av:', websiteUrl);
-                        
-                        const response = await fetch('/api/scrape-website', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({ url: websiteUrl }),
-                        });
 
-                        if (!response.ok) {
-                          const errorData = await response.json();
-                          throw new Error(errorData.error || 'Kunde inte skrapa hemsidan');
-                        }
-
-                        const scrapedResult = await response.json();
-                        console.log('Skrapningsresultat:', scrapedResult);
-                        
-                        if (scrapedResult.error) {
-                          throw new Error(scrapedResult.error);
-                        }
-
-                        // Spara skrapad data
-                        setScrapedData(scrapedResult);
-                        
-                        // Mappa skrapad data till formulärfält
-                        const mappedData = mapScrapedDataToAnswers(scrapedResult);
-                        setAnswers(mappedData.answers);
-                        
-                        // Sätt detekterade värden om de finns
-                        if (mappedData.detectedCompany) {
-                          setCompany(mappedData.detectedCompany);
-                        }
-                        if (mappedData.detectedBransch) {
-                          setBransch(mappedData.detectedBransch);
-                        }
-                        if (mappedData.detectedOmrade) {
-                          setOmrade(mappedData.detectedOmrade);
-                        }
-                        
-                        console.log('Automatiskt ifyllda svar:', mappedData.answers);
-                        
-                        // Visa framgångsmeddelande
-                        const filledFieldsCount = Object.keys(mappedData.answers).length;
-                        if (filledFieldsCount > 0) {
-                          alert(`Succé! ${filledFieldsCount} fält har fyllts i automatiskt baserat på din hemsida.`);
-                        }
-                        
-                        setPreStepPage(2);
-                      } catch (e: any) {
-                        console.error('Skrapningsfel:', e);
-                        setScrapeError(e.message || 'Kunde inte hämta information från hemsidan.');
-                      } finally {
-                        setIsScraping(false);
-                      }
-                    }}
-                    disabled={!websiteUrl || isScraping}
-                  >
-                    {isScraping ? 'Analyserar hemsidan & extraherar data...' : 'Skrapa hemsida & fyll i automatiskt'}
-                  </button>
-                  {scrapeError && <div className="text-red-600 text-sm mt-2 text-center">{scrapeError}</div>}
-                </div>
-              )}
-            </div>
-            <div className="flex justify-end">
-              <button
-                className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg mt-6 disabled:opacity-50"
-                onClick={() => setPreStepPage(2)}
-                disabled={!isPreStep1Valid}
-              >Nästa</button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    // PreStepPage 2: Bransch & Område
+  // PreStepPage 1: Company, Email, Hemsida
+  if (preStep && preStepPage === 1) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
         <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative">
