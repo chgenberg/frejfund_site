@@ -755,24 +755,8 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
 
   if (!open) return null;
   if (result) {
-    // Om score > 80 och samtycke ej givet, visa investerarfråga
-    if (result.score > 80 && investorConsent === null) {
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center">
-            <h2 className="text-2xl font-bold mb-6">Grattis till en hög poäng!</h2>
-            <p className="mb-6">Vi är i kontakt med några av de största investeringsbolagen i Sverige.<br />
-              Om du får en score på över 80/100, vill du då att vi förmedlar din information vidare?</p>
-            <div className="flex justify-center gap-6 mb-6">
-              <button className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg" onClick={() => setInvestorConsent(true)}>Ja, förmedla gärna min information</button>
-              <button className="bg-gray-200 text-[#16475b] font-bold rounded-full px-8 py-3 shadow-lg" onClick={() => setInvestorConsent(false)}>Nej, tack</button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    // När samtycke är givet eller score <= 80, spara submission
-    if (!submissionSaved && (investorConsent !== null || result.score <= 80)) {
+    // Automatiskt spara submission när resultat finns (görs en gång)
+    if (!submissionSaved) {
       fetch('/api/save-submission', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -783,52 +767,102 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
           bransch,
           omrade,
           score: result.score,
-          investorConsent,
           timestamp: new Date().toISOString()
         })
       })
         .then(res => res.json())
         .then(data => {
-          if (data.success) setSubmissionSaved(true);
-          else setSubmissionError('Kunde inte spara din information.');
+          if (data.success) {
+            setSubmissionSaved(true);
+          } else {
+            setSubmissionError('Kunde inte spara din information.');
+          }
         })
         .catch(() => setSubmissionError('Kunde inte spara din information.'));
+      
+      // Visa loading medan vi sparar
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#7edcff] mb-6 mx-auto"></div>
             <h2 className="text-2xl font-bold mb-6">Sparar din information...</h2>
           </div>
         </div>
       );
     }
-    if (submissionSaved) {
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center">
-            <h2 className="text-2xl font-bold mb-6">Tack för din inskickade affärsplan!</h2>
-            <p className="mb-6">Din information är nu sparad och vi kontaktar dig om det blir aktuellt med investerarintresse.</p>
-          </div>
-        </div>
-      );
-    }
+
+    // Om sparning misslyckades
     if (submissionError) {
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center">
             <h2 className="text-2xl font-bold mb-6">Ett fel uppstod</h2>
             <p className="mb-6">{submissionError}</p>
+            <button 
+              className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg"
+              onClick={onClose}
+            >
+              Stäng
+            </button>
           </div>
         </div>
       );
     }
-    // Visa vanliga resultatet annars
-    return (
-      <BusinessPlanResult
-        score={result.score}
-        answers={answers}
-        subscriptionLevel={result.subscriptionLevel || 'silver'}
-      />
-    );
+
+    // Om score > 80 och samtycke ej givet, visa investerarfråga
+    if (result.score > 80 && investorConsent === null && submissionSaved) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center">
+            <h2 className="text-2xl font-bold mb-6">Grattis till en hög poäng!</h2>
+            <p className="mb-6">Vi är i kontakt med några av de största investeringsbolagen i Sverige.<br />
+              Om du får en score på över 80/100, vill du då att vi förmedlar din information vidare?</p>
+            <div className="flex justify-center gap-6 mb-6">
+              <button 
+                className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg" 
+                onClick={() => {
+                  setInvestorConsent(true);
+                  // Uppdatera sparad data med investorConsent
+                  fetch('/api/save-submission', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      answers,
+                      company,
+                      email,
+                      bransch,
+                      omrade,
+                      score: result.score,
+                      investorConsent: true,
+                      timestamp: new Date().toISOString()
+                    })
+                  });
+                }}
+              >
+                Ja, förmedla gärna min information
+              </button>
+              <button 
+                className="bg-gray-200 text-[#16475b] font-bold rounded-full px-8 py-3 shadow-lg" 
+                onClick={() => setInvestorConsent(false)}
+              >
+                Nej, tack
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    // Visa vanliga resultatet när allt är sparat
+    if (submissionSaved) {
+      return (
+        <BusinessPlanResult
+          score={result.score}
+          answers={answers}
+          subscriptionLevel={result.subscriptionLevel || 'silver'}
+        />
+      );
+    }
   }
   if (preStep) {
     if (preStepPage === 1) {
