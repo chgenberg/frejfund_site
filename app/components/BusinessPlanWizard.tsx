@@ -1042,9 +1042,9 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 style={{ minHeight: '8rem', maxHeight: '8rem' }}
               >
                 <option value="">Välj...</option>
-                {current.options.map((opt: string) => (
+                {isSelectQuestion(current) ? current.options.map((opt: string) => (
                   <option key={opt} value={opt}>{opt}</option>
-                ))}
+                )) : null}
               </select>
               <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#16475b]">
                 <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
@@ -1055,7 +1055,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
           )}
           {isSelectQuestion(current) && current.type === "radio" && (
             <div className="flex flex-col gap-2 mb-4">
-              {current.options.map((opt: string) => (
+              {isSelectQuestion(current) ? current.options.map((opt: string) => (
                 <label key={opt} className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
@@ -1067,7 +1067,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                   />
                   <span>{opt}</span>
                 </label>
-              ))}
+              )) : null}
             </div>
           )}
           {(isTextQuestion(current) && (current.type === "text" || current.type === "number")) && (
