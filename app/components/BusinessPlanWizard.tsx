@@ -1314,9 +1314,12 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                         body: JSON.stringify({ url: websiteUrl })
                       });
                       const data = await res.json();
+                      console.log('Scrape API response:', data); // Debug log
                       if (data.success) {
+                        console.log('data.data:', data.data); // Debug log
                         setScrapedData(data.data);
                         const mappedData = mapScrapedDataToAnswers(data.data);
+                        console.log('mappedData:', mappedData); // Debug log
                         setAnswers(mappedData.answers);
                         if (mappedData.detectedCompany) {
                           setCompany(mappedData.detectedCompany);
