@@ -12,10 +12,20 @@ const OMRADEN = [
   'Sverige', 'Norden', 'Europa', 'Globalt', 'Annat'
 ];
 
-// Steg 1-5: Inledande frågor
-const INTRO_QUESTIONS: any[] = [];
+// Add Question type definition
+type Question = {
+  id: string;
+  label: string;
+  type: string;
+  required: boolean;
+  help: string;
+  options?: string[];
+};
 
-const QUESTIONS = [
+// Steg 1-5: Inledande frågor
+const INTRO_QUESTIONS: Question[] = [];
+
+const QUESTIONS: Question[] = [
   { id: 'company_value', label: 'Vad gör företaget och vilket värde skapar det?', type: 'textarea', required: true, help: 'Beskriv affärsidén, produkten/tjänsten, kundpain och hur ni skapar värde.' },
   { id: 'customer_problem', label: 'Vilket problem löser ni för era kunder?', type: 'textarea', required: true, help: 'Beskriv det specifika problem eller behov som er produkt/tjänst adresserar.' },
   { id: 'problem_evidence', label: 'Hur vanligt är problemet – och hur bevisar ni det?', type: 'textarea', required: true, help: 'Ge gärna en datapunkt, referens eller länk.' },
