@@ -1,4 +1,13 @@
-export const NEW_WIZARD_QUESTIONS = [
+type Question = {
+  id: string;
+  label: string;
+  type: 'textarea' | 'text' | 'number' | 'select' | 'radio' | 'file';
+  required: boolean;
+  help: string;
+  options?: string[];
+};
+
+export const NEW_WIZARD_QUESTIONS: Question[] = [
   {
     id: 'company_value',
     label: 'Vad gör företaget och vilket värde skapar det?',
