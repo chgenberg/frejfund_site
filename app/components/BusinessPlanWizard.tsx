@@ -36,6 +36,11 @@ function isSelectQuestion(question: Question): question is SelectQuestion {
   return question.type === 'select' || question.type === 'radio';
 }
 
+// Type guard to check if a question is a TextQuestion
+function isTextQuestion(question: Question): question is TextQuestion {
+  return ['textarea', 'text', 'number', 'file'].includes(question.type);
+}
+
 // Steg 1-5: Inledande frågor
 const INTRO_QUESTIONS: Question[] = [];
 
@@ -982,7 +987,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
           <div className="mb-4 text-sm text-gray-600 min-h-10">
             {current.help}
           </div>
-          {current.type === "textarea" && (
+          {isTextQuestion(current) && current.type === "textarea" && (
             <textarea
               className="w-full p-3 border rounded-xl mb-4 text-[#16475b] bg-white min-h-32"
               value={getStringValue(answers[current.id])}
@@ -992,7 +997,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               style={{ minHeight: '8rem', maxHeight: '8rem', resize: 'none' }}
             />
           )}
-          {current.type === "select" && isSelectQuestion(current) && (
+          {isSelectQuestion(current) && current.type === "select" && (
             <div className="relative mb-4">
               <select
                 className="w-full p-3 border rounded-xl pr-10 text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all min-h-32"
@@ -1012,7 +1017,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               </span>
             </div>
           )}
-          {current.type === "radio" && isSelectQuestion(current) && (
+          {isSelectQuestion(current) && current.type === "radio" && (
             <div className="flex flex-col gap-2 mb-4">
               {current.options.map((opt: string) => (
                 <label key={opt} className="flex items-center gap-2 cursor-pointer">
@@ -1029,43 +1034,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               ))}
             </div>
           )}
-          {current.type === "file" && (
-            <div className="flex flex-col items-start gap-2 mb-4">
-              <label className="block font-semibold">Bifoga P/L-rapport (valfritt)</label>
-              <div className="flex items-center gap-3">
-                <label className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all cursor-pointer flex items-center gap-2">
-                  <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M10 3v10m0 0l-3-3m3 3l3-3" stroke="#16475b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  Ladda upp PDF
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    className="hidden"
-                    onChange={async e => {
-                      setFileError(null);
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      setFileLoading(true);
-                      try {
-                        const formData = new FormData();
-                        formData.append('file', file);
-                        const res = await fetch('/api/parse-pdf', { method: 'POST', body: formData });
-                        if (!res.ok) throw new Error('Kunde inte läsa PDF');
-                        const data = await res.json();
-                        setAnswers(a => ({ ...a, runway: (a.runway ? a.runway + '\n' : '') + (data.text || '') }));
-                      } catch (err) {
-                        setFileError('Kunde inte läsa PDF-filen.');
-                      } finally {
-                        setFileLoading(false);
-                      }
-                    }}
-                  />
-                </label>
-                {fileLoading && <span className="text-[#7edcff] ml-2">Läser in PDF...</span>}
-              </div>
-              {fileError && <div className="text-red-600 mt-1">{fileError}</div>}
-            </div>
-          )}
-          {(current.type === "text" || current.type === "number") && (
+          {(isTextQuestion(current) && (current.type === "text" || current.type === "number")) && (
             <input
               className="w-full p-3 border rounded-xl mb-4 text-[#16475b] bg-white min-h-32"
               type={current.type}
@@ -1075,41 +1044,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               style={{ minHeight: '8rem', maxHeight: '8rem' }}
             />
           )}
-          {current.id === 'market_size' && (
-            <div className="flex flex-col md:flex-row items-end gap-2 mb-2">
-              <input
-                type="text"
-                className="w-full md:w-64 p-2 border rounded-xl text-[#16475b] bg-white"
-                placeholder="Ange bransch..."
-                value={marketBransch}
-                onChange={e => setMarketBransch(e.target.value)}
-              />
-              <button
-                className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all"
-                onClick={async () => {
-                  setShowMarketPopup(true);
-                  setMarketLoading(true);
-                  setMarketResult('');
-                  setMarketError(null);
-                  try {
-                    const res = await fetch('/api/market-size', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ bransch: marketBransch })
-                    });
-                    const data = await res.json();
-                    if (data.result) setMarketResult(data.result);
-                    else setMarketError('Kunde inte hämta marknadsdata.');
-                  } catch {
-                    setMarketError('Kunde inte hämta marknadsdata.');
-                  } finally {
-                    setMarketLoading(false);
-                  }
-                }}
-              >Beräkna värde</button>
-            </div>
-          )}
-          {current.id === 'runway' && (
+          {isTextQuestion(current) && current.type === "file" && (
             <div className="flex flex-col items-start gap-2 mb-4">
               <label className="block font-semibold">Bifoga P/L-rapport (valfritt)</label>
               <div className="flex items-center gap-3">
@@ -1243,6 +1178,76 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                   </div>
                 ) : null}
               </div>
+            </div>
+          )}
+          {current.id === 'market_size' && (
+            <div className="flex flex-col md:flex-row items-end gap-2 mb-2">
+              <input
+                type="text"
+                className="w-full md:w-64 p-2 border rounded-xl text-[#16475b] bg-white"
+                placeholder="Ange bransch..."
+                value={marketBransch}
+                onChange={e => setMarketBransch(e.target.value)}
+              />
+              <button
+                className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all"
+                onClick={async () => {
+                  setShowMarketPopup(true);
+                  setMarketLoading(true);
+                  setMarketResult('');
+                  setMarketError(null);
+                  try {
+                    const res = await fetch('/api/market-size', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ bransch: marketBransch })
+                    });
+                    const data = await res.json();
+                    if (data.result) setMarketResult(data.result);
+                    else setMarketError('Kunde inte hämta marknadsdata.');
+                  } catch {
+                    setMarketError('Kunde inte hämta marknadsdata.');
+                  } finally {
+                    setMarketLoading(false);
+                  }
+                }}
+              >Beräkna värde</button>
+            </div>
+          )}
+          {current.id === 'runway' && (
+            <div className="flex flex-col items-start gap-2 mb-4">
+              <label className="block font-semibold">Bifoga P/L-rapport (valfritt)</label>
+              <div className="flex items-center gap-3">
+                <label className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all cursor-pointer flex items-center gap-2">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M10 3v10m0 0l-3-3m3 3l3-3" stroke="#16475b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  Ladda upp PDF
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    className="hidden"
+                    onChange={async e => {
+                      setFileError(null);
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setFileLoading(true);
+                      try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        const res = await fetch('/api/parse-pdf', { method: 'POST', body: formData });
+                        if (!res.ok) throw new Error('Kunde inte läsa PDF');
+                        const data = await res.json();
+                        setAnswers(a => ({ ...a, runway: (a.runway ? a.runway + '\n' : '') + (data.text || '') }));
+                      } catch (err) {
+                        setFileError('Kunde inte läsa PDF-filen.');
+                      } finally {
+                        setFileLoading(false);
+                      }
+                    }}
+                  />
+                </label>
+                {fileLoading && <span className="text-[#7edcff] ml-2">Läser in PDF...</span>}
+              </div>
+              {fileError && <div className="text-red-600 mt-1">{fileError}</div>}
             </div>
           )}
           <div className="flex justify-between mt-6">
