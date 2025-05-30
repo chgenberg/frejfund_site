@@ -29,7 +29,23 @@ type SelectQuestion = BaseQuestion & {
   options: string[];
 };
 
-type Question = TextQuestion | SelectQuestion;
+type MilestoneQuestion = BaseQuestion & {
+  type: 'milestone_list';
+};
+
+type CapitalQuestion = BaseQuestion & {
+  type: 'capital_matrix';
+};
+
+type ESGQuestion = BaseQuestion & {
+  type: 'esg_checkbox';
+};
+
+type FounderMarketFitQuestion = BaseQuestion & {
+  type: 'founder_market_fit';
+};
+
+type Question = TextQuestion | SelectQuestion | MilestoneQuestion | CapitalQuestion | ESGQuestion | FounderMarketFitQuestion;
 
 // Type guard to check if a question is a SelectQuestion
 function isSelectQuestion(question: Question): question is SelectQuestion {
@@ -38,7 +54,27 @@ function isSelectQuestion(question: Question): question is SelectQuestion {
 
 // Type guard to check if a question is a TextQuestion
 function isTextQuestion(question: Question): question is TextQuestion {
-  return ['textarea', 'text', 'number', 'file'].includes(question.type);
+  return question.type === 'textarea' || question.type === 'text' || question.type === 'number' || question.type === 'file';
+}
+
+// Type guard to check if a question is a MilestoneQuestion
+function isMilestoneQuestion(question: Question): question is MilestoneQuestion {
+  return question.type === 'milestone_list';
+}
+
+// Type guard to check if a question is a CapitalQuestion
+function isCapitalQuestion(question: Question): question is CapitalQuestion {
+  return question.type === 'capital_matrix';
+}
+
+// Type guard to check if a question is an ESGQuestion
+function isESGQuestion(question: Question): question is ESGQuestion {
+  return question.type === 'esg_checkbox';
+}
+
+// Type guard to check if a question is a FounderMarketFitQuestion
+function isFounderMarketFitQuestion(question: Question): question is FounderMarketFitQuestion {
+  return question.type === 'founder_market_fit';
 }
 
 // Steg 1-5: Inledande frågor
@@ -58,6 +94,7 @@ const QUESTIONS: Question[] = [
   { id: 'revenue_block', label: 'Hur tjänar ni pengar och hur fördelas intäkterna (återkommande/engång)?', type: 'textarea', required: true, help: 'Beskriv intäktsströmmar, prissättning och fördelning mellan återkommande och engångsintäkter.' },
   { id: 'runway', label: 'Hur lång runway (antal månader) har ni? (heltal)', type: 'number', required: true, help: 'Hur många månader räcker ert kapital? (Bifoga gärna P/L-rapport om möjligt)' },
   { id: 'growth_plan', label: 'Vad är er tillväxtplan för nästa 12-24 månader?', type: 'textarea', required: true, help: 'Beskriv framtidsplaner: försäljningstillväxt, produktlanseringar, kundmål.' },
+  { id: 'milestones', label: 'Vilka tre största milstolpar planerar ni att nå kommande 12 månader (med månad/kvartal)?', type: 'milestone_list', required: true, help: 'Exempel: "Lansering Q3", "Första betalande kund i september", "ISO-certifiering Q2".' },
   { id: 'milestones', label: 'Vilka tre största milstolpar planerar ni att nå kommande 12 månader (med månad/kvartal)?', type: 'textarea', required: true, help: 'Exempel: "Lansering Q3", "Första betalande kund i september", "ISO-certifiering Q2".' },
   { id: 'team', label: 'Hur ser ert team ut?', type: 'textarea', required: true, help: 'Presentera grundarna och kärnteamet, roller och erfarenheter.' },
   { id: 'founder_equity', label: 'Hur stor ägarandel (%) behåller grundarteamet efter denna runda?', type: 'number', required: true, help: 'Svara i procent, t.ex. 65.' },
