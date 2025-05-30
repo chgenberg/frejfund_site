@@ -105,42 +105,38 @@ export async function scrapeAndAnalyze(url: string) {
     console.log('Skickar data till OpenAI för djupanalys...');
     
     // Förbättrad prompt: Fokusera på affärsplanens frågor
-    const prompt = `Du är en expert på företagsanalys. Din uppgift är att analysera företagets webbsida och försöka hitta svar på exakt dessa frågor (på svenska):
+    const prompt = `Du är en expert på företagsanalys. Din uppgift är att analysera företagets webbsida och försöka hitta svar på dessa frågor:
 
-1. Vad gör företaget och vilket värde skapar det?
-2. Vilket problem löser de för sina kunder?
-3. Hur vanligt är problemet – och hur bevisar de det?
-4. Vilket "gap" på marknaden fyller de?
-5. Hur löser de problemet? (Lösning)
-6. Varför är timingen rätt?
-7. Vem är målgruppen/kunden?
-8. Hur stort är marknadsutrymmet? (TAM/SAM/SOM)
-9. Vilka viktiga marknadstrender gynnar dem?
-10. Hur ser traction ut hittills?
-11. Hur tjänar de pengar? (intäktsströmmar)
-12. Vad är tillväxtplanen?
-13. Hur ser teamet ut?
-14. Hur stor ägarandel har grundarna?
-15. Vilka kompetenser täcker teamet – och saknas det någon?
-16. Har de styrelse eller rådgivare?
-17. Vilka är konkurrenterna?
-18. Vad gör lösningen unik?
-19. Har de immateriella rättigheter (IP)?
-20. Kapitalbehov och användning
-21. Exit-strategi
-22. Vilka är de största riskerna?
-23. Hur adresserar de hållbarhet/ESG?
-
-Svara ENDAST med ett JSON-objekt där varje fråga är en nyckel och svaret är så konkret och kortfattat som möjligt. Om information saknas, skriv "Ej angivet".
-
-Exempel:
+Svara ENDAST med ett JSON-objekt med följande nycklar (använd exakt dessa engelska nycklar):
 {
-  "vad_gor_foretaget": "...",
-  "problem": "...",
-  ...
+  "company_name": "Företagsnamn",
+  "industry": "Bransch (SaaS, Tech, Konsumentvaror, Hälsa, Fintech, Industri, Tjänster, Utbildning, Energi, Annat)",
+  "area": "Geografiskt område (Sverige, Norden, Europa, Globalt, Annat)",
+  "company_value": "Vad gör företaget och vilket värde skapar det?",
+  "customer_problem": "Vilket problem löser de för sina kunder?",
+  "problem_evidence": "Bevis för att problemet existerar",
+  "market_gap": "Vilket gap på marknaden fyller de?",
+  "solution": "Hur löser de problemet?",
+  "why_now": "Varför är timingen rätt?",
+  "target_customer": "Vem är målgruppen?",
+  "market_size": "Marknadsstorlek (TAM/SAM/SOM om tillgängligt)",
+  "market_trends": "Relevanta marknadstrender",
+  "traction": "Traction och resultat hittills",
+  "revenue_block": "Hur tjänar de pengar?",
+  "growth_plan": "Tillväxtplaner",
+  "team": "Information om teamet/grundarna",
+  "founder_equity": "Ägarstruktur om tillgängligt",
+  "team_skills": "Teamets kompetenser",
+  "competitors": "Konkurrenter",
+  "unique_solution": "Vad gör lösningen unik?",
+  "ip_rights": "Immateriella rättigheter",
+  "main_risks": "Huvudsakliga risker",
+  "esg": "ESG/hållbarhetsaspekter"
 }
 
-Analysera webbsidan och försök fylla i så många svar som möjligt. Här är webbsidans data:
+Om information saknas, skriv "Ej angivet". Svara på svenska, men använd de engelska nycklarna ovan.
+
+Analysera webbsidan:
 Titel: ${data.title}
 Meta beskrivning: ${data.description}
 H1: ${data.headings.h1.join(', ')}
@@ -179,10 +175,13 @@ Synlig text (första 3000 tecken): ${data.visibleText.slice(0, 3000)}
     const openaiData = await openaiRes.json();
     const content = openaiData.choices?.[0]?.message?.content || '';
     
+    console.log('OpenAI svar mottaget, längd:', content.length);
+    
     let result;
     try {
       // Ta bort markdown-formatering om den finns
       const jsonContent = content.replace(/```json\n?|\n?```/g, '').trim();
+      console.log('Försöker parsa JSON...');
       result = JSON.parse(jsonContent);
       // Lägg till metainformation
       result._metadata = {
@@ -192,8 +191,10 @@ Synlig text (första 3000 tecken): ${data.visibleText.slice(0, 3000)}
         raw_text_length: data.visibleText.length
       };
       result.success = true;
+      console.log('JSON-parsning lyckades!');
     } catch (e: any) {
       console.error('Fel vid parsning av JSON:', e);
+      console.error('OpenAI svar (första 500 tecken):', content.slice(0, 500));
       result = {
         raw: content,
         error: 'Kunde inte tolka analysen som JSON',
@@ -205,6 +206,7 @@ Synlig text (första 3000 tecken): ${data.visibleText.slice(0, 3000)}
         }
       };
     }
+    console.log('Returnerar resultat...');
     return result;
   } catch (e: any) {
     console.error('Fel i scrapeAndAnalyze:', e);
