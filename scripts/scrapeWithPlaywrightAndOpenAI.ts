@@ -12,6 +12,15 @@ interface ScrapedData {
   ogImage: string;
   schema: string[];
   visibleText: string;
+  metaKeywords?: string;
+  headings: {
+    h1: string[];
+    h2: string[];
+    h3: string[];
+  };
+  links: string[];
+  images: string[];
+  structuredData?: any[];
 }
 
 function validateAndFormatUrl(url: string): string {
@@ -56,9 +65,24 @@ export async function scrapeAndAnalyze(url: string) {
     const $ = cheerio.load(html);
 
     console.log('Extraherar data från sidan...');
+    
+    // Extrahera strukturerad data från JSON-LD
+    const structuredData: any[] = [];
+    $('script[type="application/ld+json"]').each((_, el) => {
+      try {
+        const jsonData = $(el).html();
+        if (jsonData) {
+          structuredData.push(JSON.parse(jsonData));
+        }
+      } catch (e) {
+        // Ignorera felaktig JSON
+      }
+    });
+
     const data: ScrapedData = {
       title: $('title').text().trim(),
       description: $('meta[name="description"]').attr('content') || '',
+      metaKeywords: $('meta[name="keywords"]').attr('content') || '',
       ogTitle: $('meta[property="og:title"]').attr('content') || '',
       ogDescription: $('meta[property="og:description"]').attr('content') || '',
       ogType: $('meta[property="og:type"]').attr('content') || '',
@@ -67,43 +91,95 @@ export async function scrapeAndAnalyze(url: string) {
         .map((_: number, el: any) => $(el).html() || '')
         .get()
         .filter(Boolean),
-      visibleText: $('body').text().replace(/\s+/g, ' ').trim()
+      headings: {
+        h1: $('h1').map((_: number, el: any) => $(el).text().trim()).get(),
+        h2: $('h2').map((_: number, el: any) => $(el).text().trim()).get(),
+        h3: $('h3').map((_: number, el: any) => $(el).text().trim()).get()
+      },
+      links: $('a[href]').map((_: number, el: any) => $(el).attr('href')).get().slice(0, 20),
+      images: $('img[alt]').map((_: number, el: any) => $(el).attr('alt')).get().slice(0, 10),
+      visibleText: $('body').text().replace(/\s+/g, ' ').trim(),
+      structuredData
     };
 
-    console.log('Skickar data till OpenAI...');
-    const prompt = `Du är en expert på att analysera företagssajter. Analysera följande data från en hemsida och returnera SVARET ENDAST SOM ETT JSON-OBJEKT utan någon annan text eller förklaringar:
+    console.log('Skickar data till OpenAI för djupanalys...');
+    
+    // Förbättrad prompt för mer detaljerad analys
+    const prompt = `Du är en expert på företagsanalys och affärsplaner. Analysera följande webbsida noggrant och extrahera ALL relevant information för en affärsplan.
 
+WEBBSIDEDATA:
 Titel: ${data.title}
-Meta description: ${data.description}
-OpenGraph: ${JSON.stringify({
-      ogTitle: data.ogTitle,
-      ogDescription: data.ogDescription,
-      ogType: data.ogType,
-      ogImage: data.ogImage
-    }, null, 2)}
-Schema.org: ${data.schema.join('\n')}
-Text: ${data.visibleText.slice(0, 4000)}
+Meta beskrivning: ${data.description}
+Meta nyckelord: ${data.metaKeywords}
+H1 rubriker: ${data.headings.h1.join(', ')}
+H2 rubriker: ${data.headings.h2.join(', ')}
+H3 rubriker: ${data.headings.h3.join(', ')}
+Bildtexter: ${data.images.join(', ')}
+Strukturerad data: ${JSON.stringify(data.structuredData)}
+Synlig text (första 5000 tecken): ${data.visibleText.slice(0, 5000)}
 
-Extrahera och sammanfatta följande information i JSON-format:
+Analysera och extrahera ALL information som kan vara relevant för en affärsplan. Svara ENDAST med ett JSON-objekt (utan markdown-formatering):
+
 {
-  "company_name": "företagsnamn",
-  "industry": "bransch",
-  "area": "område",
-  "sku_count": "antal SKUs idag",
-  "business_idea": "affärsidé",
-  "customer_segments": "målgrupp/kundsegment",
-  "team": "team/grundare",
-  "revenue_model": "affärsmodell/intäkter",
-  "market_size": "marknadsstorlek",
-  "competition": "konkurrens",
-  "funding_details": "finansiering",
-  "contact_info": "kontaktinfo",
-  "news_articles": "nyhetsartiklar eller pressmeddelanden",
-  "testimonials": "kundrecensioner eller testimonials",
-  "other": "annat relevant för en affärsplan"
+  "company_name": "Exakt företagsnamn",
+  "industry": "Specifik bransch (använd dessa kategorier: SaaS, Tech, Konsumentvaror, Hälsa, Fintech, Industri, Tjänster, Utbildning, Energi, Annat)",
+  "area": "Geografiskt område (Sverige, Norden, Europa, Globalt, Annat)",
+  "company_value": "Vad gör företaget och vilket värde skapar det?",
+  "customer_problem": "Vilket problem löser de för sina kunder?",
+  "problem_evidence": "Bevis för att problemet existerar",
+  "market_gap": "Vilket gap på marknaden fyller de?",
+  "solution": "Hur löser de problemet?",
+  "why_now": "Varför är timingen rätt?",
+  "target_customer": "Vem är målgruppen?",
+  "market_size": "Marknadsstorlek (TAM/SAM/SOM om tillgängligt)",
+  "market_trends": "Relevanta marknadstrender",
+  "traction": "Traction och resultat hittills",
+  "revenue_block": "Hur tjänar de pengar?",
+  "growth_plan": "Tillväxtplaner",
+  "team": "Information om teamet/grundarna",
+  "founder_equity": "Ägarstruktur om tillgängligt",
+  "team_skills": "Teamets kompetenser",
+  "competitors": "Konkurrenter",
+  "unique_solution": "Vad gör lösningen unik?",
+  "ip_rights": "Immateriella rättigheter",
+  "main_risks": "Huvudsakliga risker",
+  "esg": "ESG/hållbarhetsaspekter",
+  "contact_info": {
+    "address": "Adress",
+    "phone": "Telefon",
+    "email": "E-post",
+    "website": "Webbplats"
+  },
+  "testimonials": "Kundrecensioner/testimonials",
+  "product_info": {
+    "products": "Produkter/tjänster",
+    "pricing": "Prissättning om tillgängligt",
+    "features": "Funktioner/egenskaper"
+  },
+  "financial_info": {
+    "revenue_model": "Intäktsmodell",
+    "funding": "Finansieringsinformation",
+    "investors": "Investerare"
+  },
+  "metrics": {
+    "customers": "Antal kunder",
+    "users": "Antal användare", 
+    "growth_rate": "Tillväxthastighet",
+    "other_kpis": "Andra nyckeltal"
+  },
+  "news_press": "Nyheter och pressmeddelanden",
+  "social_media": "Sociala medier-närvaro",
+  "certifications": "Certifieringar och utmärkelser",
+  "partnerships": "Partnerskap och samarbeten",
+  "technology": "Teknisk information",
+  "business_model": "Affärsmodell",
+  "market_position": "Marknadsposition",
+  "competitive_advantages": "Konkurrensfördelar",
+  "future_plans": "Framtidsplaner",
+  "other_relevant": "Annan relevant information för affärsplan"
 }
 
-Svara ENDAST med JSON-objektet ovan, utan någon annan text eller förklaringar.`;
+Fyll i så mycket information som möjligt baserat på webbsidans innehåll. Om information saknas, skriv "Ej angivet" eller "Information saknas". Var specifik och detaljerad.`;
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -114,11 +190,14 @@ Svara ENDAST med JSON-objektet ovan, utan någon annan text eller förklaringar.
       body: JSON.stringify({
         model: 'gpt-4-1106-preview',
         messages: [
-          { role: 'system', content: 'Du är en expert på affärsplaner. Svara ENDAST med JSON-objektet som efterfrågas, utan någon annan text eller förklaringar.' },
+          { 
+            role: 'system', 
+            content: 'Du är en expert på företagsanalys och affärsplaner. Analysera webbsidor noggrant och extrahera ALL relevant information strukturerat. Svara ENDAST med JSON utan markdown-formatering.' 
+          },
           { role: 'user', content: prompt }
         ],
-        max_tokens: 1000,
-        temperature: 0.2,
+        max_tokens: 2000,
+        temperature: 0.1,
         response_format: { type: "json_object" }
       })
     });
@@ -129,19 +208,34 @@ Svara ENDAST med JSON-objektet ovan, utan någon annan text eller förklaringar.
       throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
     }
     
-    console.log('Får svar från OpenAI...');
+    console.log('Får detaljerat svar från OpenAI...');
     const openaiData = await openaiRes.json();
     const content = openaiData.choices?.[0]?.message?.content || '';
+    
     let result;
     try {
       // Ta bort markdown-formatering om den finns
       const jsonContent = content.replace(/```json\n?|\n?```/g, '').trim();
       result = JSON.parse(jsonContent);
+      
+      // Lägg till metainformation
+      result._metadata = {
+        scraped_at: new Date().toISOString(),
+        source_url: formattedUrl,
+        title: data.title,
+        raw_text_length: data.visibleText.length
+      };
+      
     } catch (e) {
       console.error('Fel vid parsning av JSON:', e);
       result = { 
         raw: content,
-        error: 'Kunde inte tolka analysen som JSON'
+        error: 'Kunde inte tolka analysen som JSON',
+        _metadata: {
+          scraped_at: new Date().toISOString(),
+          source_url: formattedUrl,
+          error: true
+        }
       };
     }
 

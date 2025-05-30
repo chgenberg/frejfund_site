@@ -21,7 +21,7 @@ interface CompetitorAnalysis {
 const getScoreLabel = (score: number) => {
   if (score >= 95) return { 
     emoji: '🏆', 
-    label: 'Top 1%', 
+    label: 'Exceptionell (Top 1%)', 
     summary: 'Din affärsplan är exceptionell och visar på en mycket lovande framtid.',
     strengths: [
       'Utmärkt team med relevant erfarenhet',
@@ -35,7 +35,7 @@ const getScoreLabel = (score: number) => {
   };
   if (score >= 85) return { 
     emoji: '🚀', 
-    label: 'Deal-ready', 
+    label: 'Deal-ready (Mycket stark)', 
     summary: 'Din affärsplan är mycket lovande och redo för investerare.',
     strengths: [
       'Stark grund med tydlig vision',
@@ -49,7 +49,7 @@ const getScoreLabel = (score: number) => {
   };
   if (score >= 75) return { 
     emoji: '⭐', 
-    label: 'Investable with guidance', 
+    label: 'Investable (Bra potential)', 
     summary: 'Din affärsplan har potential men behöver några justeringar.',
     strengths: [
       'Intressant marknad',
@@ -64,7 +64,7 @@ const getScoreLabel = (score: number) => {
   };
   if (score >= 50) return { 
     emoji: '⚙️', 
-    label: 'Potential, men kräver jobb', 
+    label: 'Potential (Kräver utveckling)', 
     summary: 'Din affärsplan visar potential men behöver betydande förbättringar.',
     strengths: [
       'Intressant affärsidé',
@@ -79,7 +79,7 @@ const getScoreLabel = (score: number) => {
   };
   return { 
     emoji: '🚧', 
-    label: 'Under byggtid', 
+    label: 'Under utveckling', 
     summary: 'Din affärsplan behöver omfattande omarbetning.',
     strengths: [
       'Grundläggande affärsidé på plats'
@@ -147,18 +147,57 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
   const [loadingCompetitors, setLoadingCompetitors] = useState(false);
   const [competitorError, setCompetitorError] = useState<string | null>(null);
   const [showScoreInfo, setShowScoreInfo] = useState(false);
+  const [pitchDeckLoading, setPitchDeckLoading] = useState(false);
+  const [allAiFeedback, setAllAiFeedback] = useState<Record<string, string>>({});
+  const [loadingAiFeedback, setLoadingAiFeedback] = useState(true);
   
   const scoreComparison = getScoreComparison(_score);
   const marketData = getMarketSizeData(safeAnswers.market_size?.market_value || '0');
+  const scoreInfo = getScoreLabel(_score);
 
   // Sektioner att visa feedback för
   const sectionKeys = [
     { key: 'business_idea', label: 'Affärsidé' },
-    { key: 'market_analysis', label: 'Marknadsanalys' },
-    { key: 'revenue_model', label: 'Affärsmodell' },
+    { key: 'market_analysis', label: 'Marknadsanalys' }, 
     { key: 'team', label: 'Team' },
-    { key: 'funding_details', label: 'Finansiering' }
+    { key: 'competition', label: 'Konkurrensanalys' },
+    { key: 'funding', label: 'Finansiering' }
   ];
+
+  // Hämta AI-feedback för alla sektioner direkt
+  useEffect(() => {
+    const fetchAllAiFeedback = async () => {
+      setLoadingAiFeedback(true);
+      const feedbackPromises = sectionKeys.map(async ({ key, label }) => {
+        try {
+          const response = await fetch('/api/ai-feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              section: key, 
+              answers: answers,
+              questionText: JSON.stringify(answers)
+            })
+          });
+          const data = await response.json();
+          return { key, feedback: data.feedback || `Analyserar ${label.toLowerCase()}...` };
+        } catch (error) {
+          return { key, feedback: `Kunde inte generera feedback för ${label.toLowerCase()}.` };
+        }
+      });
+
+      const results = await Promise.all(feedbackPromises);
+      const feedbackMap: Record<string, string> = {};
+      results.forEach(({ key, feedback }) => {
+        feedbackMap[key] = feedback;
+      });
+      
+      setAllAiFeedback(feedbackMap);
+      setLoadingAiFeedback(false);
+    };
+
+    fetchAllAiFeedback();
+  }, [answers]);
 
   useEffect(() => {
     setLoadingScore(true);
@@ -170,12 +209,15 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
       .then(res => res.json())
       .then(data => {
         setAiScore(data.score);
-        setMotivation(data.motivation);
-        setStrengths(data.strengths);
-        setWeaknesses(data.weaknesses);
+        setMotivation(data.motivation || scoreInfo.summary);
+        setStrengths(data.strengths || scoreInfo.strengths.join(', '));
+        setWeaknesses(data.weaknesses || scoreInfo.weaknesses.join(', '));
       })
       .catch(error => {
         console.error('Error fetching score:', error);
+        setMotivation(scoreInfo.summary);
+        setStrengths(scoreInfo.strengths.join(', '));
+        setWeaknesses(scoreInfo.weaknesses.join(', '));
       })
       .finally(() => setLoadingScore(false));
   }, [answers]);
@@ -201,17 +243,40 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
     fetchCompetitors();
   }, [answers]);
 
+  const handlePitchDeckGeneration = async () => {
+    setPitchDeckLoading(true);
+    try {
+      const response = await fetch('/api/generate-pitchdeck', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers, score: _score })
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pitch-deck.pdf';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        alert('Kunde inte generera pitch deck. Försök igen senare.');
+      }
+    } catch (error) {
+      console.error('Error generating pitch deck:', error);
+      alert('Ett fel uppstod vid generering av pitch deck.');
+    } finally {
+      setPitchDeckLoading(false);
+    }
+  };
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return '#7edc7a'; // Grön
     if (score >= 60) return '#ffd700'; // Gul
     return '#ff6b6b'; // Röd
-  };
-
-  const getScoreLabel = (score: number) => {
-    if (score >= 80) return { emoji: '🏆', label: 'Utmärkt' };
-    if (score >= 60) return { emoji: '⭐', label: 'Bra' };
-    if (score >= 40) return { emoji: '⚡', label: 'Acceptabelt' };
-    return { emoji: '🚧', label: 'Behöver förbättras' };
   };
 
   return (
@@ -253,10 +318,10 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
             Vad betyder score?
           </button>
           <div className="mt-4 text-lg text-[#16475b] text-center font-medium max-w-2xl">
-            {getScoreLabel(_score).label}
+            {scoreInfo.label}
           </div>
           <div className="mt-4 bg-[#eaf6fa] rounded-xl p-4 text-[#16475b] text-base text-center max-w-xl">
-            {getScoreLabel(_score).label}
+            {scoreInfo.label}
           </div>
         </div>
       </div>
@@ -316,9 +381,36 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 )}
               </div>
               <div className="flex-shrink-0 flex flex-col items-center">
-                <div className="text-6xl mb-2">{getScoreLabel(_score).emoji}</div>
+                <div className="text-6xl mb-2">{scoreInfo.emoji}</div>
                 <div className="text-5xl font-bold text-[#16475b]">{_score}</div>
-                <div className="text-lg text-[#16475b] font-semibold">{getScoreLabel(_score).label}</div>
+                <div className="text-lg text-[#16475b] font-semibold">{scoreInfo.label}</div>
+              </div>
+            </div>
+            
+            {/* Pitch Deck Generation Button */}
+            <div className="mt-6 pt-6 border-t border-[#16475b]/20">
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+                <button
+                  onClick={handlePitchDeckGeneration}
+                  disabled={pitchDeckLoading}
+                  className="bg-gradient-to-r from-[#16475b] to-[#2a6b8a] text-white font-bold rounded-full px-8 py-4 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
+                >
+                  {pitchDeckLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      Genererar pitch deck...
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-xl">📊</span>
+                      Generera AI Pitch Deck (PDF)
+                    </>
+                  )}
+                </button>
+                <div className="text-sm text-[#16475b] text-center">
+                  <div className="font-semibold">Professionell pitch deck</div>
+                  <div>Baserad på dina svar • Redo för investerare</div>
+                </div>
               </div>
             </div>
           </div>
@@ -528,6 +620,31 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
           <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🏁</span> Exit & Övrigt</h2>
             <div><b>Exit-plan:</b> {getOr(safeAnswers.exit_strategy?.exit_plan, 'Ej angivet')}</div>
+          </div>
+
+          {/* Second Pitch Deck Button */}
+          <div className="bg-gradient-to-br from-[#16475b] to-[#2a6b8a] rounded-3xl p-8 shadow-xl text-white text-center">
+            <h2 className="text-2xl font-bold mb-4">Redo för nästa steg?</h2>
+            <p className="text-lg mb-6 opacity-90">
+              Skapa en professionell pitch deck baserad på din analys
+            </p>
+            <button
+              onClick={handlePitchDeckGeneration}
+              disabled={pitchDeckLoading}
+              className="bg-white text-[#16475b] font-bold rounded-full px-10 py-4 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 mx-auto"
+            >
+              {pitchDeckLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#16475b]"></div>
+                  Genererar...
+                </>
+              ) : (
+                <>
+                  <span className="text-xl">🎯</span>
+                  Ladda ner Pitch Deck (PDF)
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>
