@@ -16,7 +16,12 @@ export async function POST(req: NextRequest) {
     console.log('Startar skrapning av:', url);
     const result = await scrapeAndAnalyze(url);
     
-    return NextResponse.json(result);
+    // Wrap result in 'data' property for frontend compatibility
+    return NextResponse.json({
+      success: result.success,
+      data: result,
+      error: result.error
+    });
   } catch (error: any) {
     console.error('Fel vid skrapning:', error);
     
