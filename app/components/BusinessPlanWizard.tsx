@@ -935,6 +935,9 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   // Funktioner för att mappa skrapad data till formulärfält
   const mapScrapedDataToAnswers = (scrapedData: any) => {
     const mappedAnswers: { [key: string]: string } = {};
+    let detectedCompany = '';
+    let detectedBransch = '';
+    let detectedOmrade = '';
     
     if (scrapedData) {
       // Direkt mappning för fält som matchar exakt
@@ -1004,7 +1007,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
           const milestones = [];
           const lowerText = text.toLowerCase();
           
-          // Sök efter nyckelord som indikerar milstones
+          // Sök efter nyckelord som indikerar milestones
           const milestonePatterns = [
             { keywords: ['lansering', 'launch', 'släpp'], milestone: 'Produktlansering', date: 'Q2 2024' },
             { keywords: ['kund', 'customer', 'client'], milestone: 'Första betalande kund', date: 'Q1 2024' },
@@ -1121,9 +1124,9 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         mappedAnswers['capital_block'] = JSON.stringify(capitalMatrix);
       }
 
-      // Lägg till företagsnamn från scraped data
+      // Spara företagsnamn från scraped data (returnera istället för att sätta direkt)
       if (scrapedData.company_name && scrapedData.company_name !== 'Ej angivet') {
-        setCompany(scrapedData.company_name);
+        detectedCompany = scrapedData.company_name;
       }
 
       // Automatisk bransch- och områdesigenkänning
@@ -1147,7 +1150,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         );
         
         if (detectedIndustry) {
-          setBransch(detectedIndustry[1]);
+          detectedBransch = detectedIndustry[1];
         }
       }
 
@@ -1165,12 +1168,17 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         );
         
         if (detectedArea) {
-          setOmrade(detectedArea[1]);
+          detectedOmrade = detectedArea[1];
         }
       }
     }
 
-    return mappedAnswers;
+    return {
+      answers: mappedAnswers,
+      detectedCompany,
+      detectedBransch,
+      detectedOmrade
+    };
   };
 
   // Hantera AI-exempel-popup
@@ -1397,13 +1405,24 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                         setScrapedData(scrapedResult);
                         
                         // Mappa skrapad data till formulärfält
-                        const mappedAnswers = mapScrapedDataToAnswers(scrapedResult);
-                        setAnswers(mappedAnswers);
+                        const mappedData = mapScrapedDataToAnswers(scrapedResult);
+                        setAnswers(mappedData.answers);
                         
-                        console.log('Automatiskt ifyllda svar:', mappedAnswers);
+                        // Sätt detekterade värden om de finns
+                        if (mappedData.detectedCompany) {
+                          setCompany(mappedData.detectedCompany);
+                        }
+                        if (mappedData.detectedBransch) {
+                          setBransch(mappedData.detectedBransch);
+                        }
+                        if (mappedData.detectedOmrade) {
+                          setOmrade(mappedData.detectedOmrade);
+                        }
+                        
+                        console.log('Automatiskt ifyllda svar:', mappedData.answers);
                         
                         // Visa framgångsmeddelande
-                        const filledFieldsCount = Object.keys(mappedAnswers).length;
+                        const filledFieldsCount = Object.keys(mappedData.answers).length;
                         if (filledFieldsCount > 0) {
                           alert(`Succé! ${filledFieldsCount} fält har fyllts i automatiskt baserat på din hemsida.`);
                         }
@@ -1459,7 +1478,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                   <div><strong>Värde:</strong> {scrapedData.company_value.slice(0, 100)}...</div>
                 )}
                 <div className="text-xs text-green-600 mt-2">
-                  {Object.keys(mapScrapedDataToAnswers(scrapedData)).length} fält kommer att fyllas i automatiskt
+                  {Object.keys(mapScrapedDataToAnswers(scrapedData).answers).length} fält kommer att fyllas i automatiskt
                 </div>
               </div>
             </div>
