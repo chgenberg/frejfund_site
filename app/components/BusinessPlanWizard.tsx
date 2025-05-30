@@ -12,15 +12,24 @@ const OMRADEN = [
   'Sverige', 'Norden', 'Europa', 'Globalt', 'Annat'
 ];
 
-// Add Question type definition
-type Question = {
+// Update Question type definition to be more specific
+type BaseQuestion = {
   id: string;
   label: string;
-  type: string;
   required: boolean;
   help: string;
-  options?: string[];
 };
+
+type TextQuestion = BaseQuestion & {
+  type: 'textarea' | 'text' | 'number' | 'file';
+};
+
+type SelectQuestion = BaseQuestion & {
+  type: 'select' | 'radio';
+  options: string[];
+};
+
+type Question = TextQuestion | SelectQuestion;
 
 // Steg 1-5: Inledande frågor
 const INTRO_QUESTIONS: Question[] = [];
