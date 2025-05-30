@@ -104,82 +104,49 @@ export async function scrapeAndAnalyze(url: string) {
 
     console.log('Skickar data till OpenAI för djupanalys...');
     
-    // Förbättrad prompt för mer detaljerad analys
-    const prompt = `Du är en expert på företagsanalys och affärsplaner. Analysera följande webbsida noggrant och extrahera ALL relevant information för en affärsplan.
+    // Förbättrad prompt: Fokusera på affärsplanens frågor
+    const prompt = `Du är en expert på företagsanalys. Din uppgift är att analysera företagets webbsida och försöka hitta svar på exakt dessa frågor (på svenska):
 
-WEBBSIDEDATA:
-Titel: ${data.title}
-Meta beskrivning: ${data.description}
-Meta nyckelord: ${data.metaKeywords}
-H1 rubriker: ${data.headings.h1.join(', ')}
-H2 rubriker: ${data.headings.h2.join(', ')}
-H3 rubriker: ${data.headings.h3.join(', ')}
-Bildtexter: ${data.images.join(', ')}
-Strukturerad data: ${JSON.stringify(data.structuredData)}
-Synlig text (första 5000 tecken): ${data.visibleText.slice(0, 5000)}
+1. Vad gör företaget och vilket värde skapar det?
+2. Vilket problem löser de för sina kunder?
+3. Hur vanligt är problemet – och hur bevisar de det?
+4. Vilket "gap" på marknaden fyller de?
+5. Hur löser de problemet? (Lösning)
+6. Varför är timingen rätt?
+7. Vem är målgruppen/kunden?
+8. Hur stort är marknadsutrymmet? (TAM/SAM/SOM)
+9. Vilka viktiga marknadstrender gynnar dem?
+10. Hur ser traction ut hittills?
+11. Hur tjänar de pengar? (intäktsströmmar)
+12. Vad är tillväxtplanen?
+13. Hur ser teamet ut?
+14. Hur stor ägarandel har grundarna?
+15. Vilka kompetenser täcker teamet – och saknas det någon?
+16. Har de styrelse eller rådgivare?
+17. Vilka är konkurrenterna?
+18. Vad gör lösningen unik?
+19. Har de immateriella rättigheter (IP)?
+20. Kapitalbehov och användning
+21. Exit-strategi
+22. Vilka är de största riskerna?
+23. Hur adresserar de hållbarhet/ESG?
 
-Analysera och extrahera ALL information som kan vara relevant för en affärsplan. Svara ENDAST med ett JSON-objekt (utan markdown-formatering):
+Svara ENDAST med ett JSON-objekt där varje fråga är en nyckel och svaret är så konkret och kortfattat som möjligt. Om information saknas, skriv "Ej angivet".
 
+Exempel:
 {
-  "company_name": "Exakt företagsnamn",
-  "industry": "Specifik bransch (använd dessa kategorier: SaaS, Tech, Konsumentvaror, Hälsa, Fintech, Industri, Tjänster, Utbildning, Energi, Annat)",
-  "area": "Geografiskt område (Sverige, Norden, Europa, Globalt, Annat)",
-  "company_value": "Vad gör företaget och vilket värde skapar det?",
-  "customer_problem": "Vilket problem löser de för sina kunder?",
-  "problem_evidence": "Bevis för att problemet existerar",
-  "market_gap": "Vilket gap på marknaden fyller de?",
-  "solution": "Hur löser de problemet?",
-  "why_now": "Varför är timingen rätt?",
-  "target_customer": "Vem är målgruppen?",
-  "market_size": "Marknadsstorlek (TAM/SAM/SOM om tillgängligt)",
-  "market_trends": "Relevanta marknadstrender",
-  "traction": "Traction och resultat hittills",
-  "revenue_block": "Hur tjänar de pengar?",
-  "growth_plan": "Tillväxtplaner",
-  "team": "Information om teamet/grundarna",
-  "founder_equity": "Ägarstruktur om tillgängligt",
-  "team_skills": "Teamets kompetenser",
-  "competitors": "Konkurrenter",
-  "unique_solution": "Vad gör lösningen unik?",
-  "ip_rights": "Immateriella rättigheter",
-  "main_risks": "Huvudsakliga risker",
-  "esg": "ESG/hållbarhetsaspekter",
-  "contact_info": {
-    "address": "Adress",
-    "phone": "Telefon",
-    "email": "E-post",
-    "website": "Webbplats"
-  },
-  "testimonials": "Kundrecensioner/testimonials",
-  "product_info": {
-    "products": "Produkter/tjänster",
-    "pricing": "Prissättning om tillgängligt",
-    "features": "Funktioner/egenskaper"
-  },
-  "financial_info": {
-    "revenue_model": "Intäktsmodell",
-    "funding": "Finansieringsinformation",
-    "investors": "Investerare"
-  },
-  "metrics": {
-    "customers": "Antal kunder",
-    "users": "Antal användare", 
-    "growth_rate": "Tillväxthastighet",
-    "other_kpis": "Andra nyckeltal"
-  },
-  "news_press": "Nyheter och pressmeddelanden",
-  "social_media": "Sociala medier-närvaro",
-  "certifications": "Certifieringar och utmärkelser",
-  "partnerships": "Partnerskap och samarbeten",
-  "technology": "Teknisk information",
-  "business_model": "Affärsmodell",
-  "market_position": "Marknadsposition",
-  "competitive_advantages": "Konkurrensfördelar",
-  "future_plans": "Framtidsplaner",
-  "other_relevant": "Annan relevant information för affärsplan"
+  "vad_gor_foretaget": "...",
+  "problem": "...",
+  ...
 }
 
-Fyll i så mycket information som möjligt baserat på webbsidans innehåll. Om information saknas, skriv "Ej angivet" eller "Information saknas". Var specifik och detaljerad.`;
+Analysera webbsidan och försök fylla i så många svar som möjligt. Här är webbsidans data:
+Titel: ${data.title}
+Meta beskrivning: ${data.description}
+H1: ${data.headings.h1.join(', ')}
+H2: ${data.headings.h2.join(', ')}
+Synlig text (första 3000 tecken): ${data.visibleText.slice(0, 3000)}
+`;
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
