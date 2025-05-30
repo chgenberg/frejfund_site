@@ -3,409 +3,47 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import BusinessPlanResult from './BusinessPlanResult';
 import BusinessPlanScore from './BusinessPlanScore';
+import TestWizard, { CustomTextarea, TEST_EXPORT } from './TestWizard';
 
 const BRANSCHER = [
-  "SaaS",
-  "Tech",
-  "Konsumentvaror",
-  "Hälsa",
-  "Fintech",
-  "Industri",
-  "Tjänster",
-  "Utbildning",
-  "Energi",
-  "Annat"
+  'SaaS', 'Tech', 'Konsumentvaror', 'Hälsa', 'Fintech', 'Industri', 'Tjänster', 'Utbildning', 'Energi', 'Annat'
 ];
 const OMRADEN = [
-  "Sverige",
-  "Norden",
-  "Europa",
-  "Globalt",
-  "Annat"
+  'Sverige', 'Norden', 'Europa', 'Globalt', 'Annat'
 ];
 
-const questions = [
-  // 1. Pitch & Demo
-  {
-    id: "executive_summary",
-    question: "Sammanfatta din affärsidé på max 1 minut",
-    help: "Tänk elevator pitch! Vad gör ni, för vem, och varför är det unikt?",
-    subQuestions: [
-      {
-        id: "summary",
-        label: "Executive summary (max 300 tecken)",
-        exampleAnswers: [
-          "Vi automatiserar bokföring för småföretag med AI och sparar 80% av deras tid.",
-          "Vi säljer miljövänliga rengöringsprodukter till hotell och restauranger."
-        ]
-      },
-      {
-        id: "demo_link",
-        label: "Har du en demo eller video? (länk)",
-        exampleAnswers: [
-          "https://youtu.be/demo123",
-          "https://vimeo.com/yourdemo"
-        ]
-      }
-    ]
-  },
-  // 2. Problem & Lösning
-  {
-    id: "business_idea",
-    question: "Vad är din affärsidé?",
-    help: "Beskriv tydligt vad ni gör, för vem och varför det är unikt.",
-    subQuestions: [
-      {
-        id: "what_you_do",
-        label: "Vad gör ni?",
-        exampleAnswers: [
-          "Vi utvecklar en app för att automatisera bokföring åt småföretag.",
-          "Vi säljer miljövänliga rengöringsprodukter till hotell."
-        ]
-      },
-      {
-        id: "for_whom",
-        label: "För vem?",
-        exampleAnswers: [
-          "Småföretagare inom tjänstesektorn.",
-          "Hotell och restauranger med hållbarhetsfokus."
-        ]
-      },
-      {
-        id: "why_unique",
-        label: "Varför är det unikt?",
-        exampleAnswers: [
-          "Vår lösning använder AI för att spara tid och minska fel.",
-          "Vi är de enda med Svanenmärkta produkter i branschen."
-        ]
-      }
-    ]
-  },
-  {
-    id: "customer_segments",
-    question: "Vem är din huvudsakliga kund?",
-    help: "Vilka grupper köper er produkt/tjänst och varför?",
-    subQuestions: [
-      {
-        id: "customer_group",
-        label: "Vilken grupp?",
-        exampleAnswers: [
-          "Kvinnor 25–40 år i storstad.",
-          "Småföretagare inom tjänstesektorn."
-        ]
-      },
-      {
-        id: "customer_needs",
-        label: "Vilka behov/problem har de?",
-        exampleAnswers: [
-          "Behöver spara tid på administration.",
-          "Vill ha miljövänliga alternativ."
-        ]
-      },
-      {
-        id: "customer_location",
-        label: "Var finns de?",
-        exampleAnswers: [
-          "Främst i Stockholm och Göteborg.",
-          "Hotellkedjor i hela Sverige."
-        ]
-      }
-    ]
-  },
-  {
-    id: "problem_solution",
-    question: "Vilket problem löser ni och hur?",
-    help: "Beskriv det viktigaste kundproblemet och hur ni adresserar det.",
-    subQuestions: [
-      {
-        id: "problem",
-        label: "Vilket problem?",
-        exampleAnswers: [
-          "Småföretag lägger onödig tid på bokföring.",
-          "Stora mängder kemikalier används i städbranschen."
-        ]
-      },
-      {
-        id: "solution",
-        label: "Hur löser ni det?",
-        exampleAnswers: [
-          "Vi automatiserar processen med AI.",
-          "Vi erbjuder ett miljövänligt alternativ."
-        ]
-      }
-    ]
-  },
-  {
-    id: "team",
-    question: "Vilka är grundarna och medarbetarna?",
-    help: "Beskriv teamet och deras bakgrund.",
-    subQuestions: [
-      {
-        id: "founders",
-        label: "Grundare (namn, roll, erfarenhet)",
-        exampleAnswers: [
-          "Anna (VD, 10 år i branschen), Erik (CTO, AI-expert)",
-          "Två grundare med bakgrund inom logistik och apputveckling."
-        ]
-      },
-      {
-        id: "key_team",
-        label: "Nyckelpersoner/kompetenser",
-        exampleAnswers: [
-          "Sara (Marknad, ex-Google)",
-          "Ett team på fem personer med erfarenhet från både hotell och kemikalieindustrin."
-        ]
-      },
-      {
-        id: "team_expertise",
-        label: "Teamets expertis och erfarenhet",
-        exampleAnswers: [
-          "Kombinerad erfarenhet av 25+ år inom branschen",
-          "Tidigare framgångsrika startups och exit-erfarenhet"
-        ]
-      }
-    ]
-  },
-  // 3. Marknad & Affärsmodell
-  {
-    id: "market_details",
-    question: "Hur stor är marknaden?",
-    help: "Dela upp i TAM (total), SAM (adresserbar), SOM (nåbar) och ange källa/metod.",
-    subQuestions: [
-      { id: "tam", label: "TAM (Total Addressable Market)", exampleAnswers: ["10 miljarder kr", "1 miljon användare"] },
-      { id: "sam", label: "SAM (Serviceable Addressable Market)", exampleAnswers: ["2 miljarder kr", "200 000 användare"] },
-      { id: "som", label: "SOM (Serviceable Obtainable Market)", exampleAnswers: ["200 miljoner kr", "20 000 användare"] },
-      { id: "market_source", label: "Källa/metod", exampleAnswers: ["Statista 2023", "Egna beräkningar"] }
-    ]
-  },
-  {
-    id: "revenue_model",
-    question: "Hur tjänar ni pengar?",
-    help: "Välj intäktsmodell(er) och beskriv.",
-    subQuestions: [
-      {
-        id: "model",
-        label: "Intäktsmodell(er)",
-        exampleAnswers: [
-          "Månadsabonnemang per företag.",
-          "Transaktionsavgift per bokning.",
-          "Försäljning av produkter till grossist och direkt till kund."
-        ]
-      },
-      {
-        id: "other_revenue",
-        label: "Övriga intäktskällor",
-        exampleAnswers: [
-          "Konsulttjänster inom bokföring.",
-          "Licensiering av teknik."
-        ]
-      }
-    ]
-  },
-  {
-    id: "pricing",
-    question: "Prissättning",
-    help: "Beskriv hur ni bestämmer priset på er produkt/tjänst.",
-    subQuestions: [
-      {
-        id: "price_model",
-        label: "Prismodell",
-        exampleAnswers: [
-          "Långsiktig abonnemangspris.",
-          "Transaktionspris per bokning.",
-          "Fast pris för hela kontraktet."
-        ]
-      },
-      {
-        id: "price_range",
-        label: "Prisintervallet",
-        exampleAnswers: [
-          "1000-5000 kr per månad.",
-          "500-3000 kr per bokning."
-        ]
-      }
-    ]
-  },
-  // 4. Traction & Milestones
-  {
-    id: "traction",
-    question: "Traction/milstolpar",
-    help: "Beskriv er framgång och framstegen.",
-    subQuestions: [
-      {
-        id: "milestones",
-        label: "Viktiga milstolpar",
-        exampleAnswers: [
-          "Lansering av appen.",
-          "Första kundkontakten."
-        ]
-      },
-      {
-        id: "user_growth",
-        label: "Användarökning",
-        exampleAnswers: [
-          "1000 nya användare per månad.",
-          "500 nya kunder per år."
-        ]
-      }
-    ]
-  },
-  {
-    id: "customer_validation",
-    question: "Kundvalidering",
-    help: "Beskriv hur ni har validerat er produkt/tjänst.",
-    subQuestions: [
-      {
-        id: "validation_method",
-        label: "Metod",
-        exampleAnswers: [
-          "Onlineundersökningar.",
-          "Kundintervjuer."
-        ]
-      },
-      {
-        id: "validation_results",
-        label: "Resultat",
-        exampleAnswers: [
-          "Validering av 80% av kunderna.",
-          "Validering av 50% av kunderna."
-        ]
-      }
-    ]
-  },
-  // 5. Partners & Risks
-  {
-    id: "partners",
-    question: "Partners/leverantörer",
-    help: "Beskriv era partners och leverantörer.",
-    subQuestions: [
-      {
-        id: "main_partners",
-        label: "Huvudsakliga partners",
-        exampleAnswers: [
-          "Google, Microsoft.",
-          "Ecolab, Henkel."
-        ]
-      },
-      {
-        id: "partner_contributions",
-        label: "Bidrag",
-        exampleAnswers: [
-          "Marknadsföring och distribution.",
-          "Produktutveckling och kvalitetssäkring."
-        ]
-      }
-    ]
-  },
-  {
-    id: "risks",
-    question: "Viktigaste risker",
-    help: "Beskriv de viktigaste riskerna för er affärsidé.",
-    subQuestions: [
-      {
-        id: "financial_risk",
-        label: "Finansiella risker",
-        exampleAnswers: [
-          "Marknadsrisk.",
-          "Valutarisk."
-        ]
-      },
-      {
-        id: "operational_risk",
-        label: "Operationsrisk",
-        exampleAnswers: [
-          "Teknisk risk.",
-          "Personellrisk."
-        ]
-      }
-    ]
-  },
-  // 6. Sustainability & Budget
-  {
-    id: "sustainability",
-    question: "Hållbarhet/impact",
-    help: "Beskriv hur ni tar hänsyn till hållbarheten och impacten.",
-    subQuestions: [
-      {
-        id: "environmental_impact",
-        label: "Miljöpåverkan",
-        exampleAnswers: [
-          "Minskar kemikalier i produkterna.",
-          "Ökar användningen av miljövänliga energikällor."
-        ]
-      },
-      {
-        id: "social_impact",
-        label: "Social impact",
-        exampleAnswers: [
-          "Stöttar lokala ekonomier.",
-          "Skapar jobb och utvecklar kompetenser."
-        ]
-      }
-    ]
-  },
-  {
-    id: "budget",
-    question: "Budget/prognos",
-    help: "Beskriv budgeten och prognosen för er affärsidé.",
-    subQuestions: [
-      {
-        id: "revenue_forecast",
-        label: "Revisionsprognos",
-        exampleAnswers: [
-          "2 miljoner kr i årlig intäkt.",
-          "1,5 miljoner kr i årlig intäkt."
-        ]
-      },
-      {
-        id: "cost_forecast",
-        label: "Kostnadsprognos",
-        exampleAnswers: [
-          "1 miljon kr i årliga kostnader.",
-          "500 000 kr i årliga kostnader."
-        ]
-      }
-    ]
-  },
-  // 7. Board & Exit
-  {
-    id: "board",
-    question: "Styrelse/rådgivare",
-    help: "Beskriv er styrelse och rådgivare.",
-    subQuestions: [
-      {
-        id: "board_members",
-        label: "Styrelsemedlemmar",
-        exampleAnswers: [
-          "Anna (VD), Erik (CTO), Sara (Marknad).",
-          "Två styrelsemedlemmar med erfarenhet från både hotell och kemikalieindustrin."
-        ]
-      },
-      {
-        id: "advisors",
-        label: "Rådgivare",
-        exampleAnswers: [
-          "Extern ekonom, jurist.",
-          "Intern ekonom, jurist."
-        ]
-      }
-    ]
-  },
-  {
-    id: "exit_strategy",
-    question: "Har ni en exit-strategi?",
-    help: "Beskriv eventuella exit-strategier.",
-    subQuestions: [
-      {
-        id: "exit_plan",
-        label: "Exit-plan",
-        exampleAnswers: [
-          "IPO 2027",
-          "Förvärv av större aktör"
-        ]
-      }
-    ]
-  }
+// Steg 1-5: Inledande frågor
+const INTRO_QUESTIONS: any[] = [];
+
+const QUESTIONS = [
+  { id: 'company_value', label: 'Vad gör företaget och vilket värde skapar det?', type: 'textarea', required: true, help: 'Beskriv affärsidén, produkten/tjänsten, kundpain och hur ni skapar värde.' },
+  { id: 'customer_problem', label: 'Vilket problem löser ni för era kunder?', type: 'textarea', required: true, help: 'Beskriv det specifika problem eller behov som er produkt/tjänst adresserar.' },
+  { id: 'problem_evidence', label: 'Hur vanligt är problemet – och hur bevisar ni det?', type: 'textarea', required: true, help: 'Ge gärna en datapunkt, referens eller länk.' },
+  { id: 'market_gap', label: 'Vilket "gap" på marknaden fyller ni?', type: 'textarea', required: true, help: 'Finns det en lucka där befintliga alternativ inte räcker till?' },
+  { id: 'solution', label: 'Hur löser ni problemet? (Er lösning)', type: 'textarea', required: true, help: 'Förklara er produkt/tjänst och hur den adresserar problemet.' },
+  { id: 'why_now', label: 'Varför är timingen rätt – tekniskt, marknadsmässigt eller reglerings-mässigt?', type: 'textarea', required: true, help: 'Motivera varför just nu är rätt tillfälle.' },
+  { id: 'target_customer', label: 'Vem är er målgrupp och kund?', type: 'textarea', required: true, help: 'Beskriv er idealkund. Är ni B2B eller B2C? SMB eller enterprise?' },
+  { id: 'market_size', label: 'Hur stort är marknadsutrymmet? (TAM/SAM/SOM)', type: 'textarea', required: true, help: 'Uppskatta er totala marknad: TAM, SAM, SOM.' },
+  { id: 'market_trends', label: 'Vilka viktiga marknadstrender gynnar er?', type: 'textarea', required: false, help: 'Beskriv trender (teknologiska, demografiska, regulatoriska) som ni surfar på.' },
+  { id: 'traction', label: 'Hur ser traction ut hittills?', type: 'textarea', required: true, help: 'Ange milstolpar och resultat: användare, kunder, piloter, intäkter, tillväxttal.' },
+  { id: 'revenue_block', label: 'Hur tjänar ni pengar och hur fördelas intäkterna (återkommande/engång)?', type: 'textarea', required: true, help: 'Beskriv intäktsströmmar, prissättning och fördelning mellan återkommande och engångsintäkter.' },
+  { id: 'runway', label: 'Hur lång runway (antal månader) har ni? (heltal)', type: 'number', required: true, help: 'Hur många månader räcker ert kapital? (Bifoga gärna P/L-rapport om möjligt)' },
+  { id: 'growth_plan', label: 'Vad är er tillväxtplan för nästa 12-24 månader?', type: 'textarea', required: true, help: 'Beskriv framtidsplaner: försäljningstillväxt, produktlanseringar, kundmål.' },
+  { id: 'milestones', label: 'Vilka tre största milstolpar planerar ni att nå kommande 12 månader (med månad/kvartal)?', type: 'textarea', required: true, help: 'Exempel: "Lansering Q3", "Första betalande kund i september", "ISO-certifiering Q2".' },
+  { id: 'team', label: 'Hur ser ert team ut?', type: 'textarea', required: true, help: 'Presentera grundarna och kärnteamet, roller och erfarenheter.' },
+  { id: 'founder_equity', label: 'Hur stor ägarandel (%) behåller grundarteamet efter denna runda?', type: 'number', required: true, help: 'Svara i procent, t.ex. 65.' },
+  { id: 'founder_market_fit', label: 'Hur väl matchar teamets bakgrund det problem ni löser? (1–5-skala + fritext)', type: 'text', required: true, help: '1 = ingen erfarenhet, 5 = djup domänexpertis. Motivera kort.' },
+  { id: 'team_skills', label: 'Vilka kompetenser täcker teamet – och saknas det någon?', type: 'textarea', required: false, help: 'Beskriv hur komplett teamet är och ev. kompetensluckor.' },
+  { id: 'hiring_plan', label: 'Har ni en rekryteringsplan?', type: 'textarea', required: false, help: 'Beskriv er hiring plan för kommande året.' },
+  { id: 'board_advisors', label: 'Har ni en styrelse eller rådgivare?', type: 'textarea', required: false, help: 'Ange om ni har en formell styrelse och vilka som sitter i den, eller tunga rådgivare.' },
+  { id: 'competitors', label: 'Vilka är era konkurrenter?', type: 'textarea', required: true, help: 'Lista de viktigaste konkurrenterna och hur ni skiljer er.' },
+  { id: 'unique_solution', label: 'Vad gör er lösning unik eller svår att kopiera?', type: 'textarea', required: true, help: 'Utveckla ert konkurrensförsprång: teknik, patent, nätverkseffekter, IP.' },
+  { id: 'ip_rights', label: 'Äger ni immateriella rättigheter (IP)?', type: 'radio', options: ['Ja', 'Nej'], required: false, help: 'Patent, varumärkesskydd, upphovsrätt? Om Ja – specificera kort.' },
+  { id: 'capital_block', label: 'Kapitalbehov och användning', type: 'textarea', required: true, help: 'Ange belopp (MSEK), fördelning (% till produkt/försäljning/team/övrigt) och sannolikhet att ni behöver mer kapital (1–5).' },
+  { id: 'exit_strategy', label: 'Vad är er exit-strategi för investerare?', type: 'textarea', required: false, help: 'Beskriv möjliga exitmöjligheter på sikt.' },
+  { id: 'main_risks', label: 'Vilka är de största riskerna i er affär?', type: 'textarea', required: true, help: 'Identifiera de viktigaste riskfaktorerna och hur ni planerar att hantera dem.' },
+  { id: 'esg', label: 'Hur adresserar ni hållbarhet och ESG?', type: 'textarea', required: false, help: 'Kryssa i vad som är relevant och beskriv kort.' },
+  { id: 'anything_else', label: 'Vill du dela med dig av någonting mer?', type: 'textarea', required: false, help: 'Något du vill förtydliga, komplettera eller lyfta fram?' }
 ];
 
 const EXAMPLES: { [key: string]: string[] } = {
@@ -505,16 +143,21 @@ const BRANSCH_SPECIFIC_QUESTIONS: { [key: string]: BranschQuestion[] } = {
 };
 
 // 1. Apple-inspirerade utility-klasser
-const inputBase = "w-full px-4 py-2 rounded-2xl bg-white/10 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] border border-[#16475b] text-white placeholder-[#7edcff] focus:outline-none focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all duration-200 backdrop-blur-md";
-const selectWrapper = "relative w-full";
+const focusRing = "focus:outline-none focus:ring-2 focus:ring-[#7edcff] focus:ring-offset-2 focus:ring-offset-[#f5f7fa]";
+const mobileInput = "text-base md:text-sm"; // Larger text on mobile
+const touchTarget = "min-h-[44px]"; // Minimum touch target size
+const transitionBase = "transition-all duration-200 ease-in-out";
+
+// Update the input base styles
+const inputBase = `w-full px-4 py-3 rounded-2xl bg-white/10 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] border border-[#16475b] text-[#04121d] placeholder-[#7edcff] transition-all duration-200 backdrop-blur-md ${mobileInput} ${touchTarget}`;
+
+// Update the select base styles
 const selectBase = `${inputBase} appearance-none pr-10 cursor-pointer`;
-const selectArrow = (
-  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7edcff] text-lg">
-    <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M6 8l4 4 4-4" stroke="#7edcff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-  </span>
-);
-const radioOuter = "w-5 h-5 rounded-full border-2 border-[#7edcff] bg-white/10 shadow-inner flex items-center justify-center transition-all duration-200 group-focus:ring-2 group-focus:ring-[#7edcff] group-hover:border-[#7edcff]";
-const radioInner = "w-3 h-3 rounded-full bg-[#7edcff] scale-0 group-checked:scale-100 transition-transform duration-200";
+
+// Add new feedback styles
+const successState = "border-green-500 bg-green-50/10";
+const errorState = "border-red-500 bg-red-50/10";
+const loadingState = "opacity-75 cursor-wait";
 
 interface BusinessIdea {
   what_you_do: string;
@@ -619,120 +262,500 @@ const initialAnswers: BusinessPlanAnswers = {
   }
 };
 
+// Efter inledande steg, nytt investerarvänligt frågebatteri
+const INVESTOR_QUESTIONS = [
+  {
+    id: 'company_value',
+    label: 'Vad gör företaget och vilket värde skapar det?',
+    type: 'textarea',
+    required: true,
+    help: 'Beskriv affärsidén, produkten/tjänsten, kundpain och hur ni skapar värde.'
+  },
+  {
+    id: 'customer_problem',
+    label: 'Vilket problem löser ni för era kunder?',
+    type: 'textarea',
+    required: true,
+    help: 'Beskriv det specifika problem eller behov som er produkt/tjänst adresserar.'
+  },
+  {
+    id: 'problem_evidence',
+    label: 'Hur vanligt är problemet – och hur bevisar ni det?',
+    type: 'textarea',
+    required: true,
+    help: 'Ge gärna en datapunkt, referens eller länk.'
+  },
+  {
+    id: 'market_gap',
+    label: 'Vilket "gap" på marknaden fyller ni?',
+    type: 'textarea',
+    required: true,
+    help: 'Finns det en lucka där befintliga alternativ inte räcker till?'
+  },
+  {
+    id: 'solution',
+    label: 'Hur löser ni problemet? (Er lösning)',
+    type: 'textarea',
+    required: true,
+    help: 'Förklara er produkt/tjänst och hur den adresserar problemet.'
+  },
+  {
+    id: 'why_now',
+    label: 'Varför är timingen rätt – tekniskt, marknadsmässigt eller reglerings-mässigt?',
+    type: 'textarea',
+    required: true,
+    help: 'Motivera varför just nu är rätt tillfälle.'
+  },
+  {
+    id: 'target_customer',
+    label: 'Vem är er målgrupp och kund?',
+    type: 'textarea',
+    required: true,
+    help: 'Beskriv er idealkund. Är ni B2B eller B2C? SMB eller enterprise?'
+  },
+  {
+    id: 'market_size',
+    label: 'Hur stort är marknadsutrymmet? (TAM/SAM/SOM)',
+    type: 'textarea',
+    required: true,
+    help: 'Uppskatta er totala marknad: TAM, SAM, SOM.'
+  },
+  {
+    id: 'market_trends',
+    label: 'Vilka viktiga marknadstrender gynnar er?',
+    type: 'textarea',
+    required: false,
+    help: 'Beskriv trender (teknologiska, demografiska, regulatoriska) som ni surfar på.'
+  },
+  {
+    id: 'traction',
+    label: 'Hur ser traction ut hittills?',
+    type: 'textarea',
+    required: true,
+    help: 'Ange milstolpar och resultat: användare, kunder, piloter, intäkter, tillväxttal.'
+  },
+  {
+    id: 'revenue_block',
+    label: 'Hur tjänar ni pengar och hur fördelas intäkterna (återkommande/engång)?',
+    type: 'textarea',
+    required: true,
+    help: 'Beskriv intäktsströmmar, prissättning och fördelning mellan återkommande och engångsintäkter.'
+  },
+  {
+    id: 'runway',
+    label: 'Hur lång runway (antal månader) har ni? (heltal)',
+    type: 'number',
+    required: true,
+    help: 'Hur många månader räcker ert kapital? (Bifoga gärna P/L-rapport om möjligt)'
+  },
+  {
+    id: 'growth_plan',
+    label: 'Vad är er tillväxtplan för nästa 12-24 månader?',
+    type: 'textarea',
+    required: true,
+    help: 'Beskriv framtidsplaner: försäljningstillväxt, produktlanseringar, kundmål.'
+  },
+  {
+    id: 'milestones',
+    label: 'Vilka tre största milstolpar planerar ni att nå kommande 12 månader (med månad/kvartal)?',
+    type: 'milestone_list',
+    required: true,
+    help: 'Exempel: "Lansering Q3", "Första betalande kund i september", "ISO-certifiering Q2".'
+  },
+  {
+    id: 'team',
+    label: 'Hur ser ert team ut?',
+    type: 'textarea',
+    required: true,
+    help: 'Presentera grundarna och kärnteamet, roller och erfarenheter.'
+  },
+  {
+    id: 'founder_equity',
+    label: 'Hur stor ägarandel (%) behåller grundarteamet efter denna runda?',
+    type: 'number',
+    required: true,
+    help: 'Svara i procent, t.ex. 65.'
+  },
+  {
+    id: 'founder_market_fit',
+    label: 'Hur väl matchar teamets bakgrund det problem ni löser? (1–5-skala + fritext)',
+    type: 'founder_market_fit',
+    required: true,
+    help: '1 = ingen erfarenhet, 5 = djup domänexpertis. Motivera kort.'
+  },
+  {
+    id: 'team_skills',
+    label: 'Vilka kompetenser täcker teamet – och saknas det någon?',
+    type: 'textarea',
+    required: false,
+    help: 'Beskriv hur komplett teamet är och ev. kompetensluckor.'
+  },
+  {
+    id: 'hiring_plan',
+    label: 'Har ni en rekryteringsplan?',
+    type: 'textarea',
+    required: false,
+    help: 'Beskriv er hiring plan för kommande året.'
+  },
+  {
+    id: 'board_advisors',
+    label: 'Har ni en styrelse eller rådgivare?',
+    type: 'textarea',
+    required: false,
+    help: 'Ange om ni har en formell styrelse och vilka som sitter i den, eller tunga rådgivare.'
+  },
+  {
+    id: 'competitors',
+    label: 'Vilka är era konkurrenter?',
+    type: 'textarea',
+    required: true,
+    help: 'Lista de viktigaste konkurrenterna och hur ni skiljer er.'
+  },
+  {
+    id: 'unique_solution',
+    label: 'Vad gör er lösning unik eller svår att kopiera?',
+    type: 'textarea',
+    required: true,
+    help: 'Utveckla ert konkurrensförsprång: teknik, patent, nätverkseffekter, IP.'
+  },
+  {
+    id: 'ip_rights',
+    label: 'Äger ni immateriella rättigheter (IP)?',
+    type: 'radio',
+    options: ['Ja', 'Nej'],
+    required: false,
+    help: 'Patent, varumärkesskydd, upphovsrätt? Om Ja – specificera kort.'
+  },
+  {
+    id: 'capital_block',
+    label: 'Kapitalbehov och användning',
+    type: 'capital_matrix',
+    required: true,
+    help: 'Ange belopp (MSEK), fördelning (% till produkt/försäljning/team/övrigt) och sannolikhet att ni behöver mer kapital (1–5).'
+  },
+  {
+    id: 'exit_strategy',
+    label: 'Vad är er exit-strategi för investerare?',
+    type: 'textarea',
+    required: false,
+    help: 'Beskriv möjliga exitmöjligheter på sikt.'
+  },
+  {
+    id: 'main_risks',
+    label: 'Vilka är de största riskerna i er affär?',
+    type: 'textarea',
+    required: true,
+    help: 'Identifiera de viktigaste riskfaktorerna och hur ni planerar att hantera dem.'
+  },
+  {
+    id: 'esg',
+    label: 'Hur adresserar ni hållbarhet och ESG?',
+    type: 'esg_checkbox',
+    required: false,
+    help: 'Kryssa i vad som är relevant och beskriv kort.'
+  },
+  // Bonusfråga, endast för SaaS/Fintech
+  {
+    id: 'tax_incentives',
+    label: 'Finns det några skattemässiga incitament eller stöd kopplade till investeringen?',
+    type: 'textarea',
+    required: false,
+    help: 'T.ex. bidrag, stöd, skattelättnader. (Visas bara för SaaS/Fintech)'
+  },
+  // Sista öppna frågan
+  {
+    id: 'anything_else',
+    label: 'Vill du dela med dig av någonting mer?',
+    type: 'textarea',
+    required: false,
+    help: 'Något du vill förtydliga, komplettera eller lyfta fram?'
+  }
+];
+
+// Funktion för att dynamiskt lägga till branschspecifika frågor
+function getAllQuestions(selectedIndustry: string) {
+  let industrySpecific: any[] = [];
+  // Här kan du lägga till logik för att hämta branschspecifika frågor baserat på selectedIndustry
+  // Exempel:
+  // if (selectedIndustry === 'SaaS') industrySpecific = [...];
+  return [...INTRO_QUESTIONS, ...INVESTOR_QUESTIONS, ...industrySpecific];
+}
+
+// Add these constants back
+const selectWrapper = "relative w-full";
+const selectArrow = (
+  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7edcff] text-lg">
+    <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M6 8l4 4 4-4" stroke="#7edcff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+  </span>
+);
+const radioOuter = "w-5 h-5 rounded-full border-2 border-[#7edcff] bg-white/10 shadow-inner flex items-center justify-center transition-all duration-200 group-focus:ring-2 group-focus:ring-[#7edcff] group-hover:border-[#7edcff]";
+const radioInner = "w-3 h-3 rounded-full bg-[#7edcff] scale-0 group-checked:scale-100 transition-transform duration-200";
+
+function getStringValue(val: any): string {
+  return typeof val === 'string' ? val : '';
+}
+
+// Add helper components for custom question types above the main export
+function MilestoneList({ value, onChange }: { value: { milestone: string; date: string }[]; onChange: (val: { milestone: string; date: string }[]) => void }) {
+  const handleChange = (idx: number, field: 'milestone' | 'date', val: string) => {
+    const updated = value.map((item, i) => i === idx ? { ...item, [field]: val } : item);
+    onChange(updated);
+  };
+  const addMilestone = () => onChange([...value, { milestone: '', date: '' }]);
+  const removeMilestone = (idx: number) => onChange(value.filter((_, i) => i !== idx));
+  return (
+    <div className="space-y-2">
+      {value.map((item, idx) => (
+        <div key={idx} className="flex gap-2 items-center">
+          <input
+            type="text"
+            className="flex-1 px-3 py-2 rounded-lg border border-[#16475b] bg-white/80 text-[#16475b]"
+            placeholder="Milstolpe (t.ex. 'Lansering')"
+            value={item.milestone}
+            onChange={e => handleChange(idx, 'milestone', e.target.value)}
+          />
+          <input
+            type="text"
+            className="w-32 px-3 py-2 rounded-lg border border-[#16475b] bg-white/80 text-[#16475b]"
+            placeholder="Månad/Kvartal"
+            value={item.date}
+            onChange={e => handleChange(idx, 'date', e.target.value)}
+          />
+          {value.length > 1 && (
+            <button type="button" className="text-red-500 text-xl px-2" onClick={() => removeMilestone(idx)} aria-label="Ta bort milstolpe">×</button>
+          )}
+        </div>
+      ))}
+      {value.length < 5 && (
+        <button type="button" className="mt-2 px-4 py-1 rounded-full bg-[#7edcff] text-[#16475b] font-bold" onClick={addMilestone}>+ Lägg till milstolpe</button>
+      )}
+    </div>
+  );
+}
+
+function CapitalMatrix({ value, onChange }: { value: { amount: string; product: string; sales: string; team: string; other: string; probability: string }; onChange: (val: any) => void }) {
+  const handleField = (field: string, val: string) => onChange({ ...value, [field]: val });
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2 items-center">
+        <label className="w-32">Belopp (MSEK)</label>
+        <input type="number" min="0" step="0.1" className="flex-1 px-3 py-2 rounded-lg border border-[#16475b] bg-white/80 text-[#16475b]" value={value.amount} onChange={e => handleField('amount', e.target.value)} />
+      </div>
+      <div className="flex gap-2 items-center">
+        <label className="w-32">Produkt (%)</label>
+        <input type="number" min="0" max="100" className="w-20 px-3 py-2 rounded-lg border border-[#16475b] bg-white/80 text-[#16475b]" value={value.product} onChange={e => handleField('product', e.target.value)} />
+        <label className="w-20">Försäljning (%)</label>
+        <input type="number" min="0" max="100" className="w-20 px-3 py-2 rounded-lg border border-[#16475b] bg-white/80 text-[#16475b]" value={value.sales} onChange={e => handleField('sales', e.target.value)} />
+        <label className="w-20">Team (%)</label>
+        <input type="number" min="0" max="100" className="w-20 px-3 py-2 rounded-lg border border-[#16475b] bg-white/80 text-[#16475b]" value={value.team} onChange={e => handleField('team', e.target.value)} />
+        <label className="w-20">Övrigt (%)</label>
+        <input type="number" min="0" max="100" className="w-20 px-3 py-2 rounded-lg border border-[#16475b] bg-white/80 text-[#16475b]" value={value.other} onChange={e => handleField('other', e.target.value)} />
+      </div>
+      <div className="flex gap-2 items-center">
+        <label className="w-48">Sannolikhet att mer kapital behövs (1–5)</label>
+        <input type="range" min="1" max="5" value={value.probability || '3'} onChange={e => handleField('probability', e.target.value)} className="flex-1" />
+        <span className="ml-2 font-bold">{value.probability || '3'}</span>
+      </div>
+    </div>
+  );
+}
+
+function ESGCheckbox({ value, onChange }: { value: { miljö: boolean; socialt: boolean; governance: boolean; text: string }; onChange: (val: any) => void }) {
+  const handleBox = (field: 'miljö' | 'socialt' | 'governance') => onChange({ ...value, [field]: !value[field] });
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-4 mb-2">
+        <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={value.miljö} onChange={() => handleBox('miljö')} /> Miljö</label>
+        <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={value.socialt} onChange={() => handleBox('socialt')} /> Socialt</label>
+        <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={value.governance} onChange={() => handleBox('governance')} /> Governance</label>
+      </div>
+      <textarea className="w-full min-h-[40px] rounded-lg border border-[#16475b] bg-white/80 px-4 py-2 text-[#16475b]" value={value.text} onChange={e => onChange({ ...value, text: e.target.value })} placeholder="Beskriv kort..." />
+    </div>
+  );
+}
+
+function FounderMarketFit({ value, onChange }: { value: { score: string; text: string }; onChange: (val: any) => void }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2 items-center">
+        <label className="w-48">Matchning (1–5):</label>
+        {[1,2,3,4,5].map(n => (
+          <label key={n} className="flex items-center gap-1 cursor-pointer">
+            <input type="radio" name="founder_market_fit_score" value={n} checked={value.score === String(n)} onChange={() => onChange({ ...value, score: String(n) })} />
+            <span>{n}</span>
+          </label>
+        ))}
+      </div>
+      <textarea className="w-full min-h-[40px] rounded-lg border border-[#16475b] bg-white/80 px-4 py-2 text-[#16475b]" value={value.text} onChange={e => onChange({ ...value, text: e.target.value })} placeholder="Motivera kort..." />
+    </div>
+  );
+}
+
+function useOnClickOutside(ref: any, handler: () => void) {
+  React.useEffect(() => {
+    const listener = (event: MouseEvent) => {
+      if (!ref.current || ref.current.contains(event.target)) return;
+      handler();
+    };
+    document.addEventListener('mousedown', listener);
+    return () => document.removeEventListener('mousedown', listener);
+  }, [ref, handler]);
+}
+
 export default function BusinessPlanWizard({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [answers, setAnswers] = useState<BusinessPlanAnswers>(initialAnswers);
-  const [step, setStep] = useState(0);
-  const [company, setCompany] = useState("");
-  const [email, setEmail] = useState("");
-  const [bransch, setBransch] = useState("");
-  const [customBransch, setCustomBransch] = useState("");
-  const [omrade, setOmrade] = useState("");
-  const [customOmrade, setCustomOmrade] = useState("");
-  const [linkedinProfiles, setLinkedinProfiles] = useState<string[]>([]);
-  const [profileAnalysis, setProfileAnalysis] = useState<string>("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [showExamples, setShowExamples] = useState<string | null>(null);
-  const [showMarketPopup, setShowMarketPopup] = useState(false);
-  const [marketEstimate, setMarketEstimate] = useState<string>("");
-  const [marketSource, setMarketSource] = useState<string>("");
-  const [isMarketLoading, setIsMarketLoading] = useState(false);
-  const [competitionSuggestions, setCompetitionSuggestions] = useState<string[]>([]);
-  const [isCompetitionLoading, setIsCompetitionLoading] = useState(false);
-  const [result, setResult] = useState<{ score: number; subscriptionLevel?: 'silver' | 'gold' | 'platinum' } | null>(null);
-  const [isAnalyzingPlan, setIsAnalyzingPlan] = useState(false);
-  const [analyzeError, setAnalyzeError] = useState<string | null>(null);
-  const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
-  const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
-  const [budgetPosts, setBudgetPosts] = useState<{ amount: string; purpose: string }[]>([{ amount: '', purpose: '' }]);
-  const [preStep, setPreStep] = useState(true);
-  const [hasWebsite, setHasWebsite] = useState<null | boolean>(null);
-  const [websiteUrl, setWebsiteUrl] = useState("");
-  const [isScraping, setIsScraping] = useState(false);
-  const [scrapeError, setScrapeError] = useState<string | null>(null);
-  const scrapingMessages = [
-    "Analyserar din hemsida...",
-    "Sammanfattar affärsidé och erbjudande...",
-    "Bygger frågeställningar efter dina behov...",
-    "Förbereder autofyll..."
+  const [answers, setAnswers] = React.useState<{ [key: string]: string }>({});
+  const [step, setStep] = React.useState(1);
+  const [preStep, setPreStep] = React.useState(true);
+  const [preStepPage, setPreStepPage] = React.useState(1);
+  const [result, setResult] = React.useState<any>(null);
+  // Pre-step state
+  const [company, setCompany] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [bransch, setBransch] = React.useState('');
+  const [omrade, setOmrade] = React.useState('');
+  const [privacyChecked, setPrivacyChecked] = React.useState(false);
+  const [hasWebsite, setHasWebsite] = React.useState<null | boolean>(null);
+  const [websiteUrl, setWebsiteUrl] = React.useState('');
+  const [isScraping, setIsScraping] = React.useState(false);
+  const [scrapeError, setScrapeError] = React.useState<string | null>(null);
+  const [showExample, setShowExample] = React.useState<string | null>(null);
+  const [exampleText, setExampleText] = React.useState<string>('');
+  const [isLoadingExample, setIsLoadingExample] = React.useState(false);
+  const [exampleError, setExampleError] = React.useState<string | null>(null);
+  const exampleRef = useRef<HTMLDivElement>(null);
+  const [fileLoading, setFileLoading] = React.useState(false);
+  const [fileError, setFileError] = React.useState<string | null>(null);
+  const [investorConsent, setInvestorConsent] = React.useState<null | boolean>(null);
+  const [submissionSaved, setSubmissionSaved] = React.useState(false);
+  const [submissionError, setSubmissionError] = React.useState<string | null>(null);
+  const [showMarketPopup, setShowMarketPopup] = React.useState(false);
+  const [marketLoading, setMarketLoading] = React.useState(false);
+  const [marketResult, setMarketResult] = React.useState('');
+  const [marketError, setMarketError] = React.useState<string | null>(null);
+  const marketRef = useRef<HTMLDivElement>(null);
+  const [marketBransch, setMarketBransch] = React.useState('');
+  const [linkedinInput, setLinkedinInput] = React.useState('');
+  const [linkedinLoading, setLinkedinLoading] = React.useState(false);
+  const [linkedinResult, setLinkedinResult] = React.useState('');
+  const [linkedinError, setLinkedinError] = React.useState<string | null>(null);
+  const competitorRef = useRef<HTMLDivElement>(null);
+  const [competitorBransch, setCompetitorBransch] = React.useState('');
+  const [showCompetitorPopup, setShowCompetitorPopup] = React.useState(false);
+  const [competitorLoading, setCompetitorLoading] = React.useState(false);
+  const [competitorResult, setCompetitorResult] = React.useState('');
+  const [competitorError, setCompetitorError] = React.useState<string | null>(null);
+  const [showFinalLoader, setShowFinalLoader] = React.useState(false);
+  const [finalLoaderText, setFinalLoaderText] = React.useState('Analyserar dina svar...');
+  const finalLoaderMessages = [
+    'Analyserar dina svar...',
+    'Ger praktiska råd kring investeringstips...',
+    'Sammanställer din investeringsprofil...'
   ];
-  const [scrapeMsgIdx, setScrapeMsgIdx] = useState(0);
-  const scrapeIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  // --- sub-question navigation ---
-  const [subStep, setSubStep] = useState(0);
 
-  const current = questions[step - 1];
-  const progress = Math.round(((step) / questions.length) * 100);
+  const current = QUESTIONS[step - 1];
+  const progress = Math.round((step / QUESTIONS.length) * 100);
 
-  const isStartValid =
+  const isPreStep1Valid =
     company.trim().length > 1 &&
     /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) &&
-    bransch && (bransch !== "Annat" || customBransch.trim().length > 1) &&
-    omrade && (omrade !== "Annat" || customOmrade.trim().length > 1);
+    privacyChecked &&
+    hasWebsite !== null &&
+    (hasWebsite === false || (hasWebsite === true && websiteUrl.trim().length > 3));
 
-  const handleStart = () => {
-    localStorage.setItem(
-      "bpw_start",
-      JSON.stringify({
-        company,
-        email,
-        bransch: bransch === "Annat" ? customBransch : bransch,
-        omrade: omrade === "Annat" ? customOmrade : omrade
+  const isPreStep2Valid = bransch && omrade;
+
+  // Hantera AI-exempel-popup
+  React.useEffect(() => {
+    if (!showExample) return;
+    setIsLoadingExample(true);
+    setExampleError(null);
+    setExampleText('');
+    fetch('/api/ai-suggest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ questionId: showExample, websiteUrl })
+    })
+      .then(res => res.json())
+      .then(data => {
+        setExampleText(data.suggestion || 'Inget förslag kunde genereras.');
       })
-    );
-    setStep(1);
-  };
+      .catch(() => setExampleError('Kunde inte hämta AI-förslag.'))
+      .finally(() => setIsLoadingExample(false));
+  }, [showExample, websiteUrl]);
 
-  // Fetch AI suggestions for certain questions (must be after 'current' is defined)
-  useEffect(() => {
-    if (!current?.id) return;
-    const currentAnswers = answers[current.id];
-    if (['customer_segments', 'problem_solution'].includes(current.id) && currentAnswers && Array.isArray(currentAnswers) && currentAnswers.length > 1) {
-      setIsFetchingSuggestions(true);
-      fetch('/api/ai-suggest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section: current.id, answers: currentAnswers })
-      })
-        .then(res => res.json())
-        .then(data => {
-          setAiSuggestions(data.suggestions);
-        })
-        .catch(error => {
-          console.error('Error fetching suggestions:', error);
-        })
-        .finally(() => {
-          setIsFetchingSuggestions(false);
-        });
-    }
-  }, [current, answers]);
-
-  useEffect(() => {
-    if (isScraping) {
-      setScrapeMsgIdx(0);
-      scrapeIntervalRef.current = setInterval(() => {
-        setScrapeMsgIdx(idx => (idx + 1) % scrapingMessages.length);
-      }, 1500);
-    } else if (scrapeIntervalRef.current) {
-      clearInterval(scrapeIntervalRef.current);
-      scrapeIntervalRef.current = null;
-    }
-    return () => {
-      if (scrapeIntervalRef.current) {
-        clearInterval(scrapeIntervalRef.current);
-        scrapeIntervalRef.current = null;
-      }
-    };
-  }, [isScraping, scrapingMessages.length]);
-
-  // När vi byter huvudfråga, nollställ subStep
-  useEffect(() => { setSubStep(0); }, [step]);
-
-  // Hur många sub-questions per sida?
-  const SUBS_PER_PAGE = 3;
+  useOnClickOutside(exampleRef, () => setShowExample(null));
+  useOnClickOutside(marketRef, () => setShowMarketPopup(false));
+  useOnClickOutside(competitorRef, () => setShowCompetitorPopup(false));
 
   if (!open) return null;
   if (result) {
-    // Visa stora resultatsidan istället för betygs-popup
+    // Om score > 80 och samtycke ej givet, visa investerarfråga
+    if (result.score > 80 && investorConsent === null) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center">
+            <h2 className="text-2xl font-bold mb-6">Grattis till en hög poäng!</h2>
+            <p className="mb-6">Vi är i kontakt med några av de största investeringsbolagen i Sverige.<br />
+              Om du får en score på över 80/100, vill du då att vi förmedlar din information vidare?</p>
+            <div className="flex justify-center gap-6 mb-6">
+              <button className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg" onClick={() => setInvestorConsent(true)}>Ja, förmedla gärna min information</button>
+              <button className="bg-gray-200 text-[#16475b] font-bold rounded-full px-8 py-3 shadow-lg" onClick={() => setInvestorConsent(false)}>Nej, tack</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    // När samtycke är givet eller score <= 80, spara submission
+    if (!submissionSaved && (investorConsent !== null || result.score <= 80)) {
+      fetch('/api/save-submission', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          answers,
+          company,
+          email,
+          bransch,
+          omrade,
+          score: result.score,
+          investorConsent,
+          timestamp: new Date().toISOString()
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) setSubmissionSaved(true);
+          else setSubmissionError('Kunde inte spara din information.');
+        })
+        .catch(() => setSubmissionError('Kunde inte spara din information.'));
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center">
+            <h2 className="text-2xl font-bold mb-6">Sparar din information...</h2>
+          </div>
+        </div>
+      );
+    }
+    if (submissionSaved) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center">
+            <h2 className="text-2xl font-bold mb-6">Tack för din inskickade affärsplan!</h2>
+            <p className="mb-6">Din information är nu sparad och vi kontaktar dig om det blir aktuellt med investerarintresse.</p>
+          </div>
+        </div>
+      );
+    }
+    if (submissionError) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center">
+            <h2 className="text-2xl font-bold mb-6">Ett fel uppstod</h2>
+            <p className="mb-6">{submissionError}</p>
+          </div>
+        </div>
+      );
+    }
+    // Visa vanliga resultatet annars
     return (
       <BusinessPlanResult
         score={result.score}
@@ -742,160 +765,106 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     );
   }
   if (preStep) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div className="bg-[#f5f7fa] text-[#16475b] rounded-3xl shadow-2xl border border-[#16475b] max-w-lg w-full p-8 relative animate-fade-in">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 text-[#16475b] text-2xl font-bold hover:text-[#16475b] focus:outline-none"
-            aria-label="Stäng"
-          >×</button>
-          <h2 className="text-2xl font-bold mb-6 text-center text-[#16475b]">Har du en hemsida idag?</h2>
-          <div className="flex justify-center gap-6 mb-6">
-            <button
-              className={`px-8 py-3 rounded-full font-bold text-lg shadow ${hasWebsite === true ? 'bg-[#16475b] text-white' : 'bg-[#eaf6fa] text-[#16475b]'} hover:bg-[#2a6b8a] hover:text-white transition-colors`}
-              onClick={() => setHasWebsite(true)}
-            >JA</button>
-            <button
-              className={`px-8 py-3 rounded-full font-bold text-lg shadow ${hasWebsite === false ? 'bg-[#16475b] text-white' : 'bg-[#eaf6fa] text-[#16475b]'} hover:bg-[#2a6b8a] hover:text-white transition-colors`}
-              onClick={() => { setHasWebsite(false); setPreStep(false); }}
-            >NEJ</button>
-          </div>
-          {hasWebsite && (
-            <div className="mt-4">
-              <label className="block font-semibold mb-1 text-[#16475b]">Ange din webbadress</label>
+    if (preStepPage === 1) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative">
+            <h2 className="text-2xl font-bold mb-6 text-center">Starta din affärsplan-analys</h2>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Företagsnamn</label>
               <input
-                type="url"
-                className="w-full px-4 py-2 rounded-2xl bg-white/60 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] border border-[#16475b] text-[#16475b] placeholder-[#16475b] focus:outline-none focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all duration-200 backdrop-blur-md"
-                value={websiteUrl || ""}
-                onChange={e => setWebsiteUrl(e.target.value)}
-                placeholder="www"
+                type="text"
+                className="w-full p-3 border rounded-xl mb-2 text-[#16475b] bg-white"
+                value={company}
+                onChange={e => setCompany(e.target.value)}
+                placeholder="Ex: FrejFund AB"
               />
-              <button
-                className="w-full mt-4 bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg hover:bg-[#16475b] hover:text-[#16475b] transition-colors text-lg tracking-widest uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={async () => {
-                  setIsScraping(true);
-                  setScrapeError(null);
-                  try {
-                    const res = await fetch('/api/scrape-website', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ url: websiteUrl })
-                    });
-                    const data = await res.json();
-                    if (data && typeof data === 'object') {
-                      // Mappa den skrapade datan till rätt fält
-                      const mappedData: BusinessPlanAnswers = {
-                        company_name: data.company_name,
-                        business_idea: {
-                          what_you_do: data.business_idea,
-                          for_whom: data.customer_segments,
-                          why_unique: data.övrigt?.unique_selling_point || ''
-                        },
-                        customer_segments: {
-                          customer_group: data.customer_segments,
-                          customer_needs: data.övrigt?.customer_needs || '',
-                          customer_location: data.area
-                        },
-                        problem_solution: {
-                          problem: data.övrigt?.problem || '',
-                          solution: data.business_idea
-                        },
-                        market_analysis: {
-                          market_size: data.market_size || '',
-                          competitors: data.competition || '',
-                          market_trends: data.övrigt?.market_trends || ''
-                        },
-                        business_model: {
-                          revenue_model: data.revenue_model || '',
-                          pricing_strategy: data.övrigt?.pricing_strategy || '',
-                          sales_channels: data.övrigt?.sales_channels || ''
-                        },
-                        team: {
-                          key_people: data.team || '',
-                          roles: data.övrigt?.roles || '',
-                          expertise: data.övrigt?.expertise || ''
-                        },
-                        funding_details: {
-                          funding_needed: data.övrigt?.funding_amount || '',
-                          use_of_funds: data.övrigt?.funding_usage || '',
-                          exit_strategy: data.övrigt?.funding_period || ''
-                        }
-                      };
-                      
-                      // Sätt företagsnamn och andra grundläggande fält
-                      setCompany(data.company_name || '');
-                      setBransch(data.industry || '');
-                      setOmrade(data.area || '');
-                      
-                      // Sätt svaren i formuläret
-                      setAnswers(mappedData);
-                      setPreStep(false);
-                    } else {
-                      setScrapeError('Kunde inte tolka informationen från hemsidan.');
-                    }
-                  } catch (e) {
-                    setScrapeError('Kunde inte hämta information från hemsidan.');
-                  } finally {
-                    setIsScraping(false);
-                  }
-                }}
-                disabled={!websiteUrl || isScraping}
-              >
-                {isScraping ? 'Analyserar hemsidan...' : 'Fortsätt'}
-              </button>
-              {isScraping && (
-                <div className="flex flex-col items-center mt-6 mb-2">
-                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#16475b]"></div>
-                  <div className="mt-4 text-[#16475b] text-base font-semibold min-h-[32px] text-center">
-                    {scrapingMessages[scrapeMsgIdx]}
-                  </div>
+            </div>
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">E-post</label>
+              <input
+                type="email"
+                className="w-full p-3 border rounded-xl mb-2 text-[#16475b] bg-white"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="din@email.se"
+              />
+            </div>
+            <div className="mb-4 flex items-center gap-2">
+              <input
+                id="privacy"
+                type="checkbox"
+                checked={privacyChecked}
+                onChange={e => setPrivacyChecked(e.target.checked)}
+              />
+              <label htmlFor="privacy" className="text-sm">Jag godkänner <a href="/privacy" target="_blank" className="underline">privacy policy</a></label>
+            </div>
+            <div className="mb-6">
+              <label className="block font-semibold mb-2">Har du en hemsida?</label>
+              <div className="flex gap-4 mb-2">
+                <button
+                  className={`px-6 py-2 rounded-full font-bold ${hasWebsite === true ? 'bg-[#16475b] text-white' : 'bg-gray-200 text-[#16475b]'}`}
+                  onClick={() => setHasWebsite(true)}
+                  type="button"
+                >JA</button>
+                <button
+                  className={`px-6 py-2 rounded-full font-bold ${hasWebsite === false ? 'bg-[#16475b] text-white' : 'bg-gray-200 text-[#16475b]'}`}
+                  onClick={() => setHasWebsite(false)}
+                  type="button"
+                >NEJ</button>
+              </div>
+              {hasWebsite && (
+                <div className="mt-2">
+                  <input
+                    type="url"
+                    className="w-full p-3 border rounded-xl mb-2 text-[#16475b] bg-white"
+                    value={websiteUrl}
+                    onChange={e => setWebsiteUrl(e.target.value)}
+                    placeholder="www.dittforetag.se"
+                  />
+                  <button
+                    className="w-full bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg mt-2 disabled:opacity-50"
+                    onClick={async () => {
+                      setIsScraping(true);
+                      setScrapeError(null);
+                      try {
+                        await new Promise(res => setTimeout(res, 1500));
+                        setPreStepPage(2);
+                      } catch (e) {
+                        setScrapeError('Kunde inte hämta information från hemsidan.');
+                      } finally {
+                        setIsScraping(false);
+                      }
+                    }}
+                    disabled={!websiteUrl || isScraping}
+                  >
+                    {isScraping ? 'Analyserar hemsidan...' : 'Skrapa hemsida & fortsätt'}
+                  </button>
+                  {scrapeError && <div className="text-red-600 text-sm mt-2 text-center">{scrapeError}</div>}
                 </div>
               )}
-              {scrapeError && <div className="text-red-600 text-sm mt-2 text-center">{scrapeError}</div>}
             </div>
-          )}
+            <div className="flex justify-end">
+              <button
+                className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg mt-6 disabled:opacity-50"
+                onClick={() => setPreStepPage(2)}
+                disabled={!isPreStep1Valid}
+              >Nästa</button>
+            </div>
+          </div>
         </div>
-      </div>
-    );
-  }
-  if (step === 0) {
+      );
+    }
+    // PreStepPage 2: Bransch & Område
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div className="bg-[#f5f7fa] text-[#16475b] rounded-3xl shadow-2xl border border-[#16475b] max-w-lg w-full p-8 relative animate-fade-in">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 text-[#16475b] text-2xl font-bold hover:text-[#16475b] focus:outline-none"
-            aria-label="Stäng"
-          >
-            ×
-          </button>
-          <h2 className="text-2xl font-bold text-[#16475b] mb-6 text-center">Starta din affärsplan-analys</h2>
+        <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative">
+          <h2 className="text-2xl font-bold mb-6 text-center">Starta din affärsplan-analys</h2>
           <div className="mb-4">
-            <label className="block text-[#16475b] font-semibold mb-1">Företagsnamn</label>
-            <input
-              type="text"
-              className="w-full px-4 py-2 rounded-2xl bg-white/60 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] border border-[#16475b] text-[#16475b] placeholder-[#16475b] focus:outline-none focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all duration-200 backdrop-blur-md"
-              value={company || ""}
-              onChange={e => setCompany(e.target.value)}
-              placeholder="Ex: FrejFund AB"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-[#16475b] font-semibold mb-1">E-post</label>
-            <input
-              type="email"
-              className="w-full px-4 py-2 rounded-2xl bg-white/60 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] border border-[#16475b] text-[#16475b] placeholder-[#16475b] focus:outline-none focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all duration-200 backdrop-blur-md"
-              value={email || ""}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="din@email.se"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-[#16475b] font-semibold mb-1">Bransch</label>
-            <div className={selectWrapper}>
+            <label className="block font-semibold mb-1">Bransch</label>
+            <div className="relative">
               <select
-                className="w-full px-4 py-2 rounded-2xl bg-white/60 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] border border-[#16475b] text-[#16475b] placeholder-[#16475b] focus:outline-none focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all duration-200 backdrop-blur-md appearance-none pr-10 cursor-pointer"
+                className="w-full p-4 border-2 border-[#7edcff] rounded-2xl mb-2 text-[#16475b] bg-white pr-12 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg appearance-none cursor-pointer hover:bg-[#eaf6fa]"
                 value={bransch}
                 onChange={e => setBransch(e.target.value)}
               >
@@ -904,23 +873,16 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                   <option key={b} value={b}>{b}</option>
                 ))}
               </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2">{selectArrow}</div>
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7edcff] text-2xl">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4" stroke="#7edcff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </span>
             </div>
-            {bransch === "Annat" && (
-              <input
-                type="text"
-                className="w-full px-4 py-2 rounded-2xl bg-white/60 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] border border-[#16475b] text-[#16475b] placeholder-[#16475b] focus:outline-none focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all duration-200 backdrop-blur-md"
-                value={customBransch || ""}
-                onChange={e => setCustomBransch(e.target.value)}
-                placeholder="Ange bransch"
-              />
-            )}
           </div>
           <div className="mb-6">
-            <label className="block text-[#16475b] font-semibold mb-1">Område</label>
-            <div className={selectWrapper}>
+            <label className="block font-semibold mb-1">Område</label>
+            <div className="relative">
               <select
-                className="w-full px-4 py-2 rounded-2xl bg-white/60 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] border border-[#16475b] text-[#16475b] placeholder-[#16475b] focus:outline-none focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all duration-200 backdrop-blur-md appearance-none pr-10 cursor-pointer"
+                className="w-full p-4 border-2 border-[#7edcff] rounded-2xl mb-2 text-[#16475b] bg-white pr-12 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg appearance-none cursor-pointer hover:bg-[#eaf6fa]"
                 value={omrade}
                 onChange={e => setOmrade(e.target.value)}
               >
@@ -929,475 +891,400 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                   <option key={o} value={o}>{o}</option>
                 ))}
               </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2">{selectArrow}</div>
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7edcff] text-2xl">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4" stroke="#7edcff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </span>
             </div>
-            {omrade === "Annat" && (
-              <input
-                type="text"
-                className="w-full px-4 py-2 rounded-2xl bg-white/60 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] border border-[#16475b] text-[#16475b] placeholder-[#16475b] focus:outline-none focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all duration-200 backdrop-blur-md"
-                value={customOmrade || ""}
-                onChange={e => setCustomOmrade(e.target.value)}
-                placeholder="Ange område (stad, land, region)"
-              />
-            )}
           </div>
-          <button
-            className="w-full bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg hover:bg-[#16475b] hover:text-[#16475b] transition-colors text-lg tracking-widest uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={handleStart}
-            disabled={!isStartValid}
-          >
-            Starta analysen
-          </button>
+          <div className="flex justify-between">
+            <button
+              className="bg-gray-200 text-[#16475b] font-bold rounded-full px-8 py-3 shadow-lg mt-6"
+              onClick={() => setPreStepPage(1)}
+            >Tillbaka</button>
+            <button
+              className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg mt-6 disabled:opacity-50"
+              onClick={() => setPreStep(false)}
+              disabled={!isPreStep2Valid}
+            >Starta</button>
+          </div>
         </div>
       </div>
     );
   }
   if (step > 0 && !current) return null;
-
-  const handleLinkedinProfilesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const profiles = e.target.value.split('\n').filter(profile => profile.trim() !== '');
-    setLinkedinProfiles(profiles);
-    setAnswers(a => ({
-      ...a,
-      team: {
-        key_people: e.target.value || "",
-        roles: a.team?.roles || "",
-        expertise: a.team?.expertise || ""
-      }
-    }));
-  };
-
-  const analyzeLinkedinProfiles = async () => {
-    if (linkedinProfiles.length === 0) return;
-    
-    setIsAnalyzing(true);
-    try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Example analysis - in production, this would call your backend API
-      const analysis = linkedinProfiles.map(profile => {
-        const name = profile.split('/').pop()?.replace(/-/g, ' ') || '';
-        return `${name}: ${getRandomProfileAnalysis()}`;
-      }).join('\n\n');
-      
-      setProfileAnalysis(analysis);
-    } catch (error) {
-      console.error('Error analyzing profiles:', error);
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  const getRandomProfileAnalysis = () => {
-    const analyses = [
-      "f.d. professionellt pokerproffs, numera AI-utvecklare med 7 års erfarenhet av SaaS-plattformar.",
-      "serieentreprenör inom hudvård, 3 exiter, expert på D2C-marknadsföring.",
-      "tidigare CTO på Spotify, 15 års erfarenhet av skalbar teknik.",
-      "grundare av 3 framgångsrika startups, expert på B2B-försäljning.",
-      "tidigare VD på Klarna, specialiserad på fintech och betalningslösningar."
-    ];
-    return analyses[Math.floor(Math.random() * analyses.length)];
-  };
-
-  const handleNext = () => {
-    // Validera obligatoriska fält för nuvarande sektion
-    const currentAnswers = answers[current.id] as Record<string, string>;
-    const requiredFields = getRequiredFields(current.id);
-    const missingFields = requiredFields.filter(field => !currentAnswers[field]);
-    if (missingFields.length > 0) {
-      alert(`Vänligen fyll i alla obligatoriska fält: ${missingFields.join(', ')}`);
-      return;
-    }
-    if (step < questions.length - 1) {
-      setStep(step + 1);
-    } else {
-      handleFinish();
-    }
-  };
-
-  const getRequiredFields = (sectionId: string): string[] => {
-    switch (sectionId) {
-      case 'business_idea':
-        return ['what_you_do', 'why_unique'];
-      case 'market_analysis':
-        return ['market_size', 'customer_segments'];
-      case 'revenue_model':
-        return ['model', 'price_model'];
-      case 'team':
-        return ['team_roles', 'dna_strengths'];
-      case 'funding_details':
-        return ['funding_need', 'use_of_funds'];
-      default:
-        return [];
-    }
-  };
-
-  const handleBack = () => {
-    if (step > 1) setStep(step - 1);
-  };
-
-  const handleFinish = async () => {
-    setIsAnalyzingPlan(true);
-    setAnalyzeError(null);
-    try {
-      const res = await fetch('/api/analyze-businessplan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers, applicationType: 'almi' })
-      });
-      const data = await res.json();
-      setResult(data);
-    } catch (e) {
-      setAnalyzeError('Kunde inte analysera affärsplanen. Försök igen.');
-    } finally {
-      setIsAnalyzingPlan(false);
-    }
-  };
-
-  const handleAnswerChange = (section: keyof BusinessPlanAnswers, field: string, value: string) => {
-    setAnswers(prev => {
-      const sectionData = prev[section];
-      // Om sectionData är ett objekt, uppdatera bara det fältet
-      if (typeof sectionData === 'object' && sectionData !== null) {
-        return {
-          ...prev,
-          [section]: {
-            ...sectionData,
-            [field]: value
-          }
-        };
-      }
-      // Om sectionData är en sträng (felaktigt), konvertera till objekt
-      return {
-        ...prev,
-        [section]: {
-          [field]: value
-        }
-      };
-    });
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#f5f7fa] text-[#16475b] rounded-3xl shadow-2xl border border-[#16475b] max-w-xl min-h-[700px] w-full p-8 relative animate-fade-in flex flex-col justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="bg-[#f5f7fa] text-[#16475b] rounded-3xl shadow-2xl border border-[#16475b] max-w-xl w-full p-6 md:p-8 relative animate-fade-in flex flex-col justify-between max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-[#16475b] text-2xl font-bold hover:text-[#16475b] focus:outline-none"
+          className="absolute top-4 right-4 text-[#16475b] text-2xl font-bold hover:text-[#16475b] focus:outline-none focus:ring-2 focus:ring-[#7edcff] rounded-full p-1"
           aria-label="Stäng"
-        >
-          ×
-        </button>
+        >×</button>
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[#16475b] font-bold text-sm">Fråga {step} av {questions.length}</span>
-            <span className="text-[#16475b] font-bold text-sm">{progress}%</span>
+            <span className="text-[#16475b] font-bold text-sm">Fråga {step} av {QUESTIONS.length}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[#16475b] font-bold text-sm">{progress}%</span>
+              <button
+                onClick={onClose}
+                className="text-[#16475b] text-2xl font-bold hover:text-[#16475b] focus:outline-none focus:ring-2 focus:ring-[#7edcff] rounded-full p-1 ml-2"
+                aria-label="Stäng"
+              >×</button>
+            </div>
           </div>
           <div className="w-full h-2 bg-[#eaf6fa] rounded-full overflow-hidden mb-2">
-            <div className="h-full bg-[#16475b] rounded-full transition-all" style={{ width: `${progress}%` }} />
+            <div 
+              className="h-full bg-[#16475b] rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${progress}%` }}
+              role="progressbar"
+              aria-valuenow={progress}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            />
           </div>
         </div>
-        {current && current.id === "team" ? (
-          <div>
-            <h2 className="text-xl font-bold mb-2">{current.question}</h2>
-            <p className="mb-4 text-sm text-[#16475b]">{current.help}</p>
-            <label className="block font-semibold mb-1">LinkedIn-profiler (en per rad)</label>
-            <textarea
-              className="w-full min-h-[60px] rounded-lg border border-[#16475b] bg-white/80 px-4 py-2 text-[#16475b] focus:outline-none focus:border-[#16475b]"
-              value={linkedinProfiles.join('\n') || ""}
-              onChange={handleLinkedinProfilesChange}
-              placeholder="https://www.linkedin.com/in/namn-efternamn"
-            />
+        <div id="wizard-description">
+          <div className="flex items-center gap-2 mb-2 min-h-24 md:min-h-20">
+            <h2 className="text-2xl font-bold">{current.label}</h2>
             <button
-              className="mt-2 mb-4 bg-[#16475b] text-white font-bold rounded-full px-6 py-2 shadow transition-colors hover:bg-[#7edc7a] hover:text-[#16475b]"
-              onClick={analyzeLinkedinProfiles}
-              disabled={linkedinProfiles.length === 0 || isAnalyzing}
+              type="button"
+              className="ml-2 text-[#7edcff] hover:text-[#16475b] text-xl focus:outline-none"
+              aria-label="Visa exempel"
+              onClick={() => setShowExample(current.id)}
             >
-              {isAnalyzing ? "Analyserar profiler..." : "Hämta info"}
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#7edcff" strokeWidth="2"/><text x="12" y="16" textAnchor="middle" fontSize="16" fill="#7edcff">?</text></svg>
             </button>
-            {profileAnalysis && (
-              <div className="mt-2 mb-4 p-4 bg-[#eaf6fa] rounded-lg">
-                <h3 className="text-[#16475b] font-semibold mb-2">Analys:</h3>
-                <p className="text-[#16475b] whitespace-pre-line">{profileAnalysis}</p>
-              </div>
-            )}
-            {/* Render sub-questions for team (excluding LinkedIn) */}
-            {current.subQuestions.slice(1).map((sub, idx) => (
-              <div key={sub.id} className="mb-4">
-                <label className="block font-semibold mb-1">{sub.label}</label>
-                <input
-                  type="text"
-                  className="w-full rounded-lg border border-[#16475b] bg-white/80 px-4 py-2 text-[#16475b] focus:outline-none focus:border-[#16475b]"
-                  value={answers.team?.[sub.id] || ""}
-                  onChange={e => handleAnswerChange('team', sub.id, e.target.value)}
-                  placeholder="Skriv ditt svar här..."
-                />
-                <button
-                  className="mt-1 text-xs underline text-[#16475b]"
-                  type="button"
-                  onClick={() => setShowExamples(sub.id === showExamples ? null : sub.id)}
-                >
-                  Visa förslag
-                </button>
-                {showExamples === sub.id && (
-                  <div style={{ background: '#04121d', borderRadius: '0.75rem', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #16475b' }}>
-                    <div className="font-bold text-lg mb-2 text-white">{sub.label}</div>
-                    <div className="text-sm text-white">
-                      {sub.exampleAnswers?.map((ex: string, i: number) => (
-                        <button
-                          key={i}
-                          className="bg-[#16475b] text-white rounded-full px-3 py-1 text-xs font-semibold hover:bg-[#7edcff] hover:text-[#04121d] transition-colors mr-2 mb-2"
-                          type="button"
-                          onClick={() => handleAnswerChange('team', sub.id, ex)}
-                        >
-                          {ex}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-            {/* Navigationsknappar alltid längst ner */}
-            <div className="flex justify-between mt-8">
-              <button
-                className="bg-[#eaf6fa] text-[#16475b] font-bold rounded-full px-6 py-2 shadow border border-[#16475b] hover:bg-[#16475b] hover:text-white transition-colors text-base"
-                onClick={() => {
-                  if (subStep === 0) {
-                    if (step > 1) {
-                      setStep(step - 1);
-                      setSubStep(0);
-                    }
-                  } else {
-                    setSubStep(s => Math.max(0, s - 1));
-                  }
-                }}
-                disabled={step === 1 && subStep === 0}
-              >
-                Tillbaka
-              </button>
-              <button
-                className="bg-[#16475b] text-white font-bold rounded-full px-6 py-2 shadow border border-[#16475b] hover:bg-[#16475b] hover:text-white transition-colors text-base"
-                onClick={() => {
-                  const maxSubStep = Math.ceil(current.subQuestions.length / SUBS_PER_PAGE) - 1;
-                  const isLastChunk = subStep >= maxSubStep;
-                  const isLastStep = step === questions.length;
-                  if (!isLastChunk) setSubStep(s => s + 1);
-                  else if (!isLastStep) handleNext();
-                  else handleFinish();
-                }}
-                disabled={isAnalyzingPlan}
-              >
-                {(() => {
-                  const maxSubStep = Math.ceil(current.subQuestions.length / SUBS_PER_PAGE) - 1;
-                  const isLastChunk = subStep >= maxSubStep;
-                  const isLastStep = step === questions.length;
-                  if (!isLastChunk) return 'Nästa';
-                  if (isLastStep) return isAnalyzingPlan ? 'Analyserar...' : 'Slutför';
-                  return 'Nästa';
-                })()}
-              </button>
-            </div>
           </div>
-        ) : current && current.subQuestions ? (
-          <div>
-            <h2 className="text-xl font-bold mb-2">{current.question}</h2>
-            <p className="mb-4 text-sm text-[#16475b]">{current.help}</p>
-            {/* Visa 3 sub-questions per sida */}
-            {current.subQuestions.slice(subStep * SUBS_PER_PAGE, (subStep + 1) * SUBS_PER_PAGE).map((sub: BranschQuestion) => (
-              <div key={sub.id} className="mb-4">
-                <label className="block font-semibold mb-1">{sub.label}</label>
-                <textarea
-                  className="w-full min-h-[60px] rounded-lg border border-[#16475b] bg-white/80 px-4 py-2 text-[#16475b] focus:outline-none focus:border-[#16475b]"
-                  value={typeof answers[current.id] === 'object' && answers[current.id] !== null 
-                    ? (answers[current.id] as BusinessPlanSection)[sub.id] || ""
-                    : ""}
-                  onChange={e => handleAnswerChange(current.id as keyof BusinessPlanAnswers, sub.id, e.target.value)}
-                  placeholder="Skriv ditt svar här..."
-                />
-                <button
-                  className="mt-1 text-xs underline text-[#16475b]"
-                  type="button"
-                  onClick={() => setShowExamples(sub.id === showExamples ? null : sub.id)}
-                >
-                  Visa förslag
-                </button>
-                {showExamples === sub.id && (
-                  <div style={{ background: '#04121d', borderRadius: '0.75rem', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #16475b' }}>
-                    <div className="font-bold text-lg mb-2 text-white">{sub.label}</div>
-                    <div className="text-sm text-white">
-                      {sub.exampleAnswers?.map((ex: string, i: number) => (
-                        <button
-                          key={i}
-                          className="bg-[#16475b] text-white rounded-full px-3 py-1 text-xs font-semibold hover:bg-[#7edcff] hover:text-[#04121d] transition-colors mr-2 mb-2"
-                          type="button"
-                          onClick={() => handleAnswerChange(current.id as keyof BusinessPlanAnswers, sub.id, ex)}
-                        >
-                          {ex}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-            {/* Sub-question navigation - alltid längst ner */}
-            <div className="flex justify-between items-center mt-4 relative">
-              <button
-                className="bg-[#eaf6fa] text-[#16475b] font-bold rounded-full px-6 py-2 shadow border border-[#16475b] hover:bg-[#16475b] hover:text-white transition-colors text-base"
-                onClick={() => {
-                  if (subStep === 0) {
-                    if (step > 1) {
-                      setStep(step - 1);
-                      setSubStep(0);
-                    }
-                  } else {
-                    setSubStep(s => Math.max(0, s - 1));
-                  }
-                }}
-                disabled={step === 1 && subStep === 0}
+          <div className="mb-4 text-sm text-gray-600 min-h-10">
+            {current.help}
+          </div>
+          {current.type === "textarea" && (
+            <textarea
+              className="w-full p-3 border rounded-xl mb-4 text-[#16475b] bg-white min-h-32"
+              value={getStringValue(answers[current.id])}
+              onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+              placeholder="Skriv ditt svar här..."
+              rows={6}
+              style={{ minHeight: '8rem', maxHeight: '8rem', resize: 'none' }}
+            />
+          )}
+          {current.type === "select" && (
+            <div className="relative mb-4">
+              <select
+                className="w-full p-3 border rounded-xl pr-10 text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all min-h-32"
+                value={getStringValue(answers[current.id])}
+                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+                style={{ minHeight: '8rem', maxHeight: '8rem' }}
               >
-                Tillbaka
-              </button>
-              {/* Centrera BERÄKNA MARKNADSVÄRDE mellan knapparna om market_potential */}
-              {current.id === 'market_potential' && (
-                <div className="absolute left-1/2 -translate-x-1/2 flex justify-center">
-                  <button
-                    className="bg-[#16475b] text-white font-bold rounded-full px-4 py-2 shadow hover:bg-[#7edcff] hover:text-[#04121d] transition-colors text-sm mx-2"
-                    type="button"
-                    onClick={async () => {
-                      setIsMarketLoading(true);
+                <option value="">Välj...</option>
+                {current.options?.map((opt: string) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#16475b]">
+                <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+                  <path d="M6 8l4 4 4-4" stroke="#16475b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+            </div>
+          )}
+          {current.type === "radio" && (
+            <div className="flex flex-col gap-2 mb-4">
+              {current.options?.map((opt: string) => (
+                <label key={opt} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name={current.id}
+                    value={opt}
+                    checked={getStringValue(answers[current.id]) === opt}
+                    onChange={() => setAnswers({ ...answers, [current.id]: opt })}
+                    className="accent-[#16475b]"
+                  />
+                  <span>{opt}</span>
+                </label>
+              ))}
+            </div>
+          )}
+          {current.type === "file" && (
+            <div className="flex flex-col items-start gap-2 mb-4">
+              <label className="block font-semibold">Bifoga P/L-rapport (valfritt)</label>
+              <div className="flex items-center gap-3">
+                <label className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all cursor-pointer flex items-center gap-2">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M10 3v10m0 0l-3-3m3 3l3-3" stroke="#16475b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  Ladda upp PDF
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    className="hidden"
+                    onChange={async e => {
+                      setFileError(null);
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setFileLoading(true);
                       try {
-                        const res = await fetch('/api/market-estimate', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            bransch: bransch === 'Annat' ? customBransch : bransch,
-                            omrade: omrade === 'Annat' ? customOmrade : omrade
-                          })
-                        });
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        const res = await fetch('/api/parse-pdf', { method: 'POST', body: formData });
+                        if (!res.ok) throw new Error('Kunde inte läsa PDF');
                         const data = await res.json();
-                        handleAnswerChange('market_potential', 'market_value', data.estimate || '');
-                        handleAnswerChange('market_potential', 'market_source', data.source || '');
+                        setAnswers(a => ({ ...a, runway: (a.runway ? a.runway + '\n' : '') + (data.text || '') }));
+                      } catch (err) {
+                        setFileError('Kunde inte läsa PDF-filen.');
                       } finally {
-                        setIsMarketLoading(false);
+                        setFileLoading(false);
                       }
                     }}
-                    disabled={isMarketLoading}
-                  >
-                    {isMarketLoading ? 'Hämtar marknadsvärde...' : 'BERÄKNA MARKNADSVÄRDE'}
-                  </button>
-                </div>
-              )}
-              {current.id === 'competition' && (
-                <button
-                  className="bg-[#16475b] text-white font-bold rounded-full px-4 py-2 shadow hover:bg-[#7edcff] hover:text-[#04121d] transition-colors text-sm mx-2"
-                  type="button"
-                  onClick={async () => {
-                    setIsCompetitionLoading(true);
-                    try {
-                      const res = await fetch('/api/competition-suggestions', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          business_idea: answers.business_idea?.what_you_do || '',
-                          bransch: bransch === 'Annat' ? customBransch : bransch,
-                          omrade: omrade === 'Annat' ? customOmrade : omrade
-                        })
-                      });
-                      const data = await res.json();
-                      handleAnswerChange('competition', 'main_competitors', data.suggestions || []);
-                    } finally {
-                      setIsCompetitionLoading(false);
-                    }
-                  }}
-                  disabled={isCompetitionLoading}
-                >
-                  {isCompetitionLoading ? 'Hämtar konkurrenter...' : 'HITTA KONKURRENTER'}
-                </button>
-              )}
+                  />
+                </label>
+                {fileLoading && <span className="text-[#7edcff] ml-2">Läser in PDF...</span>}
+              </div>
+              {fileError && <div className="text-red-600 mt-1">{fileError}</div>}
+            </div>
+          )}
+          {(current.type === "text" || current.type === "number") && (
+            <input
+              className="w-full p-3 border rounded-xl mb-4 text-[#16475b] bg-white min-h-32"
+              type={current.type}
+              value={getStringValue(answers[current.id])}
+              onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+              placeholder="Skriv ditt svar här..."
+              style={{ minHeight: '8rem', maxHeight: '8rem' }}
+            />
+          )}
+          {current.id === 'market_size' && (
+            <div className="flex flex-col md:flex-row items-end gap-2 mb-2">
+              <input
+                type="text"
+                className="w-full md:w-64 p-2 border rounded-xl text-[#16475b] bg-white"
+                placeholder="Ange bransch..."
+                value={marketBransch}
+                onChange={e => setMarketBransch(e.target.value)}
+              />
               <button
-                className="bg-[#16475b] text-white font-bold rounded-full px-6 py-2 shadow border border-[#16475b] hover:bg-[#16475b] hover:text-white transition-colors text-base"
-                onClick={() => {
-                  const maxSubStep = Math.ceil(current.subQuestions.length / SUBS_PER_PAGE) - 1;
-                  const isLastChunk = subStep >= maxSubStep;
-                  const isLastStep = step === questions.length;
-                  if (!isLastChunk) setSubStep(s => s + 1);
-                  else if (!isLastStep) handleNext();
-                  else handleFinish();
+                className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all"
+                onClick={async () => {
+                  setShowMarketPopup(true);
+                  setMarketLoading(true);
+                  setMarketResult('');
+                  setMarketError(null);
+                  try {
+                    const res = await fetch('/api/market-size', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ bransch: marketBransch })
+                    });
+                    const data = await res.json();
+                    if (data.result) setMarketResult(data.result);
+                    else setMarketError('Kunde inte hämta marknadsdata.');
+                  } catch {
+                    setMarketError('Kunde inte hämta marknadsdata.');
+                  } finally {
+                    setMarketLoading(false);
+                  }
                 }}
-                disabled={isAnalyzingPlan}
-              >
-                {(() => {
-                  const maxSubStep = Math.ceil(current.subQuestions.length / SUBS_PER_PAGE) - 1;
-                  const isLastChunk = subStep >= maxSubStep;
-                  const isLastStep = step === questions.length;
-                  if (!isLastChunk) return 'Nästa';
-                  if (isLastStep) return isAnalyzingPlan ? 'Analyserar...' : 'Slutför';
-                  return 'Nästa';
-                })()}
-              </button>
+              >Beräkna värde</button>
+            </div>
+          )}
+          {current.id === 'runway' && (
+            <div className="flex flex-col items-start gap-2 mb-4">
+              <label className="block font-semibold">Bifoga P/L-rapport (valfritt)</label>
+              <div className="flex items-center gap-3">
+                <label className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all cursor-pointer flex items-center gap-2">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M10 3v10m0 0l-3-3m3 3l3-3" stroke="#16475b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  Ladda upp PDF
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    className="hidden"
+                    onChange={async e => {
+                      setFileError(null);
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setFileLoading(true);
+                      try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        const res = await fetch('/api/parse-pdf', { method: 'POST', body: formData });
+                        if (!res.ok) throw new Error('Kunde inte läsa PDF');
+                        const data = await res.json();
+                        setAnswers(a => ({ ...a, runway: (a.runway ? a.runway + '\n' : '') + (data.text || '') }));
+                      } catch (err) {
+                        setFileError('Kunde inte läsa PDF-filen.');
+                      } finally {
+                        setFileLoading(false);
+                      }
+                    }}
+                  />
+                </label>
+                {fileLoading && <span className="text-[#7edcff] ml-2">Läser in PDF...</span>}
+              </div>
+              {fileError && <div className="text-red-600 mt-1">{fileError}</div>}
+            </div>
+          )}
+          {current.id === 'team' && (
+            <div className="flex flex-col gap-2 mb-4">
+              <label className="block font-semibold">LinkedIn-profiler (en per rad)</label>
+              <textarea
+                className="w-full p-2 border rounded-xl text-[#16475b] bg-white"
+                rows={2}
+                placeholder="https://linkedin.com/in/namn..."
+                value={linkedinInput}
+                onChange={e => { setLinkedinInput(e.target.value); setLinkedinError(null); }}
+              />
+              <button
+                className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all w-fit"
+                onClick={async () => {
+                  setLinkedinLoading(true);
+                  setLinkedinResult('');
+                  setLinkedinError(null);
+                  try {
+                    const res = await fetch('/api/scrape-linkedin', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ profiles: linkedinInput.split('\n').filter(Boolean) })
+                    });
+                    const data = await res.json();
+                    if (data.result) {
+                      setLinkedinResult(data.result);
+                      setAnswers(a => ({ ...a, team: (a.team ? a.team + '\n' : '') + data.result }));
+                    } else setLinkedinError('Kunde inte hämta info.');
+                  } catch {
+                    setLinkedinError('Kunde inte hämta info.');
+                  } finally {
+                    setLinkedinLoading(false);
+                  }
+                }}
+              >Skrapa LinkedIn-profiler</button>
+              {linkedinLoading && <span className="text-[#7edcff]">Hämtar info...</span>}
+              {linkedinError && <span className="text-red-600">{linkedinError}</span>}
+              {linkedinResult && <div className="bg-[#eaf6fa] rounded-xl p-2 mt-2 text-left whitespace-pre-line">{linkedinResult}</div>}
+            </div>
+          )}
+          {current.id === 'competitors' && (
+            <div className="flex flex-col md:flex-row items-end gap-2 mb-2">
+              <input
+                type="text"
+                className="w-full md:w-64 p-2 border rounded-xl text-[#16475b] bg-white"
+                placeholder="Ange bransch..."
+                value={competitorBransch}
+                onChange={e => setCompetitorBransch(e.target.value)}
+              />
+              <button
+                className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all"
+                onClick={async () => {
+                  setShowCompetitorPopup(true);
+                  setCompetitorLoading(true);
+                  setCompetitorResult('');
+                  setCompetitorError(null);
+                  try {
+                    const res = await fetch('/api/competitor-suggest', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ bransch: competitorBransch })
+                    });
+                    const data = await res.json();
+                    if (data.result) setCompetitorResult(data.result);
+                    else setCompetitorError('Kunde inte hämta förslag.');
+                  } catch {
+                    setCompetitorError('Kunde inte hämta förslag.');
+                  } finally {
+                    setCompetitorLoading(false);
+                  }
+                }}
+              >Få förslag</button>
+            </div>
+          )}
+          {showCompetitorPopup && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+              <div ref={competitorRef} className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative animate-fade-in text-center">
+                <button className="absolute top-2 right-3 text-2xl text-[#7edcff] hover:text-[#16475b]" onClick={() => setShowCompetitorPopup(false)} aria-label="Stäng">×</button>
+                <h2 className="text-xl font-bold mb-4">AI-förslag på konkurrenter</h2>
+                {competitorLoading ? (
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7edcff]"></div>
+                    <span className="text-[#16475b]">Hämtar konkurrenter...</span>
+                  </div>
+                ) : competitorError ? (
+                  <div className="text-red-600">{competitorError}</div>
+                ) : competitorResult ? (
+                  <div>
+                    <div className="whitespace-pre-line text-left bg-[#eaf6fa] rounded-xl p-4 mb-4">{competitorResult}</div>
+                    <button
+                      className="bg-[#16475b] text-white font-bold rounded-full px-6 py-2 shadow hover:bg-[#7edcff] hover:text-[#16475b] transition-all"
+                      onClick={() => {
+                        setAnswers(a => ({ ...a, competitors: competitorResult }));
+                        setShowCompetitorPopup(false);
+                      }}
+                    >Fyll i svaret</button>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          )}
+          <div className="flex justify-between mt-6">
+            <button
+              onClick={() => setStep(s => Math.max(s - 1, 1))}
+              disabled={step === 1}
+              className="px-4 py-2 rounded bg-gray-200 text-[#16475b] disabled:opacity-50"
+            >Tillbaka</button>
+            <button
+              onClick={() => {
+                if (current.required && !getStringValue(answers[current.id])) {
+                  alert('Fältet är obligatoriskt');
+                  return;
+                }
+                setStep(s => Math.min(s + 1, QUESTIONS.length));
+              }}
+              className="px-4 py-2 rounded bg-[#16475b] text-white"
+            >Nästa</button>
+          </div>
+        </div>
+        {showExample === current.id && (
+          <div ref={exampleRef} className="absolute left-0 right-0 mx-auto top-20 z-50 max-w-md w-full bg-white border border-[#7edcff] rounded-2xl shadow-xl p-6 animate-fade-in">
+            <button className="absolute top-2 right-3 text-2xl text-[#7edcff] hover:text-[#16475b]" onClick={() => setShowExample(null)} aria-label="Stäng">×</button>
+            <div className="font-bold mb-2 text-[#16475b]">AI-förslag</div>
+            {isLoadingExample ? (
+              <div className="flex items-center gap-2"><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#7edcff]"></div> Hämtar förslag...</div>
+            ) : exampleError ? (
+              <div className="text-red-600">{exampleError}</div>
+            ) : (
+              <div className="text-[#16475b] whitespace-pre-line">{exampleText}</div>
+            )}
+          </div>
+        )}
+        {showMarketPopup && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div ref={marketRef} className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative animate-fade-in text-center">
+              <button className="absolute top-2 right-3 text-2xl text-[#7edcff] hover:text-[#16475b]" onClick={() => setShowMarketPopup(false)} aria-label="Stäng">×</button>
+              <h2 className="text-xl font-bold mb-4">AI-baserad marknadsuppskattning</h2>
+              {marketLoading ? (
+                <div className="flex flex-col items-center gap-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7edcff]"></div>
+                  <span className="text-[#16475b]">Hämtar marknadsdata...</span>
+                </div>
+              ) : marketError ? (
+                <div className="text-red-600">{marketError}</div>
+              ) : marketResult ? (
+                <div>
+                  <div className="whitespace-pre-line text-left bg-[#eaf6fa] rounded-xl p-4 mb-4">{marketResult}</div>
+                  <button
+                    className="bg-[#16475b] text-white font-bold rounded-full px-6 py-2 shadow hover:bg-[#7edcff] hover:text-[#16475b] transition-all"
+                    onClick={() => {
+                      setAnswers(a => ({ ...a, market_size: marketResult }));
+                      setShowMarketPopup(false);
+                    }}
+                  >Fyll i svaret</button>
+                </div>
+              ) : null}
             </div>
           </div>
-        ) : (
-          <div className="flex justify-between mt-4">
-            <button
-              className="bg-[#eaf6fa] text-[#16475b] font-bold rounded-full px-6 py-2 shadow border border-[#16475b] hover:bg-[#16475b] hover:text-white transition-colors text-base"
-              onClick={handleBack}
-              disabled={step === 1}
-            >
-              Tillbaka
-            </button>
-            <button
-              className="bg-[#16475b] text-white font-bold rounded-full px-6 py-2 shadow border border-[#16475b] hover:bg-[#16475b] hover:text-white transition-colors text-base"
-              onClick={() => {
-                const maxSubStep = Math.ceil(current.subQuestions.length / SUBS_PER_PAGE) - 1;
-                const isLastChunk = subStep >= maxSubStep;
-                const isLastStep = step === questions.length;
-                if (!isLastChunk) setSubStep(s => s + 1);
-                else if (!isLastStep) handleNext();
-                else handleFinish();
-              }}
-              disabled={isAnalyzingPlan}
-            >
-              {(() => {
-                const maxSubStep = Math.ceil(current.subQuestions.length / SUBS_PER_PAGE) - 1;
-                const isLastChunk = subStep >= maxSubStep;
-                const isLastStep = step === questions.length;
-                if (!isLastChunk) return 'Nästa';
-                if (isLastStep) return isAnalyzingPlan ? 'Analyserar...' : 'Slutför';
-                return 'Nästa';
-              })()}
-            </button>
-          </div>
         )}
-        {analyzeError && <div className="text-red-600 text-sm mt-2 text-center">{analyzeError}</div>}
-        {isAnalyzingPlan && (
-          <div className="flex justify-center items-center mt-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#16475b]"></div>
-            <span className="ml-3 text-[#16475b]">AI analyserar din affärsplan...</span>
-          </div>
-        )}
-        {current.id === 'market_potential' && (
-          <div className="mb-4">
-            {answers.market_potential?.market_source && (
-              <div className="text-xs mt-2 text-[#16475b]">
-                {typeof answers.market_potential.market_source === 'string' 
-                  ? answers.market_potential.market_source 
-                  : ''}
-              </div>
-            )}
-          </div>
-        )}
-        {current.id === 'competition' && (
-          <div className="mb-4">
-            {Array.isArray(answers.competition?.main_competitors) && answers.competition.main_competitors.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {answers.competition.main_competitors.map((c: string, i: number) => (
-                  <span key={i} className="bg-[#eaf6fa] text-[#16475b] rounded-full px-3 py-1 text-xs font-semibold">{c}</span>
-                ))}
-              </div>
-            )}
+        {showFinalLoader && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center flex flex-col items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#7edcff] mb-6"></div>
+              <h2 className="text-2xl font-bold mb-4">{finalLoaderText}</h2>
+            </div>
           </div>
         )}
       </div>
