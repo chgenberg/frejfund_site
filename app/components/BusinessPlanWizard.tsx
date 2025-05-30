@@ -662,7 +662,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     'Sammanställer din investeringsprofil...'
   ];
 
-  const current = QUESTIONS[step - 1];
+  const current: Question = QUESTIONS[step - 1];
   const progress = Math.round((step / QUESTIONS.length) * 100);
 
   const isPreStep1Valid =
