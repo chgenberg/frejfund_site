@@ -136,6 +136,7 @@ const getOr = (val: ReactNode, fallback: ReactNode): ReactNode => {
 
 export default function BusinessPlanResult({ score: _score, answers, feedback = {}, subscriptionLevel = 'silver' }: ResultProps) {
   const safeAnswers = answers as Record<string, Record<string, string>>;
+  const typedAnswers = answers as Record<string, string | any>;
   const [aiScore, setAiScore] = useState<number | null>(null);
   const [motivation, setMotivation] = useState('');
   const [strengths, setStrengths] = useState('');
@@ -168,21 +169,65 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
   useEffect(() => {
     const fetchAllAiFeedback = async () => {
       setLoadingAiFeedback(true);
-      const feedbackPromises = sectionKeys.map(async ({ key, label }) => {
+      
+      // Samla relevanta svar för varje sektion
+      const sectionData = {
+        business_idea: {
+          company_value: typedAnswers.company_value,
+          customer_problem: typedAnswers.customer_problem,
+          solution: typedAnswers.solution,
+          problem_evidence: typedAnswers.problem_evidence,
+          market_gap: typedAnswers.market_gap
+        },
+        market_analysis: {
+          market_size: typedAnswers.market_size,
+          market_trends: typedAnswers.market_trends,
+          target_customer: typedAnswers.target_customer,
+          why_now: typedAnswers.why_now
+        },
+        team: {
+          team: typedAnswers.team,
+          team_skills: typedAnswers.team_skills,
+          founder_equity: typedAnswers.founder_equity,
+          founder_market_fit: typedAnswers.founder_market_fit
+        },
+        competition: {
+          competitors: typedAnswers.competitors,
+          unique_solution: typedAnswers.unique_solution,
+          ip_rights: typedAnswers.ip_rights
+        },
+        funding: {
+          capital_block: typedAnswers.capital_block,
+          runway: typedAnswers.runway,
+          revenue_block: typedAnswers.revenue_block,
+          growth_plan: typedAnswers.growth_plan
+        }
+      };
+
+      const feedbackPromises = Object.entries(sectionData).map(async ([key, data]) => {
         try {
-          const response = await fetch('/api/ai-feedback', {
+          // Filtrera bort tomma värden
+          const filteredData = Object.entries(data).reduce((acc, [k, v]) => {
+            if (v) acc[k] = v;
+            return acc;
+          }, {} as Record<string, any>);
+
+          if (Object.keys(filteredData).length === 0) {
+            return { key, feedback: '' };
+          }
+
+          const res = await fetch('/api/ai-section-feedback', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
               section: key, 
-              answers: answers,
-              questionText: JSON.stringify(answers)
+              text: JSON.stringify(filteredData)
             })
           });
-          const data = await response.json();
-          return { key, feedback: data.feedback || `Analyserar ${label.toLowerCase()}...` };
+          const result = await res.json();
+          return { key, feedback: result.feedback || '' };
         } catch (error) {
-          return { key, feedback: `Kunde inte generera feedback för ${label.toLowerCase()}.` };
+          return { key, feedback: '' };
         }
       });
 
@@ -292,7 +337,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
           ) : (
             <>
               <div className="flex flex-col items-center justify-center mb-2">
-                <div className="w-48 h-48">
+                <div className="w-64 h-64">
                   <CircularProgressbar
                     value={_score}
                     text={`${_score}`}
@@ -300,6 +345,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                       pathColor: getScoreColor(_score),
                       textColor: '#16475b',
                       trailColor: '#eaf6fa',
+                      textSize: '28px'
                     })}
                   />
                 </div>
@@ -320,9 +366,6 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
           <div className="mt-4 text-lg text-[#16475b] text-center font-medium max-w-2xl">
             {scoreInfo.label}
           </div>
-          <div className="mt-4 bg-[#eaf6fa] rounded-xl p-4 text-[#16475b] text-base text-center max-w-xl">
-            {scoreInfo.label}
-          </div>
         </div>
       </div>
 
@@ -339,7 +382,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
         <div className="max-w-4xl w-full space-y-8">
           {/* SCORE INFO MODAL */}
           {showScoreInfo && (
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
               <div className="bg-white rounded-3xl shadow-2xl border border-[#16475b] max-w-lg w-full p-8 relative animate-fade-in">
                 <button
                   onClick={() => setShowScoreInfo(false)}
@@ -365,7 +408,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
           )}
 
           {/* Executive Summary & Demo */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-[#16475b] mb-8 text-[#04121d]">
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-[#16475b] mb-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div className="flex-1">
                 <h1 className="text-3xl font-bold text-[#16475b] mb-2 flex items-center gap-2">
@@ -417,35 +460,86 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
 
           {/* AI-feedback för sektioner */}
           <div className="space-y-4">
-            {sectionKeys.map(({ key, label }) => (
-              <div key={key} className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
-                <div className="font-bold text-[#16475b] mb-1">AI-feedback för {label}:</div>
-                <SectionFeedback section={key} text={safeAnswers[key] ? JSON.stringify(safeAnswers[key]) : ''} />
+            {loadingAiFeedback ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#16475b] mx-auto mb-2"></div>
+                <div className="text-[#16475b]">Analyserar dina svar...</div>
               </div>
-            ))}
+            ) : (
+              <React.Fragment>
+                {/* Affärsidé */}
+                {(typedAnswers.company_value || typedAnswers.customer_problem || typedAnswers.solution) && (
+                  <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
+                    <div className="font-bold text-[#16475b] mb-2">AI-feedback för Affärsidé:</div>
+                    <div className="text-[#16475b]">
+                      {allAiFeedback.business_idea || `Baserat på: ${typedAnswers.company_value || typedAnswers.customer_problem || typedAnswers.solution || 'Ingen information'}`}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Marknadsanalys */}
+                {(typedAnswers.market_size || typedAnswers.market_trends || typedAnswers.target_customer) && (
+                  <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
+                    <div className="font-bold text-[#16475b] mb-2">AI-feedback för Marknadsanalys:</div>
+                    <div className="text-[#16475b]">
+                      {allAiFeedback.market_analysis || `Baserat på: ${typedAnswers.market_size || typedAnswers.market_trends || 'Ingen information'}`}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Team */}
+                {(typedAnswers.team || typedAnswers.team_skills || typedAnswers.founder_equity) && (
+                  <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
+                    <div className="font-bold text-[#16475b] mb-2">AI-feedback för Team:</div>
+                    <div className="text-[#16475b]">
+                      {allAiFeedback.team || `Baserat på: ${typedAnswers.team || 'Ingen information'}`}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Konkurrensanalys */}
+                {(typedAnswers.competitors || typedAnswers.unique_solution) && (
+                  <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
+                    <div className="font-bold text-[#16475b] mb-2">AI-feedback för Konkurrensanalys:</div>
+                    <div className="text-[#16475b]">
+                      {allAiFeedback.competition || `Baserat på: ${typedAnswers.competitors || 'Ingen information'}`}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Finansiering */}
+                {(typedAnswers.capital_block || typedAnswers.runway) && (
+                  <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
+                    <div className="font-bold text-[#16475b] mb-2">AI-feedback för Finansiering:</div>
+                    <div className="text-[#16475b]">
+                      {allAiFeedback.funding || `Baserat på: ${typedAnswers.capital_block || typedAnswers.runway || 'Ingen information'}`}
+                    </div>
+                  </div>
+                )}
+              </React.Fragment>
+            )}
           </div>
 
           {/* Problem & Lösning */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] flex flex-col md:flex-row gap-6 text-[#04121d]">
+          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] flex flex-col md:flex-row gap-6">
             <div className="flex-1">
               <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>❓</span> Problem</h2>
-              <div className="text-[#16475b] mb-2">{getOr(safeAnswers.business_idea?.what_you_do, 'Ej angivet.')}</div>
+              <div className="text-[#16475b] mb-2">{getOr(typedAnswers.customer_problem, 'Ej angivet.')}</div>
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>💡</span> Lösning</h2>
-              <div className="text-[#16475b] mb-2">{getOr(safeAnswers.business_idea?.why_unique, 'Ej angivet.')}</div>
+              <div className="text-[#16475b] mb-2">{getOr(typedAnswers.solution, 'Ej angivet.')}</div>
             </div>
           </div>
 
           {/* Marknad (TAM/SAM/SOM) */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] text-[#04121d]">
+          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-4 flex items-center gap-2"><span>📊</span> Marknad</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1 space-y-2">
-                <div className="text-[#04121d]"><b>TAM:</b> {getOr(safeAnswers.market_details?.tam, 'Ej angivet')}</div>
-                <div className="text-[#04121d]"><b>SAM:</b> {getOr(safeAnswers.market_details?.sam, 'Ej angivet')}</div>
-                <div className="text-[#04121d]"><b>SOM:</b> {getOr(safeAnswers.market_details?.som, 'Ej angivet')}</div>
-                <div className="text-xs text-[#2a6b8a]">Källa: {getOr(safeAnswers.market_details?.market_source, 'Ej angiven')}</div>
+                <div className="text-[#16475b]"><b>TAM/SAM/SOM:</b> {getOr(typedAnswers.market_size, 'Ej angivet')}</div>
+                <div className="text-[#16475b]"><b>Målgrupp:</b> {getOr(typedAnswers.target_customer, 'Ej angivet')}</div>
+                <div className="text-[#16475b]"><b>Marknadstrender:</b> {getOr(typedAnswers.market_trends, 'Ej angivet')}</div>
               </div>
               {/* Dummy funnel-graf */}
               <div className="flex-1 flex items-center justify-center">
@@ -458,73 +552,98 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
             </div>
           </div>
 
-          {/* Affärsmodell & Prissättning */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] grid grid-cols-1 md:grid-cols-2 gap-6 text-[#04121d]">
+          {/* Affärsmodell & Intäkter */}
+          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>💰</span> Affärsmodell</h2>
-              <div>{getOr(safeAnswers.revenue_model?.model, 'Ej angivet')}</div>
-              <div className="text-xs text-[#2a6b8a]">Övriga intäkter: {getOr(safeAnswers.revenue_model?.other_revenue, 'Ej angivet')}</div>
+              <div className="text-[#16475b]">{getOr(typedAnswers.revenue_block, 'Ej angivet')}</div>
             </div>
             <div>
-              <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🏷️</span> Prissättning</h2>
-              <div>{getOr(safeAnswers.pricing?.price_model, 'Ej angivet')}</div>
-              <div className="text-xs text-[#2a6b8a]">Prisintervall: {getOr(safeAnswers.pricing?.price_range, 'Ej angivet')}</div>
+              <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>📈</span> Tillväxtplan</h2>
+              <div className="text-[#16475b]">{getOr(typedAnswers.growth_plan, 'Ej angivet')}</div>
             </div>
           </div>
 
           {/* Traction & Milestones */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] text-[#04121d]">
+          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>📈</span> Traction & Milstolpar</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <div><b>Milstolpar:</b> {getOr(safeAnswers.milestones?.milestones_list, 'Ej angivet')}</div>
+                <div className="text-[#16475b]"><b>Traction:</b> {getOr(typedAnswers.traction, 'Ej angivet')}</div>
               </div>
               <div className="flex-1">
-                <div><b>KPI/Traction:</b> {getOr(safeAnswers.milestones?.traction_kpi, 'Ej angivet')}</div>
+                <div className="text-[#16475b]"><b>Milstolpar:</b> {
+                  typedAnswers.milestones ? (
+                    JSON.parse(typedAnswers.milestones as string).map((m: any, i: number) => 
+                      `${m.milestone} (${m.date})`
+                    ).join(', ')
+                  ) : 'Ej angivet'
+                }</div>
               </div>
             </div>
           </div>
 
           {/* Team & Founders' DNA */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] text-[#04121d]">
+          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🧬</span> Team & Founders' DNA</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <div><b>Roller:</b> {getOr(safeAnswers.founders_dna?.team_roles, 'Ej angivet')}</div>
+                <div className="text-[#16475b]"><b>Team:</b> {getOr(typedAnswers.team, 'Ej angivet')}</div>
+                <div className="text-[#16475b]"><b>Ägarandel efter runda:</b> {getOr(typedAnswers.founder_equity, 'Ej angivet')}%</div>
               </div>
               <div className="flex-1">
-                <div><b>Styrkor:</b> {getOr(safeAnswers.founders_dna?.dna_strengths, 'Ej angivet')}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Kundcase/LOI */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] text-[#04121d]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🤝</span> Kundcase & LOI</h2>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
-                <div><b>LOI/länk:</b> {getOr(safeAnswers.customer_cases?.loi_links, 'Ej angivet')}</div>
-              </div>
-              <div className="flex-1">
-                <div><b>Kundcitat:</b> {getOr(safeAnswers.customer_cases?.customer_quotes, 'Ej angivet')}</div>
+                <div className="text-[#16475b]"><b>Founder-Market Fit:</b> {
+                  typedAnswers.founder_market_fit ? (
+                    (() => {
+                      const fmf = JSON.parse(typedAnswers.founder_market_fit as string);
+                      return `${fmf.score}/5 - ${fmf.text}`;
+                    })()
+                  ) : 'Ej angivet'
+                }</div>
               </div>
             </div>
           </div>
 
-          {/* Konkurrent-matris */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] text-[#04121d]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>⚔️</span> Konkurrenter & Matris</h2>
+          {/* Kapitalbehov */}
+          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
+            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>💵</span> Kapitalbehov & Användning</h2>
+            {typedAnswers.capital_block ? (
+              (() => {
+                const capital = JSON.parse(typedAnswers.capital_block as string);
+                return (
+                  <div className="space-y-2">
+                    <div className="text-[#16475b]"><b>Total summa:</b> {capital.amount} MSEK</div>
+                    <div className="text-[#16475b]"><b>Fördelning:</b></div>
+                    <ul className="list-disc list-inside text-[#16475b] ml-4">
+                      <li>Produktutveckling: {capital.product}%</li>
+                      <li>Försäljning & Marknad: {capital.sales}%</li>
+                      <li>Personal & Rekrytering: {capital.team}%</li>
+                      <li>Övrigt: {capital.other}%</li>
+                    </ul>
+                    <div className="text-[#16475b]"><b>Sannolikhet för mer kapital:</b> {capital.probability}/5</div>
+                    <div className="text-[#16475b]"><b>Runway:</b> {getOr(typedAnswers.runway, 'Ej angivet')} månader</div>
+                  </div>
+                );
+              })()
+            ) : (
+              <div className="text-[#16475b]">Ej angivet</div>
+            )}
+          </div>
+
+          {/* Konkurrenter & Matris */}
+          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
+            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>⚔️</span> Konkurrenter & Differentiering</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <div><b>Konkurrenter:</b> {getOr(safeAnswers.competition_matrix?.competitors, 'Ej angivet')}</div>
-                <div><b>Funktioner vs pris:</b> {getOr(safeAnswers.competition_matrix?.features_vs_price, 'Ej angivet')}</div>
-                <div><b>Egen position:</b> {getOr(safeAnswers.competition_matrix?.positioning, 'Ej angivet')}</div>
+                <div className="text-[#16475b]"><b>Konkurrenter:</b> {getOr(typedAnswers.competitors, 'Ej angivet')}</div>
+                <div className="text-[#16475b] mt-2"><b>Unik lösning:</b> {getOr(typedAnswers.unique_solution, 'Ej angivet')}</div>
+                <div className="text-[#16475b] mt-2"><b>IP-rättigheter:</b> {getOr(typedAnswers.ip_rights, 'Ej angivet')}</div>
               </div>
             </div>
           </div>
 
           {/* AI-driven Konkurrentanalys */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] text-[#04121d]">
+          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-4 flex items-center gap-2"><span>🔎</span> AI-Konkurrentanalys</h2>
             {loadingCompetitors && <div className="text-[#16475b]">Hämtar konkurrensanalys...</div>}
             {competitorError && <div className="text-red-600">{competitorError}</div>}
@@ -533,13 +652,13 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 {competitorAnalysis.map((c: any, i) => (
                   <div key={i} className="border-b border-[#eaf6fa] pb-4 mb-4 last:border-b-0 last:mb-0">
                     <div className="flex items-center gap-4 mb-2">
-                      <div className="font-bold text-lg">{c.name}</div>
+                      <div className="font-bold text-lg text-[#16475b]">{c.name}</div>
                       {c.url && <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-[#2a6b8a] underline text-sm">{c.url}</a>}
                     </div>
                     {c.error ? (
                       <div className="text-red-600 text-sm">{c.error}</div>
                     ) : (
-                      <div className="text-sm space-y-1">
+                      <div className="text-sm space-y-1 text-[#16475b]">
                         <div><b>Styrkor:</b> {c.strengths || '-'}</div>
                         <div><b>Svagheter:</b> {c.weaknesses || '-'}</div>
                         <div><b>Möjligheter för dig:</b> {c.opportunities || '-'}</div>
@@ -552,10 +671,10 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
           </div>
 
           {/* Budget/Prognos */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] text-[#04121d]">
+          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>📑</span> Budget & Prognos</h2>
             <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
+              <div className="flex-1 text-[#16475b]">
                 <div><b>Budget/prognos:</b> {getOr(safeAnswers.budget_forecast?.forecast_table, 'Ej angivet')}</div>
                 <div><b>ARPU:</b> {getOr(safeAnswers.budget_forecast?.arpu, 'Ej angivet')}</div>
                 <div><b>CAC:</b> {getOr(safeAnswers.budget_forecast?.cac, 'Ej angivet')}</div>
@@ -566,10 +685,10 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
           </div>
 
           {/* Cap Table & Dilution */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] text-[#04121d]">
+          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🥧</span> Cap Table & Dilution</h2>
             <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
+              <div className="flex-1 text-[#16475b]">
                 <div><b>Ägare och andel:</b> {getOr(safeAnswers.cap_table?.owners, 'Ej angivet')}</div>
                 <div><b>Planerade rundor:</b> {getOr(safeAnswers.cap_table?.planned_rounds, 'Ej angivet')}</div>
                 <div><b>Pro-forma:</b> {getOr(safeAnswers.cap_table?.pro_forma, 'Ej angivet')}</div>
@@ -589,7 +708,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
           <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🛠️</span> Teknik & IP</h2>
             <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
+              <div className="flex-1 text-[#16475b]">
                 <div><b>Patentstatus:</b> {getOr(safeAnswers.tech_ip?.patent_status, 'Ej angivet')}</div>
                 <div><b>Tech-stack:</b> {getOr(safeAnswers.tech_ip?.tech_stack, 'Ej angivet')}</div>
                 <div><b>Unika algoritmer:</b> {getOr(safeAnswers.tech_ip?.unique_algorithms, 'Ej angivet')}</div>
@@ -601,7 +720,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
           <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🌱</span> ESG & Impact</h2>
             <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
+              <div className="flex-1 text-[#16475b]">
                 <div><b>KPI för impact:</b> {getOr(safeAnswers.esg_impact?.kpi, 'Ej angivet')}</div>
                 <div><b>FN-SDG:</b> {getOr(safeAnswers.esg_impact?.sdg, 'Ej angivet')}</div>
                 <div><b>Jämförelse med bransch:</b> {getOr(safeAnswers.esg_impact?.industry_comparison, 'Ej angivet')}</div>

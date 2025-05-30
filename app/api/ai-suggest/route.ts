@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           model: 'gpt-4o',
           messages: [
-            { role: 'system', content: 'Du är en expert på affärsplaner och företagsanalys. Ge alltid specifika, användbara svar baserat på den givna kontexten.' },
+            { role: 'system', content: 'Du är en expert på affärsplaner och företagsanalys. Ge ENDAST konkreta, specifika svar direkt utan förklaringar om hur du kom fram till svaret. Svara kort och koncist men informativt. Inga långa utläggningar eller pedagogiska förklaringar.' },
             { role: 'user', content: contextualPrompt }
           ],
           max_tokens: 300,
