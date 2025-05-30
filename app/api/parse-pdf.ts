@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error
 // eslint-disable-next-line
 declare module 'pdf-parse';
 import { NextApiRequest, NextApiResponse } from 'next';
