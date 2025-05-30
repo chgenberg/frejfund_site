@@ -1239,12 +1239,126 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative">
           <h2 className="text-2xl font-bold mb-6 text-center">Starta din affärsplan-analys</h2>
           
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Företagsnamn</label>
+            <input
+              type="text"
+              className="w-full p-4 border-2 border-[#7edcff] rounded-2xl mb-2 text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg"
+              placeholder="Ange företagets namn"
+              value={company}
+              onChange={e => setCompany(e.target.value)}
+            />
+          </div>
+          
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">E-post</label>
+            <input
+              type="email"
+              className="w-full p-4 border-2 border-[#7edcff] rounded-2xl mb-2 text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg"
+              placeholder="din@epost.se"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+          </div>
+          
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">Har ni en hemsida?</label>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                className={`flex-1 p-3 rounded-xl font-medium transition-all ${
+                  hasWebsite === true 
+                    ? 'bg-[#16475b] text-white' 
+                    : 'bg-gray-100 text-[#16475b] hover:bg-gray-200'
+                }`}
+                onClick={() => setHasWebsite(true)}
+              >
+                Ja
+              </button>
+              <button
+                type="button"
+                className={`flex-1 p-3 rounded-xl font-medium transition-all ${
+                  hasWebsite === false 
+                    ? 'bg-[#16475b] text-white' 
+                    : 'bg-gray-100 text-[#16475b] hover:bg-gray-200'
+                }`}
+                onClick={() => setHasWebsite(false)}
+              >
+                Nej
+              </button>
+            </div>
+          </div>
+          
+          {hasWebsite === true && (
+            <div className="mb-4 animate-fadeIn">
+              <label className="block font-semibold mb-1">Hemsida</label>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  className="flex-1 p-4 border-2 border-[#7edcff] rounded-2xl text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all"
+                  placeholder="https://www.dittforetag.se"
+                  value={websiteUrl}
+                  onChange={e => setWebsiteUrl(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="bg-[#7edcff] text-[#16475b] font-bold rounded-2xl px-6 py-3 shadow hover:bg-[#16475b] hover:text-white transition-all disabled:opacity-50"
+                  disabled={!websiteUrl || isScraping}
+                  onClick={async () => {
+                    setIsScraping(true);
+                    setScrapeError(null);
+                    try {
+                      const res = await fetch('/api/scrape-website', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: websiteUrl })
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        setScrapedData(data.data);
+                        const mappedData = mapScrapedDataToAnswers(data.data);
+                        setAnswers(mappedData.answers);
+                        if (mappedData.detectedCompany) {
+                          setCompany(mappedData.detectedCompany);
+                        }
+                        if (mappedData.detectedBransch) {
+                          setBransch(mappedData.detectedBransch);
+                        }
+                        if (mappedData.detectedOmrade) {
+                          setOmrade(mappedData.detectedOmrade);
+                        }
+                      } else {
+                        setScrapeError(data.error || 'Kunde inte hämta data från hemsidan');
+                      }
+                    } catch (error) {
+                      setScrapeError('Ett fel uppstod vid hämtning av data');
+                    } finally {
+                      setIsScraping(false);
+                    }
+                  }}
+                >
+                  {isScraping ? (
+                    <span className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></div>
+                      Analyserar...
+                    </span>
+                  ) : (
+                    'Analysera hemsida'
+                  )}
+                </button>
+              </div>
+              {scrapeError && (
+                <div className="mt-2 text-red-600 text-sm">{scrapeError}</div>
+              )}
+            </div>
+          )}
+          
           {/* Visa skrapningssammanfattning om tillgänglig */}
           {scrapedData && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl animate-fadeIn">
               <h3 className="font-bold text-green-800 mb-2 flex items-center">
-                <span className="mr-2">🤖</span>
-                Information hämtad från din hemsida
+                <span className="mr-2">✅</span>
+                Hemsida analyserad framgångsrikt!
               </h3>
               <div className="text-sm text-green-700 space-y-1">
                 {scrapedData.company_name && (
@@ -1256,12 +1370,49 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 {scrapedData.company_value && (
                   <div><strong>Värde:</strong> {scrapedData.company_value.slice(0, 100)}...</div>
                 )}
-                <div className="text-xs text-green-600 mt-2">
-                  {Object.keys(mapScrapedDataToAnswers(scrapedData).answers).length} fält kommer att fyllas i automatiskt
+                <div className="text-xs text-green-600 mt-2 font-semibold">
+                  ✓ {Object.keys(mapScrapedDataToAnswers(scrapedData).answers).length} fält kommer att fyllas i automatiskt
                 </div>
               </div>
             </div>
           )}
+          
+          <div className="mb-6">
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="mr-2 w-5 h-5 text-[#16475b] border-2 border-[#7edcff] rounded focus:ring-[#7edcff]"
+                checked={privacyChecked}
+                onChange={e => setPrivacyChecked(e.target.checked)}
+              />
+              <span className="text-sm text-[#16475b]">
+                Jag godkänner att mina uppgifter behandlas enligt <a href="/privacy" className="text-[#7edcff] underline">integritetspolicyn</a>
+              </span>
+            </label>
+          </div>
+          
+          <div className="flex justify-between">
+            <button
+              className="bg-gray-200 text-[#16475b] font-bold rounded-full px-8 py-3 shadow-lg"
+              onClick={onClose}
+            >Avbryt</button>
+            <button
+              className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg disabled:opacity-50"
+              onClick={() => setPreStepPage(2)}
+              disabled={!isPreStep1Valid}
+            >Nästa</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // PreStepPage 2: Bransch och Område
+  if (preStep && preStepPage === 2) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative">
+          <h2 className="text-2xl font-bold mb-6 text-center">Företagsinformation</h2>
           
           <div className="mb-4">
             <label className="block font-semibold mb-1">Bransch</label>

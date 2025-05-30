@@ -3,7 +3,6 @@ import Image from 'next/image';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import SectionFeedback from './SectionFeedback';
-import PitchDeckCustomization, { PitchDeckConfig } from './PitchDeckCustomization';
 
 interface ResultProps {
   score: number;
@@ -149,10 +148,14 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
   const [loadingCompetitors, setLoadingCompetitors] = useState(false);
   const [competitorError, setCompetitorError] = useState<string | null>(null);
   const [showScoreInfo, setShowScoreInfo] = useState(false);
-  const [pitchDeckLoading, setPitchDeckLoading] = useState(false);
   const [allAiFeedback, setAllAiFeedback] = useState<Record<string, string>>({});
   const [loadingAiFeedback, setLoadingAiFeedback] = useState(true);
-  const [showPitchDeckCustomization, setShowPitchDeckCustomization] = useState(false);
+  const [showAnalysisModal, setShowAnalysisModal] = useState(false);
+  const [showAdditionalQuestions, setShowAdditionalQuestions] = useState(false);
+  const [additionalAnswers, setAdditionalAnswers] = useState<Record<string, string>>({});
+  const [generatingReport, setGeneratingReport] = useState(false);
+  const [companyLogo, setCompanyLogo] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   
   const scoreComparison = getScoreComparison(_score);
   const marketData = getMarketSizeData(safeAnswers.market_size?.market_value || '0');
@@ -289,49 +292,6 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
     }
     fetchCompetitors();
   }, [answers]);
-
-  const handlePitchDeckGeneration = async (config?: PitchDeckConfig) => {
-    setShowPitchDeckCustomization(false);
-    setPitchDeckLoading(true);
-    
-    try {
-      const formData = new FormData();
-      formData.append('answers', JSON.stringify(answers));
-      formData.append('score', String(_score));
-      
-      if (config) {
-        if (config.logo) {
-          formData.append('logo', config.logo);
-        }
-        formData.append('colors', JSON.stringify(config.colors));
-        formData.append('fontFamily', config.fontFamily);
-      }
-      
-      const response = await fetch('/api/generate-pitchdeck', {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'pitch-deck.pdf';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      } else {
-        alert('Kunde inte generera pitch deck. Försök igen senare.');
-      }
-    } catch (error) {
-      console.error('Error generating pitch deck:', error);
-      alert('Ett fel uppstod vid generering av pitch deck.');
-    } finally {
-      setPitchDeckLoading(false);
-    }
-  };
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return '#7edc7a'; // Grön
@@ -705,32 +665,22 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
             <div><b>Exit-plan:</b> {getOr(safeAnswers.exit_strategy?.exit_plan, 'Ej angivet')}</div>
           </div>
 
-          {/* Pitch Deck Generation Section */}
+          {/* Komplett AI-affärsanalys Section */}
           <div className="bg-gradient-to-br from-[#16475b] to-[#2a6b8a] rounded-3xl p-8 shadow-xl text-white text-center">
-            <h2 className="text-2xl font-bold mb-4">Redo för nästa steg?</h2>
+            <h2 className="text-2xl font-bold mb-4">Vill du ha en djupare analys?</h2>
             <p className="text-lg mb-6 opacity-90">
-              Skapa en professionell pitch deck baserad på din analys
+              Få en komplett AI-driven affärsanalys med branschspecifika insikter
             </p>
             <button
-              onClick={() => setShowPitchDeckCustomization(true)}
-              disabled={pitchDeckLoading}
-              className="bg-white text-[#16475b] font-bold rounded-full px-10 py-4 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 mx-auto"
+              onClick={() => setShowAnalysisModal(true)}
+              className="bg-white text-[#16475b] font-bold rounded-full px-10 py-4 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 mx-auto"
             >
-              {pitchDeckLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#16475b]"></div>
-                  Genererar...
-                </>
-              ) : (
-                <>
-                  <span className="text-xl">🎯</span>
-                  Generera AI Pitch Deck (PDF)
-                </>
-              )}
+              <span className="text-xl">🎯</span>
+              Komplett AI-affärsanalys
             </button>
             <div className="text-sm text-white/80 mt-4">
-              <div className="font-semibold">Professionell pitch deck</div>
-              <div>Baserad på dina svar • Redo för investerare</div>
+              <div className="font-semibold">3x mer djupgående analys</div>
+              <div>Branschspecifika frågor • Konkreta förbättringsåtgärder • PDF-rapport</div>
             </div>
           </div>
         </div>
@@ -778,12 +728,269 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
         </div>
       )}
 
-      {/* Pitch Deck Customization Modal */}
-      {showPitchDeckCustomization && (
-        <PitchDeckCustomization
-          onGenerate={handlePitchDeckGeneration}
-          onClose={() => setShowPitchDeckCustomization(false)}
-        />
+      {/* Komplett AI-affärsanalys Modal */}
+      {showAnalysisModal && (
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-8 animate-fadeIn">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-[#16475b]">Komplett AI-affärsanalys</h2>
+              <button
+                onClick={() => setShowAnalysisModal(false)}
+                className="text-[#16475b] text-2xl font-bold hover:text-[#2a6b8a] focus:outline-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              <div className="bg-[#eaf6fa] rounded-2xl p-6">
+                <h3 className="text-lg font-semibold text-[#16475b] mb-4">Vad ingår i analysen?</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">📊</span>
+                    <div>
+                      <div className="font-semibold text-[#16475b]">3x mer djupgående analys</div>
+                      <div className="text-sm text-[#16475b]/80">Omfattande AI-analys av alla aspekter av din affärsplan</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">🎯</span>
+                    <div>
+                      <div className="font-semibold text-[#16475b]">5 branschspecifika frågor</div>
+                      <div className="text-sm text-[#16475b]/80">Anpassade efter just din bransch och utmaningar</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">💡</span>
+                    <div>
+                      <div className="font-semibold text-[#16475b]">Konkreta förbättringsåtgärder</div>
+                      <div className="text-sm text-[#16475b]/80">Handlingsplan med prioriterade åtgärder</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">📄</span>
+                    <div>
+                      <div className="font-semibold text-[#16475b]">Professionell PDF-rapport</div>
+                      <div className="text-sm text-[#16475b]/80">Med ditt företags logo och formaterad text</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-[#7edcff]/20 to-[#16475b]/20 rounded-2xl p-6 text-center">
+                <div className="text-3xl font-bold text-[#16475b] mb-2">197 kr</div>
+                <div className="text-sm text-[#16475b]/80">Engångskostnad</div>
+              </div>
+
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={() => setShowAnalysisModal(false)}
+                  className="px-6 py-3 text-[#16475b] hover:bg-[#f5f7fa] rounded-full transition-colors"
+                >
+                  Avbryt
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAnalysisModal(false);
+                    setShowAdditionalQuestions(true);
+                  }}
+                  className="px-8 py-3 bg-gradient-to-r from-[#16475b] to-[#2a6b8a] text-white font-bold rounded-full hover:shadow-lg transition-all"
+                >
+                  Testa gratis (Demo)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Additional Questions Modal */}
+      {showAdditionalQuestions && (
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-8 animate-fadeIn max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-[#16475b]">Branschspecifika frågor</h2>
+              <button
+                onClick={() => setShowAdditionalQuestions(false)}
+                className="text-[#16475b] text-2xl font-bold hover:text-[#2a6b8a] focus:outline-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Logo Upload */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-[#16475b] mb-3">Företagslogo (valfritt)</h3>
+                <div className="flex items-center gap-6">
+                  <div className="w-32 h-32 border-2 border-dashed border-[#7edcff] rounded-xl flex items-center justify-center bg-[#f5f7fa]">
+                    {logoPreview ? (
+                      <img src={logoPreview} alt="Logo preview" className="max-w-full max-h-full object-contain" />
+                    ) : (
+                      <svg className="w-12 h-12 text-[#7edcff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    )}
+                  </div>
+                  <div>
+                    <label className="bg-[#16475b] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-[#2a6b8a] transition-colors inline-block">
+                      Ladda upp logo
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setCompanyLogo(file);
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setLogoPreview(reader.result as string);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                    <p className="text-sm text-[#16475b]/60 mt-2">PNG eller JPG, max 5MB</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Questions based on industry */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-[#16475b]">Branschspecifika frågor för {typedAnswers.bransch || 'din bransch'}</h3>
+                
+                {/* Question 1 */}
+                <div>
+                  <label className="block font-semibold text-[#16475b] mb-2">
+                    1. Vilka regulatoriska utmaningar finns inom er bransch?
+                  </label>
+                  <textarea
+                    className="w-full min-h-[100px] rounded-xl border border-[#7edcff] bg-white px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none"
+                    placeholder="Beskriv eventuella lagar, regler eller certifieringar som påverkar er verksamhet..."
+                    value={additionalAnswers.regulatory || ''}
+                    onChange={(e) => setAdditionalAnswers({ ...additionalAnswers, regulatory: e.target.value })}
+                  />
+                </div>
+
+                {/* Question 2 */}
+                <div>
+                  <label className="block font-semibold text-[#16475b] mb-2">
+                    2. Hur ser er go-to-market strategi ut?
+                  </label>
+                  <textarea
+                    className="w-full min-h-[100px] rounded-xl border border-[#7edcff] bg-white px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none"
+                    placeholder="Beskriv hur ni planerar att nå ut till era kunder..."
+                    value={additionalAnswers.goToMarket || ''}
+                    onChange={(e) => setAdditionalAnswers({ ...additionalAnswers, goToMarket: e.target.value })}
+                  />
+                </div>
+
+                {/* Question 3 */}
+                <div>
+                  <label className="block font-semibold text-[#16475b] mb-2">
+                    3. Vilka är era viktigaste KPI:er och hur mäter ni framgång?
+                  </label>
+                  <textarea
+                    className="w-full min-h-[100px] rounded-xl border border-[#7edcff] bg-white px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none"
+                    placeholder="Lista era viktigaste nyckeltal och mål..."
+                    value={additionalAnswers.kpis || ''}
+                    onChange={(e) => setAdditionalAnswers({ ...additionalAnswers, kpis: e.target.value })}
+                  />
+                </div>
+
+                {/* Question 4 */}
+                <div>
+                  <label className="block font-semibold text-[#16475b] mb-2">
+                    4. Hur ser er prissättningsstrategi ut jämfört med konkurrenter?
+                  </label>
+                  <textarea
+                    className="w-full min-h-[100px] rounded-xl border border-[#7edcff] bg-white px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none"
+                    placeholder="Beskriv er prissättning och positionering..."
+                    value={additionalAnswers.pricing || ''}
+                    onChange={(e) => setAdditionalAnswers({ ...additionalAnswers, pricing: e.target.value })}
+                  />
+                </div>
+
+                {/* Question 5 */}
+                <div>
+                  <label className="block font-semibold text-[#16475b] mb-2">
+                    5. Vilka partnerskap eller samarbeten är kritiska för er tillväxt?
+                  </label>
+                  <textarea
+                    className="w-full min-h-[100px] rounded-xl border border-[#7edcff] bg-white px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none"
+                    placeholder="Beskriv viktiga partners, leverantörer eller distributionskanaler..."
+                    value={additionalAnswers.partnerships || ''}
+                    onChange={(e) => setAdditionalAnswers({ ...additionalAnswers, partnerships: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-center gap-4 mt-8">
+                <button
+                  onClick={() => setShowAdditionalQuestions(false)}
+                  className="px-6 py-3 text-[#16475b] hover:bg-[#f5f7fa] rounded-full transition-colors"
+                >
+                  Avbryt
+                </button>
+                <button
+                  onClick={async () => {
+                    setGeneratingReport(true);
+                    setShowAdditionalQuestions(false);
+                    
+                    try {
+                      // Skapa FormData för att skicka både JSON och fil
+                      const formData = new FormData();
+                      formData.append('answers', JSON.stringify(answers));
+                      formData.append('additionalAnswers', JSON.stringify(additionalAnswers));
+                      formData.append('score', String(_score));
+                      formData.append('company', typedAnswers.company || '');
+                      if (companyLogo) {
+                        formData.append('logo', companyLogo);
+                      }
+                      
+                      const response = await fetch('/api/generate-deep-analysis', {
+                        method: 'POST',
+                        body: formData
+                      });
+                      
+                      if (response.ok) {
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'affarsanalys-rapport.pdf';
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                      } else {
+                        alert('Kunde inte generera rapport. Försök igen senare.');
+                      }
+                    } catch (error) {
+                      console.error('Error generating report:', error);
+                      alert('Ett fel uppstod vid generering av rapport.');
+                    } finally {
+                      setGeneratingReport(false);
+                    }
+                  }}
+                  disabled={generatingReport}
+                  className="px-8 py-3 bg-gradient-to-r from-[#16475b] to-[#2a6b8a] text-white font-bold rounded-full hover:shadow-lg transition-all disabled:opacity-50"
+                >
+                  {generatingReport ? (
+                    <span className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      Genererar rapport...
+                    </span>
+                  ) : (
+                    'Generera rapport'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
