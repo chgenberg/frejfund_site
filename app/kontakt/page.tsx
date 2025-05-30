@@ -37,14 +37,14 @@ export default function Kontakt() {
       />
       <div className="flex flex-col gap-10 w-full max-w-2xl items-center bg-white/90 rounded-3xl shadow-xl p-10 border border-gray-200 backdrop-blur-md">
         <div className="text-center">
-          <h1 className="text-3xl font-extrabold mb-4 text-[#01121f]">FREJFUND</h1>
-          <p className="text-lg text-gray-800 font-medium mb-2">Bonanova, Palma<br />Spanien</p>
-          <a href="mailto:hej@frejfund.com" className="text-lg text-[#16475b] underline font-semibold">hej@frejfund.com</a>
+          <h1 className="text-3xl font-extrabold mb-4 text-[#01121f]">Christopher Genberg AB</h1>
+          <p className="text-lg text-gray-800 font-medium mb-2">Södra Skjutbanevägen 10<br />439 55 Åsa, Sverige</p>
+          <a href="mailto:info@christophergenberg.se" className="text-lg text-[#16475b] underline font-semibold">info@christophergenberg.se</a>
         </div>
         <div className="w-full h-72 rounded-2xl overflow-hidden shadow-lg border border-gray-300">
           <iframe
-            title="Google Maps Bonanova Palma"
-            src="https://www.google.com/maps?q=Bonanova,+Palma,+Mallorca,+Spanien&output=embed"
+            title="Google Maps Södra Skjutbanevägen 10, Åsa"
+            src="https://www.google.com/maps?q=Södra+Skjutbanevägen+10,+439+55+Åsa,+Sverige&output=embed"
             width="100%"
             height="100%"
             style={{ border: 0 }}

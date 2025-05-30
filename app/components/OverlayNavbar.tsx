@@ -46,13 +46,6 @@ export default function OverlayNavbar() {
                 OM OSS
               </Link>
               <Link 
-                href="/vara-paket" 
-                className="block px-6 py-3 hover:bg-white/10 transition-colors text-base tracking-wide text-center uppercase"
-                onClick={() => setIsOpen(false)}
-              >
-                VÅRA PAKET
-              </Link>
-              <Link 
                 href="/pitch-pingvinen" 
                 className="block px-6 py-3 hover:bg-white/10 transition-colors text-base tracking-wide text-center uppercase"
                 onClick={() => setIsOpen(false)}

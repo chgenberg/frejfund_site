@@ -84,7 +84,7 @@ export default function PitchPingvinen() {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center px-4 py-12">
-      <h1 className="text-3xl md:text-4xl font-extrabold text-[#16475b] tracking-widest text-center mb-10 mt-2 uppercase">PITCH-PINGVINEN</h1>
+      <h1 className="text-4xl md:text-5xl font-extrabold text-[#16475b] tracking-widest text-center mb-10 mt-2 uppercase">PITCH-PINGVINEN</h1>
       
       {/* Bakgrundsbild */}
       <Image
@@ -95,29 +95,35 @@ export default function PitchPingvinen() {
         priority
       />
 
-      <div className="w-full max-w-4xl flex flex-col gap-8">
-        {/* Huvudfunktion: Pitch-Pingvinen utan vit ruta */}
-        <div className="flex flex-col items-center gap-8 w-full max-w-lg mx-auto mb-2">
-          <h2 className="text-2xl font-bold text-[#16475b] mb-6 text-center">Spela in din pitch</h2>
-          <p className="text-gray-200 text-center mb-8">
-            Tryck på mikrofonen och berätta din idé på max 20 sekunder. Pingvinen lyssnar och ger dig ett investerar-score direkt!
+      <div className="w-full max-w-6xl flex flex-col gap-12">
+        {/* Huvudfunktion: Pitch-Pingvinen */}
+        <div className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto mb-2 bg-white/90 rounded-3xl shadow-xl p-10 border border-gray-200">
+          <h2 className="text-2xl font-bold text-[#16475b] mb-4 text-center">Spela in din pitch</h2>
+          <p className="text-[#16475b] text-center mb-4 text-lg font-medium">
+            Tryck på mikrofonen och berätta din idé på max 20 sekunder.<br />
+            <span className="font-semibold">Tips:</span> Fokusera på <span className="underline">vad du löser för kunden</span> (värdeerbjudande), varför just du/ni är rätt team och vad som gör idén unik.
           </p>
+          <ul className="text-[#16475b] text-sm mb-4 bg-[#eaf6fa] rounded-xl p-4 border border-[#7edcff]/30 w-full max-w-md mx-auto">
+            <li><b>Värdeerbjudande:</b> Vad får kunden ut? (Ex: "Vi hjälper småföretag att spara tid på bokföring.")</li>
+            <li><b>Unikhet:</b> Vad gör er annorlunda än konkurrenterna?</li>
+            <li><b>Team:</b> Varför är ni rätt personer att lyckas?</li>
+          </ul>
           <Image src="/pingvin.png" alt="Pitch-Pingvinen" width={120} height={120} className={listening ? "animate-pulse" : ""} />
           <button
-            className={`w-20 h-20 rounded-full flex items-center justify-center bg-[#16475b] text-white text-4xl shadow-lg border-4 border-white transition-all ${recording ? 'animate-pulse' : ''}`}
+            className={`w-24 h-24 rounded-full flex items-center justify-center bg-[#16475b] text-white text-4xl shadow-lg border-4 border-white transition-all ${recording ? 'animate-pulse' : ''}`}
             onClick={recording ? stopRecording : startRecording}
             aria-label={recording ? "Stoppa inspelning" : "Starta inspelning"}
             disabled={listening}
           >
             {recording ? (
-              <span className="material-icons" style={{ fontSize: 24 }}>stop</span>
+              <span className="material-icons" style={{ fontSize: 28 }}>stop</span>
             ) : (
               <Image src="/mic.png" alt="Mikrofon" width={44} height={44} style={{ filter: 'invert(1)' }} />
             )}
           </button>
           {/* Progress bar */}
           {recording && (
-            <div className="w-full max-w-xs h-3 bg-white/30 rounded-full mt-2 overflow-hidden">
+            <div className="w-full max-w-xs h-3 bg-[#eaf6fa] rounded-full mt-2 overflow-hidden">
               <div
                 className="h-full bg-[#7edcff] rounded-full transition-all duration-100"
                 style={{ width: `${progress * 100}%` }}
@@ -127,11 +133,11 @@ export default function PitchPingvinen() {
           {audioUrl && (
             <audio controls src={audioUrl} className="mt-2" />
           )}
-          {listening && <div className="text-white font-bold animate-pulse mt-2">Pingvinen lyssnar...</div>}
+          {listening && <div className="text-[#16475b] font-bold animate-pulse mt-2">Pingvinen lyssnar...</div>}
           {/* Popup overlay for score/feedback */}
           {showPopup && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-              <div className="bg-white/95 rounded-3xl shadow-2xl border border-white/20 px-8 py-10 max-w-xs w-full flex flex-col items-center animate-fade-in relative">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl shadow-2xl border border-[#7edcff]/30 px-10 py-12 max-w-xs w-full flex flex-col items-center animate-fade-in relative">
                 <button
                   className="absolute top-4 right-4 text-[#16475b] text-2xl font-bold hover:text-[#0d2a36] focus:outline-none"
                   onClick={() => setShowPopup(false)}
@@ -160,10 +166,10 @@ export default function PitchPingvinen() {
             </div>
           )}
         </div>
-        {/* Diskret AI pitch-generator under huvudfunktionen */}
-        <div className="bg-[#16475b] text-white rounded-2xl shadow border border-gray-100 p-6 max-w-md mx-auto mt-2">
-          <h3 className="text-lg font-bold mb-2 text-center">Behöver du inspiration?</h3>
-          <p className="text-white/80 text-center mb-4 text-sm">Låt AI skapa ett pitch-manus åt dig! Fyll i tre snabba fält och få ett färdigt manus på 30 sekunder.</p>
+        {/* Inspiration/AI pitch-generator */}
+        <div className="bg-gradient-to-br from-[#7edcff]/90 to-[#16475b]/90 text-white rounded-2xl shadow-xl border border-[#7edcff]/40 p-8 max-w-2xl mx-auto mt-2 flex flex-col items-center">
+          <h3 className="text-2xl font-extrabold mb-2 text-center">Behöver du inspiration?</h3>
+          <p className="text-white/90 text-center mb-4 text-lg">Låt AI skapa ett pitch-manus åt dig!<br />Fyll i tre snabba fält och få ett färdigt manus på 30 sekunder.<br /><span className='text-[#ffe066] font-semibold'>Tips: Testa olika värdeerbjudanden för att se vad som låter bäst!</span></p>
           <PitchGenerator />
         </div>
       </div>
