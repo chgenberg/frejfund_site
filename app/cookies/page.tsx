@@ -54,7 +54,7 @@ export default function Cookies() {
 
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">
             <h2 className="text-xl font-bold mb-4 text-[#16475b]">Hur du hanterar cookies</h2>
-            <p className="leading-relaxed">Vid första besöket visas vår cookie-banner. Du kan när som helst ändra eller återkalla samtycke via &quot;Cookieinställningar&quot; i sidfoten eller i din webbläsare.</p>
+            <p className="leading-relaxed">Vid första besöket visas vår cookie-banner. Du kan när som helst ändra eller återkalla samtycke via "Cookieinställningar" i sidfoten eller i din webbläsare. Christopher Genberg AB är personuppgiftsansvarig för behandlingen av cookies.</p>
           </section>
         </div>
       </div>

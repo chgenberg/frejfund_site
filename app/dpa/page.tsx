@@ -24,7 +24,7 @@ export default function DPA() {
 
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">
             <h2 className="text-xl font-bold mb-4 text-[#16475b]">Parter</h2>
-            <p className="leading-relaxed">Personuppgiftsansvarig = Kunden; Personuppgiftsbiträde = FrejFund AB.</p>
+            <p className="leading-relaxed">Personuppgiftsansvarig = Kunden; Personuppgiftsbiträde = Christopher Genberg AB.</p>
           </section>
 
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">

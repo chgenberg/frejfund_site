@@ -498,9 +498,22 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
               <div className="flex-1">
                 <div className="text-[#16475b]"><b>Milstolpar:</b> {
                   typedAnswers.milestones ? (
-                    JSON.parse(typedAnswers.milestones as string).map((m: any, i: number) => 
-                      `${m.milestone} (${m.date})`
-                    ).join(', ')
+                    (() => {
+                      try {
+                        const milestones = typeof typedAnswers.milestones === 'string' 
+                          ? JSON.parse(typedAnswers.milestones) 
+                          : typedAnswers.milestones;
+                        
+                        if (Array.isArray(milestones)) {
+                          return milestones.map((m: any, i: number) => 
+                            `${m.milestone} (${m.date})`
+                          ).join(', ');
+                        }
+                        return 'Ej angivet';
+                      } catch (e) {
+                        return 'Ej angivet';
+                      }
+                    })()
                   ) : 'Ej angivet'
                 }</div>
               </div>
@@ -519,8 +532,14 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 <div className="text-[#16475b]"><b>Founder-Market Fit:</b> {
                   typedAnswers.founder_market_fit ? (
                     (() => {
-                      const fmf = JSON.parse(typedAnswers.founder_market_fit as string);
-                      return `${fmf.score}/5 - ${fmf.text}`;
+                      try {
+                        const fmf = typeof typedAnswers.founder_market_fit === 'string'
+                          ? JSON.parse(typedAnswers.founder_market_fit)
+                          : typedAnswers.founder_market_fit;
+                        return `${fmf.score}/5 - ${fmf.text}`;
+                      } catch (e) {
+                        return 'Ej angivet';
+                      }
                     })()
                   ) : 'Ej angivet'
                 }</div>
@@ -533,21 +552,27 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>💵</span> Kapitalbehov & Användning</h2>
             {typedAnswers.capital_block ? (
               (() => {
-                const capital = JSON.parse(typedAnswers.capital_block as string);
-                return (
-                  <div className="space-y-2">
-                    <div className="text-[#16475b]"><b>Total summa:</b> {capital.amount} MSEK</div>
-                    <div className="text-[#16475b]"><b>Fördelning:</b></div>
-                    <ul className="list-disc list-inside text-[#16475b] ml-4">
-                      <li>Produktutveckling: {capital.product}%</li>
-                      <li>Försäljning & Marknad: {capital.sales}%</li>
-                      <li>Personal & Rekrytering: {capital.team}%</li>
-                      <li>Övrigt: {capital.other}%</li>
-                    </ul>
-                    <div className="text-[#16475b]"><b>Sannolikhet för mer kapital:</b> {capital.probability}/5</div>
-                    <div className="text-[#16475b]"><b>Runway:</b> {getOr(typedAnswers.runway, 'Ej angivet')} månader</div>
-                  </div>
-                );
+                try {
+                  const capital = typeof typedAnswers.capital_block === 'string'
+                    ? JSON.parse(typedAnswers.capital_block)
+                    : typedAnswers.capital_block;
+                  return (
+                    <div className="space-y-2">
+                      <div className="text-[#16475b]"><b>Total summa:</b> {capital.amount} MSEK</div>
+                      <div className="text-[#16475b]"><b>Fördelning:</b></div>
+                      <ul className="list-disc list-inside text-[#16475b] ml-4">
+                        <li>Produktutveckling: {capital.product}%</li>
+                        <li>Försäljning & Marknad: {capital.sales}%</li>
+                        <li>Personal & Rekrytering: {capital.team}%</li>
+                        <li>Övrigt: {capital.other}%</li>
+                      </ul>
+                      <div className="text-[#16475b]"><b>Sannolikhet för mer kapital:</b> {capital.probability}/5</div>
+                      <div className="text-[#16475b]"><b>Runway:</b> {getOr(typedAnswers.runway, 'Ej angivet')} månader</div>
+                    </div>
+                  );
+                } catch (e) {
+                  return <div className="text-[#16475b]">Ej angivet</div>;
+                }
               })()
             ) : (
               <div className="text-[#16475b]">Ej angivet</div>

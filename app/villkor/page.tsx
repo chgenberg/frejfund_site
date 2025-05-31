@@ -28,18 +28,18 @@ export default function Terms() {
           </section>
 
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">
-            <h2 className="text-xl font-bold mb-4 text-[#16475b]">Abonnemang & betalning</h2>
-            <p className="leading-relaxed">Priser visas exkl. moms. Abonnemang kan sägas upp när som helst och löper ut vid periodens slut.</p>
+            <h2 className="text-xl font-bold mb-4 text-[#16475b]">Betalning</h2>
+            <p className="leading-relaxed">Priser visas exkl. moms. Betalning sker via Stripe/Klarna.</p>
           </section>
 
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">
             <h2 className="text-xl font-bold mb-4 text-[#16475b]">Dataskydd</h2>
-            <p className="leading-relaxed">Vi behandlar uppgifter enligt vår <a href="/integritet" className="text-[#16475b] hover:underline">Integritetspolicy</a>.</p>
+            <p className="leading-relaxed">Vi behandlar uppgifter enligt vår <a href="/integritet" className="text-[#16475b] hover:underline">Integritetspolicy</a>. Information som kunden anger i analysen sparas för utvärdering och analys för att förbättra vår tjänst.</p>
           </section>
 
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">
             <h2 className="text-xl font-bold mb-4 text-[#16475b]">Immateriella rättigheter</h2>
-            <p className="leading-relaxed">All kod, grafik och rapportmotor tillhör FrejFund AB. Du äger dina inmatade uppgifter och genererade rapporter.</p>
+            <p className="leading-relaxed">All kod, grafik och rapportmotor tillhör Christopher Genberg AB. Du äger dina inmatade uppgifter och genererade rapporter.</p>
           </section>
 
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">

@@ -20,7 +20,7 @@ export default function Privacy() {
         <div className="space-y-10 text-gray-800">
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">
             <h2 className="text-xl font-bold mb-4 text-[#16475b]">1. Vem är personuppgiftsansvarig?</h2>
-            <p className="leading-relaxed">FrejFund AB (org.nr 559999-9999), Storgatan 1, 111 22 Stockholm, är personuppgiftsansvarig för behandling av dina personuppgifter.</p>
+            <p className="leading-relaxed">Christopher Genberg AB, Södra Skjutbanevägen 10, 439 55 Åsa, Sverige, är personuppgiftsansvarig för behandling av dina personuppgifter.</p>
           </section>
 
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">
@@ -45,8 +45,8 @@ export default function Privacy() {
                   <tr className="hover:bg-gray-50/50">
                     <td className="p-3 text-sm">Affärsdata</td>
                     <td className="p-3 text-sm">svar i analysformulär, pitch-pdf</td>
-                    <td className="p-3 text-sm">AI-analys, rapportgenerering</td>
-                    <td className="p-3 text-sm">Avtal</td>
+                    <td className="p-3 text-sm">AI-analys, rapportgenerering, utvärdering och förbättring av tjänsten</td>
+                    <td className="p-3 text-sm">Avtal & berättigat intresse</td>
                   </tr>
                   <tr className="hover:bg-gray-50/50">
                     <td className="p-3 text-sm">Teknisk data</td>

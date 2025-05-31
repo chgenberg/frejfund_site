@@ -1,13 +1,14 @@
 import Image from 'next/image';
 import IdeaMashSlot from '../components/IdeaMashSlot';
-import CapitalChanceCalculator from '../components/CapitalChanceCalculator';
 
 export default function About() {
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center px-2 py-12">
       <h1 className="text-3xl md:text-4xl font-extrabold text-[#16475b] tracking-widest text-center mb-10 mt-2 uppercase">OM OSS</h1>
-      {/* Kapitaljämförelse + kalkylator högst upp */}
-      <CapitalChanceCalculator />
+      {/* Idé slot maskinen överst */}
+      <div className="mb-10 w-full flex justify-center">
+        <IdeaMashSlot />
+      </div>
       {/* Bakgrundsbild */}
       <Image
         src="/omoss.png"
@@ -74,11 +75,6 @@ export default function About() {
               Tillsammans driver de FrejFund som ett väloljat pokermaskineri med silkeslen finish – där odds, algoritmer och omtanke möts för att göra entreprenörskap lite enklare, mycket roligare och betydligt mer investerbart.
             </p>
           </div>
-        </div>
-
-        {/* Slot machine at the bottom */}
-        <div className="mt-16 w-full flex justify-center">
-          <IdeaMashSlot />
         </div>
       </div>
     </div>
