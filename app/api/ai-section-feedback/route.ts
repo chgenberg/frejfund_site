@@ -14,7 +14,11 @@ export async function POST(req: NextRequest) {
     }, { status: 500 });
   }
 
-  const prompt = `Här är ${section}-beskrivningen för ett startup: "${text}". Ge en kort, pedagogisk kommentar på svenska: 1. Vad är bra? 2. Vad kan förbättras? 3. Tips till entreprenören. Svara i tre meningar.`;
+  const prompt = `Här är ${section}-beskrivningen för ett startup: "${text}". Ge en pedagogisk kommentar på svenska:
+1. Vad är bra?
+2. Vad kan förbättras?
+3. Tips till entreprenören.
+Svara utförligt men koncist, alltid i fullständiga meningar och avsluta aldrig mitt i en mening. Om svaret blir långt, avsluta med en sammanfattning. Svara i max 10 meningar.`;
 
   try {
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -29,7 +33,7 @@ export async function POST(req: NextRequest) {
           { role: 'system', content: 'Du är en pedagogisk och konstruktiv affärscoach.' },
           { role: 'user', content: prompt }
         ],
-        max_tokens: 200,
+        max_tokens: 600,
         temperature: 0.7
       })
     });
