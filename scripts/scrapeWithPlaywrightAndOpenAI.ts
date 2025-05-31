@@ -30,9 +30,9 @@ function validateAndFormatUrl(url: string): string {
       url = 'https://' + url;
     }
     
-    // Validera URL
-    new URL(url);
-    return url;
+    // Validera URL med WHATWG URL API
+    const urlObj = new URL(url);
+    return urlObj.toString();
   } catch (e) {
     throw new Error('Ogiltig URL. Kontrollera att URL:en är korrekt formaterad.');
   }
@@ -112,29 +112,34 @@ Svara ENDAST med ett JSON-objekt med följande nycklar (använd exakt dessa enge
   "company_name": "Företagsnamn",
   "industry": "Bransch (SaaS, Tech, Konsumentvaror, Hälsa, Fintech, Industri, Tjänster, Utbildning, Energi, Annat)",
   "area": "Geografiskt område (Sverige, Norden, Europa, Globalt, Annat)",
-  "company_value": "Vad gör företaget och vilket värde skapar det?",
-  "customer_problem": "Vilket problem löser de för sina kunder?",
-  "problem_evidence": "Bevis för att problemet existerar",
-  "market_gap": "Vilket gap på marknaden fyller de?",
-  "solution": "Hur löser de problemet?",
-  "why_now": "Varför är timingen rätt?",
-  "target_customer": "Vem är målgruppen?",
-  "market_size": "Marknadsstorlek (TAM/SAM/SOM om tillgängligt)",
-  "market_trends": "Relevanta marknadstrender",
-  "traction": "Traction och resultat hittills",
-  "revenue_block": "Hur tjänar de pengar?",
-  "growth_plan": "Tillväxtplaner",
-  "team": "Information om teamet/grundarna",
-  "founder_equity": "Ägarstruktur om tillgängligt",
-  "team_skills": "Teamets kompetenser",
-  "competitors": "Konkurrenter",
-  "unique_solution": "Vad gör lösningen unik?",
-  "ip_rights": "Immateriella rättigheter",
-  "main_risks": "Huvudsakliga risker",
-  "esg": "ESG/hållbarhetsaspekter"
+  "company_value": "Vad gör företaget och vilket värde skapar det? (Dela upp i stycken med \\n\\n mellan styckena)",
+  "customer_problem": "Vilket problem löser de för sina kunder? (Dela upp i stycken med \\n\\n mellan styckena)",
+  "problem_evidence": "Bevis för att problemet existerar (Dela upp i stycken med \\n\\n mellan styckena)",
+  "market_gap": "Vilket gap på marknaden fyller de? (Dela upp i stycken med \\n\\n mellan styckena)",
+  "solution": "Hur löser de problemet? (Dela upp i stycken med \\n\\n mellan styckena)",
+  "why_now": "Varför är timingen rätt? (Dela upp i stycken med \\n\\n mellan styckena)",
+  "target_customer": "Vem är målgruppen? (Dela upp i stycken med \\n\\n mellan styckena)",
+  "market_size": "Marknadsstorlek (TAM/SAM/SOM om tillgängligt) (Dela upp i stycken med \\n\\n mellan styckena)",
+  "market_trends": "Relevanta marknadstrender (Dela upp i stycken med \\n\\n mellan styckena)",
+  "traction": "Traction och resultat hittills (Dela upp i stycken med \\n\\n mellan styckena)",
+  "revenue_block": "Hur tjänar de pengar? (Dela upp i stycken med \\n\\n mellan styckena)",
+  "growth_plan": "Tillväxtplaner (Dela upp i stycken med \\n\\n mellan styckena)",
+  "team": "Information om teamet/grundarna (Dela upp i stycken med \\n\\n mellan styckena)",
+  "founder_equity": "Ägarstruktur om tillgängligt (Dela upp i stycken med \\n\\n mellan styckena)",
+  "team_skills": "Teamets kompetenser (Dela upp i stycken med \\n\\n mellan styckena)",
+  "competitors": "Konkurrenter (Dela upp i stycken med \\n\\n mellan styckena)",
+  "unique_solution": "Vad gör lösningen unik? (Dela upp i stycken med \\n\\n mellan styckena)",
+  "ip_rights": "Immateriella rättigheter (Dela upp i stycken med \\n\\n mellan styckena)",
+  "main_risks": "Huvudsakliga risker (Dela upp i stycken med \\n\\n mellan styckena)",
+  "esg": "ESG/hållbarhetsaspekter (Dela upp i stycken med \\n\\n mellan styckena)"
 }
 
-Om information saknas, skriv "Ej angivet". Svara på svenska, men använd de engelska nycklarna ovan.
+Viktigt:
+1. Om information saknas, skriv "Ej angivet"
+2. Svara på svenska, men använd de engelska nycklarna ovan
+3. För längre svar, dela upp texten i logiska stycken med \\n\\n mellan styckena
+4. Varje stycke ska vara sammanhängande och fokusera på ett specifikt aspekt
+5. Använd punktlistor (-) för att strukturera information där det är lämpligt
 
 Analysera webbsidan:
 Titel: ${data.title}
