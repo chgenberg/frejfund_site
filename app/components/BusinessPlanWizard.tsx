@@ -1204,7 +1204,22 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   useOnClickOutside(marketRef, () => setShowMarketPopup(false));
   useOnClickOutside(competitorRef, () => setShowCompetitorPopup(false));
 
+  console.log('BusinessPlanWizard render - open:', open, 'result:', result); // Debug log
+
   if (!open) return null;
+  
+  // Visa resultat om det finns
+  if (result) {
+    console.log('Showing BusinessPlanResult with:', result); // Debug log
+    return (
+      <BusinessPlanResult 
+        score={result.score}
+        answers={result.answers}
+        feedback={result.feedback}
+        subscriptionLevel={result.subscriptionLevel}
+      />
+    );
+  }
   
   // Lägg till CSS för animeringar
   if (typeof window !== 'undefined' && !document.getElementById('wizard-animations')) {
@@ -1865,12 +1880,14 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                     .then(res => res.json())
                     .then(data => {
                       clearInterval(loaderInterval);
+                      console.log('analyze-businessplan response:', data); // Debug log
                       if (data.error) {
                         alert('Ett fel uppstod vid analysen. Försök igen.');
                         setShowFinalLoader(false);
                       } else {
                         // Visa resultatet
                         const score = data.total_score || 75;
+                        console.log('Setting result with score:', score); // Debug log
                         setResult({ 
                           score, 
                           subscriptionLevel: score >= 80 ? 'gold' : 'silver',
