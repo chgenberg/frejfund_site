@@ -327,7 +327,7 @@ export async function POST(request: Request) {
     const drawWrappedText = (text: string, x: number, fontSize: number, font: any, color: any, maxWidth: number = width - 100, isBold: boolean = false) => {
       const sanitized = sanitizeText(text);
       const parts = parseTextWithBold(sanitized);
-      let currentX = x;
+      const currentX = x;
       let currentLine = '';
       const lineHeight = fontSize * 1.5;
       
