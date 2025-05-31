@@ -1353,10 +1353,18 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                   }}
                 >
                   {isScraping ? (
-                    <span className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></div>
-                      Analyserar...
-                    </span>
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></div>
+                        <span>Analyserar hemsida...</span>
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        Hämtar och extraherar företagsdata
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                        <div className="bg-[#7edcff] h-2 rounded-full animate-pulse" style={{ width: '70%' }}></div>
+                      </div>
+                    </div>
                   ) : (
                     'Analysera hemsida'
                   )}
@@ -1546,7 +1554,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 </div>
                 <button
                   type="button"
-                  className="text-xs bg-blue-600 text-white px-3 py-1 rounded-full hover:bg-blue-700 transition-colors"
+                  className="text-xs bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-4 py-1.5 rounded-full hover:from-gray-200 hover:to-gray-300 transition-all duration-200 shadow-sm border border-gray-300"
                   onClick={async () => {
                     // Försök att hämta mer specifik information för detta fält
                     try {
@@ -1577,14 +1585,14 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
           {isTextQuestion(current) && current.type === "textarea" && (
             <div className="relative">
               <textarea
-                className={`w-full p-3 border rounded-xl mb-4 text-[#16475b] bg-white min-h-32 ${
-                  scrapedData && answers[current.id] ? 'border-green-300 bg-green-50' : ''
-                }`}
+                className={`w-full p-4 border-2 rounded-2xl text-[#16475b] bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 ${
+                  scrapedData && answers[current.id] ? 'border-green-300 bg-green-50/50' : 'border-gray-200 hover:border-[#7edcff] focus:border-[#7edcff]'
+                } focus:outline-none focus:ring-4 focus:ring-[#7edcff]/20`}
                 value={getStringValue(answers[current.id])}
                 onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
                 placeholder={scrapedData && answers[current.id] ? "Automatiskt ifyllt från din hemsida - redigera efter behov" : "Skriv ditt svar här..."}
                 rows={6}
-                style={{ minHeight: '8rem', maxHeight: '8rem', resize: 'none' }}
+                style={{ minHeight: '150px', maxHeight: '150px', resize: 'none' }}
               />
               {scrapedData && answers[current.id] && (
                 <div className="absolute top-2 right-2">
@@ -1598,10 +1606,10 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
           {isSelectQuestion(current) && current.type === "select" && (
             <div className="relative mb-4">
               <select
-                className="w-full p-3 border rounded-xl pr-10 text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all min-h-32"
+                className="w-full p-4 border-2 rounded-2xl pr-12 text-[#16475b] bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 border-gray-200 hover:border-[#7edcff] focus:border-[#7edcff] focus:outline-none focus:ring-4 focus:ring-[#7edcff]/20"
                 value={getStringValue(answers[current.id])}
                 onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
-                style={{ minHeight: '8rem', maxHeight: '8rem' }}
+                style={{ minHeight: '60px', height: '60px' }}
               >
                 <option value="">Välj...</option>
                 {isSelectQuestion(current) ? current.options.map((opt: string) => (
@@ -1634,12 +1642,12 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
           )}
           {(isTextQuestion(current) && (current.type === "text" || current.type === "number")) && (
             <input
-              className="w-full p-3 border rounded-xl mb-4 text-[#16475b] bg-white min-h-32"
+              className="w-full p-4 border-2 rounded-2xl text-[#16475b] bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 border-gray-200 hover:border-[#7edcff] focus:border-[#7edcff] focus:outline-none focus:ring-4 focus:ring-[#7edcff]/20"
               type={current.type}
               value={getStringValue(answers[current.id])}
               onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
               placeholder="Skriv ditt svar här..."
-              style={{ minHeight: '8rem', maxHeight: '8rem' }}
+              style={{ minHeight: '60px', height: '60px' }}
             />
           )}
           {isTextQuestion(current) && current.type === "file" && (
@@ -1811,6 +1819,15 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 if (current.required && !getStringValue(answers[current.id])) {
                   alert('Fältet är obligatoriskt');
                   return;
+                }
+                
+                // Kolla minimum längd för textfält
+                if (current.required && isTextQuestion(current) && (current.type === 'textarea' || current.type === 'text')) {
+                  const value = getStringValue(answers[current.id]);
+                  if (value.length < 20) {
+                    alert('Vänligen skriv minst 20 tecken för att ge tillräcklig information');
+                    return;
+                  }
                 }
                 
                 if (step === INVESTOR_QUESTIONS.length) {

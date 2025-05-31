@@ -357,7 +357,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
         <div className="max-w-4xl w-full space-y-8">
           {/* SCORE INFO MODAL */}
           {showScoreInfo && (
-            <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
               <div className="bg-white rounded-3xl shadow-2xl border border-[#16475b] max-w-lg w-full p-8 relative animate-fade-in">
                 <button
                   onClick={() => setShowScoreInfo(false)}
@@ -395,7 +395,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 {(typedAnswers.company_value || typedAnswers.customer_problem || typedAnswers.solution) && (
                   <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
                     <div className="font-bold text-[#16475b] mb-2">AI-feedback för Affärsidé:</div>
-                    <div className="text-[#16475b]">
+                    <div className="text-[#16475b] whitespace-pre-wrap">
                       {allAiFeedback.business_idea || `Baserat på: ${typedAnswers.company_value || typedAnswers.customer_problem || typedAnswers.solution || 'Ingen information'}`}
                     </div>
                   </div>
@@ -405,7 +405,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 {(typedAnswers.market_size || typedAnswers.market_trends || typedAnswers.target_customer) && (
                   <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
                     <div className="font-bold text-[#16475b] mb-2">AI-feedback för Marknadsanalys:</div>
-                    <div className="text-[#16475b]">
+                    <div className="text-[#16475b] whitespace-pre-wrap">
                       {allAiFeedback.market_analysis || `Baserat på: ${typedAnswers.market_size || typedAnswers.market_trends || 'Ingen information'}`}
                     </div>
                   </div>
@@ -415,7 +415,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 {(typedAnswers.team || typedAnswers.team_skills || typedAnswers.founder_equity) && (
                   <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
                     <div className="font-bold text-[#16475b] mb-2">AI-feedback för Team:</div>
-                    <div className="text-[#16475b]">
+                    <div className="text-[#16475b] whitespace-pre-wrap">
                       {allAiFeedback.team || `Baserat på: ${typedAnswers.team || 'Ingen information'}`}
                     </div>
                   </div>
@@ -425,7 +425,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 {(typedAnswers.competitors || typedAnswers.unique_solution) && (
                   <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
                     <div className="font-bold text-[#16475b] mb-2">AI-feedback för Konkurrensanalys:</div>
-                    <div className="text-[#16475b]">
+                    <div className="text-[#16475b] whitespace-pre-wrap">
                       {allAiFeedback.competition || `Baserat på: ${typedAnswers.competitors || 'Ingen information'}`}
                     </div>
                   </div>
@@ -435,7 +435,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 {(typedAnswers.capital_block || typedAnswers.runway) && (
                   <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
                     <div className="font-bold text-[#16475b] mb-2">AI-feedback för Finansiering:</div>
-                    <div className="text-[#16475b]">
+                    <div className="text-[#16475b] whitespace-pre-wrap">
                       {allAiFeedback.funding || `Baserat på: ${typedAnswers.capital_block || typedAnswers.runway || 'Ingen information'}`}
                     </div>
                   </div>
