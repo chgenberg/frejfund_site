@@ -525,7 +525,13 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🧬</span> Team & Founders' DNA</h2>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <div className="text-[#16475b]"><b>Team:</b> {getOr(typedAnswers.team, 'Ej angivet')}</div>
+                <div className="text-[#16475b]"><b>Team:</b> {
+                  typeof typedAnswers.team === 'string'
+                    ? getOr(typedAnswers.team, 'Ej angivet')
+                    : typedAnswers.team && typeof typedAnswers.team === 'object'
+                      ? Object.values(typedAnswers.team).filter(Boolean).join(', ')
+                      : 'Ej angivet'
+                }</div>
                 <div className="text-[#16475b]"><b>Ägarandel efter runda:</b> {getOr(typedAnswers.founder_equity, 'Ej angivet')}%</div>
               </div>
               <div className="flex-1">
