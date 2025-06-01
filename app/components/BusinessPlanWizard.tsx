@@ -1843,7 +1843,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 }, 2000);
                 
                 try {
-                  const response = await fetch('/api/analyze-business', {
+                  const response = await fetch('/api/analyze-businessplan', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
