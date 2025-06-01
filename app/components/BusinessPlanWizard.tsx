@@ -1721,8 +1721,20 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             </div>
           )}
           {current.id === 'runway' && (
-            <div className="flex flex-col items-start gap-2 mb-4">
-              <label className="block font-semibold">Bifoga P/L-rapport (valfritt)</label>
+            <div className="flex flex-col items-start gap-2 mb-4 w-full">
+              <label className="block font-semibold flex items-center gap-2"><svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20" stroke="#16475b" strokeWidth="2" strokeLinecap="round"/></svg> Hur lång runway har ni?</label>
+              <input
+                type="number"
+                className="w-full p-4 border-2 border-[#7edcff] rounded-2xl text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg"
+                placeholder="Antal månader..."
+                value={getStringValue(answers[current.id])}
+                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+                min={0}
+                max={60}
+                style={{ maxWidth: '220px' }}
+              />
+              <span className="text-sm text-gray-500">Hur många månader räcker ert kapital? (Bifoga gärna P/L-rapport om möjligt)</span>
+              {/* PDF-upload som tidigare */}
               <div className="flex items-center gap-3">
                 <label className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all cursor-pointer flex items-center gap-2">
                   <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M10 3v10m0 0l-3-3m3 3l3-3" stroke="#16475b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>

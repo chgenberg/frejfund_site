@@ -374,8 +374,8 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
 
       {/* Bakgrundsbild */}
       <Image
-        src="/brain.png"
-        alt="Brain"
+        src="/bakgrund.png"
+        alt="Bakgrund"
         fill
         className="object-cover"
         priority
@@ -643,6 +643,8 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 <div><b>Scenario:</b> {getOr(safeAnswers.budget_forecast?.scenario, 'Ej angivet')}</div>
               </div>
             </div>
+            <div className="mt-2"><b>Du svarade:</b> <span className="font-normal">{JSON.stringify(safeAnswers.budget_forecast) || 'Ej angivet'}</span></div>
+            <div className="mb-1"><b>Vår AI feedback:</b> <span className="font-normal text-xs">{allAiFeedback['budget_forecast'] || 'Ingen feedback tillgänglig.'}</span></div>
           </div>
 
           {/* Cap Table & Dilution */}
@@ -654,15 +656,9 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 <div><b>Planerade rundor:</b> {getOr(safeAnswers.cap_table?.planned_rounds, 'Ej angivet')}</div>
                 <div><b>Pro-forma:</b> {getOr(safeAnswers.cap_table?.pro_forma, 'Ej angivet')}</div>
               </div>
-              {/* Dummy pie chart */}
-              <div className="flex-1 flex items-center justify-center">
-                <svg width="100" height="100" viewBox="0 0 32 32">
-                  <circle r="16" cx="16" cy="16" fill="#eaf6fa" />
-                  <path d="M16 16 L16 0 A16 16 0 0 1 32 16 Z" fill="#7edcff" />
-                  <path d="M16 16 L32 16 A16 16 0 0 1 16 32 Z" fill="#16475b" />
-                </svg>
-              </div>
             </div>
+            <div className="mt-2"><b>Du svarade:</b> <span className="font-normal">{JSON.stringify(safeAnswers.cap_table) || 'Ej angivet'}</span></div>
+            <div className="mb-1"><b>Vår AI feedback:</b> <span className="font-normal text-xs">{allAiFeedback['cap_table'] || 'Ingen feedback tillgänglig.'}</span></div>
           </div>
 
           {/* Teknik/IP */}
@@ -675,6 +671,8 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 <div><b>Unika algoritmer:</b> {getOr(safeAnswers.tech_ip?.unique_algorithms, 'Ej angivet')}</div>
               </div>
             </div>
+            <div className="mt-2"><b>Du svarade:</b> <span className="font-normal">{JSON.stringify(safeAnswers.tech_ip) || 'Ej angivet'}</span></div>
+            <div className="mb-1"><b>Vår AI feedback:</b> <span className="font-normal text-xs">{allAiFeedback['tech_ip'] || 'Ingen feedback tillgänglig.'}</span></div>
           </div>
 
           {/* ESG/Impact */}
@@ -686,38 +684,27 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 <div><b>FN-SDG:</b> {getOr(safeAnswers.esg_impact?.sdg, 'Ej angivet')}</div>
                 <div><b>Jämförelse med bransch:</b> {getOr(safeAnswers.esg_impact?.industry_comparison, 'Ej angivet')}</div>
               </div>
-              {/* Dummy radar chart */}
-              <div className="flex-1 flex items-center justify-center">
-                <svg width="100" height="100" viewBox="0 0 100 100">
-                  <polygon points="50,10 90,30 80,90 20,90 10,30" fill="#7edcff33" />
-                  <polygon points="50,30 75,40 70,80 30,80 25,40" fill="#16475b88" />
-                </svg>
-              </div>
             </div>
+            <div className="mt-2"><b>Du svarade:</b> <span className="font-normal">{JSON.stringify(safeAnswers.esg_impact) || 'Ej angivet'}</span></div>
+            <div className="mb-1"><b>Vår AI feedback:</b> <span className="font-normal text-xs">{allAiFeedback['esg_impact'] || 'Ingen feedback tillgänglig.'}</span></div>
           </div>
 
           {/* Exit/Övrigt */}
           <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🏁</span> Exit & Övrigt</h2>
             <div><b>Exit-plan:</b> {getOr(safeAnswers.exit_strategy?.exit_plan, 'Ej angivet')}</div>
+            <div className="mt-2"><b>Du svarade:</b> <span className="font-normal">{JSON.stringify(safeAnswers.exit_strategy) || 'Ej angivet'}</span></div>
+            <div className="mb-1"><b>Vår AI feedback:</b> <span className="font-normal text-xs">{allAiFeedback['exit_strategy'] || 'Ingen feedback tillgänglig.'}</span></div>
           </div>
 
           {/* Komplett AI-affärsanalys Section */}
-          <div className="bg-gradient-to-br from-[#16475b] to-[#2a6b8a] rounded-3xl p-8 shadow-xl text-white text-center">
-            <h2 className="text-2xl font-bold mb-4">Vill du ha en djupare analys?</h2>
-            <p className="text-lg mb-6 opacity-90">
-              Få en komplett AI-driven affärsanalys med branschspecifika insikter
-            </p>
-            <button
-              onClick={() => setShowAnalysisModal(true)}
-              className="bg-white text-[#16475b] font-bold rounded-full px-10 py-4 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 mx-auto"
-            >
-              <span className="text-xl">🎯</span>
-              Komplett AI-affärsanalys
-            </button>
-            <div className="text-sm text-white/80 mt-4">
-              <div className="font-semibold">3x mer djupgående analys</div>
-              <div>Branschspecifika frågor • Konkreta förbättringsåtgärder • PDF-rapport</div>
+          <div className="w-full flex justify-center mb-4">
+            <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20 max-w-xl w-full flex flex-col items-center">
+              <div className="font-bold text-[#16475b] text-lg mb-2">Vill du ha en djupare analys?</div>
+              <button className="bg-[#16475b] text-white font-bold rounded-full px-6 py-2 shadow hover:bg-[#7edcff] hover:text-[#16475b] transition-all" onClick={() => setShowAnalysisModal(true)}>
+                Komplett AI-affärsanalys
+              </button>
+              <div className="text-xs text-[#16475b]/70 mt-1">3x mer djupgående analys • Branschspecifika frågor • Konkreta förbättringsåtgärder • PDF-rapport</div>
             </div>
           </div>
         </div>

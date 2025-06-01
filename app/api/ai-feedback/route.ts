@@ -31,6 +31,8 @@ export async function POST(request: Request) {
     const feedback = feedbackData[section as keyof typeof feedbackData] || 
       `Analyserar ${section}... Bra innehåll som visar förståelse för området. Fortsätt utveckla denna del med mer specifika exempel och data.`;
 
+    const prompt = `Ge AI-feedback på varje del av affärsplanen. Gör varje feedback ca 30% kortare än tidigare, men se till att meningarna är kompletta och inte slutar mitt i. Svara på svenska. Format: {"budget_forecast": "...", ...}`;
+
     return NextResponse.json({ feedback });
   } catch (error) {
     console.error('Error generating AI feedback:', error);
