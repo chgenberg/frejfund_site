@@ -33,6 +33,7 @@ export default function RootLayout({
             priority
           />
           <OverlayNavbar />
+          <LoginModal />
           <main className="flex-grow relative z-10">
             {children}
           </main>
