@@ -21,13 +21,6 @@ export default function OverlayNavbar() {
           <span className="block w-7 h-0.5 my-0.5 rounded bg-white transition-all duration-200 group-hover:bg-gray-300" />
           <span className="block w-7 h-0.5 my-0.5 rounded bg-white transition-all duration-200 group-hover:bg-gray-300" />
         </button>
-        <button
-          onClick={useLoginModal()}
-          className="ml-2 px-5 py-2 bg-[#16475b] text-white font-bold rounded-full shadow-md hover:bg-[#133a4a] transition-colors text-sm tracking-wide uppercase focus:outline-none focus:ring-2 focus:ring-[#16475b]/40"
-          style={{ letterSpacing: '0.08em' }}
-        >
-          LOGGA IN
-        </button>
         {isOpen && (
           <div className="absolute left-8 top-12 w-60 bg-[#16475b] backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl animate-fade-in p-2">
             <div className="py-2">

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import SectionFeedback from './SectionFeedback';
+import ReportDesignWizard from './ReportDesignWizard';
 
 interface ResultProps {
   score: number;
@@ -156,6 +157,8 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
   const [generatingReport, setGeneratingReport] = useState(false);
   const [companyLogo, setCompanyLogo] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [showDesignWizard, setShowDesignWizard] = useState(false);
+  const [pendingReportData, setPendingReportData] = useState<any>(null);
   
   const scoreComparison = getScoreComparison(_score);
   const marketData = getMarketSizeData(safeAnswers.market_size?.market_value || '0');
@@ -969,42 +972,16 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                   onClick={async () => {
                     setGeneratingReport(true);
                     setShowAdditionalQuestions(false);
-                    
-                    try {
-                      // Skapa FormData för att skicka både JSON och fil
-                      const formData = new FormData();
-                      formData.append('answers', JSON.stringify(answers));
-                      formData.append('additionalAnswers', JSON.stringify(additionalAnswers));
-                      formData.append('score', String(_score));
-                      formData.append('company', typedAnswers.company || '');
-                      if (companyLogo) {
-                        formData.append('logo', companyLogo);
-                      }
-                      
-                      const response = await fetch('/api/generate-deep-analysis', {
-                        method: 'POST',
-                        body: formData
-                      });
-                      
-                      if (response.ok) {
-                        const blob = await response.blob();
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'affarsanalys-rapport.pdf';
-                        document.body.appendChild(a);
-                        a.click();
-                        window.URL.revokeObjectURL(url);
-                        document.body.removeChild(a);
-                      } else {
-                        alert('Kunde inte generera rapport. Försök igen senare.');
-                      }
-                    } catch (error) {
-                      console.error('Error generating report:', error);
-                      alert('Ett fel uppstod vid generering av rapport.');
-                    } finally {
-                      setGeneratingReport(false);
-                    }
+                    // Spara rapportdata och visa design-wizard
+                    setPendingReportData({
+                      answers,
+                      additionalAnswers,
+                      score: _score,
+                      company: typedAnswers.company || '',
+                      logo: companyLogo,
+                      logoPreview,
+                    });
+                    setShowDesignWizard(true);
                   }}
                   disabled={generatingReport}
                   className="px-8 py-3 bg-gradient-to-r from-[#16475b] to-[#2a6b8a] text-white font-bold rounded-full hover:shadow-lg transition-all disabled:opacity-50"
@@ -1022,6 +999,61 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
             </div>
           </div>
         </div>
+      )}
+
+      {/* Design Wizard Modal */}
+      {showDesignWizard && (
+        <ReportDesignWizard
+          onConfirm={async (design) => {
+            setShowDesignWizard(false);
+            setGeneratingReport(true);
+            try {
+              // Förbered data för HTML-PDF API
+              const { answers, additionalAnswers, score, company, logo, logoPreview } = pendingReportData;
+              // Skapa sektioner (exempel, anpassa efter behov)
+              const sections = [
+                { title: 'Sammanfattning', content: answers.company_value || '' },
+                { title: 'Marknad', content: answers.market_size || '' },
+                { title: 'Team', content: answers.team || '' },
+                // ...lägg till fler sektioner efter behov
+              ];
+              // Ladda upp logo om det finns (eller använd preview-url)
+              let logoUrl = logoPreview;
+              // Skicka till nya API:t
+              const response = await fetch('/api/generate-deep-analysis/generateHtmlPdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  companyName: company,
+                  score,
+                  scoreExplanation: 'AI-genererad förklaring här',
+                  logoUrl,
+                  date: new Date().toLocaleDateString('sv-SE'),
+                  sections,
+                  design,
+                })
+              });
+              if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'affarsanalys-rapport.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+              } else {
+                alert('Kunde inte generera rapport. Försök igen senare.');
+              }
+            } catch (error) {
+              console.error('Error generating report:', error);
+              alert('Ett fel uppstod vid generering av rapport.');
+            } finally {
+              setGeneratingReport(false);
+            }
+          }}
+        />
       )}
     </div>
   );

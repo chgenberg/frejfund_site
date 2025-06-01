@@ -1,7 +1,8 @@
 "use client";
 import Image from 'next/image';
+import React from 'react';
 
-export default function Privacy() {
+export default function IntegritetPage() {
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center px-4 py-12">
       <Image
@@ -13,7 +14,7 @@ export default function Privacy() {
       />
       <div className="w-full max-w-4xl mx-auto bg-white/95 rounded-3xl shadow-xl p-8 md:p-12 border border-white/20 backdrop-blur-md">
         <h1 className="text-3xl md:text-4xl font-extrabold mb-12 text-center text-[#16475b] tracking-tight">
-          Integritetspolicy
+          Integritetspolicy / Privacy Policy
           <span className="block text-lg font-normal text-gray-600 mt-2">GDPR</span>
         </h1>
         
