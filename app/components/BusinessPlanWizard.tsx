@@ -1250,32 +1250,10 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
         <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative">
           <h2 className="text-2xl font-bold mb-6 text-center">Starta din affärsplan-analys</h2>
-          
-          <div className="mb-4">
-            <label className="block font-semibold mb-1">Företagsnamn</label>
-            <input
-              type="text"
-              className="w-full p-4 border-2 border-[#7edcff] rounded-2xl mb-2 text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg"
-              placeholder="Ange företagets namn"
-              value={company}
-              onChange={e => setCompany(e.target.value)}
-            />
-          </div>
-          
-          <div className="mb-4">
-            <label className="block font-semibold mb-1">E-post</label>
-            <input
-              type="email"
-              className="w-full p-4 border-2 border-[#7edcff] rounded-2xl mb-2 text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg"
-              placeholder="din@epost.se"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-          </div>
-          
+          {/* Hemsida först */}
           <div className="mb-4">
             <label className="block font-semibold mb-2">Har ni en hemsida?</label>
-            <div className="flex gap-4">
+            <div className="flex gap-4 flex-col sm:flex-row">
               <button
                 type="button"
                 className={`flex-1 p-3 rounded-xl font-medium transition-all ${
@@ -1300,11 +1278,10 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               </button>
             </div>
           </div>
-          
           {hasWebsite === true && (
             <div className="mb-4 animate-fadeIn">
               <label className="block font-semibold mb-1">Hemsida</label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="url"
                   className="flex-1 p-4 border-2 border-[#7edcff] rounded-2xl text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all"
@@ -1326,12 +1303,9 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                         body: JSON.stringify({ url: websiteUrl })
                       });
                       const data = await res.json();
-                      console.log('Scrape API response:', data); // Debug log
                       if (data.success) {
-                        console.log('data.data:', data.data); // Debug log
                         setScrapedData(data.data);
                         const mappedData = mapScrapedDataToAnswers(data.data);
-                        console.log('mappedData:', mappedData); // Debug log
                         setAnswers(mappedData.answers);
                         if (mappedData.detectedCompany) {
                           setCompany(mappedData.detectedCompany);
@@ -1375,30 +1349,28 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               )}
             </div>
           )}
-          
-          {/* Visa skrapningssammanfattning om tillgänglig */}
-          {scrapedData && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl animate-fadeIn">
-              <h3 className="font-bold text-green-800 mb-2 flex items-center">
-                <span className="mr-2">✅</span>
-                Hemsida analyserad framgångsrikt!
-              </h3>
-              <div className="text-sm text-green-700 space-y-1">
-                {scrapedData.company_name && (
-                  <div><strong>Företag:</strong> {scrapedData.company_name}</div>
-                )}
-                {scrapedData.industry && (
-                  <div><strong>Bransch:</strong> {scrapedData.industry}</div>
-                )}
-                {scrapedData.company_value && (
-                  <div><strong>Värde:</strong> {scrapedData.company_value.slice(0, 100)}...</div>
-                )}
-                <div className="text-xs text-green-600 mt-2 font-semibold">
-                  ✓ {Object.keys(mapScrapedDataToAnswers(scrapedData).answers).length} fält kommer att fyllas i automatiskt
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Företagsnamn */}
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">Företagsnamn</label>
+            <input
+              type="text"
+              className="w-full p-4 border-2 border-[#7edcff] rounded-2xl mb-2 text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg"
+              placeholder="Ange företagets namn"
+              value={company}
+              onChange={e => setCompany(e.target.value)}
+            />
+          </div>
+          {/* E-post */}
+          <div className="mb-4">
+            <label className="block font-semibold mb-1">E-post</label>
+            <input
+              type="email"
+              className="w-full p-4 border-2 border-[#7edcff] rounded-2xl mb-2 text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg"
+              placeholder="din@epost.se"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+          </div>
           
           <div className="mb-6">
             <label className="flex items-center cursor-pointer">

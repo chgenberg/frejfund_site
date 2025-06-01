@@ -302,6 +302,31 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
     return '#ff6b6b'; // Röd
   };
 
+  // Milestones
+  let milestones = [];
+  try {
+    milestones = typedAnswers.milestones ? JSON.parse(typedAnswers.milestones) : [];
+  } catch (e) {
+    console.error("Kunde inte parsa milestones:", typedAnswers.milestones, e);
+    milestones = [];
+  }
+  // Founder market fit
+  let founderMarketFit: any = {};
+  try {
+    founderMarketFit = typedAnswers.founder_market_fit ? JSON.parse(typedAnswers.founder_market_fit) : {};
+  } catch (e) {
+    console.error("Kunde inte parsa founder_market_fit:", typedAnswers.founder_market_fit, e);
+    founderMarketFit = {};
+  }
+  // Capital block
+  let capitalBlock: any = {};
+  try {
+    capitalBlock = typedAnswers.capital_block ? JSON.parse(typedAnswers.capital_block) : {};
+  } catch (e) {
+    console.error("Kunde inte parsa capital_block:", typedAnswers.capital_block, e);
+    capitalBlock = {};
+  }
+
   return (
     <div className="relative min-h-screen w-full">
       {/* SCORE HEADER ALLRA HÖGST UPP */}
@@ -500,23 +525,10 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
               </div>
               <div className="flex-1">
                 <div className="text-[#16475b]"><b>Milstolpar:</b> {
-                  typedAnswers.milestones ? (
-                    (() => {
-                      try {
-                        const milestones = typeof typedAnswers.milestones === 'string' 
-                          ? JSON.parse(typedAnswers.milestones) 
-                          : typedAnswers.milestones;
-                        
-                        if (Array.isArray(milestones)) {
-                          return milestones.map((m: any, i: number) => 
-                            `${m.milestone} (${m.date})`
-                          ).join(', ');
-                        }
-                        return 'Ej angivet';
-                      } catch (e) {
-                        return 'Ej angivet';
-                      }
-                    })()
+                  milestones.length > 0 ? (
+                    milestones.map((m: any, i: number) => 
+                      `${m.milestone} (${m.date})`
+                    ).join(', ')
                   ) : 'Ej angivet'
                 }</div>
               </div>
@@ -539,16 +551,11 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
               </div>
               <div className="flex-1">
                 <div className="text-[#16475b]"><b>Founder-Market Fit:</b> {
-                  typedAnswers.founder_market_fit ? (
+                  Object.keys(founderMarketFit).length > 0 ? (
                     (() => {
-                      try {
-                        const fmf = typeof typedAnswers.founder_market_fit === 'string'
-                          ? JSON.parse(typedAnswers.founder_market_fit)
-                          : typedAnswers.founder_market_fit;
-                        return `${fmf.score}/5 - ${fmf.text}`;
-                      } catch (e) {
-                        return 'Ej angivet';
-                      }
+                      const score = founderMarketFit.score;
+                      const text = founderMarketFit.text;
+                      return `${score}/5 - ${text}`;
                     })()
                   ) : 'Ej angivet'
                 }</div>
@@ -559,29 +566,25 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
           {/* Kapitalbehov */}
           <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
             <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>💵</span> Kapitalbehov & Användning</h2>
-            {typedAnswers.capital_block ? (
+            {Object.keys(capitalBlock).length > 0 ? (
               (() => {
-                try {
-                  const capital = typeof typedAnswers.capital_block === 'string'
-                    ? JSON.parse(typedAnswers.capital_block)
-                    : typedAnswers.capital_block;
-                  return (
-                    <div className="space-y-2">
-                      <div className="text-[#16475b]"><b>Total summa:</b> {capital.amount} MSEK</div>
-                      <div className="text-[#16475b]"><b>Fördelning:</b></div>
-                      <ul className="list-disc list-inside text-[#16475b] ml-4">
-                        <li>Produktutveckling: {capital.product}%</li>
-                        <li>Försäljning & Marknad: {capital.sales}%</li>
-                        <li>Personal & Rekrytering: {capital.team}%</li>
-                        <li>Övrigt: {capital.other}%</li>
-                      </ul>
-                      <div className="text-[#16475b]"><b>Sannolikhet för mer kapital:</b> {capital.probability}/5</div>
-                      <div className="text-[#16475b]"><b>Runway:</b> {getOr(typedAnswers.runway, 'Ej angivet')} månader</div>
-                    </div>
-                  );
-                } catch (e) {
-                  return <div className="text-[#16475b]">Ej angivet</div>;
-                }
+                const amount = capitalBlock.amount;
+                const distribution = capitalBlock.distribution;
+                const probability = capitalBlock.probability;
+                const runway = capitalBlock.runway;
+                return (
+                  <div className="space-y-2">
+                    <div className="text-[#16475b]"><b>Total summa:</b> {amount} MSEK</div>
+                    <div className="text-[#16475b]"><b>Fördelning:</b></div>
+                    <ul className="list-disc list-inside text-[#16475b] ml-4">
+                      {distribution && distribution.map((d: any, i: number) => (
+                        <li key={i}>{d.category}: {d.percentage}%</li>
+                      ))}
+                    </ul>
+                    <div className="text-[#16475b]"><b>Sannolikhet för mer kapital:</b> {probability}/5</div>
+                    <div className="text-[#16475b]"><b>Runway:</b> {getOr(runway, 'Ej angivet')} månader</div>
+                  </div>
+                );
               })()
             ) : (
               <div className="text-[#16475b]">Ej angivet</div>
