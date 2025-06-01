@@ -1860,6 +1860,29 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                   const data = await response.json();
                   clearInterval(messageInterval);
                   setShowFinalLoader(false);
+                  
+                  // Spara submission till Render's persistenta disk
+                  try {
+                    await fetch('/api/save-submission', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        timestamp: new Date().toISOString(),
+                        company_name: company,
+                        email: email,
+                        bransch: bransch,
+                        omrade: omrade,
+                        has_website: hasWebsite,
+                        website_url: websiteUrl,
+                        answers: answers,
+                        result: data
+                      })
+                    });
+                    console.log('Submission saved successfully');
+                  } catch (saveError) {
+                    console.error('Could not save submission:', saveError);
+                  }
+                  
                   setResult(data);
                 } catch (error) {
                   clearInterval(messageInterval);
