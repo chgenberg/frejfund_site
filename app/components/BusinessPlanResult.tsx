@@ -1018,7 +1018,7 @@ export default function BusinessPlanResult({ score: _score, answers, feedback = 
                 // ...lägg till fler sektioner efter behov
               ];
               // Ladda upp logo om det finns (eller använd preview-url)
-              let logoUrl = logoPreview;
+              const logoUrl = logoPreview;
               // Skicka till nya API:t
               const response = await fetch('/api/generate-deep-analysis/generateHtmlPdf', {
                 method: 'POST',
