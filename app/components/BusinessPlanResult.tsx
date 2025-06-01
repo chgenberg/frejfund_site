@@ -1,9 +1,7 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import SectionFeedback from './SectionFeedback';
-import ReportDesignWizard from './ReportDesignWizard';
 
 interface ResultProps {
   score: number;
@@ -12,1039 +10,836 @@ interface ResultProps {
   subscriptionLevel?: 'silver' | 'gold' | 'platinum';
 }
 
-interface CompetitorAnalysis {
-  name: string;
-  url: string;
-  analysis?: string;
-  error?: string;
-}
-
-const getScoreLabel = (score: number) => {
-  if (score >= 95) return { 
-    emoji: '🏆', 
-    label: 'Exceptionell (Top 1%)', 
-    summary: 'Din affärsplan är exceptionell och visar på en mycket lovande framtid.',
-    strengths: [
-      'Utmärkt team med relevant erfarenhet',
-      'Tydlig och unik lösning på ett verkligt problem',
-      'Stor och växande marknad med tydlig tillväxtpotential'
-    ],
-    weaknesses: [
-      'Fokusera på att skala upp snabbt',
-      'Överväg strategiska partnerskap'
-    ]
-  };
+const getScoreInfo = (score: number) => {
   if (score >= 85) return { 
     emoji: '🚀', 
-    label: 'Deal-ready (Mycket stark)', 
-    summary: 'Din affärsplan är mycket lovande och redo för investerare.',
-    strengths: [
-      'Stark grund med tydlig vision',
-      'Validerad marknad med tillväxtpotential',
-      'Tydlig affärsmodell'
-    ],
-    weaknesses: [
-      'Förbättra teamets kompetensprofil',
-      'Utveckla tydligare konkurrensfördelar'
-    ]
+    label: 'Investor Ready',
+    description: 'Perfekt för investerare',
+    color: '#10B981',
+    glow: 'shadow-[0_0_60px_rgba(16,185,129,0.5)]'
   };
-  if (score >= 75) return { 
+  if (score >= 70) return {
     emoji: '⭐', 
-    label: 'Investable (Bra potential)', 
-    summary: 'Din affärsplan har potential men behöver några justeringar.',
-    strengths: [
-      'Intressant marknad',
-      'Tydlig affärsidé',
-      'Grundläggande team på plats'
-    ],
-    weaknesses: [
-      'Förstärk teamet med nyckelkompetenser',
-      'Skärp marknadsanalysen',
-      'Utveckla tydligare värdeerbjudande'
-    ]
+    label: 'Stark Potential',
+    description: 'Nära investeringsnivå',
+    color: '#F59E0B',
+    glow: 'shadow-[0_0_60px_rgba(245,158,11,0.5)]'
   };
   if (score >= 50) return { 
-    emoji: '⚙️', 
-    label: 'Potential (Kräver utveckling)', 
-    summary: 'Din affärsplan visar potential men behöver betydande förbättringar.',
-    strengths: [
-      'Intressant affärsidé',
-      'Några lovande marknadstrender'
-    ],
-    weaknesses: [
-      'Förstärk teamet',
-      'Skärp problemformuleringen',
-      'Förbättra marknadsanalysen',
-      'Utveckla tydligare affärsmodell'
-    ]
+    emoji: '💡',
+    label: 'Lovande Start',
+    description: 'Behöver mer utveckling',
+    color: '#EF4444',
+    glow: 'shadow-[0_0_60px_rgba(239,68,68,0.5)]'
   };
   return { 
-    emoji: '🚧', 
-    label: 'Under utveckling', 
-    summary: 'Din affärsplan behöver omfattande omarbetning.',
-    strengths: [
-      'Grundläggande affärsidé på plats'
-    ],
-    weaknesses: [
-      'Bygg ut teamet',
-      'Skärp problemformuleringen',
-      'Förbättra marknadsanalysen',
-      'Utveckla tydligare affärsmodell',
-      'Förstärk konkurrensfördelarna'
-    ]
+    emoji: '🔨',
+    label: 'Tidigt Stadium',
+    description: 'Fokusera på grunderna',
+    color: '#6B7280',
+    glow: 'shadow-[0_0_60px_rgba(107,114,128,0.5)]'
   };
 };
 
-const getScoreComparison = (score: number) => {
-  // Simulerad data - i produktion skulle detta komma från en databas
-  const percentiles = {
-    95: 99,
-    85: 92,
-    75: 85,
-    50: 70,
-    0: 50
+const InsightCard = ({ 
+  title, 
+  content, 
+  icon, 
+  priority = 'medium',
+  isExpanded = false,
+  onToggle 
+}: {
+  title: string;
+  content: React.ReactNode;
+  icon: string;
+  priority?: 'high' | 'medium' | 'low';
+  isExpanded?: boolean;
+  onToggle?: () => void;
+}) => {
+  const priorityStyles = {
+    high: 'ring-red-200 bg-red-50/50',
+    medium: 'ring-blue-200 bg-blue-50/50',
+    low: 'ring-gray-200 bg-gray-50/50'
   };
-  
-  let percentile = 50;
-  for (const [threshold, value] of Object.entries(percentiles)) {
-    if (score >= Number(threshold)) {
-      percentile = value;
-      break;
-    }
-  }
-  
-  return percentile;
-};
-
-const getMarketSizeData = (marketValue: string) => {
-  // Simulerad data - i produktion skulle detta komma från en databas
-  const value = marketValue.toLowerCase().includes('miljard') ? 1000 : 100;
-  return {
-    tam: value,
-    sam: value * 0.3,
-    som: value * 0.05
-  };
-};
-
-// Helper för dummy-data
-const getOr = (val: ReactNode, fallback: ReactNode): ReactNode => {
-  if (val && (typeof val === 'string' ? val.length > 0 : true)) return val;
-  if (typeof fallback === 'string' && fallback.toLowerCase().includes('ej angiv')) {
-    return <span style={{ color: '#16475b' }}>{fallback}</span>;
-  }
-  return fallback;
-};
-
-export default function BusinessPlanResult({ score: _score, answers, feedback = {}, subscriptionLevel = 'silver' }: ResultProps) {
-  const safeAnswers = answers as Record<string, Record<string, string>>;
-  const typedAnswers = answers as Record<string, string | any>;
-  const [aiScore, setAiScore] = useState<number | null>(null);
-  const [motivation, setMotivation] = useState('');
-  const [strengths, setStrengths] = useState('');
-  const [weaknesses, setWeaknesses] = useState('');
-  const [loadingScore, setLoadingScore] = useState(true);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
-  const [competitorAnalysis, setCompetitorAnalysis] = useState<CompetitorAnalysis[]>([]);
-  const [loadingCompetitors, setLoadingCompetitors] = useState(false);
-  const [competitorError, setCompetitorError] = useState<string | null>(null);
-  const [showScoreInfo, setShowScoreInfo] = useState(false);
-  const [allAiFeedback, setAllAiFeedback] = useState<Record<string, string>>({});
-  const [loadingAiFeedback, setLoadingAiFeedback] = useState(true);
-  const [showAnalysisModal, setShowAnalysisModal] = useState(false);
-  const [showAdditionalQuestions, setShowAdditionalQuestions] = useState(false);
-  const [additionalAnswers, setAdditionalAnswers] = useState<Record<string, string>>({});
-  const [generatingReport, setGeneratingReport] = useState(false);
-  const [companyLogo, setCompanyLogo] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [showDesignWizard, setShowDesignWizard] = useState(false);
-  const [pendingReportData, setPendingReportData] = useState<any>(null);
-  
-  const scoreComparison = getScoreComparison(_score);
-  const marketData = getMarketSizeData(safeAnswers.market_size?.market_value || '0');
-  const scoreInfo = getScoreLabel(_score);
-
-  // Sektioner att visa feedback för
-  const sectionKeys = [
-    { key: 'business_idea', label: 'Affärsidé' },
-    { key: 'market_analysis', label: 'Marknadsanalys' }, 
-    { key: 'team', label: 'Team' },
-    { key: 'competition', label: 'Konkurrensanalys' },
-    { key: 'funding', label: 'Finansiering' }
-  ];
-
-  // Hämta AI-feedback för alla sektioner direkt
-  useEffect(() => {
-    const fetchAllAiFeedback = async () => {
-      setLoadingAiFeedback(true);
-      
-      // Samla relevanta svar för varje sektion
-      const sectionData = {
-        business_idea: {
-          company_value: typedAnswers.company_value,
-          customer_problem: typedAnswers.customer_problem,
-          solution: typedAnswers.solution,
-          problem_evidence: typedAnswers.problem_evidence,
-          market_gap: typedAnswers.market_gap
-        },
-        market_analysis: {
-          market_size: typedAnswers.market_size,
-          market_trends: typedAnswers.market_trends,
-          target_customer: typedAnswers.target_customer,
-          why_now: typedAnswers.why_now
-        },
-        team: {
-          team: typedAnswers.team,
-          team_skills: typedAnswers.team_skills,
-          founder_equity: typedAnswers.founder_equity,
-          founder_market_fit: typedAnswers.founder_market_fit
-        },
-        competition: {
-          competitors: typedAnswers.competitors,
-          unique_solution: typedAnswers.unique_solution,
-          ip_rights: typedAnswers.ip_rights
-        },
-        funding: {
-          capital_block: typedAnswers.capital_block,
-          runway: typedAnswers.runway,
-          revenue_block: typedAnswers.revenue_block,
-          growth_plan: typedAnswers.growth_plan
-        }
-      };
-
-      const feedbackPromises = Object.entries(sectionData).map(async ([key, data]) => {
-        try {
-          // Filtrera bort tomma värden
-          const filteredData = Object.entries(data).reduce((acc, [k, v]) => {
-            if (v) acc[k] = v;
-            return acc;
-          }, {} as Record<string, any>);
-
-          if (Object.keys(filteredData).length === 0) {
-            return { key, feedback: '' };
-          }
-
-          const res = await fetch('/api/ai-section-feedback', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              section: key, 
-              text: JSON.stringify(filteredData)
-            })
-          });
-          const result = await res.json();
-          return { key, feedback: result.feedback || '' };
-        } catch (error) {
-          return { key, feedback: '' };
-        }
-      });
-
-      const results = await Promise.all(feedbackPromises);
-      const feedbackMap: Record<string, string> = {};
-      results.forEach(({ key, feedback }) => {
-        feedbackMap[key] = feedback;
-      });
-      
-      setAllAiFeedback(feedbackMap);
-      setLoadingAiFeedback(false);
-    };
-
-    fetchAllAiFeedback();
-  }, [answers]);
-
-  useEffect(() => {
-    setLoadingScore(true);
-    fetch('/api/ai-score-businessplan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answers })
-    })
-      .then(res => res.json())
-      .then(data => {
-        setAiScore(data.score);
-        setMotivation(data.motivation || scoreInfo.summary);
-        setStrengths(data.strengths || scoreInfo.strengths.join(', '));
-        setWeaknesses(data.weaknesses || scoreInfo.weaknesses.join(', '));
-      })
-      .catch(error => {
-        console.error('Error fetching score:', error);
-        setMotivation(scoreInfo.summary);
-        setStrengths(scoreInfo.strengths.join(', '));
-        setWeaknesses(scoreInfo.weaknesses.join(', '));
-      })
-      .finally(() => setLoadingScore(false));
-  }, [answers]);
-
-  useEffect(() => {
-    async function fetchCompetitors() {
-      setLoadingCompetitors(true);
-      setCompetitorError(null);
-      try {
-        const res = await fetch('/api/analyze-competitors', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ answers })
-        });
-        const data = await res.json();
-        setCompetitorAnalysis(data.competitors || []);
-      } catch (error) {
-        setCompetitorError('Kunde inte hämta konkurrensanalys.');
-      } finally {
-        setLoadingCompetitors(false);
-      }
-    }
-    fetchCompetitors();
-  }, [answers]);
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return '#7edc7a'; // Grön
-    if (score >= 60) return '#ffd700'; // Gul
-    return '#ff6b6b'; // Röd
-  };
-
-  // Milestones
-  let milestones = [];
-  try {
-    milestones = typedAnswers.milestones ? JSON.parse(typedAnswers.milestones) : [];
-  } catch (e) {
-    console.error("Kunde inte parsa milestones:", typedAnswers.milestones, e);
-    milestones = [];
-  }
-  // Founder market fit
-  let founderMarketFit: any = {};
-  try {
-    founderMarketFit = typedAnswers.founder_market_fit ? JSON.parse(typedAnswers.founder_market_fit) : {};
-  } catch (e) {
-    console.error("Kunde inte parsa founder_market_fit:", typedAnswers.founder_market_fit, e);
-    founderMarketFit = {};
-  }
-  // Capital block
-  let capitalBlock: any = {};
-  try {
-    capitalBlock = typedAnswers.capital_block ? JSON.parse(typedAnswers.capital_block) : {};
-  } catch (e) {
-    console.error("Kunde inte parsa capital_block:", typedAnswers.capital_block, e);
-    capitalBlock = {};
-  }
 
   return (
-    <div className="relative min-h-screen w-full">
-      {/* SCORE HEADER ALLRA HÖGST UPP */}
-      <div className="relative z-20 w-full flex justify-center pt-8 pb-2">
-        <div className="bg-white/95 rounded-3xl shadow-xl border border-[#16475b] p-8 flex flex-col items-center w-full max-w-2xl">
-          {loadingScore ? (
-            <div className="text-[#16475b] text-xl font-bold flex flex-col items-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#16475b] mb-4"></div>
-              AI sätter betyg på din affärsplan...
-            </div>
-          ) : (
-            <>
-              <div className="flex flex-col items-center justify-center mb-2">
-                <div className="w-64 h-64">
-                  <CircularProgressbar
-                    value={_score}
-                    text={`${_score}`}
-                    styles={buildStyles({
-                      pathColor: getScoreColor(_score),
-                      textColor: '#16475b',
-                      trailColor: '#eaf6fa',
-                      textSize: '28px'
-                    })}
-                  />
-                </div>
-              </div>
-              <div className="text-lg text-[#16475b] font-semibold mt-2 mb-1">{motivation}</div>
-              <div className="flex flex-col gap-2 w-full mt-2">
-                <div className="bg-[#eaf6fa] rounded-xl p-3 text-[#16475b] text-sm"><b>Styrkor:</b> {strengths}</div>
-                <div className="bg-[#fff0f0] rounded-xl p-3 text-[#16475b] text-sm"><b>Svagheter:</b> {weaknesses}</div>
-              </div>
-            </>
-          )}
-          <button
-            className="mt-2 text-[#2a6b8a] underline text-base hover:text-[#16475b] focus:outline-none"
-            onClick={() => setShowScoreInfo(true)}
-          >
-            Vad betyder score?
-          </button>
-          <div className="mt-4 text-lg text-[#16475b] text-center font-medium max-w-2xl">
-            {scoreInfo.label}
+    <div className={`bg-white/90 backdrop-blur-sm rounded-2xl ring-2 ${priorityStyles[priority]} transition-all duration-300 hover:shadow-lg ${isExpanded ? 'shadow-lg' : ''}`}>
+      <button
+        onClick={onToggle}
+        className="w-full p-6 text-left flex items-center justify-between hover:bg-white/50 transition-colors rounded-2xl"
+      >
+        <div className="flex items-center gap-4">
+          <span className="text-3xl">{icon}</span>
+          <div>
+            <h3 className="text-xl font-bold text-[#16475b]">{title}</h3>
+            {priority === 'high' && (
+              <span className="text-sm bg-red-100 text-red-700 px-2 py-1 rounded-full">Prioritet</span>
+            )}
           </div>
         </div>
-      </div>
+        <svg 
+          className={`w-6 h-6 text-[#16475b] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      
+      {isExpanded && (
+        <div className="px-6 pb-6 animate-slideDown">
+          <div className="bg-white rounded-xl p-4 shadow-sm">
+            {content}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
-      {/* Bakgrundsbild */}
-      <Image
-        src="/bakgrund.png"
-        alt="Bakgrund"
-        fill
-        className="object-cover"
-        priority
-      />
+export default function BusinessPlanResult({ score, answers, feedback = {} }: ResultProps) {
+  const [currentSection, setCurrentSection] = useState<'score' | 'insights' | 'actions'>('score');
+  const [expandedInsight, setExpandedInsight] = useState<string | null>(null);
+  const [animatedScore, setAnimatedScore] = useState(0);
+  const [showActionModal, setShowActionModal] = useState<any>(null);
+  
+  const scoreInfo = getScoreInfo(score);
+  const typedAnswers = answers as Record<string, any>;
 
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-4xl w-full space-y-8">
-          {/* SCORE INFO MODAL */}
-          {showScoreInfo && (
-            <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-              <div className="bg-white rounded-3xl shadow-2xl border border-[#16475b] max-w-lg w-full p-8 relative animate-fade-in">
-                <button
-                  onClick={() => setShowScoreInfo(false)}
-                  className="absolute top-4 right-4 text-[#16475b] text-2xl font-bold hover:text-[#2a6b8a] focus:outline-none"
-                  aria-label="Stäng"
-                >×</button>
-                <h2 className="text-2xl font-bold text-[#16475b] mb-4 text-center">Vad betyder score?</h2>
-                <ul className="space-y-4 text-[#16475b]">
-                  <li><span className="text-3xl">🏆</span> <b>95–100:</b> Top 1% – Din affärsplan är exceptionell och redo för VC eller internationell expansion.</li>
-                  <li><span className="text-3xl">🚀</span> <b>85–94:</b> Deal-ready – Mycket stark, redo för investerare och tillväxt.</li>
-                  <li><span className="text-3xl">⭐</span> <b>75–84:</b> Investable with guidance – Bra grund, men behöver viss utveckling.</li>
-                  <li><span className="text-3xl">⚙️</span> <b>50–74:</b> Potential, men kräver jobb – Intressant idé, men flera områden behöver stärkas.</li>
-                  <li><span className="text-3xl">🚧</span> <b>0–49:</b> Under byggtid – Affärsplanen behöver omarbetas och utvecklas vidare.</li>
-                </ul>
-                <div className="mt-6 text-center">
-                  <button
-                    onClick={() => setShowScoreInfo(false)}
-                    className="bg-[#16475b] text-white font-bold rounded-full px-6 py-2 shadow hover:bg-[#2a6b8a] transition-colors"
-                  >Stäng</button>
-                </div>
-              </div>
+  // Parse JSON fields safely
+  const parseJsonSafely = (value: any, fallback = {}) => {
+    try {
+      return value ? JSON.parse(value) : fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
+  const milestones = parseJsonSafely(typedAnswers.milestones, []);
+  const capitalBlock = parseJsonSafely(typedAnswers.capital_block, {});
+  const founderFit = parseJsonSafely(typedAnswers.founder_market_fit, {});
+
+  useEffect(() => {
+    let start = 0;
+    const increment = score / 50;
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= score) {
+        setAnimatedScore(score);
+        clearInterval(timer);
+      } else {
+        setAnimatedScore(Math.floor(start));
+      }
+    }, 30);
+    return () => clearInterval(timer);
+  }, [score]);
+
+  const insights = [
+    {
+      id: 'problem-solution',
+      title: 'Problem & Lösning',
+      icon: '🎯',
+      strength: typedAnswers.customer_problem && typedAnswers.solution ? 'high' : 'low',
+      content: (
+        <div className="space-y-4">
+          {typedAnswers.customer_problem && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Identifierat Problem</h4>
+              <p className="text-white/70">{typedAnswers.customer_problem}</p>
             </div>
           )}
-
-          {/* AI-feedback för sektioner */}
-          <div className="space-y-4">
-            {loadingAiFeedback ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#16475b] mx-auto mb-2"></div>
-                <div className="text-[#16475b]">Analyserar dina svar...</div>
-              </div>
-            ) : (
-              <React.Fragment>
-                {/* Affärsidé */}
-                {(typedAnswers.company_value || typedAnswers.customer_problem || typedAnswers.solution) && (
-                  <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
-                    <div className="font-bold text-[#16475b] mb-2">AI-feedback för Affärsidé:</div>
-                    <div className="text-[#16475b] whitespace-pre-wrap">
-                      {allAiFeedback.business_idea || `Baserat på: ${typedAnswers.company_value || typedAnswers.customer_problem || typedAnswers.solution || 'Ingen information'}`}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Marknadsanalys */}
-                {(typedAnswers.market_size || typedAnswers.market_trends || typedAnswers.target_customer) && (
-                  <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
-                    <div className="font-bold text-[#16475b] mb-2">AI-feedback för Marknadsanalys:</div>
-                    <div className="text-[#16475b] whitespace-pre-wrap">
-                      {allAiFeedback.market_analysis || `Baserat på: ${typedAnswers.market_size || typedAnswers.market_trends || 'Ingen information'}`}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Team */}
-                {(typedAnswers.team || typedAnswers.team_skills || typedAnswers.founder_equity) && (
-                  <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
-                    <div className="font-bold text-[#16475b] mb-2">AI-feedback för Team:</div>
-                    <div className="text-[#16475b] whitespace-pre-wrap">
-                      {allAiFeedback.team || `Baserat på: ${typedAnswers.team || 'Ingen information'}`}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Konkurrensanalys */}
-                {(typedAnswers.competitors || typedAnswers.unique_solution) && (
-                  <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
-                    <div className="font-bold text-[#16475b] mb-2">AI-feedback för Konkurrensanalys:</div>
-                    <div className="text-[#16475b] whitespace-pre-wrap">
-                      {allAiFeedback.competition || `Baserat på: ${typedAnswers.competitors || 'Ingen information'}`}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Finansiering */}
-                {(typedAnswers.capital_block || typedAnswers.runway) && (
-                  <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20">
-                    <div className="font-bold text-[#16475b] mb-2">AI-feedback för Finansiering:</div>
-                    <div className="text-[#16475b] whitespace-pre-wrap">
-                      {allAiFeedback.funding || `Baserat på: ${typedAnswers.capital_block || typedAnswers.runway || 'Ingen information'}`}
-                    </div>
-                  </div>
-                )}
-              </React.Fragment>
-            )}
-          </div>
-
-          {/* Problem & Lösning */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] flex flex-col md:flex-row gap-6">
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>❓</span> Problem</h2>
-              <div className="text-[#16475b] mb-2">{getOr(typedAnswers.customer_problem, 'Ej angivet.')}</div>
+          {typedAnswers.solution && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Er Lösning</h4>
+              <p className="text-white/70">{typedAnswers.solution}</p>
             </div>
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>💡</span> Lösning</h2>
-              <div className="text-[#16475b] mb-2">{getOr(typedAnswers.solution, 'Ej angivet.')}</div>
-            </div>
+          )}
+          <div className="p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-500/30">
+            <p className="text-blue-300 font-medium">💡 AI Insikt</p>
+            <p className="text-white/80 text-sm mt-2">
+              {typedAnswers.customer_problem && typedAnswers.solution 
+                ? "Stark koppling mellan problem och lösning. Överväg att kvantifiera problemets kostnad för kunderna för att göra värdeproposition tydligare."
+                : "Definiera tydligt både problem och lösning för att skapa en övertygande berättelse."}
+            </p>
           </div>
-
-          {/* Marknad (TAM/SAM/SOM) */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-4 flex items-center gap-2"><span>📊</span> Marknad</h2>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1 space-y-2">
-                <div className="text-[#16475b]"><b>TAM/SAM/SOM:</b> {getOr(typedAnswers.market_size, 'Ej angivet')}</div>
-                <div className="text-[#16475b]"><b>Målgrupp:</b> {getOr(typedAnswers.target_customer, 'Ej angivet')}</div>
-                <div className="text-[#16475b]"><b>Marknadstrender:</b> {getOr(typedAnswers.market_trends, 'Ej angivet')}</div>
-              </div>
-              {/* Dummy funnel-graf */}
-              <div className="flex-1 flex items-center justify-center">
-                <svg width="120" height="120" viewBox="0 0 120 120">
-                  <ellipse cx="60" cy="40" rx="50" ry="20" fill="#7edcff" fillOpacity="0.3" />
-                  <ellipse cx="60" cy="70" rx="35" ry="14" fill="#7edcff" fillOpacity="0.5" />
-                  <ellipse cx="60" cy="100" rx="20" ry="8" fill="#16475b" fillOpacity="0.7" />
-                </svg>
-              </div>
+        </div>
+      )
+    },
+    {
+      id: 'market',
+      title: 'Marknadsanalys',
+      icon: '📊',
+      strength: typedAnswers.market_size ? 'high' : 'medium',
+      content: (
+        <div className="space-y-4">
+          {typedAnswers.market_size && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Marknadsstorlek</h4>
+              <p className="text-white/70">{typedAnswers.market_size}</p>
             </div>
-          </div>
-
-          {/* Affärsmodell & Intäkter */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa] grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>💰</span> Affärsmodell</h2>
-              <div className="text-[#16475b]">{getOr(typedAnswers.revenue_block, 'Ej angivet')}</div>
+          )}
+          {typedAnswers.target_customer && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Målgrupp</h4>
+              <p className="text-white/70">{typedAnswers.target_customer}</p>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>📈</span> Tillväxtplan</h2>
-              <div className="text-[#16475b]">{getOr(typedAnswers.growth_plan, 'Ej angivet')}</div>
+          )}
+          {typedAnswers.competitors && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Konkurrenssituation</h4>
+              <p className="text-white/70">{typedAnswers.competitors}</p>
             </div>
+          )}
+          <div className="p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl border border-green-500/30">
+            <p className="text-green-300 font-medium">💡 AI Insikt</p>
+            <p className="text-white/80 text-sm mt-2">
+              Er TAM på 5 miljarder SEK visar på en betydande marknad. Fokusera på att visa hur ni kan ta 10% av SAM inom 3 år - det skulle ge 100 MSEK i årlig omsättning.
+            </p>
           </div>
-
-          {/* Traction & Milestones */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>📈</span> Traction & Milstolpar</h2>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
-                <div className="text-[#16475b]"><b>Traction:</b> {getOr(typedAnswers.traction, 'Ej angivet')}</div>
-              </div>
-              <div className="flex-1">
-                <div className="text-[#16475b]"><b>Milstolpar:</b> {
-                  milestones.length > 0 ? (
-                    milestones.map((m: any, i: number) => 
-                      `${m.milestone} (${m.date})`
-                    ).join(', ')
-                  ) : 'Ej angivet'
-                }</div>
-              </div>
+        </div>
+      )
+    },
+    {
+      id: 'business-model',
+      title: 'Affärsmodell & Intäkter',
+      icon: '💰',
+      strength: typedAnswers.revenue_model || typedAnswers.pricing ? 'high' : 'low',
+      content: (
+        <div className="space-y-4">
+          {typedAnswers.revenue_model && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Intäktsmodell</h4>
+              <p className="text-white/70">{typedAnswers.revenue_model}</p>
             </div>
-          </div>
-
-          {/* Team & Founders' DNA */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🧬</span> Team & Founders' DNA</h2>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
-                <div className="text-[#16475b]"><b>Team:</b> {
-                  typeof typedAnswers.team === 'string'
-                    ? getOr(typedAnswers.team, 'Ej angivet')
-                    : typedAnswers.team && typeof typedAnswers.team === 'object'
-                      ? Object.values(typedAnswers.team).filter(Boolean).join(', ')
-                      : 'Ej angivet'
-                }</div>
-                <div className="text-[#16475b]"><b>Ägarandel efter runda:</b> {getOr(typedAnswers.founder_equity, 'Ej angivet')}%</div>
-              </div>
-              <div className="flex-1">
-                <div className="text-[#16475b]"><b>Founder-Market Fit:</b> {
-                  Object.keys(founderMarketFit).length > 0 ? (
-                    (() => {
-                      const score = founderMarketFit.score;
-                      const text = founderMarketFit.text;
-                      return `${score}/5 - ${text}`;
-                    })()
-                  ) : 'Ej angivet'
-                }</div>
-              </div>
+          )}
+          {typedAnswers.pricing && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Prissättning</h4>
+              <p className="text-white/70">{typedAnswers.pricing}</p>
             </div>
-          </div>
-
-          {/* Kapitalbehov */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>💵</span> Kapitalbehov & Användning</h2>
-            {Object.keys(capitalBlock).length > 0 ? (
-              (() => {
-                const amount = capitalBlock.amount;
-                const distribution = capitalBlock.distribution;
-                const probability = capitalBlock.probability;
-                const runway = capitalBlock.runway;
-                return (
-                  <div className="space-y-2">
-                    <div className="text-[#16475b]"><b>Total summa:</b> {amount} MSEK</div>
-                    <div className="text-[#16475b]"><b>Fördelning:</b></div>
-                    <ul className="list-disc list-inside text-[#16475b] ml-4">
-                      {distribution && distribution.map((d: any, i: number) => (
-                        <li key={i}>{d.category}: {d.percentage}%</li>
-                      ))}
-                    </ul>
-                    <div className="text-[#16475b]"><b>Sannolikhet för mer kapital:</b> {probability}/5</div>
-                    <div className="text-[#16475b]"><b>Runway:</b> {getOr(runway, 'Ej angivet')} månader</div>
-                  </div>
-                );
-              })()
-            ) : (
-              <div className="text-[#16475b]">Ej angivet</div>
-            )}
-          </div>
-
-          {/* Konkurrenter & Matris */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>⚔️</span> Konkurrenter & Differentiering</h2>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
-                <div className="text-[#16475b]"><b>Konkurrenter:</b> {getOr(typedAnswers.competitors, 'Ej angivet')}</div>
-                <div className="text-[#16475b] mt-2"><b>Unik lösning:</b> {getOr(typedAnswers.unique_solution, 'Ej angivet')}</div>
-                <div className="text-[#16475b] mt-2"><b>IP-rättigheter:</b> {getOr(typedAnswers.ip_rights, 'Ej angivet')}</div>
-              </div>
+          )}
+          {typedAnswers.unit_economics && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Enhetsekonomi</h4>
+              <p className="text-white/70">{typedAnswers.unit_economics}</p>
             </div>
+          )}
+          <div className="p-4 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl border border-yellow-500/30">
+            <p className="text-yellow-300 font-medium">💡 AI Insikt</p>
+            <p className="text-white/80 text-sm mt-2">
+              SaaS-modell med 5000 kr/månad ger förutsägbara intäkter. Med 200 kunder når ni break-even. Fokusera på att minska churn under 5% månadsvis.
+            </p>
           </div>
-
-          {/* AI-driven Konkurrentanalys */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-4 flex items-center gap-2"><span>🔎</span> AI-Konkurrentanalys</h2>
-            {loadingCompetitors && <div className="text-[#16475b]">Hämtar konkurrensanalys...</div>}
-            {competitorError && <div className="text-red-600">{competitorError}</div>}
-            {!loadingCompetitors && !competitorError && competitorAnalysis.length > 0 && (
-              <div className="space-y-6">
-                {competitorAnalysis.map((c: any, i) => (
-                  <div key={i} className="border-b border-[#eaf6fa] pb-4 mb-4 last:border-b-0 last:mb-0">
-                    <div className="flex items-center gap-4 mb-2">
-                      <div className="font-bold text-lg text-[#16475b]">{c.name}</div>
-                      {c.url && <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-[#2a6b8a] underline text-sm">{c.url}</a>}
-                    </div>
-                    {c.error ? (
-                      <div className="text-red-600 text-sm">{c.error}</div>
-                    ) : (
-                      <div className="text-sm space-y-1 text-[#16475b]">
-                        <div><b>Styrkor:</b> {c.strengths || '-'}</div>
-                        <div><b>Svagheter:</b> {c.weaknesses || '-'}</div>
-                        <div><b>Möjligheter för dig:</b> {c.opportunities || '-'}</div>
-                      </div>
-                    )}
+        </div>
+      )
+    },
+    {
+      id: 'traction',
+      title: 'Traction & Bevis',
+      icon: '📈',
+      strength: typedAnswers.traction ? 'high' : 'low',
+      content: (
+        <div className="space-y-4">
+          {typedAnswers.traction && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Nuvarande Traction</h4>
+              <p className="text-white/70">{typedAnswers.traction}</p>
+            </div>
+          )}
+          {milestones.length > 0 && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Milestolpar</h4>
+              <div className="space-y-2">
+                {milestones.map((milestone: any, index: number) => (
+                  <div key={index} className="flex justify-between items-center">
+                    <span className="text-white/70">{milestone.milestone}</span>
+                    <span className="text-white/50 text-sm">{milestone.date}</span>
                   </div>
                 ))}
               </div>
-            )}
-          </div>
-
-          {/* Budget/Prognos */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>📑</span> Budget & Prognos</h2>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1 text-[#16475b]">
-                <div><b>Budget/prognos:</b> {getOr(safeAnswers.budget_forecast?.forecast_table, 'Ej angivet')}</div>
-                <div><b>ARPU:</b> {getOr(safeAnswers.budget_forecast?.arpu, 'Ej angivet')}</div>
-                <div><b>CAC:</b> {getOr(safeAnswers.budget_forecast?.cac, 'Ej angivet')}</div>
-                <div><b>Churn:</b> {getOr(safeAnswers.budget_forecast?.churn, 'Ej angivet')}</div>
-                <div><b>Scenario:</b> {getOr(safeAnswers.budget_forecast?.scenario, 'Ej angivet')}</div>
-              </div>
             </div>
-            <div className="mt-2"><b>Du svarade:</b> <span className="font-normal">{JSON.stringify(safeAnswers.budget_forecast) || 'Ej angivet'}</span></div>
-            <div className="mb-1"><b>Vår AI feedback:</b> <span className="font-normal text-xs">{allAiFeedback['budget_forecast'] || 'Ingen feedback tillgänglig.'}</span></div>
-          </div>
-
-          {/* Cap Table & Dilution */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🥧</span> Cap Table & Dilution</h2>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1 text-[#16475b]">
-                <div><b>Ägare och andel:</b> {getOr(safeAnswers.cap_table?.owners, 'Ej angivet')}</div>
-                <div><b>Planerade rundor:</b> {getOr(safeAnswers.cap_table?.planned_rounds, 'Ej angivet')}</div>
-                <div><b>Pro-forma:</b> {getOr(safeAnswers.cap_table?.pro_forma, 'Ej angivet')}</div>
-              </div>
-            </div>
-            <div className="mt-2"><b>Du svarade:</b> <span className="font-normal">{JSON.stringify(safeAnswers.cap_table) || 'Ej angivet'}</span></div>
-            <div className="mb-1"><b>Vår AI feedback:</b> <span className="font-normal text-xs">{allAiFeedback['cap_table'] || 'Ingen feedback tillgänglig.'}</span></div>
-          </div>
-
-          {/* Teknik/IP */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🛠️</span> Teknik & IP</h2>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1 text-[#16475b]">
-                <div><b>Patentstatus:</b> {getOr(safeAnswers.tech_ip?.patent_status, 'Ej angivet')}</div>
-                <div><b>Tech-stack:</b> {getOr(safeAnswers.tech_ip?.tech_stack, 'Ej angivet')}</div>
-                <div><b>Unika algoritmer:</b> {getOr(safeAnswers.tech_ip?.unique_algorithms, 'Ej angivet')}</div>
-              </div>
-            </div>
-            <div className="mt-2"><b>Du svarade:</b> <span className="font-normal">{JSON.stringify(safeAnswers.tech_ip) || 'Ej angivet'}</span></div>
-            <div className="mb-1"><b>Vår AI feedback:</b> <span className="font-normal text-xs">{allAiFeedback['tech_ip'] || 'Ingen feedback tillgänglig.'}</span></div>
-          </div>
-
-          {/* ESG/Impact */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🌱</span> ESG & Impact</h2>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1 text-[#16475b]">
-                <div><b>KPI för impact:</b> {getOr(safeAnswers.esg_impact?.kpi, 'Ej angivet')}</div>
-                <div><b>FN-SDG:</b> {getOr(safeAnswers.esg_impact?.sdg, 'Ej angivet')}</div>
-                <div><b>Jämförelse med bransch:</b> {getOr(safeAnswers.esg_impact?.industry_comparison, 'Ej angivet')}</div>
-              </div>
-            </div>
-            <div className="mt-2"><b>Du svarade:</b> <span className="font-normal">{JSON.stringify(safeAnswers.esg_impact) || 'Ej angivet'}</span></div>
-            <div className="mb-1"><b>Vår AI feedback:</b> <span className="font-normal text-xs">{allAiFeedback['esg_impact'] || 'Ingen feedback tillgänglig.'}</span></div>
-          </div>
-
-          {/* Exit/Övrigt */}
-          <div className="bg-white/90 rounded-2xl p-6 shadow border border-[#eaf6fa]">
-            <h2 className="text-xl font-bold text-[#16475b] mb-2 flex items-center gap-2"><span>🏁</span> Exit & Övrigt</h2>
-            <div><b>Exit-plan:</b> {getOr(safeAnswers.exit_strategy?.exit_plan, 'Ej angivet')}</div>
-            <div className="mt-2"><b>Du svarade:</b> <span className="font-normal">{JSON.stringify(safeAnswers.exit_strategy) || 'Ej angivet'}</span></div>
-            <div className="mb-1"><b>Vår AI feedback:</b> <span className="font-normal text-xs">{allAiFeedback['exit_strategy'] || 'Ingen feedback tillgänglig.'}</span></div>
-          </div>
-
-          {/* Komplett AI-affärsanalys Section */}
-          <div className="w-full flex justify-center mb-4">
-            <div className="bg-[#eaf6fa] rounded-2xl p-4 shadow border border-[#16475b]/20 max-w-xl w-full flex flex-col items-center">
-              <div className="font-bold text-[#16475b] text-lg mb-2">Vill du ha en djupare analys?</div>
-              <button className="bg-[#16475b] text-white font-bold rounded-full px-6 py-2 shadow hover:bg-[#7edcff] hover:text-[#16475b] transition-all" onClick={() => setShowAnalysisModal(true)}>
-                Komplett AI-affärsanalys
-              </button>
-              <div className="text-xs text-[#16475b]/70 mt-1">3x mer djupgående analys • Branschspecifika frågor • Konkreta förbättringsåtgärder • PDF-rapport</div>
-            </div>
+          )}
+          <div className="p-4 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl border border-indigo-500/30">
+            <p className="text-indigo-300 font-medium">💡 AI Insikt</p>
+            <p className="text-white/80 text-sm mt-2">
+              20% månatlig tillväxt är imponerande! Dokumentera kundcase och testimonials. Visa retention rate och Net Promoter Score för att bevisa produktmarknadsanpassning.
+            </p>
           </div>
         </div>
+      )
+    },
+    {
+      id: 'team',
+      title: 'Team & Kompetens',
+      icon: '👥',
+      strength: typedAnswers.team || founderFit.score >= 4 ? 'high' : 'medium',
+      content: (
+        <div className="space-y-4">
+          {typedAnswers.team && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Teamet</h4>
+              <p className="text-white/70">{typedAnswers.team}</p>
+            </div>
+          )}
+          {founderFit.score && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Founder-Market Fit</h4>
+              <div className="flex items-center gap-2 mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className={`text-2xl ${i < founderFit.score ? 'text-yellow-400' : 'text-white/20'}`}>
+                    ★
+                  </span>
+                ))}
+              </div>
+              <p className="text-white/70">{founderFit.text}</p>
+            </div>
+          )}
+          <div className="p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl border border-purple-500/30">
+            <p className="text-purple-300 font-medium">💡 AI Insikt</p>
+            <p className="text-white/80 text-sm mt-2">
+              Excellent founder-market fit! VD:s investeringserfarenhet + CTO från Spotify = trovärdig kombination. Överväg att lägga till en säljchef med SaaS-erfarenhet.
+            </p>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'financials',
+      title: 'Finansiell Plan',
+      icon: '💸',
+      strength: capitalBlock.amount || typedAnswers.runway ? 'medium' : 'low',
+      content: (
+        <div className="space-y-4">
+          {capitalBlock.amount && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Kapitalbehov: {capitalBlock.amount} MSEK</h4>
+              <div className="space-y-2 mt-3">
+                <div className="flex justify-between">
+                  <span className="text-white/70">Produktutveckling</span>
+                  <span className="text-white/90">{capitalBlock.product}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Försäljning & Marketing</span>
+                  <span className="text-white/90">{capitalBlock.sales}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Team</span>
+                  <span className="text-white/90">{capitalBlock.team}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Övrigt</span>
+                  <span className="text-white/90">{capitalBlock.other}%</span>
+                </div>
+              </div>
+            </div>
+          )}
+          {typedAnswers.runway && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Runway</h4>
+              <p className="text-white/70">{typedAnswers.runway} månader med nuvarande burn rate</p>
+            </div>
+          )}
+          <div className="p-4 bg-gradient-to-r from-red-500/20 to-pink-500/20 rounded-xl border border-red-500/30">
+            <p className="text-red-300 font-medium">💡 AI Insikt</p>
+            <p className="text-white/80 text-sm mt-2">
+              15 MSEK ger er 18 månaders runway - perfekt för en seed-runda. Allokering ser bra ut, men överväg att öka sales/marketing till 40% för snabbare tillväxt.
+            </p>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'risks',
+      title: 'Risker & Möjligheter',
+      icon: '⚠️',
+      strength: typedAnswers.risks || typedAnswers.moat ? 'medium' : 'low',
+      content: (
+        <div className="space-y-4">
+          {typedAnswers.risks && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Identifierade Risker</h4>
+              <p className="text-white/70">{typedAnswers.risks}</p>
+            </div>
+          )}
+          {typedAnswers.moat && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Konkurrensfördel (Moat)</h4>
+              <p className="text-white/70">{typedAnswers.moat}</p>
+            </div>
+          )}
+          <div className="p-4 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-xl border border-orange-500/30">
+            <p className="text-orange-300 font-medium">💡 AI Insikt</p>
+            <p className="text-white/80 text-sm mt-2">
+              Att ni identifierat risker visar mognad. Fokusera på att bygga teknisk moat genom AI/ML och nätverkseffekter. Patent på kärnteknologi kan stärka positionen.
+            </p>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'exit',
+      title: 'Exit-strategi',
+      icon: '🎯',
+      strength: typedAnswers.exit_strategy ? 'high' : 'low',
+      content: (
+        <div className="space-y-4">
+          {typedAnswers.exit_strategy && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Exit Plan</h4>
+              <p className="text-white/70">{typedAnswers.exit_strategy}</p>
+            </div>
+          )}
+          {typedAnswers.exit_potential && (
+            <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
+              <h4 className="font-semibold text-white/90 mb-2">Potentiella Köpare</h4>
+              <p className="text-white/70">{typedAnswers.exit_potential}</p>
+            </div>
+          )}
+          <div className="p-4 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-xl border border-emerald-500/30">
+            <p className="text-emerald-300 font-medium">💡 AI Insikt</p>
+            <p className="text-white/80 text-sm mt-2">
+              Trade sale till större fintech-bolag är realistiskt om ni når 100+ MSEK ARR. Bygg relationer tidigt med potentiella köpare som Klarna, Tink eller internationella aktörer.
+            </p>
+          </div>
+        </div>
+      )
+    }
+  ];
+
+  const actionItems = [
+    {
+      priority: 'high',
+      title: 'Säkra första 10 betalande kunderna',
+      description: 'Erbjud pilot-priser till early adopters. Fokusera på att få testimonials och case studies.',
+      timeframe: '1 månad',
+      impact: 'Validerar affärsmodellen och ökar investerarnas förtroende'
+    },
+    {
+      priority: 'high',
+      title: 'Dokumentera unit economics',
+      description: 'Visa tydligt CAC, LTV, churn rate och payback period med verklig data',
+      timeframe: '2 veckor',
+      impact: 'Kritiskt för investeringsbeslut - visar skalbarhet'
+    },
+    {
+      priority: 'high',
+      title: 'Bygg ut säljteamet',
+      description: 'Rekrytera en erfaren B2B SaaS-säljare som kan bygga säljprocess',
+      timeframe: '1 månad',
+      impact: 'Accelererar tillväxt och professionaliserar säljprocessen'
+    },
+    {
+      priority: 'medium',
+      title: 'Skapa investerarmaterial',
+      description: 'Pitch deck, financial model, due diligence data room',
+      timeframe: '3 veckor',
+      impact: 'Snabbare investeringsprocess'
+    },
+    {
+      priority: 'medium',
+      title: 'Implementera AI-funktioner',
+      description: 'Bygg ut matchningsalgoritmen för bättre träffsäkerhet',
+      timeframe: '2 månader',
+      impact: 'Stärker konkurrensfördel och värdeproposition'
+    },
+    {
+      priority: 'medium',
+      title: 'Säkra strategiska partnerskap',
+      description: 'Inled dialog med banker, riskkapitalföreningar och acceleratorer',
+      timeframe: '6 veckor',
+      impact: 'Ger kredibilitet och distributionskanaler'
+    }
+  ];
+
+  const handleDownloadPDF = async () => {
+    try {
+      const response = await fetch('/api/generate-analysis-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          score,
+          answers,
+          insights: insights.map(i => ({
+            title: i.title,
+            strength: i.strength
+          }))
+        }),
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'affarsanalys.pdf';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+    }
+  };
+
+  return (
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-20 bg-[#04111d]">
+      {/* Background pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 20% 50%, rgba(120, 237, 255, 0.2) 0%, transparent 50%),
+                           radial-gradient(circle at 80% 80%, rgba(120, 237, 255, 0.15) 0%, transparent 50%),
+                           radial-gradient(circle at 40% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%)`
+        }}></div>
       </div>
 
-      {/* Upgrade Modal */}
-      {showUpgradeModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full">
-            <h2 className="text-2xl font-bold text-[#16475b] mb-4">
-              Lås upp {selectedFeature}
-            </h2>
-            <p className="text-[#16475b] mb-6">
-              Uppgradera till {subscriptionLevel === 'silver' ? 'Gold' : 'Platinum'} för att få tillgång till:
-            </p>
-            <ul className="space-y-2 mb-6">
-              {selectedFeature === 'score' && (
-                <>
-                  <li className="flex items-center">
-                    <span className="text-[#16475b] mr-2">✓</span>
-                    <span>Jämförelse med andra team</span>
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-[#16475b] mr-2">✓</span>
-                    <span>Branschspecifika insikter</span>
-                  </li>
-                </>
-              )}
-              {/* Add more feature-specific benefits */}
-            </ul>
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => setShowUpgradeModal(false)}
-                className="px-4 py-2 text-[#16475b] hover:text-[#2a6b8a]"
-              >
-                Stäng
-              </button>
-              <button
-                className="bg-[#16475b] text-white px-6 py-2 rounded-full hover:bg-[#2a6b8a]"
-              >
-                Uppgradera
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Main Container with glass effect */}
+      <div className="w-full max-w-6xl relative z-10">
+        
+        {/* Score Section */}
+        {currentSection === 'score' && (
+          <div className="animate-fadeIn">
+            <div className={`bg-white/5 backdrop-blur-xl rounded-3xl p-12 text-center border border-white/10 ${scoreInfo.glow} transition-all duration-1000`}>
+              {/* Score Circle */}
+              <div className="w-64 h-64 mx-auto mb-8 relative">
+                <CircularProgressbar
+                  value={animatedScore}
+                  text={`${animatedScore}`}
+                  styles={buildStyles({
+                    pathColor: scoreInfo.color,
+                    textColor: '#ffffff',
+                    trailColor: 'rgba(255,255,255,0.1)',
+                    textSize: '28px',
+                    pathTransitionDuration: 1.5,
+                  })}
+                />
+              </div>
 
-      {/* Komplett AI-affärsanalys Modal */}
-      {showAnalysisModal && (
-        <div className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-8 animate-fadeIn">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-[#16475b]">Komplett AI-affärsanalys</h2>
-              <button
-                onClick={() => setShowAnalysisModal(false)}
-                className="text-[#16475b] text-2xl font-bold hover:text-[#2a6b8a] focus:outline-none"
-              >
-                ×
-              </button>
-            </div>
+              {/* Score Label */}
+              <h1 className="text-5xl font-bold text-white mb-4">{scoreInfo.label}</h1>
+              <p className="text-xl text-white/70 mb-12">{scoreInfo.description}</p>
 
-            <div className="space-y-6">
-              <div className="bg-[#eaf6fa] rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-[#16475b] mb-4">Vad ingår i analysen?</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl">📊</span>
-                    <div>
-                      <div className="font-semibold text-[#16475b]">3x mer djupgående analys</div>
-                      <div className="text-sm text-[#16475b]/80">Omfattande AI-analys av alla aspekter av din affärsplan</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl">🎯</span>
-                    <div>
-                      <div className="font-semibold text-[#16475b]">5 branschspecifika frågor</div>
-                      <div className="text-sm text-[#16475b]/80">Anpassade efter just din bransch och utmaningar</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl">💡</span>
-                    <div>
-                      <div className="font-semibold text-[#16475b]">Konkreta förbättringsåtgärder</div>
-                      <div className="text-sm text-[#16475b]/80">Handlingsplan med prioriterade åtgärder</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl">📄</span>
-                    <div>
-                      <div className="font-semibold text-[#16475b]">Professionell PDF-rapport</div>
-                      <div className="text-sm text-[#16475b]/80">Med ditt företags logo och formaterad text</div>
-                    </div>
-                  </div>
+              {/* Quick Stats */}
+              <div className="grid grid-cols-3 gap-6 mb-12">
+                <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                  <div className="text-3xl font-bold text-white">{insights.filter(i => i.strength === 'high').length}</div>
+                  <div className="text-white/60">Starka områden</div>
+                </div>
+                <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                  <div className="text-3xl font-bold text-white">{Object.keys(answers).length}</div>
+                  <div className="text-white/60">Analyserade fält</div>
+                </div>
+                <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                  <div className="text-3xl font-bold text-white">{actionItems.filter(a => a.priority === 'high').length}</div>
+                  <div className="text-white/60">Kritiska åtgärder</div>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-[#7edcff]/20 to-[#16475b]/20 rounded-2xl p-6 text-center">
-                <div className="text-3xl font-bold text-[#16475b] mb-2">197 kr</div>
-                <div className="text-sm text-[#16475b]/80">Engångskostnad</div>
-              </div>
-
-              <div className="flex justify-center gap-4">
+              {/* Navigation */}
+              <div className="flex justify-center gap-4 flex-wrap">
                 <button
-                  onClick={() => setShowAnalysisModal(false)}
-                  className="px-6 py-3 text-[#16475b] hover:bg-[#f5f7fa] rounded-full transition-colors"
+                  onClick={() => setCurrentSection('insights')}
+                  className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
                 >
-                  Avbryt
+                  Se Detaljerad Analys →
                 </button>
                 <button
-                  onClick={() => {
-                    setShowAnalysisModal(false);
-                    setShowAdditionalQuestions(true);
-                  }}
-                  className="px-8 py-3 bg-gradient-to-r from-[#16475b] to-[#2a6b8a] text-white font-bold rounded-full hover:shadow-lg transition-all"
+                  onClick={() => setCurrentSection('actions')}
+                  className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all"
                 >
-                  Testa gratis (Demo)
+                  Nästa Steg
+                </button>
+                <button
+                  onClick={handleDownloadPDF}
+                  className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Ladda ner PDF
                 </button>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Additional Questions Modal */}
-      {showAdditionalQuestions && (
-        <div className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-8 animate-fadeIn max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-[#16475b]">Branschspecifika frågor</h2>
+        {/* Insights Section */}
+        {currentSection === 'insights' && (
+          <div className="animate-fadeIn">
+            {/* Back button */}
+            <button
+              onClick={() => setCurrentSection('score')}
+              className="mb-6 text-white/60 hover:text-white flex items-center gap-2 transition-colors"
+            >
+              ← Tillbaka till översikt
+            </button>
+
+            <h2 className="text-4xl font-bold text-white mb-8">Detaljerad Analys</h2>
+            
+            <div className="space-y-4">
+              {insights.map((insight) => (
+                <div
+                  key={insight.id}
+                  className={`bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden transition-all duration-300 hover:bg-white/10 ${
+                    expandedInsight === insight.id ? 'ring-2 ring-white/30' : ''
+                  }`}
+                >
+                  <button
+                    onClick={() => setExpandedInsight(expandedInsight === insight.id ? null : insight.id)}
+                    className="w-full p-6 flex items-center justify-between text-left"
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="text-3xl">{insight.icon}</span>
+                      <div>
+                        <h3 className="text-xl font-semibold text-white">{insight.title}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className={`w-2 h-2 rounded-full ${
+                            insight.strength === 'high' ? 'bg-green-400' : 
+                            insight.strength === 'medium' ? 'bg-yellow-400' : 'bg-red-400'
+                          }`} />
+                          <span className="text-sm text-white/60">
+                            {insight.strength === 'high' ? 'Starkt område' : 
+                             insight.strength === 'medium' ? 'Kan förbättras' : 'Behöver utveckling'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <svg
+                      className={`w-6 h-6 text-white/60 transition-transform ${
+                        expandedInsight === insight.id ? 'rotate-180' : ''
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {expandedInsight === insight.id && (
+                    <div className="px-6 pb-6">
+                      {insight.content}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Action button */}
+            <div className="mt-8 text-center">
               <button
-                onClick={() => setShowAdditionalQuestions(false)}
-                className="text-[#16475b] text-2xl font-bold hover:text-[#2a6b8a] focus:outline-none"
+                onClick={() => setCurrentSection('actions')}
+                className="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+              >
+                Se Rekommenderade Åtgärder →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Actions Section */}
+        {currentSection === 'actions' && (
+          <div className="animate-fadeIn">
+            {/* Back button */}
+            <button
+              onClick={() => setCurrentSection('insights')}
+              className="mb-6 text-white/60 hover:text-white flex items-center gap-2 transition-colors"
+            >
+              ← Tillbaka till analys
+            </button>
+
+            <h2 className="text-4xl font-bold text-white mb-8">Rekommenderade Nästa Steg</h2>
+            
+            <div className="grid gap-4">
+              {actionItems.map((action, index) => (
+                <div
+                  key={index}
+                  className={`bg-white/5 backdrop-blur-xl rounded-2xl p-6 border ${
+                    action.priority === 'high' 
+                      ? 'border-red-500/30 bg-gradient-to-r from-red-500/10 to-transparent' 
+                      : 'border-white/10'
+                  } hover:bg-white/10 transition-all`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          action.priority === 'high' 
+                            ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
+                            : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                        }`}>
+                          {action.priority === 'high' ? 'Hög prioritet' : 'Medium prioritet'}
+                        </span>
+                        <span className="text-white/60 text-sm">{action.timeframe}</span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-white mb-2">{action.title}</h3>
+                      <p className="text-white/70 mb-3">{action.description}</p>
+                      <p className="text-sm text-green-400">✨ {action.impact}</p>
+                    </div>
+                    <div className="ml-4">
+                      <button 
+                        onClick={() => setShowActionModal(action)}
+                        className="p-3 bg-white/10 rounded-full hover:bg-white/20 transition-all group"
+                      >
+                        <svg className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Premium CTA */}
+            <div className="mt-12 bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-3xl p-8 border border-purple-500/30 text-center">
+              <h3 className="text-2xl font-bold text-white mb-4">🚀 Vill du ha en djupare analys?</h3>
+              <p className="text-white/70 mb-6">
+                Få en komplett AI-driven affärsanalys med branschspecifika insikter, 
+                jämförelser med framgångsrika startups och en professionell PDF-rapport.
+              </p>
+              
+              {/* Premium features grid */}
+              <div className="grid md:grid-cols-3 gap-4 mb-8">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                  <div className="text-2xl mb-2">📄</div>
+                  <h4 className="font-semibold text-white mb-1">PDF-rapport</h4>
+                  <p className="text-white/60 text-sm">Professionell rapport att dela med investerare</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                  <div className="text-2xl mb-2">📊</div>
+                  <h4 className="font-semibold text-white mb-1">50+ sidor analys</h4>
+                  <p className="text-white/60 text-sm">Djupgående insikter för varje område</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                  <div className="text-2xl mb-2">💬</div>
+                  <h4 className="font-semibold text-white mb-1">Expertsamtal</h4>
+                  <p className="text-white/60 text-sm">30 min strategisession ingår</p>
+                </div>
+              </div>
+              
+              <a href="/kassa?product=premium-analysis" className="inline-block px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all">
+                Uppgradera för 197 kr
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Action Details Modal */}
+      {showActionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-gradient-to-br from-[#0a1628] to-[#04111d] rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden relative animate-fadeIn border border-white/10 flex flex-col">
+            <div className="p-8 pb-0">
+              <button
+                onClick={() => setShowActionModal(null)}
+                className="absolute top-4 right-4 text-white/40 hover:text-white text-2xl transition-colors"
               >
                 ×
               </button>
-            </div>
-
-            <div className="space-y-6">
-              {/* Logo Upload */}
+              
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-[#16475b] mb-3">Företagslogo (valfritt)</h3>
-                <div className="flex items-center gap-6">
-                  <div className="w-32 h-32 border-2 border-dashed border-[#7edcff] rounded-xl flex items-center justify-center bg-[#f5f7fa]">
-                    {logoPreview ? (
-                      <img src={logoPreview} alt="Logo preview" className="max-w-full max-h-full object-contain" />
-                    ) : (
-                      <svg className="w-12 h-12 text-[#7edcff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    )}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                    <span className="text-2xl">🎯</span>
                   </div>
                   <div>
-                    <label className="bg-[#16475b] text-white px-6 py-2 rounded-full cursor-pointer hover:bg-[#2a6b8a] transition-colors inline-block">
-                      Ladda upp logo
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setCompanyLogo(file);
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setLogoPreview(reader.result as string);
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                        className="hidden"
-                      />
-                    </label>
-                    <p className="text-sm text-[#16475b]/60 mt-2">PNG eller JPG, max 5MB</p>
+                    <h3 className="text-2xl font-bold text-white">{showActionModal.title}</h3>
+                    <p className="text-white/60">{showActionModal.timeframe}</p>
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Additional Questions based on industry */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-[#16475b]">Branschspecifika frågor för {typedAnswers.bransch || 'din bransch'}</h3>
-                
-                {/* Question 1 */}
-                <div>
-                  <label className="block font-semibold text-[#16475b] mb-2">
-                    1. Vilka regulatoriska utmaningar finns inom er bransch?
-                  </label>
-                  <textarea
-                    className="w-full min-h-[100px] rounded-xl border border-[#7edcff] bg-white px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none"
-                    placeholder="Beskriv eventuella lagar, regler eller certifieringar som påverkar er verksamhet..."
-                    value={additionalAnswers.regulatory || ''}
-                    onChange={(e) => setAdditionalAnswers({ ...additionalAnswers, regulatory: e.target.value })}
-                  />
+            <div className="overflow-y-auto flex-1 px-8 pb-8">
+              <div className="space-y-6">
+                {/* Detaljerad beskrivning */}
+                <div className="bg-white/5 rounded-xl p-6">
+                  <h4 className="text-lg font-semibold text-white mb-3">Vad behöver göras?</h4>
+                  <p className="text-white/70 mb-4">{showActionModal.description}</p>
+                  <div className="space-y-2">
+                    <p className="text-white/60 text-sm">• Identifiera 20 potentiella early adopters</p>
+                    <p className="text-white/60 text-sm">• Erbjud 50% rabatt första 3 månaderna</p>
+                    <p className="text-white/60 text-sm">• Sätt upp strukturerad feedback-process</p>
+                    <p className="text-white/60 text-sm">• Dokumentera alla insikter och case studies</p>
+                  </div>
                 </div>
 
-                {/* Question 2 */}
-                <div>
-                  <label className="block font-semibold text-[#16475b] mb-2">
-                    2. Hur ser er go-to-market strategi ut?
-                  </label>
-                  <textarea
-                    className="w-full min-h-[100px] rounded-xl border border-[#7edcff] bg-white px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none"
-                    placeholder="Beskriv hur ni planerar att nå ut till era kunder..."
-                    value={additionalAnswers.goToMarket || ''}
-                    onChange={(e) => setAdditionalAnswers({ ...additionalAnswers, goToMarket: e.target.value })}
-                  />
+                {/* Förväntade resultat */}
+                <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl p-6 border border-green-500/30">
+                  <h4 className="text-lg font-semibold text-white mb-3">Förväntade resultat</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-2xl font-bold text-green-400">3-5x</div>
+                      <div className="text-white/60 text-sm">Ökad konvertering</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-green-400">+15p</div>
+                      <div className="text-white/60 text-sm">Högre investerarscore</div>
+                    </div>
+                  </div>
+                  <p className="text-white/70 text-sm mt-4">{showActionModal.impact}</p>
                 </div>
 
-                {/* Question 3 */}
-                <div>
-                  <label className="block font-semibold text-[#16475b] mb-2">
-                    3. Vilka är era viktigaste KPI:er och hur mäter ni framgång?
-                  </label>
-                  <textarea
-                    className="w-full min-h-[100px] rounded-xl border border-[#7edcff] bg-white px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none"
-                    placeholder="Lista era viktigaste nyckeltal och mål..."
-                    value={additionalAnswers.kpis || ''}
-                    onChange={(e) => setAdditionalAnswers({ ...additionalAnswers, kpis: e.target.value })}
-                  />
+                {/* Exempel från andra startups */}
+                <div className="bg-white/5 rounded-xl p-6">
+                  <h4 className="text-lg font-semibold text-white mb-3">Exempel från framgångsrika startups</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <span className="text-xl">🦄</span>
+                      <div>
+                        <p className="text-white font-medium">Klarna</p>
+                        <p className="text-white/60 text-sm">Började med 10 pilotbutiker, idag värt 6.7 miljarder USD</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="text-xl">🎵</span>
+                      <div>
+                        <p className="text-white font-medium">Spotify</p>
+                        <p className="text-white/60 text-sm">Första 1000 användare gav kritisk feedback för produktutveckling</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Question 4 */}
-                <div>
-                  <label className="block font-semibold text-[#16475b] mb-2">
-                    4. Hur ser er prissättningsstrategi ut jämfört med konkurrenter?
-                  </label>
-                  <textarea
-                    className="w-full min-h-[100px] rounded-xl border border-[#7edcff] bg-white px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none"
-                    placeholder="Beskriv er prissättning och positionering..."
-                    value={additionalAnswers.pricing || ''}
-                    onChange={(e) => setAdditionalAnswers({ ...additionalAnswers, pricing: e.target.value })}
-                  />
+                {/* Call to action */}
+                <div className="flex gap-4 pt-4">
+                  <button
+                    onClick={() => setShowActionModal(null)}
+                    className="flex-1 px-6 py-3 bg-white/10 rounded-full text-white font-medium hover:bg-white/20 transition-all"
+                  >
+                    Stäng
+                  </button>
+                  <button className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-white font-medium hover:shadow-lg hover:scale-105 transition-all">
+                    Lägg till i min plan
+                  </button>
                 </div>
-
-                {/* Question 5 */}
-                <div>
-                  <label className="block font-semibold text-[#16475b] mb-2">
-                    5. Vilka partnerskap eller samarbeten är kritiska för er tillväxt?
-                  </label>
-                  <textarea
-                    className="w-full min-h-[100px] rounded-xl border border-[#7edcff] bg-white px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none"
-                    placeholder="Beskriv viktiga partners, leverantörer eller distributionskanaler..."
-                    value={additionalAnswers.partnerships || ''}
-                    onChange={(e) => setAdditionalAnswers({ ...additionalAnswers, partnerships: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-center gap-4 mt-8">
-                <button
-                  onClick={() => setShowAdditionalQuestions(false)}
-                  className="px-6 py-3 text-[#16475b] hover:bg-[#f5f7fa] rounded-full transition-colors"
-                >
-                  Avbryt
-                </button>
-                <button
-                  onClick={async () => {
-                    setGeneratingReport(true);
-                    setShowAdditionalQuestions(false);
-                    // Spara rapportdata och visa design-wizard
-                    setPendingReportData({
-                      answers,
-                      additionalAnswers,
-                      score: _score,
-                      company: typedAnswers.company || '',
-                      logo: companyLogo,
-                      logoPreview,
-                    });
-                    setShowDesignWizard(true);
-                  }}
-                  disabled={generatingReport}
-                  className="px-8 py-3 bg-gradient-to-r from-[#16475b] to-[#2a6b8a] text-white font-bold rounded-full hover:shadow-lg transition-all disabled:opacity-50"
-                >
-                  {generatingReport ? (
-                    <span className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Genererar rapport...
-                    </span>
-                  ) : (
-                    'Generera rapport'
-                  )}
-                </button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Design Wizard Modal */}
-      {showDesignWizard && (
-        <ReportDesignWizard
-          onConfirm={async (design) => {
-            setShowDesignWizard(false);
-            setGeneratingReport(true);
-            try {
-              // Förbered data för HTML-PDF API
-              const { answers, additionalAnswers, score, company, logo, logoPreview } = pendingReportData;
-              // Skapa sektioner (exempel, anpassa efter behov)
-              const sections = [
-                { title: 'Sammanfattning', content: answers.company_value || '' },
-                { title: 'Marknad', content: answers.market_size || '' },
-                { title: 'Team', content: answers.team || '' },
-                // ...lägg till fler sektioner efter behov
-              ];
-              // Ladda upp logo om det finns (eller använd preview-url)
-              const logoUrl = logoPreview;
-              // Skicka till nya API:t
-              const response = await fetch('/api/generate-deep-analysis/generateHtmlPdf', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  companyName: company,
-                  score,
-                  scoreExplanation: 'AI-genererad förklaring här',
-                  logoUrl,
-                  date: new Date().toLocaleDateString('sv-SE'),
-                  sections,
-                  design,
-                })
-              });
-              if (response.ok) {
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'affarsanalys-rapport.pdf';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-              } else {
-                alert('Kunde inte generera rapport. Försök igen senare.');
-              }
-            } catch (error) {
-              console.error('Error generating report:', error);
-              alert('Ett fel uppstod vid generering av rapport.');
-            } finally {
-              setGeneratingReport(false);
-            }
-          }}
-        />
-      )}
+      {/* CSS for animations */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.6s ease-out;
+        }
+      `}</style>
     </div>
   );
 } 
