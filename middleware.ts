@@ -2,41 +2,27 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const url = request.nextUrl.clone();
+  const url = request.nextUrl;
   const hostname = request.headers.get('host') || '';
-  const forwardedHost = request.headers.get('x-forwarded-host');
-  const forwardedProto = request.headers.get('x-forwarded-proto') || 'https';
 
-  // Use the forwarded host if available (this is what Render sends)
-  if (forwardedHost) {
-    url.host = forwardedHost;
-    url.protocol = forwardedProto;
-    url.port = ''; // Clear any port number
-  }
+  // Log for debugging
+  console.log('Middleware - Host:', hostname);
+  console.log('Middleware - URL:', url.toString());
 
   // Redirect www to non-www
-  if (hostname.startsWith('www.') || (forwardedHost && forwardedHost.startsWith('www.'))) {
-    const newHost = (forwardedHost || hostname).replace('www.', '');
-    url.host = newHost;
-    url.protocol = forwardedProto;
-    url.port = ''; // Clear any port number
-    return NextResponse.redirect(url, 301);
+  if (hostname.includes('www.')) {
+    const newUrl = new URL(request.url);
+    newUrl.host = hostname.replace('www.', '');
+    console.log('Redirecting to:', newUrl.toString());
+    return NextResponse.redirect(newUrl, 301);
   }
 
-  // Health check endpoint for Render
+  // Health check endpoint
   if (url.pathname === '/health') {
     return new NextResponse('OK', { status: 200 });
   }
 
-  // Create response with correct host headers
-  const response = NextResponse.next();
-  
-  // Set the correct host header to prevent port being added
-  if (forwardedHost) {
-    response.headers.set('x-forwarded-host', forwardedHost);
-  }
-
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
