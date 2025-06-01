@@ -208,21 +208,21 @@ const BRANSCH_SPECIFIC_QUESTIONS: { [key: string]: BranschQuestion[] } = {
   ]
 };
 
-// 1. Apple-inspirerade utility-klasser
-const focusRing = "focus:outline-none focus:ring-2 focus:ring-[#7edcff] focus:ring-offset-2 focus:ring-offset-[#f5f7fa]";
-const mobileInput = "text-base md:text-sm"; // Larger text on mobile
-const touchTarget = "min-h-[44px]"; // Minimum touch target size
+// Update these style constants for dark theme
+const focusRing = "focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-[#04111d]";
+const mobileInput = "text-base md:text-sm";
+const touchTarget = "min-h-[44px]";
 const transitionBase = "transition-all duration-200 ease-in-out";
 
-// Update the input base styles
-const inputBase = `w-full px-4 py-3 rounded-2xl bg-white/10 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] border border-[#16475b] text-[#04121d] placeholder-[#7edcff] transition-all duration-200 backdrop-blur-md ${mobileInput} ${touchTarget}`;
+// Update the input base styles for dark theme
+const inputBase = `w-full px-4 py-3 rounded-2xl bg-white/10 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] border border-white/20 text-white placeholder-white/40 transition-all duration-200 backdrop-blur-md ${mobileInput} ${touchTarget} ${focusRing} hover:bg-white/15 hover:border-white/30`;
 
 // Update the select base styles
 const selectBase = `${inputBase} appearance-none pr-10 cursor-pointer`;
 
 // Add new feedback styles
-const successState = "border-green-500 bg-green-50/10";
-const errorState = "border-red-500 bg-red-50/10";
+const successState = "border-green-500 bg-green-500/10";
+const errorState = "border-red-500 bg-red-500/10";
 const loadingState = "opacity-75 cursor-wait";
 
 interface BusinessIdea {
@@ -573,24 +573,24 @@ function MilestoneList({ value, onChange }: { value: { milestone: string; date: 
   return (
     <div className="space-y-4">
       {value.map((item, idx) => (
-        <div key={idx} className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
+        <div key={idx} className="bg-white/5 rounded-2xl p-4 border border-white/20 hover:border-white/30 transition-all">
           <div className="flex items-start gap-3">
             <div className="flex-1 space-y-3">
               <div>
-                <label className="block text-sm font-medium text-[#16475b] mb-2">Milstolpe {idx + 1}</label>
+                <label className="block text-sm font-medium text-white/80 mb-2">Milstolpe {idx + 1}</label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 rounded-xl border border-[#7edcff] bg-white/80 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 text-white placeholder-white/40 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all hover:bg-white/15"
                   placeholder="T.ex. 'Lansering', 'Första betalande kund', 'ISO-certifiering'"
                   value={item.milestone}
                   onChange={e => handleChange(idx, 'milestone', e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#16475b] mb-2">Tidpunkt</label>
+                <label className="block text-sm font-medium text-white/80 mb-2">Tidpunkt</label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 rounded-xl border border-[#7edcff] bg-white/80 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 text-white placeholder-white/40 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all hover:bg-white/15"
                   placeholder="T.ex. 'Q3 2024', 'September', 'H1 2025'"
                   value={item.date}
                   onChange={e => handleChange(idx, 'date', e.target.value)}
@@ -600,7 +600,7 @@ function MilestoneList({ value, onChange }: { value: { milestone: string; date: 
             {value.length > 1 && (
               <button 
                 type="button" 
-                className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center hover:bg-red-200 transition-colors mt-8" 
+                className="w-8 h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500/30 transition-colors mt-8" 
                 onClick={() => removeMilestone(idx)} 
                 aria-label="Ta bort milstolpe"
               >
@@ -613,7 +613,7 @@ function MilestoneList({ value, onChange }: { value: { milestone: string; date: 
       {value.length < 5 && (
         <button 
           type="button" 
-          className="w-full py-3 px-4 rounded-2xl border-2 border-dashed border-[#7edcff] text-[#7edcff] font-medium hover:bg-[#7edcff]/10 transition-all flex items-center justify-center gap-2" 
+          className="w-full py-3 px-4 rounded-2xl border-2 border-dashed border-purple-500/50 text-purple-400 font-medium hover:bg-purple-500/10 hover:border-purple-500 transition-all flex items-center justify-center gap-2" 
           onClick={addMilestone}
         >
           <span className="text-xl">+</span>
@@ -630,87 +630,87 @@ function CapitalMatrix({ value, onChange }: { value: { amount: string; product: 
   return (
     <div className="space-y-4">
       {/* Kapitalbehov */}
-      <div className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
-        <label className="block font-semibold mb-3 text-[#16475b]">Totalt kapitalbehov</label>
+      <div className="bg-white/5 rounded-2xl p-4 border border-white/20">
+        <label className="block font-semibold mb-3 text-white">Totalt kapitalbehov</label>
         <div className="flex items-center gap-3">
           <input 
             type="number" 
             min="0" 
             step="0.5" 
-            className="w-24 px-3 py-2 rounded-xl border border-[#7edcff] bg-white/80 text-[#16475b] text-center font-bold focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all" 
+            className="w-24 px-3 py-2 rounded-xl border border-white/20 bg-white/10 text-white text-center font-bold focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all hover:bg-white/15" 
             value={value.amount} 
             onChange={e => handleField('amount', e.target.value)}
             placeholder="8" 
           />
-          <span className="text-[#16475b] font-medium">MSEK</span>
+          <span className="text-white/80 font-medium">MSEK</span>
         </div>
       </div>
 
       {/* Fördelning */}
-      <div className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
-        <label className="block font-semibold mb-3 text-[#16475b]">Hur ska kapitalet användas? (%)</label>
+      <div className="bg-white/5 rounded-2xl p-4 border border-white/20">
+        <label className="block font-semibold mb-3 text-white">Hur ska kapitalet användas? (%)</label>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-[#16475b]">Produktutveckling</label>
+            <label className="text-sm font-medium text-white/80">Produktutveckling</label>
             <div className="flex items-center gap-2">
               <input 
                 type="number" 
                 min="0" 
                 max="100" 
-                className="w-16 px-2 py-1 rounded-lg border border-[#7edcff] bg-white/80 text-[#16475b] text-center text-sm focus:ring-1 focus:ring-[#7edcff] transition-all" 
+                className="w-16 px-2 py-1 rounded-lg border border-white/20 bg-white/10 text-white text-center text-sm focus:ring-1 focus:ring-purple-500 transition-all hover:bg-white/15" 
                 value={value.product} 
                 onChange={e => handleField('product', e.target.value)}
                 placeholder="40" 
               />
-              <span className="text-xs text-gray-500">%</span>
+              <span className="text-xs text-white/60">%</span>
             </div>
           </div>
           
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-[#16475b]">Försäljning & Marknad</label>
+            <label className="text-sm font-medium text-white/80">Försäljning & Marknad</label>
             <div className="flex items-center gap-2">
               <input 
                 type="number" 
                 min="0" 
                 max="100" 
-                className="w-16 px-2 py-1 rounded-lg border border-[#7edcff] bg-white/80 text-[#16475b] text-center text-sm focus:ring-1 focus:ring-[#7edcff] transition-all" 
+                className="w-16 px-2 py-1 rounded-lg border border-white/20 bg-white/10 text-white text-center text-sm focus:ring-1 focus:ring-purple-500 transition-all hover:bg-white/15" 
                 value={value.sales} 
                 onChange={e => handleField('sales', e.target.value)}
                 placeholder="30" 
               />
-              <span className="text-xs text-gray-500">%</span>
+              <span className="text-xs text-white/60">%</span>
             </div>
           </div>
           
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-[#16475b]">Personal & Rekrytering</label>
+            <label className="text-sm font-medium text-white/80">Personal & Rekrytering</label>
             <div className="flex items-center gap-2">
               <input 
                 type="number" 
                 min="0" 
                 max="100" 
-                className="w-16 px-2 py-1 rounded-lg border border-[#7edcff] bg-white/80 text-[#16475b] text-center text-sm focus:ring-1 focus:ring-[#7edcff] transition-all" 
+                className="w-16 px-2 py-1 rounded-lg border border-white/20 bg-white/10 text-white text-center text-sm focus:ring-1 focus:ring-purple-500 transition-all hover:bg-white/15" 
                 value={value.team} 
                 onChange={e => handleField('team', e.target.value)}
                 placeholder="25" 
               />
-              <span className="text-xs text-gray-500">%</span>
+              <span className="text-xs text-white/60">%</span>
             </div>
           </div>
           
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-[#16475b]">Övrigt</label>
+            <label className="text-sm font-medium text-white/80">Övrigt</label>
             <div className="flex items-center gap-2">
               <input 
                 type="number" 
                 min="0" 
                 max="100" 
-                className="w-16 px-2 py-1 rounded-lg border border-[#7edcff] bg-white/80 text-[#16475b] text-center text-sm focus:ring-1 focus:ring-[#7edcff] transition-all" 
+                className="w-16 px-2 py-1 rounded-lg border border-white/20 bg-white/10 text-white text-center text-sm focus:ring-1 focus:ring-purple-500 transition-all hover:bg-white/15" 
                 value={value.other} 
                 onChange={e => handleField('other', e.target.value)}
                 placeholder="5" 
               />
-              <span className="text-xs text-gray-500">%</span>
+              <span className="text-xs text-white/60">%</span>
             </div>
           </div>
         </div>
@@ -719,7 +719,7 @@ function CapitalMatrix({ value, onChange }: { value: { amount: string; product: 
         {(() => {
           const total = (parseInt(value.product) || 0) + (parseInt(value.sales) || 0) + (parseInt(value.team) || 0) + (parseInt(value.other) || 0);
           return total > 0 ? (
-            <div className={`mt-3 text-sm text-center font-medium ${total === 100 ? 'text-green-600' : 'text-orange-600'}`}>
+            <div className={`mt-3 text-sm text-center font-medium ${total === 100 ? 'text-green-400' : 'text-orange-400'}`}>
               Totalt: {total}% {total !== 100 && '(bör vara 100%)'}
             </div>
           ) : null;
@@ -727,23 +727,23 @@ function CapitalMatrix({ value, onChange }: { value: { amount: string; product: 
       </div>
 
       {/* Sannolikhet för mer kapital */}
-      <div className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
-        <label className="block font-semibold mb-3 text-[#16475b]">Sannolikhet att ni behöver mer kapital inom 18 månader</label>
+      <div className="bg-white/5 rounded-2xl p-4 border border-white/20">
+        <label className="block font-semibold mb-3 text-white">Sannolikhet att ni behöver mer kapital inom 18 månader</label>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">Låg</span>
+          <span className="text-sm text-white/60">Låg</span>
           <input 
             type="range" 
             min="1" 
             max="5" 
             value={value.probability || '3'} 
             onChange={e => handleField('probability', e.target.value)} 
-            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+            className="flex-1 h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider"
             style={{
-              background: `linear-gradient(to right, #7edcff 0%, #7edcff ${((parseInt(value.probability) || 3) - 1) * 25}%, #e5e7eb ${((parseInt(value.probability) || 3) - 1) * 25}%, #e5e7eb 100%)`
+              background: `linear-gradient(to right, #a855f7 0%, #a855f7 ${((parseInt(value.probability) || 3) - 1) * 25}%, rgba(255,255,255,0.1) ${((parseInt(value.probability) || 3) - 1) * 25}%, rgba(255,255,255,0.1) 100%)`
             }}
           />
-          <span className="text-sm text-gray-600">Hög</span>
-          <div className="w-8 h-8 rounded-full bg-[#7edcff] text-[#16475b] flex items-center justify-center font-bold text-sm">
+          <span className="text-sm text-white/60">Hög</span>
+          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center justify-center font-bold text-sm">
             {value.probability || '3'}
           </div>
         </div>
@@ -757,8 +757,8 @@ function ESGCheckbox({ value, onChange }: { value: { miljö: boolean; socialt: b
   
   return (
     <div className="space-y-4">
-      <div className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
-        <label className="block font-semibold mb-3 text-[#16475b]">Välj relevanta områden:</label>
+      <div className="bg-white/5 rounded-2xl p-4 border border-white/20">
+        <label className="block font-semibold mb-3 text-white">Välj relevanta områden:</label>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {[
             { key: 'miljö', label: 'Miljö & Klimat', icon: '🌱' },
@@ -768,8 +768,8 @@ function ESGCheckbox({ value, onChange }: { value: { miljö: boolean; socialt: b
             <label key={key} className="flex items-center gap-3 cursor-pointer group">
               <div className={`relative w-6 h-6 rounded-lg border-2 transition-all duration-200 ${
                 value[key as keyof typeof value] 
-                  ? 'bg-[#7edcff] border-[#7edcff]' 
-                  : 'bg-white border-gray-300 group-hover:border-[#7edcff]'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 border-purple-500' 
+                  : 'bg-white/10 border-white/30 group-hover:border-purple-400'
               }`}>
                 <input
                   type="checkbox"
@@ -779,7 +779,7 @@ function ESGCheckbox({ value, onChange }: { value: { miljö: boolean; socialt: b
                 />
                 {value[key as keyof typeof value] && (
                   <svg 
-                    className="w-4 h-4 text-[#16475b] absolute top-0.5 left-0.5" 
+                    className="w-4 h-4 text-white absolute top-0.5 left-0.5" 
                     fill="currentColor" 
                     viewBox="0 0 20 20"
                   >
@@ -791,7 +791,7 @@ function ESGCheckbox({ value, onChange }: { value: { miljö: boolean; socialt: b
                   </svg>
                 )}
               </div>
-              <span className="flex items-center gap-2 text-[#16475b] font-medium">
+              <span className="flex items-center gap-2 text-white/80 font-medium group-hover:text-white transition-colors">
                 <span>{icon}</span>
                 {label}
               </span>
@@ -1235,9 +1235,19 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         from { transform: rotate(0deg); }
         to { transform: rotate(-360deg); }
       }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: .5; }
+      }
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+      }
       .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
       .animate-slideIn { animation: slideIn 0.4s ease-out; }
       .animate-spin-reverse { animation: spin-reverse 1s linear infinite; }
+      .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+      .animate-float { animation: float 3s ease-in-out infinite; }
       .delay-150 { animation-delay: 150ms; }
       .delay-300 { animation-delay: 300ms; }
     `;
@@ -1247,19 +1257,31 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   // PreStepPage 1: Company, Email, Hemsida
   if (preStep && preStepPage === 1) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative">
-          <h2 className="text-2xl font-bold mb-6 text-center">Starta din affärsplan-analys</h2>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-3xl shadow-2xl border border-white/10 max-w-lg w-full p-8 relative animate-fadeIn">
+          {/* Background glow effect */}
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-xl -z-10"></div>
+          
+          <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+            Starta din AI-analys
+          </h2>
+          
+          {/* Progress dots */}
+          <div className="flex justify-center gap-2 mb-8">
+            <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+            <div className="w-2 h-2 rounded-full bg-white/20"></div>
+          </div>
+          
           {/* Hemsida först */}
-          <div className="mb-4">
-            <label className="block font-semibold mb-2">Har ni en hemsida?</label>
+          <div className="mb-6">
+            <label className="block font-semibold mb-3 text-white/90">Har ni en hemsida?</label>
             <div className="flex gap-4 flex-col sm:flex-row">
               <button
                 type="button"
-                className={`flex-1 p-3 rounded-xl font-medium transition-all ${
+                className={`flex-1 p-4 rounded-2xl font-medium transition-all transform hover:scale-105 ${
                   hasWebsite === true 
-                    ? 'bg-[#16475b] text-white' 
-                    : 'bg-gray-100 text-[#16475b] hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' 
+                    : 'bg-white/10 text-white/70 hover:bg-white/20 border border-white/20'
                 }`}
                 onClick={() => setHasWebsite(true)}
               >
@@ -1267,10 +1289,10 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               </button>
               <button
                 type="button"
-                className={`flex-1 p-3 rounded-xl font-medium transition-all ${
+                className={`flex-1 p-4 rounded-2xl font-medium transition-all transform hover:scale-105 ${
                   hasWebsite === false 
-                    ? 'bg-[#16475b] text-white' 
-                    : 'bg-gray-100 text-[#16475b] hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' 
+                    : 'bg-white/10 text-white/70 hover:bg-white/20 border border-white/20'
                 }`}
                 onClick={() => setHasWebsite(false)}
               >
@@ -1278,20 +1300,21 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               </button>
             </div>
           </div>
+          
           {hasWebsite === true && (
-            <div className="mb-4 animate-fadeIn">
-              <label className="block font-semibold mb-1">Hemsida</label>
-              <div className="flex flex-col sm:flex-row gap-2">
+            <div className="mb-6 animate-fadeIn">
+              <label className="block font-semibold mb-3 text-white/90">Hemsida</label>
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="url"
-                  className="flex-1 p-4 border-2 border-[#7edcff] rounded-2xl text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all"
+                  className={inputBase}
                   placeholder="https://www.dittforetag.se"
                   value={websiteUrl}
                   onChange={e => setWebsiteUrl(e.target.value)}
                 />
                 <button
                   type="button"
-                  className="bg-[#7edcff] text-[#16475b] font-bold rounded-2xl px-6 py-3 shadow hover:bg-[#16475b] hover:text-white transition-all disabled:opacity-50"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-2xl px-6 py-3 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 transform hover:scale-105"
                   disabled={!websiteUrl || isScraping}
                   onClick={async () => {
                     setIsScraping(true);
@@ -1329,14 +1352,11 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                   {isScraping ? (
                     <div className="flex flex-col items-center gap-2">
                       <div className="flex items-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#16475b]"></div>
-                        <span>Analyserar hemsida...</span>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <span>Analyserar...</span>
                       </div>
-                      <div className="text-xs text-gray-600">
-                        Hämtar och extraherar företagsdata
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                        <div className="bg-[#7edcff] h-2 rounded-full animate-pulse" style={{ width: '70%' }}></div>
+                      <div className="text-xs text-white/60">
+                        Hämtar företagsdata
                       </div>
                     </div>
                   ) : (
@@ -1345,27 +1365,29 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 </button>
               </div>
               {scrapeError && (
-                <div className="mt-2 text-red-600 text-sm">{scrapeError}</div>
+                <div className="mt-2 text-red-400 text-sm">{scrapeError}</div>
               )}
             </div>
           )}
+          
           {/* Företagsnamn */}
-          <div className="mb-4">
-            <label className="block font-semibold mb-1">Företagsnamn</label>
+          <div className="mb-6">
+            <label className="block font-semibold mb-3 text-white/90">Företagsnamn</label>
             <input
               type="text"
-              className="w-full p-4 border-2 border-[#7edcff] rounded-2xl mb-2 text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg"
+              className={inputBase}
               placeholder="Ange företagets namn"
               value={company}
               onChange={e => setCompany(e.target.value)}
             />
           </div>
+          
           {/* E-post */}
-          <div className="mb-4">
-            <label className="block font-semibold mb-1">E-post</label>
+          <div className="mb-6">
+            <label className="block font-semibold mb-3 text-white/90">E-post</label>
             <input
               type="email"
-              className="w-full p-4 border-2 border-[#7edcff] rounded-2xl mb-2 text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg"
+              className={inputBase}
               placeholder="din@epost.se"
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -1373,29 +1395,29 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
           </div>
           
           <div className="mb-6">
-            <label className="flex items-center cursor-pointer">
+            <label className="flex items-center cursor-pointer group">
               <input
                 type="checkbox"
-                className="mr-2 w-5 h-5 text-[#16475b] border-2 border-[#7edcff] rounded focus:ring-[#7edcff]"
+                className="mr-3 w-5 h-5 text-purple-500 bg-white/10 border-2 border-white/30 rounded focus:ring-purple-500 focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#04111d] transition-all"
                 checked={privacyChecked}
                 onChange={e => setPrivacyChecked(e.target.checked)}
               />
-              <span className="text-sm text-[#16475b]">
-                Jag godkänner att mina uppgifter behandlas enligt <a href="/privacy" className="text-[#7edcff] underline">integritetspolicyn</a>
+              <span className="text-sm text-white/80 group-hover:text-white transition-colors">
+                Jag godkänner att mina uppgifter behandlas enligt <a href="/privacy" className="text-purple-400 underline hover:text-purple-300">integritetspolicyn</a>
               </span>
             </label>
           </div>
           
-          <div className="flex justify-between">
+          <div className="flex justify-between mt-8">
             <button
-              className="bg-gray-200 text-[#16475b] font-bold rounded-full px-8 py-3 shadow-lg"
+              className="px-6 py-3 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-all border border-white/20"
               onClick={onClose}
             >Avbryt</button>
             <button
-              className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg disabled:opacity-50"
+              className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-full shadow-lg hover:shadow-xl disabled:opacity-50 transition-all transform hover:scale-105"
               onClick={() => setPreStepPage(2)}
               disabled={!isPreStep1Valid}
-            >Nästa</button>
+            >Nästa →</button>
           </div>
         </div>
       </div>
@@ -1405,85 +1427,101 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   // PreStepPage 2: Bransch och Område
   if (preStep && preStepPage === 2) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative">
-          <h2 className="text-2xl font-bold mb-6 text-center">Företagsinformation</h2>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-3xl shadow-2xl border border-white/10 max-w-lg w-full p-8 relative animate-fadeIn">
+          {/* Background glow effect */}
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-xl -z-10"></div>
           
-          <div className="mb-4">
-            <label className="block font-semibold mb-1">Bransch</label>
+          <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+            Företagsinformation
+          </h2>
+          
+          {/* Progress dots */}
+          <div className="flex justify-center gap-2 mb-8">
+            <div className="w-2 h-2 rounded-full bg-white/20"></div>
+            <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+          </div>
+          
+          <div className="mb-6">
+            <label className="block font-semibold mb-3 text-white/90">Bransch</label>
             <div className="relative">
               <select
-                className="w-full p-4 border-2 border-[#7edcff] rounded-2xl mb-2 text-[#16475b] bg-white pr-12 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg appearance-none cursor-pointer hover:bg-[#eaf6fa]"
+                className={`${selectBase} ${bransch ? 'border-purple-500/50' : ''}`}
                 value={bransch}
                 onChange={e => setBransch(e.target.value)}
               >
                 <option value="">Välj bransch...</option>
                 {BRANSCHER.map(b => (
-                  <option key={b} value={b}>{b}</option>
+                  <option key={b} value={b} className="bg-[#04111d] text-white">{b}</option>
                 ))}
               </select>
-              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7edcff] text-2xl">
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4" stroke="#7edcff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/60">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path d="M8 10l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </span>
             </div>
           </div>
-          <div className="mb-6">
-            <label className="block font-semibold mb-1">Område</label>
+          
+          <div className="mb-8">
+            <label className="block font-semibold mb-3 text-white/90">Område</label>
             <div className="relative">
               <select
-                className="w-full p-4 border-2 border-[#7edcff] rounded-2xl mb-2 text-[#16475b] bg-white pr-12 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg appearance-none cursor-pointer hover:bg-[#eaf6fa]"
+                className={`${selectBase} ${omrade ? 'border-purple-500/50' : ''}`}
                 value={omrade}
                 onChange={e => setOmrade(e.target.value)}
               >
                 <option value="">Välj område...</option>
                 {OMRADEN.map(o => (
-                  <option key={o} value={o}>{o}</option>
+                  <option key={o} value={o} className="bg-[#04111d] text-white">{o}</option>
                 ))}
               </select>
-              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#7edcff] text-2xl">
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4" stroke="#7edcff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/60">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path d="M8 10l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </span>
             </div>
           </div>
-          <div className="flex justify-between">
+          
+          <div className="flex justify-between mt-8">
             <button
-              className="bg-gray-200 text-[#16475b] font-bold rounded-full px-8 py-3 shadow-lg mt-6"
+              className="px-6 py-3 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-all border border-white/20"
               onClick={() => setPreStepPage(1)}
-            >Tillbaka</button>
+            >← Tillbaka</button>
             <button
-              className="bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg mt-6 disabled:opacity-50"
+              className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-full shadow-lg hover:shadow-xl disabled:opacity-50 transition-all transform hover:scale-105"
               onClick={() => setPreStep(false)}
               disabled={!isPreStep2Valid}
-            >Starta</button>
+            >Starta analys →</button>
           </div>
         </div>
       </div>
     );
   }
+  
   if (step > 0 && !current) return null;
+  
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-[#f5f7fa] text-[#16475b] rounded-3xl shadow-2xl border border-[#16475b] max-w-xl w-full p-6 md:p-8 relative animate-fade-in flex flex-col justify-between max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <div className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-3xl shadow-2xl border border-white/10 max-w-xl w-full p-6 md:p-8 relative animate-fadeIn flex flex-col justify-between max-h-[90vh] overflow-y-auto">
+        {/* Background glow effect */}
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-xl -z-10"></div>
+        
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-[#16475b] text-2xl font-bold hover:text-[#16475b] focus:outline-none focus:ring-2 focus:ring-[#7edcff] rounded-full p-1"
+          className="absolute top-4 right-4 text-white/60 text-2xl font-bold hover:text-white transition-colors"
           aria-label="Stäng"
         >×</button>
+        
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[#16475b] font-bold text-sm">Fråga {step} av {INVESTOR_QUESTIONS.length}</span>
-            <div className="flex items-center gap-2">
-              <span className="text-[#16475b] font-bold text-sm">{progress}%</span>
-              <button
-                onClick={onClose}
-                className="text-[#16475b] text-2xl font-bold hover:text-[#16475b] focus:outline-none focus:ring-2 focus:ring-[#7edcff] rounded-full p-1 ml-2"
-                aria-label="Stäng"
-              >×</button>
-            </div>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-white/60 font-medium text-sm">Fråga {step} av {INVESTOR_QUESTIONS.length}</span>
+            <span className="text-white/80 font-bold text-sm">{progress}%</span>
           </div>
-          <div className="w-full h-2 bg-[#eaf6fa] rounded-full overflow-hidden mb-2">
+          <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-[#16475b] rounded-full transition-all duration-500 ease-out"
+              className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
               role="progressbar"
               aria-valuenow={progress}
@@ -1492,43 +1530,48 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             />
           </div>
         </div>
+        
         <div id="wizard-description">
-          <div className="flex items-center gap-2 mb-2 min-h-24 md:min-h-20">
+          <div className="flex items-center gap-2 mb-4">
             <h2 className="text-2xl font-bold">{current.label}</h2>
             {scrapedData && answers[current.id] && (
-              <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 border border-green-200">
+              <span className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-xs bg-green-500/20 text-green-300 border border-green-500/30">
                 <span className="mr-1">🤖</span>
-                Ifyllt automatiskt
+                Automatiskt ifyllt
               </span>
             )}
             <button
               type="button"
-              className="ml-2 text-[#7edcff] hover:text-[#16475b] text-xl focus:outline-none"
+              className="ml-auto text-purple-400 hover:text-purple-300 text-xl transition-colors"
               aria-label="Visa exempel"
               onClick={() => setShowExample(current.id)}
             >
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#7edcff" strokeWidth="2"/><text x="12" y="16" textAnchor="middle" fontSize="16" fill="#7edcff">?</text></svg>
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                <text x="12" y="16" textAnchor="middle" fontSize="14" fill="currentColor">?</text>
+              </svg>
             </button>
           </div>
-          <div className="mb-4 text-sm text-gray-600 min-h-10">
+          
+          <div className="mb-6 text-sm text-white/60">
             {current.help}
             {scrapedData && answers[current.id] && (
-              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
-                <div className="text-green-800 text-xs">
-                  <strong>Automatiskt ifyllt från din hemsida:</strong> {scrapedData._metadata?.source_url}
+              <div className="mt-3 p-3 bg-green-500/10 border border-green-500/30 rounded-xl">
+                <div className="text-green-300 text-xs">
+                  <strong>Automatiskt ifyllt från:</strong> {scrapedData._metadata?.source_url}
                 </div>
               </div>
             )}
             {scrapedData && !answers[current.id] && websiteUrl && (
-              <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="text-blue-800 text-xs mb-2">
+              <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+                <div className="text-blue-300 text-xs mb-2">
                   Detta fält kunde inte fyllas i automatiskt från hemsidan.
                 </div>
                 <button
                   type="button"
-                  className="text-xs bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-4 py-1.5 rounded-full hover:from-gray-200 hover:to-gray-300 transition-all duration-200 shadow-sm border border-gray-300"
+                  className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1.5 rounded-full hover:shadow-lg transition-all"
                   onClick={async () => {
-                    // Försök att hämta mer specifik information för detta fält
+                    setIsLoadingExample(true);
                     try {
                       const response = await fetch('/api/ai-suggest', {
                         method: 'POST',
@@ -1546,420 +1589,25 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                       }
                     } catch (error) {
                       console.error('Kunde inte hämta AI-förslag:', error);
+                    } finally {
+                      setIsLoadingExample(false);
                     }
                   }}
+                  disabled={isLoadingExample}
                 >
-                  AI-förslag för detta fält
+                  {isLoadingExample ? (
+                    <span className="flex items-center gap-2">
+                      <span className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></span>
+                      Genererar...
+                    </span>
+                  ) : (
+                    'AI-förslag för detta fält'
+                  )}
                 </button>
               </div>
             )}
           </div>
-          {isTextQuestion(current) && current.type === "textarea" && (
-            <div className="relative">
-              <textarea
-                className={`w-full p-4 border-2 rounded-2xl text-[#16475b] bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 ${
-                  scrapedData && answers[current.id] ? 'border-green-300 bg-green-50/50' : 'border-gray-200 hover:border-[#7edcff] focus:border-[#7edcff]'
-                } focus:outline-none focus:ring-4 focus:ring-[#7edcff]/20`}
-                value={getStringValue(answers[current.id])}
-                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
-                placeholder={scrapedData && answers[current.id] ? "Automatiskt ifyllt från din hemsida - redigera efter behov" : "Skriv ditt svar här..."}
-                rows={6}
-                style={{ minHeight: '150px', maxHeight: '150px', resize: 'none' }}
-              />
-              {scrapedData && answers[current.id] && (
-                <div className="absolute top-2 right-2">
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-200 text-green-800">
-                    🤖 Auto
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-          {isSelectQuestion(current) && current.type === "select" && (
-            <div className="relative mb-4">
-              <select
-                className="w-full p-4 border-2 rounded-2xl pr-12 text-[#16475b] bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 border-gray-200 hover:border-[#7edcff] focus:border-[#7edcff] focus:outline-none focus:ring-4 focus:ring-[#7edcff]/20"
-                value={getStringValue(answers[current.id])}
-                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
-                style={{ minHeight: '60px', height: '60px' }}
-              >
-                <option value="">Välj...</option>
-                {isSelectQuestion(current) ? current.options.map((opt: string) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                )) : null}
-              </select>
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#16475b]">
-                <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
-                  <path d="M6 8l4 4 4-4" stroke="#16475b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </span>
-            </div>
-          )}
-          {isSelectQuestion(current) && current.type === "radio" && (
-            <div className="flex flex-col gap-2 mb-4">
-              {isSelectQuestion(current) ? current.options.map((opt: string) => (
-                <label key={opt} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name={current.id}
-                    value={opt}
-                    checked={getStringValue(answers[current.id]) === opt}
-                    onChange={() => setAnswers({ ...answers, [current.id]: opt })}
-                    className="accent-[#16475b]"
-                  />
-                  <span>{opt}</span>
-                </label>
-              )) : null}
-            </div>
-          )}
-          {(isTextQuestion(current) && (current.type === "text" || current.type === "number")) && (
-            <input
-              className="w-full p-4 border-2 rounded-2xl text-[#16475b] bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 border-gray-200 hover:border-[#7edcff] focus:border-[#7edcff] focus:outline-none focus:ring-4 focus:ring-[#7edcff]/20"
-              type={current.type}
-              value={getStringValue(answers[current.id])}
-              onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
-              placeholder="Skriv ditt svar här..."
-              style={{ minHeight: '60px', height: '60px' }}
-            />
-          )}
-          {isTextQuestion(current) && current.type === "file" && (
-            <div className="flex flex-col items-start gap-2 mb-4">
-              <label className="block font-semibold">Bifoga P/L-rapport (valfritt)</label>
-              <div className="flex items-center gap-3">
-                <label className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all cursor-pointer flex items-center gap-2">
-                  <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M10 3v10m0 0l-3-3m3 3l3-3" stroke="#16475b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  Ladda upp PDF
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    className="hidden"
-                    onChange={async e => {
-                      setFileError(null);
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      setFileLoading(true);
-                      try {
-                        const formData = new FormData();
-                        formData.append('file', file);
-                        const res = await fetch('/api/parse-pdf', { method: 'POST', body: formData });
-                        if (!res.ok) throw new Error('Kunde inte läsa PDF');
-                        const data = await res.json();
-                        setAnswers(a => ({ ...a, runway: (a.runway ? a.runway + '\n' : '') + (data.text || '') }));
-                      } catch (err) {
-                        setFileError('Kunde inte läsa PDF-filen.');
-                      } finally {
-                        setFileLoading(false);
-                      }
-                    }}
-                  />
-                </label>
-                {fileLoading && <span className="text-[#7edcff] ml-2">Läser in PDF...</span>}
-              </div>
-              {fileError && <div className="text-red-600 mt-1">{fileError}</div>}
-            </div>
-          )}
-          {current.id === 'team' && (
-            <div className="mb-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-blue-600">💡</span>
-                <span className="font-semibold text-blue-800">Tips för teamfrågan:</span>
-              </div>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Inkludera namn, roller och relevant erfarenhet</li>
-                <li>• Nämn tidigare företag och utbildning</li>
-                <li>• Beskriv varje persons nyckelkompetenser</li>
-                <li>• Förklara hur teamet kompletterar varandra</li>
-              </ul>
-            </div>
-          )}
-          {current.id === 'competitors' && (
-            <div className="mb-4 p-4 bg-green-50 rounded-xl border border-green-200">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-green-600">🎯</span>
-                <span className="font-semibold text-green-800">Tips för konkurrentanalys:</span>
-              </div>
-              <ul className="text-sm text-green-700 space-y-1">
-                <li>• Lista både direkta och indirekta konkurrenter</li>
-                <li>• Förklara hur ni skiljer er från varje konkurrent</li>
-                <li>• Inkludera både svenska och internationella aktörer</li>
-                <li>• Nämn er unika konkurrensfördel</li>
-              </ul>
-            </div>
-          )}
-          {current.id === 'market_size' && (
-            <div className="flex flex-col md:flex-row items-end gap-2 mb-2">
-              <input
-                type="text"
-                className="w-full md:w-64 p-2 border rounded-xl text-[#16475b] bg-white"
-                placeholder="Ange bransch..."
-                value={marketBransch}
-                onChange={e => setMarketBransch(e.target.value)}
-              />
-              <button
-                className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all"
-                onClick={async () => {
-                  setShowMarketPopup(true);
-                  setMarketLoading(true);
-                  setMarketResult('');
-                  setMarketError(null);
-                  try {
-                    const res = await fetch('/api/market-size', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ bransch: marketBransch })
-                    });
-                    const data = await res.json();
-                    if (data.result) setMarketResult(data.result);
-                    else setMarketError('Kunde inte hämta marknadsdata.');
-                  } catch {
-                    setMarketError('Kunde inte hämta marknadsdata.');
-                  } finally {
-                    setMarketLoading(false);
-                  }
-                }}
-              >Beräkna värde</button>
-            </div>
-          )}
-          {current.id === 'runway' && (
-            <div className="flex flex-col items-start gap-2 mb-4 w-full">
-              <label className="block font-semibold flex items-center gap-2"><svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20" stroke="#16475b" strokeWidth="2" strokeLinecap="round"/></svg> Hur lång runway har ni?</label>
-              <input
-                type="number"
-                className="w-full p-4 border-2 border-[#7edcff] rounded-2xl text-[#16475b] bg-white focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all text-lg"
-                placeholder="Antal månader..."
-                value={getStringValue(answers[current.id])}
-                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
-                min={0}
-                max={60}
-                style={{ maxWidth: '220px' }}
-              />
-              <span className="text-sm text-gray-500">Hur många månader räcker ert kapital? (Bifoga gärna P/L-rapport om möjligt)</span>
-              {/* PDF-upload som tidigare */}
-              <div className="flex items-center gap-3">
-                <label className="bg-[#7edcff] text-[#16475b] font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-all cursor-pointer flex items-center gap-2">
-                  <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M10 3v10m0 0l-3-3m3 3l3-3" stroke="#16475b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  Ladda upp PDF
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    className="hidden"
-                    onChange={async e => {
-                      setFileError(null);
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      setFileLoading(true);
-                      try {
-                        const formData = new FormData();
-                        formData.append('file', file);
-                        const res = await fetch('/api/parse-pdf', { method: 'POST', body: formData });
-                        if (!res.ok) throw new Error('Kunde inte läsa PDF');
-                        const data = await res.json();
-                        setAnswers(a => ({ ...a, runway: (a.runway ? a.runway + '\n' : '') + (data.text || '') }));
-                      } catch (err) {
-                        setFileError('Kunde inte läsa PDF-filen.');
-                      } finally {
-                        setFileLoading(false);
-                      }
-                    }}
-                  />
-                </label>
-                {fileLoading && <span className="text-[#7edcff] ml-2">Läser in PDF...</span>}
-              </div>
-              {fileError && <div className="text-red-600 mt-1">{fileError}</div>}
-            </div>
-          )}
-          {isMilestoneQuestion(current) && (
-            <MilestoneList 
-              value={JSON.parse(answers[current.id] || '[]')}
-              onChange={(val) => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
-            />
-          )}
-          {isCapitalQuestion(current) && (
-            <CapitalMatrix 
-              value={JSON.parse(answers[current.id] || '{"amount":"","product":"","sales":"","team":"","other":"","probability":"3"}')}
-              onChange={(val) => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
-            />
-          )}
-          {isESGQuestion(current) && (
-            <ESGCheckbox 
-              value={JSON.parse(answers[current.id] || '{"miljö":false,"socialt":false,"governance":false,"text":""}')}
-              onChange={(val) => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
-            />
-          )}
-          {isFounderMarketFitQuestion(current) && (
-            <FounderMarketFit 
-              value={JSON.parse(answers[current.id] || '{"score":"","text":""}')}
-              onChange={(val) => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
-            />
-          )}
-          <div className="flex justify-between mt-6">
-            <button
-              onClick={() => setStep(s => Math.max(s - 1, 1))}
-              disabled={step === 1}
-              className="px-4 py-2 rounded bg-gray-200 text-[#16475b] disabled:opacity-50"
-            >Tillbaka</button>
-            <button
-              onClick={() => {
-                if (current.required && !getStringValue(answers[current.id])) {
-                  alert('Fältet är obligatoriskt');
-                  return;
-                }
-                
-                // Kolla minimum längd för textfält
-                if (current.required && isTextQuestion(current) && (current.type === 'textarea' || current.type === 'text')) {
-                  const value = getStringValue(answers[current.id]);
-                  if (value.length < 20) {
-                    alert('Vänligen skriv minst 20 tecken för att ge tillräcklig information');
-                    return;
-                  }
-                }
-                
-                if (step === INVESTOR_QUESTIONS.length) {
-                  // Sista frågan - visa resultat
-                  setShowFinalLoader(true);
-                  setFinalLoaderText(finalLoaderMessages[0]);
-                  let loaderIndex = 0;
-                  const loaderInterval = setInterval(() => {
-                    loaderIndex++;
-                    if (loaderIndex < finalLoaderMessages.length) {
-                      setFinalLoaderText(finalLoaderMessages[loaderIndex]);
-                    }
-                  }, 2000);
-
-                  // Formatera svaren för API:et
-                  const formattedAnswers = {
-                    company_name: company,
-                    business_idea: {
-                      what_you_do: answers.company_value || '',
-                      for_whom: answers.target_customer || '',
-                      why_unique: answers.unique_solution || ''
-                    },
-                    customer_segments: {
-                      customer_group: answers.target_customer || '',
-                      customer_needs: answers.customer_problem || '',
-                      customer_location: omrade || ''
-                    },
-                    problem_solution: {
-                      problem: answers.customer_problem || '',
-                      solution: answers.solution || '',
-                      unique_value: answers.unique_solution || ''
-                    },
-                    market_analysis: {
-                      market_size: answers.market_size || '',
-                      competitors: answers.competitors || '',
-                      market_trends: answers.market_trends || ''
-                    },
-                    business_model: {
-                      revenue_model: answers.revenue_block || '',
-                      pricing_strategy: answers.revenue_block || '',
-                      sales_channels: answers.revenue_block || ''
-                    },
-                    team: {
-                      key_people: answers.team || '',
-                      roles: answers.team || '',
-                      expertise: answers.team_skills || ''
-                    },
-                    funding_details: {
-                      funding_needed: answers.capital_block || '',
-                      use_of_funds: answers.capital_block || '',
-                      exit_strategy: answers.exit_strategy || ''
-                    }
-                  };
-
-                  // Anropa API:et för att analysera affärsplanen
-                  fetch('/api/analyze-businessplan', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                      answers: formattedAnswers,
-                      applicationType: 'investor'
-                    })
-                  })
-                    .then(res => res.json())
-                    .then(data => {
-                      clearInterval(loaderInterval);
-                      if (data.error) {
-                        alert('Ett fel uppstod vid analysen. Försök igen.');
-                        setShowFinalLoader(false);
-                      } else {
-                        // Visa resultatet
-                        const score = data.total_score || 75;
-                        setResult({ 
-                          score, 
-                          subscriptionLevel: score >= 80 ? 'gold' : 'silver',
-                          answers: {
-                            ...answers,
-                            company_name: company,
-                            bransch: bransch,
-                            omrade: omrade
-                          }, // Include company info with raw answers
-                          feedback: data
-                        });
-                        setShowFinalLoader(false);
-                      }
-                    })
-                    .catch(error => {
-                      clearInterval(loaderInterval);
-                      console.error('Error analyzing business plan:', error);
-                      alert('Ett fel uppstod vid analysen. Försök igen.');
-                      setShowFinalLoader(false);
-                    });
-                } else {
-                  setStep(s => Math.min(s + 1, INVESTOR_QUESTIONS.length));
-                }
-              }}
-              className="px-4 py-2 rounded bg-[#16475b] text-white"
-            >{step === INVESTOR_QUESTIONS.length ? 'Slutför' : 'Nästa'}</button>
-          </div>
         </div>
-        {showExample === current.id && (
-          <div ref={exampleRef} className="absolute left-0 right-0 mx-auto top-20 z-50 max-w-md w-full bg-white border border-[#7edcff] rounded-2xl shadow-xl p-6 animate-fade-in">
-            <button className="absolute top-2 right-3 text-2xl text-[#7edcff] hover:text-[#16475b]" onClick={() => setShowExample(null)} aria-label="Stäng">×</button>
-            <div className="font-bold mb-2 text-[#16475b]">AI-förslag</div>
-            {isLoadingExample ? (
-              <div className="flex items-center gap-2"><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#7edcff]"></div> Hämtar förslag...</div>
-            ) : exampleError ? (
-              <div className="text-red-600">{exampleError}</div>
-            ) : (
-              <div className="text-[#16475b] whitespace-pre-line">{exampleText}</div>
-            )}
-          </div>
-        )}
-        {showMarketPopup && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div ref={marketRef} className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative animate-fade-in text-center">
-              <button className="absolute top-2 right-3 text-2xl text-[#7edcff] hover:text-[#16475b]" onClick={() => setShowMarketPopup(false)} aria-label="Stäng">×</button>
-              <h2 className="text-xl font-bold mb-4">AI-baserad marknadsuppskattning</h2>
-              {marketLoading ? (
-                <div className="flex flex-col items-center gap-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7edcff]"></div>
-                  <span className="text-[#16475b]">Hämtar marknadsdata...</span>
-                </div>
-              ) : marketError ? (
-                <div className="text-red-600">{marketError}</div>
-              ) : marketResult ? (
-                <div>
-                  <div className="whitespace-pre-line text-left bg-[#eaf6fa] rounded-xl p-4 mb-4">{marketResult}</div>
-                  <button
-                    className="bg-[#16475b] text-white font-bold rounded-full px-6 py-2 shadow hover:bg-[#7edcff] hover:text-[#16475b] transition-all"
-                    onClick={() => {
-                      setAnswers(a => ({ ...a, market_size: marketResult }));
-                      setShowMarketPopup(false);
-                    }}
-                  >Fyll i svaret</button>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        )}
-        {showFinalLoader && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-white text-[#16475b] rounded-3xl shadow-2xl border max-w-lg w-full p-8 relative text-center flex flex-col items-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#7edcff] mb-6"></div>
-              <h2 className="text-2xl font-bold mb-4">{finalLoaderText}</h2>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
