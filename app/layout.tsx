@@ -11,8 +11,28 @@ import { AuthProvider } from './context/AuthContext'
 const nunito = Nunito({ subsets: ['latin'], weight: ['400', '600', '700'] })
 
 export const metadata: Metadata = {
-  title: 'FrejFund',
-  description: 'AI-baserad affärsanalys och investerarmatchning',
+  title: 'FrejFund - AI-driven affärsanalys för investeringar',
+  description: 'FrejFund använder AI för att analysera affärsplaner och matcha startups med rätt investerare. Få en objektiv bedömning på 10 minuter.',
+  openGraph: {
+    title: 'FrejFund - AI-driven affärsanalys för investeringar',
+    description: 'Analysera din affärsidé och hitta rätt investerare med AI',
+    images: [
+      {
+        url: '/api/og',
+        width: 1200,
+        height: 630,
+        alt: 'FrejFund AI Analysis',
+      },
+    ],
+    locale: 'sv_SE',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FrejFund - AI-driven affärsanalys',
+    description: 'Analysera din affärsidé och hitta rätt investerare',
+    images: ['/api/og'],
+  },
 }
 
 export default function RootLayout({

@@ -800,10 +800,10 @@ function ESGCheckbox({ value, onChange }: { value: { miljö: boolean; socialt: b
         </div>
       </div>
       
-      <div className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
-        <label className="block font-semibold mb-3 text-[#16475b]">Beskriv era ESG-initiativ:</label>
+      <div className="bg-white/5 rounded-2xl p-4 border border-white/20">
+        <label className="block font-semibold mb-3 text-white">Beskriv era ESG-initiativ:</label>
         <textarea 
-          className="w-full min-h-[100px] rounded-xl border border-[#7edcff] bg-white/80 px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none" 
+          className="w-full min-h-[100px] rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none hover:bg-white/15" 
           value={value.text} 
           onChange={e => onChange({ ...value, text: e.target.value })} 
           placeholder="Beskriv konkreta åtgärder, mål eller initiativ inom valda områden..."
@@ -816,15 +816,15 @@ function ESGCheckbox({ value, onChange }: { value: { miljö: boolean; socialt: b
 function FounderMarketFit({ value, onChange }: { value: { score: string; text: string }; onChange: (val: any) => void }) {
   return (
     <div className="space-y-4">
-      <div className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
-        <label className="block font-semibold mb-3 text-[#16475b]">Matchning (1–5):</label>
+      <div className="bg-white/5 rounded-2xl p-4 border border-white/20">
+        <label className="block font-semibold mb-3 text-white">Matchning (1–5):</label>
         <div className="flex gap-3 justify-center">
           {[1,2,3,4,5].map(n => (
             <label key={n} className="flex flex-col items-center gap-2 cursor-pointer group">
-              <div className={`w-12 h-12 rounded-full border-2 border-[#7edcff] flex items-center justify-center font-bold text-lg transition-all duration-200 ${
+              <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold text-lg transition-all duration-200 ${
                 value.score === String(n) 
-                  ? 'bg-[#7edcff] text-[#16475b] shadow-lg scale-110' 
-                  : 'bg-white/80 text-[#7edcff] hover:bg-[#7edcff]/20 hover:scale-105'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg scale-110 border-purple-500' 
+                  : 'bg-white/10 text-white/70 border-white/30 hover:bg-white/20 hover:scale-105 hover:border-purple-400'
               }`}>
                 {n}
               </div>
@@ -837,7 +837,7 @@ function FounderMarketFit({ value, onChange }: { value: { score: string; text: s
                 className="hidden"
               />
               <span className={`text-xs font-medium transition-colors ${
-                value.score === String(n) ? 'text-[#16475b]' : 'text-gray-500'
+                value.score === String(n) ? 'text-purple-400' : 'text-white/50'
               }`}>
                 {n === 1 ? 'Ingen' : n === 3 ? 'Bra' : n === 5 ? 'Expert' : ''}
               </span>
@@ -845,10 +845,10 @@ function FounderMarketFit({ value, onChange }: { value: { score: string; text: s
           ))}
         </div>
       </div>
-      <div className="bg-white/50 rounded-2xl p-4 border border-[#7edcff]/30">
-        <label className="block font-semibold mb-2 text-[#16475b]">Motivering:</label>
+      <div className="bg-white/5 rounded-2xl p-4 border border-white/20">
+        <label className="block font-semibold mb-2 text-white">Motivering:</label>
         <textarea 
-          className="w-full min-h-[80px] rounded-xl border border-[#7edcff] bg-white/80 px-4 py-3 text-[#16475b] placeholder-gray-400 focus:ring-2 focus:ring-[#7edcff] focus:border-[#7edcff] transition-all resize-none" 
+          className="w-full min-h-[80px] rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/40 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none hover:bg-white/15" 
           value={value.text} 
           onChange={e => onChange({ ...value, text: e.target.value })} 
           placeholder="Beskriv kort teamets relevanta erfarenhet och expertis..."
@@ -881,6 +881,9 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const [bransch, setBransch] = React.useState('');
   const [omrade, setOmrade] = React.useState('');
   const [privacyChecked, setPrivacyChecked] = React.useState(false);
+  const [linkedinChecked, setLinkedinChecked] = React.useState(false);
+  const [showLinkedinInfo, setShowLinkedinInfo] = React.useState(false);
+  const linkedinInfoRef = useRef<HTMLDivElement>(null);
   const [hasWebsite, setHasWebsite] = React.useState<null | boolean>(null);
   const [websiteUrl, setWebsiteUrl] = React.useState('');
   const [isScraping, setIsScraping] = React.useState(false);
@@ -927,6 +930,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     company.trim().length > 1 &&
     /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) &&
     privacyChecked &&
+    linkedinChecked &&
     hasWebsite !== null &&
     (hasWebsite === false || (hasWebsite === true && websiteUrl.trim().length > 3));
 
@@ -1203,6 +1207,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   useOnClickOutside(exampleRef, () => setShowExample(null));
   useOnClickOutside(marketRef, () => setShowMarketPopup(false));
   useOnClickOutside(competitorRef, () => setShowCompetitorPopup(false));
+  useOnClickOutside(linkedinInfoRef, () => setShowLinkedinInfo(false));
 
   if (!open) return null;
   
@@ -1408,6 +1413,62 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             </label>
           </div>
           
+          <div className="mb-6">
+            <div className="flex items-center">
+              <label className="flex items-center cursor-pointer group flex-1">
+                <input
+                  type="checkbox"
+                  className="mr-3 w-5 h-5 text-purple-500 bg-white/10 border-2 border-white/30 rounded focus:ring-purple-500 focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#04111d] transition-all"
+                  checked={linkedinChecked}
+                  onChange={e => setLinkedinChecked(e.target.checked)}
+                />
+                <span className="text-sm text-white/80 group-hover:text-white transition-colors">
+                  Dela FrejFund på LinkedIn
+                </span>
+              </label>
+              <button
+                type="button"
+                className="ml-2 text-purple-400 hover:text-purple-300 transition-colors"
+                onClick={() => setShowLinkedinInfo(true)}
+                aria-label="Information om LinkedIn-delning"
+              >
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                  <text x="12" y="16" textAnchor="middle" fontSize="14" fill="currentColor">?</text>
+                </svg>
+              </button>
+            </div>
+            
+            {linkedinChecked && (
+              <div className="mt-3 animate-fadeIn">
+                <a
+                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://frejfund.se')}&title=${encodeURIComponent('Jag analyserade min affärsidé med AI!')}&summary=${encodeURIComponent('Testa att analysera din affärsidé du också! FrejFund hjälper startups att hitta rätt investerare med AI-driven analys. Få din investeringsscore på 10 minuter.')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#0077b5] hover:bg-[#006399] text-white rounded-xl transition-all transform hover:scale-105"
+                  onClick={(e) => {
+                    // Öppna LinkedIn-delning i nytt fönster
+                    e.preventDefault();
+                    const width = 600;
+                    const height = 600;
+                    const left = (window.innerWidth - width) / 2;
+                    const top = (window.innerHeight - height) / 2;
+                    window.open(
+                      e.currentTarget.href,
+                      'linkedin-share',
+                      `width=${width},height=${height},left=${left},top=${top}`
+                    );
+                  }}
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                  Dela på LinkedIn
+                </a>
+              </div>
+            )}
+          </div>
+          
           <div className="flex justify-between mt-8">
             <button
               className="px-6 py-3 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-all border border-white/20"
@@ -1608,7 +1669,309 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             )}
           </div>
         </div>
+        
+        {/* Form inputs - Add a container with min-height to keep consistent size */}
+        <div className="flex-1 min-h-[200px] mb-6">
+          {/* Textarea questions */}
+          {isTextQuestion(current) && current.type === "textarea" && (
+            <div className="relative">
+              <textarea
+                className={`${inputBase} ${
+                  scrapedData && answers[current.id] ? 'border-green-500/50 bg-green-500/10' : ''
+                }`}
+                value={getStringValue(answers[current.id])}
+                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+                placeholder={scrapedData && answers[current.id] ? "Automatiskt ifyllt - redigera efter behov" : "Skriv ditt svar här..."}
+                rows={6}
+                style={{ minHeight: '150px', maxHeight: '250px', resize: 'vertical' }}
+              />
+              {scrapedData && answers[current.id] && (
+                <div className="absolute top-2 right-2">
+                  <span className="text-green-400 text-xs">🤖 AI-fyllt</span>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Text input questions */}
+          {isTextQuestion(current) && current.type === "text" && (
+            <input
+              type="text"
+              className={`${inputBase} ${
+                scrapedData && answers[current.id] ? 'border-green-500/50 bg-green-500/10' : ''
+              }`}
+              value={getStringValue(answers[current.id])}
+              onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+              placeholder={scrapedData && answers[current.id] ? "Automatiskt ifyllt" : "Skriv ditt svar..."}
+            />
+          )}
+          
+          {/* Number input questions */}
+          {isTextQuestion(current) && current.type === "number" && (
+            <div className="flex items-center gap-4">
+              <input
+                type="number"
+                className={`${inputBase} max-w-[200px] text-center text-2xl font-bold ${
+                  scrapedData && answers[current.id] ? 'border-green-500/50 bg-green-500/10' : ''
+                }`}
+                value={getStringValue(answers[current.id])}
+                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+                placeholder="0"
+                min="0"
+              />
+              {current.id === 'runway' && (
+                <span className="text-white/60 text-lg">månader</span>
+              )}
+              {current.id === 'founder_equity' && (
+                <span className="text-white/60 text-lg">%</span>
+              )}
+            </div>
+          )}
+          
+          {/* Select questions */}
+          {isSelectQuestion(current) && current.type === "select" && (
+            <div className="relative">
+              <select
+                className={`${selectBase} ${
+                  answers[current.id] ? 'border-purple-500/50' : ''
+                }`}
+                value={getStringValue(answers[current.id])}
+                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+              >
+                <option value="">Välj ett alternativ...</option>
+                {current.options.map(opt => (
+                  <option key={opt} value={opt} className="bg-[#04111d] text-white">{opt}</option>
+                ))}
+              </select>
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/60">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path d="M8 10l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+            </div>
+          )}
+          
+          {/* Radio questions */}
+          {isSelectQuestion(current) && current.type === "radio" && (
+            <div className="space-y-3">
+              {current.options.map(opt => (
+                <label key={opt} className="flex items-center gap-3 cursor-pointer group">
+                  <div className="relative">
+                    <input
+                      type="radio"
+                      name={current.id}
+                      value={opt}
+                      checked={getStringValue(answers[current.id]) === opt}
+                      onChange={() => setAnswers({ ...answers, [current.id]: opt })}
+                      className="sr-only"
+                    />
+                    <div className={`w-6 h-6 rounded-full border-2 transition-all ${
+                      getStringValue(answers[current.id]) === opt
+                        ? 'border-purple-500 bg-purple-500'
+                        : 'border-white/30 bg-white/10 group-hover:border-purple-400'
+                    }`}>
+                      {getStringValue(answers[current.id]) === opt && (
+                        <div className="w-full h-full rounded-full flex items-center justify-center">
+                          <div className="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-white/80 group-hover:text-white transition-colors">{opt}</span>
+                </label>
+              ))}
+            </div>
+          )}
+          
+          {/* Milestone list */}
+          {isMilestoneQuestion(current) && (
+            <MilestoneList
+              value={answers[current.id] ? JSON.parse(answers[current.id] as string) : [{ milestone: '', date: '' }]}
+              onChange={val => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
+            />
+          )}
+          
+          {/* Capital matrix */}
+          {isCapitalQuestion(current) && (
+            <CapitalMatrix
+              value={answers[current.id] ? JSON.parse(answers[current.id] as string) : { amount: '', product: '', sales: '', team: '', other: '', probability: '3' }}
+              onChange={val => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
+            />
+          )}
+          
+          {/* ESG checkbox */}
+          {isESGQuestion(current) && (
+            <ESGCheckbox
+              value={answers[current.id] ? JSON.parse(answers[current.id] as string) : { miljö: false, socialt: false, governance: false, text: '' }}
+              onChange={val => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
+            />
+          )}
+          
+          {/* Founder market fit */}
+          {isFounderMarketFitQuestion(current) && (
+            <FounderMarketFit
+              value={answers[current.id] ? JSON.parse(answers[current.id] as string) : { score: '', text: '' }}
+              onChange={val => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
+            />
+          )}
+        </div>
+        
+        {/* Navigation buttons */}
+        <div className="flex justify-between items-center mt-auto">
+          <button
+            type="button"
+            className="px-6 py-3 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-all border border-white/20 disabled:opacity-50"
+            onClick={() => setStep(step - 1)}
+            disabled={step === 1}
+          >
+            ← Tillbaka
+          </button>
+          
+          <button
+            type="button"
+            className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105 disabled:opacity-50"
+            onClick={async () => {
+              if (step < INVESTOR_QUESTIONS.length) {
+                setStep(step + 1);
+              } else {
+                // Submit and show loading
+                setShowFinalLoader(true);
+                let messageIndex = 0;
+                const messageInterval = setInterval(() => {
+                  messageIndex = (messageIndex + 1) % finalLoaderMessages.length;
+                  setFinalLoaderText(finalLoaderMessages[messageIndex]);
+                }, 2000);
+                
+                try {
+                  const response = await fetch('/api/analyze-business', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      ...answers,
+                      company_name: company,
+                      email: email,
+                      bransch: bransch,
+                      omrade: omrade,
+                      has_website: hasWebsite,
+                      website_url: websiteUrl
+                    })
+                  });
+                  
+                  const data = await response.json();
+                  clearInterval(messageInterval);
+                  setShowFinalLoader(false);
+                  setResult(data);
+                } catch (error) {
+                  clearInterval(messageInterval);
+                  setShowFinalLoader(false);
+                  console.error('Error submitting:', error);
+                }
+              }
+            }}
+            disabled={current.required && !answers[current.id]}
+          >
+            {step === INVESTOR_QUESTIONS.length ? 'Slutför analys →' : 'Nästa →'}
+          </button>
+        </div>
       </div>
+      
+      {/* Example popup */}
+      {showExample && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 p-4">
+          <div ref={exampleRef} className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-2xl shadow-xl border border-white/10 max-w-lg w-full p-6 animate-fadeIn">
+            <h3 className="text-xl font-bold mb-4">Exempel för "{current.label}"</h3>
+            {isLoadingExample ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+              </div>
+            ) : exampleError ? (
+              <p className="text-red-400">{exampleError}</p>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-white/80">{exampleText}</p>
+                <button
+                  className="w-full py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:shadow-lg transition-all"
+                  onClick={() => {
+                    setAnswers({ ...answers, [current.id]: exampleText });
+                    setShowExample(null);
+                  }}
+                >
+                  Använd detta exempel
+                </button>
+              </div>
+            )}
+            <button
+              className="absolute top-4 right-4 text-white/60 hover:text-white"
+              onClick={() => setShowExample(null)}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Final loader */}
+      {showFinalLoader && (
+        <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-3xl shadow-2xl border border-white/10 p-8 max-w-md w-full text-center">
+            <div className="mb-6">
+              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center animate-pulse">
+                <svg className="w-10 h-10 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold mb-2">{finalLoaderText}</h3>
+            <p className="text-white/60">Detta tar vanligtvis 20-30 sekunder</p>
+          </div>
+        </div>
+      )}
+      
+      {/* LinkedIn info popup */}
+      {showLinkedinInfo && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 p-4">
+          <div ref={linkedinInfoRef} className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-2xl shadow-xl border border-white/10 max-w-md w-full p-6 animate-fadeIn">
+            <button
+              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+              onClick={() => setShowLinkedinInfo(false)}
+            >
+              ✕
+            </button>
+            
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#0077b5]/20 flex items-center justify-center">
+                <svg className="w-8 h-8 text-[#0077b5]" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-3">Varför ber vi om detta?</h3>
+            </div>
+            
+            <div className="space-y-4 text-white/80">
+              <p>
+                Vi på FrejFund vill hjälpa så många entreprenörer som möjligt att få rätt finansiering för sina affärsidéer. 
+              </p>
+              <p>
+                <strong className="text-white">Det är väldigt lite för dig</strong> - bara ett klick för att dela vår tjänst.
+              </p>
+              <p>
+                <strong className="text-white">Men det betyder väldigt mycket för oss</strong> - varje delning hjälper fler entreprenörer att hitta oss och få den hjälp de behöver.
+              </p>
+              <p className="text-sm italic">
+                Tillsammans kan vi bygga ett starkare startup-ekosystem i Sverige! 🚀
+              </p>
+            </div>
+            
+            <button
+              className="w-full mt-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:shadow-lg transition-all"
+              onClick={() => setShowLinkedinInfo(false)}
+            >
+              Förstått!
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
