@@ -7,7 +7,6 @@ import { testData } from './testData';
 
 // Markera sidan som dynamisk för att förhindra prerendering
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
 
 export default function ResultPage() {
   const [resultData, setResultData] = useState<any>(null);
@@ -21,6 +20,16 @@ export default function ResultPage() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('latestAnalysisResult', JSON.stringify(testData));
       setResultData(testData);
+      setLoading(false);
+    }
+  };
+  
+  // Funktion för att sätta premium-analys och simulera betalning
+  const setPremiumTestData = () => {
+    if (typeof window !== 'undefined') {
+      const premiumData = { ...testData, subscriptionLevel: 'premium', paymentSuccess: true };
+      localStorage.setItem('latestAnalysisResult', JSON.stringify(premiumData));
+      setResultData(premiumData);
       setLoading(false);
     }
   };
@@ -107,9 +116,15 @@ export default function ResultPage() {
               <p className="text-white/40 mb-2">För utveckling:</p>
               <button
                 onClick={setTestData}
-                className="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all"
+                className="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all mr-2"
               >
-                Ladda test-data
+                Ladda test-data (standard)
+              </button>
+              <button
+                onClick={setPremiumTestData}
+                className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all"
+              >
+                Ladda test-data (premium/efter betalning)
               </button>
             </div>
           </div>
