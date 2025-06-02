@@ -4,12 +4,44 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import BusinessPlanResult from '../components/BusinessPlanResult';
 
+// Markera sidan som dynamisk för att förhindra prerendering
+export const dynamic = 'force-dynamic';
+
+// Test data för utveckling
+const testData = {
+  score: 75,
+  answers: {
+    "1": "Ja",
+    "2": "Nej",
+    "3": "Ja",
+    "4": "Nej",
+    "5": "Ja"
+  },
+  feedback: {
+    "1": "Bra jobbat med att definiera målgruppen!",
+    "2": "Överväg att utveckla en mer detaljerad marknadsanalys.",
+    "3": "Utmärkt att du har en tydlig affärsmodell.",
+    "4": "Försök att specificera dina intäkter mer detaljerat.",
+    "5": "Bra att du har identifierat dina konkurrenter."
+  },
+  subscriptionLevel: "premium"
+};
+
 export default function ResultPage() {
   const [resultData, setResultData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
+  
+  // Funktion för att sätta test-data
+  const setTestData = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('latestAnalysisResult', JSON.stringify(testData));
+      setResultData(testData);
+      setLoading(false);
+    }
+  };
   
   useEffect(() => {
     // Försök hämta data från olika källor
@@ -38,9 +70,8 @@ export default function ResultPage() {
           }
         }
         
-        // 3. Om ingen data finns, redirect till startsidan
+        // 3. Om ingen data finns, visa test-knapp istället för att redirecta
         setLoading(false);
-        router.push('/');
       } catch (error) {
         console.error('Error loading result data:', error);
         setError('Ett fel uppstod vid laddning av analysresultatet');
@@ -83,12 +114,23 @@ export default function ResultPage() {
       <div className="min-h-screen bg-[#04111d] flex items-center justify-center">
         <div className="text-center">
           <p className="text-white/60 mb-4">Ingen analys hittades</p>
-          <button
-            onClick={() => router.push('/')}
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all"
-          >
-            Gör en ny analys
-          </button>
+          <div className="space-y-4">
+            <button
+              onClick={() => router.push('/')}
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all"
+            >
+              Gör en ny analys
+            </button>
+            <div className="mt-4">
+              <p className="text-white/40 mb-2">För utveckling:</p>
+              <button
+                onClick={setTestData}
+                className="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all"
+              >
+                Ladda test-data
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
