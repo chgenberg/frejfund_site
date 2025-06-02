@@ -13,6 +13,7 @@ const nunito = Nunito({ subsets: ['latin'], weight: ['400', '600', '700'] })
 export const metadata: Metadata = {
   title: 'FrejFund - AI-driven affärsanalys för investeringar',
   description: 'FrejFund använder AI för att analysera affärsplaner och matcha startups med rätt investerare. Få en objektiv bedömning på 10 minuter.',
+  metadataBase: new URL('https://www.frejfund.com'),
   openGraph: {
     title: 'FrejFund - AI-driven affärsanalys för investeringar',
     description: 'Analysera din affärsidé och hitta rätt investerare med AI',
