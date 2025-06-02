@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       'funding_needs'
     ];
 
-    const missingQuestions = requiredQuestions.filter(q => !answers[q] || answers[q].trim().length < 10);
+    const missingQuestions = requiredQuestions.filter(q => !answers[q] || answers[q].trim().length < 3);
     
     if (missingQuestions.length > 0) {
       return NextResponse.json({
