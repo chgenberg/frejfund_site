@@ -17,8 +17,11 @@ export async function POST(request: Request) {
     const { score, answers, insights, actionItems, scoreInfo } = data;
     
     // Extract premiumAnalysis from inside answers
-    const premiumAnalysis = answers?.premiumAnalysis;
+    const premiumAnalysis = answers?.premiumAnalysis || data.premiumAnalysis;
     const subscriptionLevel = data.subscriptionLevel || (premiumAnalysis ? 'premium' : 'standard');
+    
+    console.log('PDF Generation - Premium Analysis:', premiumAnalysis ? 'Found' : 'Not found');
+    console.log('PDF Generation - Subscription Level:', subscriptionLevel);
 
     // Create a new PDF document
     const pdfDoc = await PDFDocument.create();
@@ -42,29 +45,49 @@ export async function POST(request: Request) {
     const drawHeader = (page: any, title: string, subtitle?: string) => {
       const { width, height } = page.getSize();
       
-      // Header background with gradient effect
+      // Header background with gradient effect - multiple layers for gradient simulation
       page.drawRectangle({
         x: 0,
-        y: height - 100,
+        y: height - 120,
         width: width,
-        height: 100,
+        height: 120,
         color: primaryColor,
       });
-
-      // Accent line
+      
+      // Gradient overlay effect
       page.drawRectangle({
         x: 0,
-        y: height - 102,
-        width: width,
-        height: 2,
-        color: accentColor,
+        y: height - 120,
+        width: width / 2,
+        height: 120,
+        color: rgb(0.016, 0.067, 0.114),
+        opacity: 0.7,
       });
 
-      // Title
+      // Accent line - purple gradient effect
+      page.drawRectangle({
+        x: 0,
+        y: height - 122,
+        width: width,
+        height: 4,
+        color: accentColor,
+      });
+      
+      // Decorative element
+      page.drawRectangle({
+        x: width - 150,
+        y: height - 100,
+        width: 100,
+        height: 60,
+        color: accentColor,
+        opacity: 0.1,
+      });
+
+      // Title with better positioning
       page.drawText(title.toUpperCase(), {
         x: 50,
-        y: height - 60,
-        size: 20,
+        y: height - 65,
+        size: 24,
         font: helveticaBold,
         color: white,
       });
@@ -72,15 +95,24 @@ export async function POST(request: Request) {
       if (subtitle) {
         page.drawText(subtitle, {
           x: 50,
-          y: height - 80,
-          size: 12,
+          y: height - 90,
+          size: 14,
           font: helveticaFont,
           color: rgb(0.8, 0.8, 0.8),
         });
       }
+      
+      // Page decoration - modern geometric shape
+      page.drawRectangle({
+        x: 50,
+        y: height - 150,
+        width: 60,
+        height: 2,
+        color: accentColor,
+      });
 
       // Return Y position for content
-      return height - 140;
+      return height - 170;
     };
 
     const wrapText = (text: string, maxWidth: number, fontSize: number, font: any): string[] => {
@@ -340,7 +372,8 @@ export async function POST(request: Request) {
     pages.push(tocPage);
     let yPos = drawHeader(tocPage, 'Innehållsförteckning', 'Komplett översikt av er affärsanalys');
 
-    const sections = [
+    // Dynamically build sections based on actual content
+    const sections: { title: string; page: number; type: string }[] = [
       { title: 'Sammanfattning', page: 3, type: 'standard' },
       { title: 'Affärspoäng & Bedömning', page: 4, type: 'standard' },
       { title: 'Problem & Lösning', page: 5, type: 'standard' },
@@ -353,17 +386,35 @@ export async function POST(request: Request) {
       { title: 'Åtgärdsplan', page: 12, type: 'standard' },
     ];
 
+    // Only add premium sections if we have premium data
     if (subscriptionLevel === 'premium' && premiumAnalysis) {
-      sections.push(
-        { title: 'PREMIUM INNEHÅLL', page: 13, type: 'header' },
-        { title: 'SWOT-Analys', page: 14, type: 'premium' },
-        { title: 'Finansiella Projektioner (3 år)', page: 15, type: 'premium' },
-        { title: 'Detaljerade Rekommendationer', page: 17, type: 'premium' },
-        { title: 'Benchmark-Analys', page: 19, type: 'premium' },
-        { title: 'Investeringsförslag', page: 21, type: 'premium' },
-        { title: 'Marknadsinsikter', page: 23, type: 'premium' },
-        { title: 'Investerarfilm - Koncept & Guide', page: 25, type: 'premium' }
-      );
+      let nextPage = 13;
+      sections.push({ title: 'PREMIUM INNEHÅLL', page: nextPage++, type: 'header' });
+      
+      if (premiumAnalysis.swot) {
+        sections.push({ title: 'SWOT-Analys', page: nextPage++, type: 'premium' });
+      }
+      if (premiumAnalysis.financialProjections) {
+        sections.push({ title: 'Finansiella Projektioner (3 år)', page: nextPage++, type: 'premium' });
+      }
+      if (premiumAnalysis.detailedRecommendations) {
+        sections.push({ title: 'Detaljerade Rekommendationer', page: nextPage++, type: 'premium' });
+      }
+      if (premiumAnalysis.benchmarkAnalysis) {
+        sections.push({ title: 'Benchmark-Analys', page: nextPage++, type: 'premium' });
+      }
+      if (premiumAnalysis.investmentProposal) {
+        sections.push({ title: 'Investeringsförslag', page: nextPage++, type: 'premium' });
+      }
+      if (premiumAnalysis.marketInsights) {
+        sections.push({ title: 'Marknadsinsikter', page: nextPage++, type: 'premium' });
+      }
+      if (premiumAnalysis.investorFilm) {
+        sections.push({ title: 'Investerarfilm - Koncept & Guide', page: nextPage++, type: 'premium' });
+      }
+      if (premiumAnalysis.aiImagePrompts) {
+        sections.push({ title: 'AI Bildprompts', page: nextPage++, type: 'premium' });
+      }
     }
 
     // Draw TOC sections
@@ -887,6 +938,636 @@ export async function POST(request: Request) {
       }
     }
 
+    // ===== MARKNADSANALYS =====
+    const marketPage = pdfDoc.addPage(PageSizes.A4);
+    pages.push(marketPage);
+    yPos = drawHeader(marketPage, 'Marknadsanalys', 'Marknadspotential & Positionering');
+
+    // Market size visualization
+    if (answers.market_size) {
+      // Market size card
+      marketPage.drawRectangle({
+        x: 50,
+        y: yPos - 80,
+        width: width - 100,
+        height: 80,
+        color: rgb(0.02, 0.08, 0.15),
+      });
+
+      marketPage.drawText('MARKNADSSTORLEK', {
+        x: 70,
+        y: yPos - 30,
+        size: 12,
+        font: helveticaBold,
+        color: accentColor,
+      });
+
+      yPos = drawWrappedText(
+        marketPage,
+        answers.market_size,
+        70,
+        yPos - 50,
+        width - 140,
+        11,
+        helveticaFont,
+        white
+      );
+      
+      yPos -= 40;
+    }
+
+    // Target customer
+    if (answers.target_customer) {
+      marketPage.drawText('MÅLGRUPP', {
+        x: 50,
+        y: yPos,
+        size: 14,
+        font: helveticaBold,
+        color: primaryColor,
+      });
+      yPos -= 25;
+      
+      yPos = drawWrappedText(
+        marketPage,
+        answers.target_customer,
+        50,
+        yPos,
+        width - 100,
+        12,
+        helveticaFont,
+        textColor
+      );
+      yPos -= 30;
+    }
+
+    // Market trends
+    if (answers.market_trends) {
+      marketPage.drawText('MARKNADSTRENDER', {
+        x: 50,
+        y: yPos,
+        size: 14,
+        font: helveticaBold,
+        color: primaryColor,
+      });
+      yPos -= 25;
+      
+      yPos = drawWrappedText(
+        marketPage,
+        answers.market_trends,
+        50,
+        yPos,
+        width - 100,
+        12,
+        helveticaFont,
+        textColor
+      );
+    }
+
+    // ===== AFFÄRSMODELL & INTÄKTER =====
+    const bizModelPage = pdfDoc.addPage(PageSizes.A4);
+    pages.push(bizModelPage);
+    yPos = drawHeader(bizModelPage, 'Affärsmodell & Intäkter', 'Hur ni tjänar pengar');
+
+    if (answers.revenue_block || answers.revenue_model) {
+      const revenueText = answers.revenue_block || answers.revenue_model || '';
+      
+      // Revenue model visualization
+      bizModelPage.drawRectangle({
+        x: 50,
+        y: yPos - 100,
+        width: width - 100,
+        height: 100,
+        color: rgb(0.02, 0.08, 0.15),
+      });
+
+      bizModelPage.drawText('INTÄKTSMODELL', {
+        x: 70,
+        y: yPos - 30,
+        size: 14,
+        font: helveticaBold,
+        color: greenColor,
+      });
+
+      yPos = drawWrappedText(
+        bizModelPage,
+        revenueText,
+        70,
+        yPos - 55,
+        width - 140,
+        11,
+        helveticaFont,
+        white
+      );
+      
+      yPos -= 60;
+    }
+
+    // Unit economics if available
+    if (answers.unit_economics) {
+      bizModelPage.drawText('ENHETSEKONOMI', {
+        x: 50,
+        y: yPos,
+        size: 14,
+        font: helveticaBold,
+        color: primaryColor,
+      });
+      yPos -= 25;
+      
+      yPos = drawWrappedText(
+        bizModelPage,
+        answers.unit_economics,
+        50,
+        yPos,
+        width - 100,
+        12,
+        helveticaFont,
+        textColor
+      );
+    }
+
+    // ===== TEAM & KOMPETENS =====
+    const teamPage = pdfDoc.addPage(PageSizes.A4);
+    pages.push(teamPage);
+    yPos = drawHeader(teamPage, 'Team & Kompetens', 'Människorna bakom visionen');
+
+    if (answers.team) {
+      // Team background card
+      teamPage.drawRectangle({
+        x: 50,
+        y: yPos - 20,
+        width: width - 100,
+        height: 20,
+        color: accentColor,
+      });
+
+      teamPage.drawText('TEAMET', {
+        x: 60,
+        y: yPos - 15,
+        size: 12,
+        font: helveticaBold,
+        color: white,
+      });
+      
+      yPos -= 40;
+
+      yPos = drawWrappedText(
+        teamPage,
+        answers.team,
+        50,
+        yPos,
+        width - 100,
+        12,
+        helveticaFont,
+        textColor
+      );
+      yPos -= 30;
+    }
+
+    // Founder equity
+    if (answers.founder_equity) {
+      teamPage.drawText('GRUNDARÄGARSKAP', {
+        x: 50,
+        y: yPos,
+        size: 14,
+        font: helveticaBold,
+        color: primaryColor,
+      });
+      yPos -= 25;
+      
+      teamPage.drawText(`Grundarteamet behåller ${answers.founder_equity}% efter denna runda`, {
+        x: 50,
+        y: yPos,
+        size: 12,
+        font: helveticaFont,
+        color: textColor,
+      });
+      yPos -= 30;
+    }
+
+    // Skills & gaps
+    if (answers.team_skills) {
+      teamPage.drawText('KOMPETENSER', {
+        x: 50,
+        y: yPos,
+        size: 14,
+        font: helveticaBold,
+        color: primaryColor,
+      });
+      yPos -= 25;
+      
+      yPos = drawWrappedText(
+        teamPage,
+        answers.team_skills,
+        50,
+        yPos,
+        width - 100,
+        12,
+        helveticaFont,
+        textColor
+      );
+    }
+
+    // ===== TRACTION & BEVIS =====
+    const tractionPage = pdfDoc.addPage(PageSizes.A4);
+    pages.push(tractionPage);
+    yPos = drawHeader(tractionPage, 'Traction & Bevis', 'Vad ni uppnått hittills');
+
+    if (answers.traction) {
+      // Traction highlight box
+      tractionPage.drawRectangle({
+        x: 50,
+        y: yPos - 80,
+        width: width - 100,
+        height: 80,
+        color: rgb(0.9, 0.98, 0.9),
+      });
+
+      tractionPage.drawText('NUVARANDE TRACTION', {
+        x: 70,
+        y: yPos - 30,
+        size: 12,
+        font: helveticaBold,
+        color: greenColor,
+      });
+
+      yPos = drawWrappedText(
+        tractionPage,
+        answers.traction,
+        70,
+        yPos - 50,
+        width - 140,
+        11,
+        helveticaFont,
+        textColor
+      );
+      
+      yPos -= 40;
+    }
+
+    // Milestones
+    if (answers.milestones) {
+      tractionPage.drawText('PLANERADE MILSTOLPAR', {
+        x: 50,
+        y: yPos,
+        size: 14,
+        font: helveticaBold,
+        color: primaryColor,
+      });
+      yPos -= 25;
+      
+      try {
+        const milestones = JSON.parse(answers.milestones);
+        milestones.forEach((milestone: any, index: number) => {
+          // Milestone box
+          tractionPage.drawRectangle({
+            x: 50,
+            y: yPos - 35,
+            width: width - 100,
+            height: 35,
+            color: index % 2 === 0 ? lightGray : white,
+          });
+
+          tractionPage.drawText(`${index + 1}. ${milestone.milestone}`, {
+            x: 60,
+            y: yPos - 15,
+            size: 11,
+            font: helveticaBold,
+            color: primaryColor,
+          });
+
+          tractionPage.drawText(milestone.date, {
+            x: width - 150,
+            y: yPos - 15,
+            size: 11,
+            font: helveticaFont,
+            color: blueColor,
+          });
+
+          yPos -= 40;
+        });
+      } catch (e) {
+        // If milestones is not JSON, just display as text
+        yPos = drawWrappedText(
+          tractionPage,
+          answers.milestones,
+          50,
+          yPos,
+          width - 100,
+          12,
+          helveticaFont,
+          textColor
+        );
+      }
+    }
+
+    // ===== FINANSIELL PLAN =====
+    const financialPage = pdfDoc.addPage(PageSizes.A4);
+    pages.push(financialPage);
+    yPos = drawHeader(financialPage, 'Finansiell Plan', 'Ekonomisk översikt');
+
+    // Runway
+    if (answers.runway) {
+      // Runway visualization
+      const runwayMonths = parseInt(answers.runway) || 12;
+      const runwayColor = runwayMonths >= 18 ? greenColor : 
+                         runwayMonths >= 12 ? orangeColor : redColor;
+
+      financialPage.drawRectangle({
+        x: 50,
+        y: yPos - 100,
+        width: width - 100,
+        height: 100,
+        color: rgb(0.02, 0.08, 0.15),
+      });
+
+      financialPage.drawText('RUNWAY', {
+        x: 70,
+        y: yPos - 30,
+        size: 14,
+        font: helveticaBold,
+        color: accentColor,
+      });
+
+      financialPage.drawText(`${runwayMonths}`, {
+        x: 70,
+        y: yPos - 65,
+        size: 36,
+        font: helveticaBold,
+        color: runwayColor,
+      });
+
+      financialPage.drawText('månader', {
+        x: 120,
+        y: yPos - 65,
+        size: 14,
+        font: helveticaFont,
+        color: white,
+      });
+
+      yPos -= 120;
+    }
+
+    // Capital needs
+    if (answers.capital_block) {
+      try {
+        const capital = JSON.parse(answers.capital_block);
+        
+        financialPage.drawText('KAPITALBEHOV', {
+          x: 50,
+          y: yPos,
+          size: 14,
+          font: helveticaBold,
+          color: primaryColor,
+        });
+        yPos -= 25;
+
+        // Amount needed
+        financialPage.drawText(`Söker: ${capital.amount} MSEK`, {
+          x: 50,
+          y: yPos,
+          size: 16,
+          font: helveticaBold,
+          color: accentColor,
+        });
+        yPos -= 30;
+
+        // Use of funds
+        financialPage.drawText('ANVÄNDNING AV KAPITAL', {
+          x: 50,
+          y: yPos,
+          size: 12,
+          font: helveticaBold,
+          color: primaryColor,
+        });
+        yPos -= 25;
+
+        const useOfFunds = [
+          { label: 'Produktutveckling', value: capital.product },
+          { label: 'Försäljning & Marknad', value: capital.sales },
+          { label: 'Personal & Rekrytering', value: capital.team },
+          { label: 'Övrigt', value: capital.other }
+        ];
+
+        useOfFunds.forEach(fund => {
+          if (fund.value && parseInt(fund.value) > 0) {
+            // Fund bar
+            const barWidth = (parseInt(fund.value) / 100) * (width - 200);
+            
+            financialPage.drawRectangle({
+              x: 50,
+              y: yPos - 15,
+              width: barWidth,
+              height: 15,
+              color: blueColor,
+            });
+
+            financialPage.drawText(`${fund.label}: ${fund.value}%`, {
+              x: 60,
+              y: yPos - 12,
+              size: 10,
+              font: helveticaFont,
+              color: white,
+            });
+
+            yPos -= 25;
+          }
+        });
+      } catch (e) {
+        // Fallback if not JSON
+        yPos = drawWrappedText(
+          financialPage,
+          answers.capital_block,
+          50,
+          yPos,
+          width - 100,
+          12,
+          helveticaFont,
+          textColor
+        );
+      }
+    }
+
+    // ===== RISKER & MÖJLIGHETER =====
+    const risksPage = pdfDoc.addPage(PageSizes.A4);
+    pages.push(risksPage);
+    yPos = drawHeader(risksPage, 'Risker & Möjligheter', 'Riskhantering & Potential');
+
+    if (answers.main_risks) {
+      risksPage.drawText('HUVUDSAKLIGA RISKER', {
+        x: 50,
+        y: yPos,
+        size: 14,
+        font: helveticaBold,
+        color: redColor,
+      });
+      yPos -= 25;
+      
+      yPos = drawWrappedText(
+        risksPage,
+        answers.main_risks,
+        50,
+        yPos,
+        width - 100,
+        12,
+        helveticaFont,
+        textColor
+      );
+      yPos -= 30;
+    }
+
+    // Exit strategy
+    if (answers.exit_strategy) {
+      risksPage.drawText('EXIT-STRATEGI', {
+        x: 50,
+        y: yPos,
+        size: 14,
+        font: helveticaBold,
+        color: greenColor,
+      });
+      yPos -= 25;
+      
+      yPos = drawWrappedText(
+        risksPage,
+        answers.exit_strategy,
+        50,
+        yPos,
+        width - 100,
+        12,
+        helveticaFont,
+        textColor
+      );
+    }
+
+    // ===== ÅTGÄRDSPLAN =====
+    const actionPage = pdfDoc.addPage(PageSizes.A4);
+    pages.push(actionPage);
+    yPos = drawHeader(actionPage, 'Åtgärdsplan', 'Nästa steg för framgång');
+
+    // Action items from insights or generated
+    if (actionItems && actionItems.length > 0) {
+      actionItems.forEach((item: any, index: number) => {
+        // Priority indicator
+        const priorityColor = item.priority === 'high' ? redColor :
+                            item.priority === 'medium' ? orangeColor : greenColor;
+        
+        // Action item card
+        actionPage.drawRectangle({
+          x: 50,
+          y: yPos - 60,
+          width: width - 100,
+          height: 60,
+          color: index % 2 === 0 ? rgb(0.98, 0.98, 0.98) : white,
+        });
+
+        // Priority badge
+        actionPage.drawRectangle({
+          x: 55,
+          y: yPos - 25,
+          width: 8,
+          height: 20,
+          color: priorityColor,
+        });
+
+        actionPage.drawText(item.title || 'Åtgärd', {
+          x: 70,
+          y: yPos - 20,
+          size: 12,
+          font: helveticaBold,
+          color: primaryColor,
+        });
+
+        if (item.description) {
+          drawWrappedText(
+            actionPage,
+            item.description,
+            70,
+            yPos - 35,
+            width - 170,
+            10,
+            helveticaFont,
+            textColor,
+            1.3
+          );
+        }
+
+        if (item.timeframe) {
+          actionPage.drawText(item.timeframe, {
+            x: width - 120,
+            y: yPos - 35,
+            size: 10,
+            font: helveticaFont,
+            color: blueColor,
+          });
+        }
+
+        yPos -= 70;
+        
+        // Check if we need a new page
+        if (yPos < 150 && index < actionItems.length - 1) {
+          const newActionPage = pdfDoc.addPage(PageSizes.A4);
+          pages.push(newActionPage);
+          yPos = drawHeader(newActionPage, 'Åtgärdsplan', 'Fortsättning');
+        }
+      });
+    } else {
+      // Default recommendations if no action items
+      const defaultActions = [
+        { 
+          title: 'Validera affärsmodellen', 
+          desc: 'Genomför kundintervjuer och marknadsvalidering',
+          priority: 'high' 
+        },
+        { 
+          title: 'Säkra initial finansiering', 
+          desc: 'Förbered pitch deck och börja investerardialog',
+          priority: 'medium' 
+        },
+        { 
+          title: 'Bygg MVP', 
+          desc: 'Utveckla en minimal viable product för att testa marknaden',
+          priority: 'high' 
+        }
+      ];
+
+      defaultActions.forEach((action, index) => {
+        const priorityColor = action.priority === 'high' ? redColor : orangeColor;
+        
+        actionPage.drawRectangle({
+          x: 50,
+          y: yPos - 50,
+          width: width - 100,
+          height: 50,
+          color: index % 2 === 0 ? rgb(0.98, 0.98, 0.98) : white,
+        });
+
+        actionPage.drawRectangle({
+          x: 55,
+          y: yPos - 20,
+          width: 8,
+          height: 15,
+          color: priorityColor,
+        });
+
+        actionPage.drawText(action.title, {
+          x: 70,
+          y: yPos - 15,
+          size: 12,
+          font: helveticaBold,
+          color: primaryColor,
+        });
+
+        actionPage.drawText(action.desc, {
+          x: 70,
+          y: yPos - 30,
+          size: 10,
+          font: helveticaFont,
+          color: textColor,
+        });
+
+        yPos -= 60;
+      });
+    }
+
     // ===== PREMIUM SECTIONS =====
     if (subscriptionLevel === 'premium' && premiumAnalysis) {
       
@@ -1037,7 +1718,6 @@ export async function POST(request: Request) {
         pages.push(finPage);
         yPos = drawHeader(finPage, 'Finansiella Projektioner', '3-årsprognos');
         
-        // Add financial projections content here
         finPage.drawText('INTÄKTS- OCH KOSTNADSPROGNOS', {
           x: 50,
           y: yPos,
@@ -1047,7 +1727,941 @@ export async function POST(request: Request) {
         });
         yPos -= 30;
         
-        // You would add the actual financial data table here
+        // Table header
+        const tableX = 50;
+        const columnWidth = (width - 100) / 4;
+        
+        // Header background
+        finPage.drawRectangle({
+          x: tableX,
+          y: yPos - 25,
+          width: width - 100,
+          height: 25,
+          color: primaryColor,
+        });
+        
+        // Headers
+        finPage.drawText('Metrics', {
+          x: tableX + 10,
+          y: yPos - 18,
+          size: 11,
+          font: helveticaBold,
+          color: white,
+        });
+        
+        ['År 1', 'År 2', 'År 3'].forEach((year, i) => {
+          finPage.drawText(year, {
+            x: tableX + columnWidth * (i + 1) + 10,
+            y: yPos - 18,
+            size: 11,
+            font: helveticaBold,
+            color: white,
+          });
+        });
+        
+        yPos -= 30;
+        
+        // Financial data
+        if (premiumAnalysis.financialProjections) {
+          const projections = premiumAnalysis.financialProjections;
+          const metrics = [
+            { label: 'Intäkter (MSEK)', key: 'revenue' },
+            { label: 'Kostnader (MSEK)', key: 'costs' },
+            { label: 'EBITDA (MSEK)', key: 'ebitda' },
+            { label: 'Antal kunder', key: 'customers' }
+          ];
+          
+          metrics.forEach((metric, idx) => {
+            // Row background
+            if (idx % 2 === 1) {
+              finPage.drawRectangle({
+                x: tableX,
+                y: yPos - 20,
+                width: width - 100,
+                height: 20,
+                color: lightGray,
+              });
+            }
+            
+            finPage.drawText(metric.label, {
+              x: tableX + 10,
+              y: yPos - 15,
+              size: 10,
+              font: helveticaFont,
+              color: textColor,
+            });
+            
+            ['year1', 'year2', 'year3'].forEach((year, i) => {
+              const value = projections[year]?.[metric.key] || 0;
+              const color = metric.key === 'ebitda' && value < 0 ? redColor : textColor;
+              
+              finPage.drawText(value.toString(), {
+                x: tableX + columnWidth * (i + 1) + 10,
+                y: yPos - 15,
+                size: 10,
+                font: helveticaBold,
+                color: color,
+              });
+            });
+            
+            yPos -= 25;
+          });
+        }
+        
+        // Growth chart visualization
+        yPos -= 20;
+        finPage.drawText('TILLVÄXTKURVA', {
+          x: 50,
+          y: yPos,
+          size: 12,
+          font: helveticaBold,
+          color: primaryColor,
+        });
+        yPos -= 30;
+        
+        // Simple growth visualization
+        const chartHeight = 100;
+        const chartWidth = width - 100;
+        
+        finPage.drawRectangle({
+          x: 50,
+          y: yPos - chartHeight,
+          width: chartWidth,
+          height: chartHeight,
+          color: rgb(0.98, 0.98, 0.98),
+        });
+      }
+
+      // Detailed Recommendations
+      if (premiumAnalysis.detailedRecommendations) {
+        let recPage = pdfDoc.addPage(PageSizes.A4);
+        pages.push(recPage);
+        yPos = drawHeader(recPage, 'Detaljerade Rekommendationer', 'Konkreta åtgärder för framgång');
+        
+        // Immediate actions
+        if (premiumAnalysis.detailedRecommendations.immediate) {
+          recPage.drawText('OMEDELBARA ÅTGÄRDER (1-2 månader)', {
+            x: 50,
+            y: yPos,
+            size: 14,
+            font: helveticaBold,
+            color: redColor,
+          });
+          yPos -= 25;
+          
+          premiumAnalysis.detailedRecommendations.immediate.forEach((rec: any, index: number) => {
+            // Recommendation card
+            const cardHeight = 120;
+            
+            recPage.drawRectangle({
+              x: 50,
+              y: yPos - cardHeight,
+              width: width - 100,
+              height: cardHeight,
+              color: index % 2 === 0 ? white : rgb(0.98, 0.98, 0.98),
+            });
+            
+            // Priority indicator
+            recPage.drawRectangle({
+              x: 55,
+              y: yPos - 20,
+              width: 5,
+              height: cardHeight - 10,
+              color: redColor,
+            });
+            
+            // Action title
+            recPage.drawText(rec.action, {
+              x: 70,
+              y: yPos - 20,
+              size: 12,
+              font: helveticaBold,
+              color: primaryColor,
+            });
+            
+            // Details
+            const detailY = yPos - 40;
+            
+            recPage.drawText('Varför:', {
+              x: 70,
+              y: detailY,
+              size: 10,
+              font: helveticaBold,
+              color: textColor,
+            });
+            
+            drawWrappedText(
+              recPage,
+              rec.why,
+              120,
+              detailY,
+              width - 170,
+              9,
+              helveticaFont,
+              textColor,
+              1.2
+            );
+            
+            recPage.drawText('Hur:', {
+              x: 70,
+              y: detailY - 20,
+              size: 10,
+              font: helveticaBold,
+              color: textColor,
+            });
+            
+            drawWrappedText(
+              recPage,
+              rec.how,
+              120,
+              detailY - 20,
+              width - 170,
+              9,
+              helveticaFont,
+              textColor,
+              1.2
+            );
+            
+            recPage.drawText('Förväntad effekt:', {
+              x: 70,
+              y: detailY - 40,
+              size: 10,
+              font: helveticaBold,
+              color: textColor,
+            });
+            
+            recPage.drawText(rec.impact, {
+              x: 170,
+              y: detailY - 40,
+              size: 9,
+              font: helveticaFont,
+              color: greenColor,
+            });
+            
+            recPage.drawText('Tidsram:', {
+              x: 70,
+              y: detailY - 55,
+              size: 10,
+              font: helveticaBold,
+              color: textColor,
+            });
+            
+            recPage.drawText(rec.timeline, {
+              x: 120,
+              y: detailY - 55,
+              size: 9,
+              font: helveticaFont,
+              color: blueColor,
+            });
+            
+            yPos -= cardHeight + 10;
+            
+            // Check if we need a new page
+            if (yPos < 200 && index < premiumAnalysis.detailedRecommendations.immediate.length - 1) {
+              recPage = pdfDoc.addPage(PageSizes.A4);
+              pages.push(recPage);
+              yPos = drawHeader(recPage, 'Detaljerade Rekommendationer', 'Fortsättning');
+            }
+          });
+        }
+        
+        // Short-term actions
+        if (premiumAnalysis.detailedRecommendations.shortTerm && yPos > 200) {
+          yPos -= 20;
+          recPage.drawText('KORTSIKTIGA ÅTGÄRDER (3-6 månader)', {
+            x: 50,
+            y: yPos,
+            size: 14,
+            font: helveticaBold,
+            color: orangeColor,
+          });
+          yPos -= 25;
+          
+          // Similar structure for short-term recommendations
+        }
+      }
+
+      // Benchmark Analysis
+      if (premiumAnalysis.benchmarkAnalysis) {
+        const benchPage = pdfDoc.addPage(PageSizes.A4);
+        pages.push(benchPage);
+        yPos = drawHeader(benchPage, 'Benchmark-Analys', 'Jämförelse med branschstandard');
+        
+        // Industry comparison
+        if (premiumAnalysis.benchmarkAnalysis.industryComparison) {
+          benchPage.drawText('NYCKELTAL VS BRANSCHSNITT', {
+            x: 50,
+            y: yPos,
+            size: 14,
+            font: helveticaBold,
+            color: primaryColor,
+          });
+          yPos -= 30;
+          
+          const comparisons = premiumAnalysis.benchmarkAnalysis.industryComparison;
+          const metrics = ['grossMargin', 'cacPayback', 'growthRate', 'churnRate'];
+          const labels = {
+            grossMargin: 'Bruttomarginal',
+            cacPayback: 'CAC Payback',
+            growthRate: 'Tillväxttakt',
+            churnRate: 'Churn Rate'
+          };
+          
+          metrics.forEach((metric, index) => {
+            if (comparisons[metric]) {
+              const comp = comparisons[metric];
+              
+              // Metric card
+              benchPage.drawRectangle({
+                x: 50,
+                y: yPos - 60,
+                width: width - 100,
+                height: 60,
+                color: index % 2 === 0 ? white : rgb(0.98, 0.98, 0.98),
+              });
+              
+              benchPage.drawText(labels[metric as keyof typeof labels], {
+                x: 60,
+                y: yPos - 20,
+                size: 12,
+                font: helveticaBold,
+                color: primaryColor,
+              });
+              
+              // Values
+              benchPage.drawText(`Ni: ${comp.us}`, {
+                x: 60,
+                y: yPos - 40,
+                size: 11,
+                font: helveticaFont,
+                color: textColor,
+              });
+              
+              benchPage.drawText(`Bransch: ${comp.industry}`, {
+                x: 200,
+                y: yPos - 40,
+                size: 11,
+                font: helveticaFont,
+                color: textColor,
+              });
+              
+              // Verdict with color
+              const verdictColor = comp.verdict.includes('bättre') || comp.verdict.includes('Bra') 
+                ? greenColor 
+                : comp.verdict.includes('sämre') || comp.verdict.includes('Högt')
+                ? redColor
+                : orangeColor;
+              
+              benchPage.drawText(comp.verdict, {
+                x: 350,
+                y: yPos - 40,
+                size: 10,
+                font: helveticaBold,
+                color: verdictColor,
+              });
+              
+              yPos -= 70;
+            }
+          });
+        }
+        
+        // Peer comparison table
+        if (premiumAnalysis.benchmarkAnalysis.peerComparison) {
+          yPos -= 20;
+          benchPage.drawText('JÄMFÖRELSE MED LIKNANDE BOLAG', {
+            x: 50,
+            y: yPos,
+            size: 14,
+            font: helveticaBold,
+            color: primaryColor,
+          });
+          yPos -= 30;
+          
+          // Table header
+          benchPage.drawRectangle({
+            x: 50,
+            y: yPos - 25,
+            width: width - 100,
+            height: 25,
+            color: primaryColor,
+          });
+          
+          const colWidth = (width - 100) / 4;
+          ['Företag', 'Funding', 'Revenue', 'Värdering'].forEach((header, i) => {
+            benchPage.drawText(header, {
+              x: 60 + colWidth * i,
+              y: yPos - 18,
+              size: 10,
+              font: helveticaBold,
+              color: white,
+            });
+          });
+          
+          yPos -= 30;
+          
+          // Peer data
+          premiumAnalysis.benchmarkAnalysis.peerComparison.forEach((peer: any, idx: number) => {
+            if (idx % 2 === 1) {
+              benchPage.drawRectangle({
+                x: 50,
+                y: yPos - 20,
+                width: width - 100,
+                height: 20,
+                color: lightGray,
+              });
+            }
+            
+            benchPage.drawText(peer.company, {
+              x: 60,
+              y: yPos - 15,
+              size: 10,
+              font: helveticaFont,
+              color: textColor,
+            });
+            
+            benchPage.drawText(peer.funding, {
+              x: 60 + colWidth,
+              y: yPos - 15,
+              size: 10,
+              font: helveticaFont,
+              color: textColor,
+            });
+            
+            benchPage.drawText(peer.revenue, {
+              x: 60 + colWidth * 2,
+              y: yPos - 15,
+              size: 10,
+              font: helveticaFont,
+              color: textColor,
+            });
+            
+            benchPage.drawText(peer.valuation, {
+              x: 60 + colWidth * 3,
+              y: yPos - 15,
+              size: 10,
+              font: helveticaFont,
+              color: textColor,
+            });
+            
+            yPos -= 25;
+          });
+        }
+      }
+
+      // Investment Proposal
+      if (premiumAnalysis.investmentProposal) {
+        const invPage = pdfDoc.addPage(PageSizes.A4);
+        pages.push(invPage);
+        yPos = drawHeader(invPage, 'Investeringsförslag', 'Er kapitalanskaffning');
+        
+        const proposal = premiumAnalysis.investmentProposal;
+        
+        // Investment ask card
+        invPage.drawRectangle({
+          x: 50,
+          y: yPos - 120,
+          width: width - 100,
+          height: 120,
+          color: rgb(0.02, 0.08, 0.15),
+        });
+        
+        invPage.drawText('INVESTERINGSRUNDA', {
+          x: 70,
+          y: yPos - 30,
+          size: 14,
+          font: helveticaBold,
+          color: accentColor,
+        });
+        
+        invPage.drawText(`Söker: ${proposal.askAmount}`, {
+          x: 70,
+          y: yPos - 60,
+          size: 24,
+          font: helveticaBold,
+          color: white,
+        });
+        
+        invPage.drawText(`Värdering: ${proposal.valuation}`, {
+          x: 70,
+          y: yPos - 85,
+          size: 16,
+          font: helveticaFont,
+          color: accentColor,
+        });
+        
+        yPos -= 140;
+        
+        // Use of funds
+        invPage.drawText('ANVÄNDNING AV KAPITAL', {
+          x: 50,
+          y: yPos,
+          size: 14,
+          font: helveticaBold,
+          color: primaryColor,
+        });
+        yPos -= 30;
+        
+        if (proposal.useOfFunds) {
+          const funds = proposal.useOfFunds;
+          const fundItems = [
+            { label: 'Produktutveckling', value: funds.productDevelopment, color: blueColor },
+            { label: 'Försäljning & Marknadsföring', value: funds.salesMarketing, color: greenColor },
+            { label: 'Teamutbyggnad', value: funds.teamExpansion, color: accentColor },
+            { label: 'Övrigt', value: funds.other, color: orangeColor }
+          ];
+          
+          fundItems.forEach(item => {
+            if (item.value) {
+              const barWidth = (parseInt(item.value) / 100) * (width - 200);
+              
+              invPage.drawRectangle({
+                x: 50,
+                y: yPos - 20,
+                width: barWidth,
+                height: 20,
+                color: item.color,
+              });
+              
+              invPage.drawText(`${item.label}: ${item.value}`, {
+                x: 60,
+                y: yPos - 15,
+                size: 10,
+                font: helveticaFont,
+                color: white,
+              });
+              
+              yPos -= 30;
+            }
+          });
+        }
+        
+        // Key metrics
+        if (proposal.keyMetrics) {
+          yPos -= 20;
+          invPage.drawText('NYCKELTAL', {
+            x: 50,
+            y: yPos,
+            size: 14,
+            font: helveticaBold,
+            color: primaryColor,
+          });
+          yPos -= 30;
+          
+          const metricsGrid = [
+            { label: 'Nuvarande MRR', value: proposal.keyMetrics.currentMRR },
+            { label: 'Mål MRR (12 mån)', value: proposal.keyMetrics.targetMRR12Months },
+            { label: 'Nuvarande kunder', value: proposal.keyMetrics.currentCustomers },
+            { label: 'Mål kunder (12 mån)', value: proposal.keyMetrics.targetCustomers12Months },
+            { label: 'Burn rate', value: proposal.keyMetrics.burnRate },
+            { label: 'Månader runway', value: proposal.keyMetrics.monthsRunway }
+          ];
+          
+          // Create 2x3 grid
+          metricsGrid.forEach((metric, index) => {
+            const col = index % 2;
+            const row = Math.floor(index / 2);
+            const x = 50 + col * (width - 100) / 2;
+            const y = yPos - row * 50;
+            
+            invPage.drawRectangle({
+              x: x,
+              y: y - 40,
+              width: (width - 110) / 2,
+              height: 40,
+              color: rgb(0.98, 0.98, 0.98),
+            });
+            
+            invPage.drawText(metric.label, {
+              x: x + 10,
+              y: y - 15,
+              size: 10,
+              font: helveticaFont,
+              color: textColor,
+            });
+            
+            invPage.drawText(metric.value?.toString() || 'N/A', {
+              x: x + 10,
+              y: y - 30,
+              size: 12,
+              font: helveticaBold,
+              color: primaryColor,
+            });
+          });
+          
+          yPos -= 160;
+        }
+        
+        // Investor benefits
+        if (proposal.investorBenefits) {
+          invPage.drawText('FÖRDELAR FÖR INVESTERARE', {
+            x: 50,
+            y: yPos,
+            size: 14,
+            font: helveticaBold,
+            color: greenColor,
+          });
+          yPos -= 25;
+          
+          proposal.investorBenefits.forEach((benefit: string, index: number) => {
+            invPage.drawRectangle({
+              x: 55,
+              y: yPos + 3,
+              width: 6,
+              height: 6,
+              color: greenColor,
+            });
+            
+            yPos = drawWrappedText(
+              invPage,
+              benefit,
+              70,
+              yPos,
+              width - 120,
+              11,
+              helveticaFont,
+              textColor
+            );
+            yPos -= 10;
+          });
+        }
+      }
+
+      // Market Insights
+      if (premiumAnalysis.marketInsights) {
+        const marketInsightsPage = pdfDoc.addPage(PageSizes.A4);
+        pages.push(marketInsightsPage);
+        yPos = drawHeader(marketInsightsPage, 'Marknadsinsikter', 'Djupgående marknadsanalys');
+        
+        const insights = premiumAnalysis.marketInsights;
+        
+        // Market size
+        if (insights.marketSize) {
+          const ms = insights.marketSize;
+          
+          marketInsightsPage.drawRectangle({
+            x: 50,
+            y: yPos - 80,
+            width: width - 100,
+            height: 80,
+            color: rgb(0.02, 0.08, 0.15),
+          });
+          
+          marketInsightsPage.drawText('MARKNADSSTORLEK', {
+            x: 70,
+            y: yPos - 25,
+            size: 12,
+            font: helveticaBold,
+            color: accentColor,
+          });
+          
+          marketInsightsPage.drawText(ms.current, {
+            x: 70,
+            y: yPos - 45,
+            size: 18,
+            font: helveticaBold,
+            color: white,
+          });
+          
+          marketInsightsPage.drawText(`${ms.growth} årlig tillväxt`, {
+            x: 70,
+            y: yPos - 65,
+            size: 12,
+            font: helveticaFont,
+            color: greenColor,
+          });
+          
+          marketInsightsPage.drawText(`Prognos: ${ms.projected}`, {
+            x: 300,
+            y: yPos - 45,
+            size: 14,
+            font: helveticaFont,
+            color: white,
+          });
+          
+          yPos -= 100;
+        }
+        
+        // Key trends
+        if (insights.keyTrends) {
+          marketInsightsPage.drawText('VIKTIGA TRENDER', {
+            x: 50,
+            y: yPos,
+            size: 14,
+            font: helveticaBold,
+            color: primaryColor,
+          });
+          yPos -= 25;
+          
+          insights.keyTrends.forEach((trend: any, index: number) => {
+            const trendColor = trend.impact === 'Hög' ? redColor : 
+                              trend.impact === 'Medium' ? orangeColor : greenColor;
+            
+            marketInsightsPage.drawRectangle({
+              x: 50,
+              y: yPos - 50,
+              width: width - 100,
+              height: 50,
+              color: index % 2 === 0 ? white : rgb(0.98, 0.98, 0.98),
+            });
+            
+            marketInsightsPage.drawText(trend.icon, {
+              x: 60,
+              y: yPos - 25,
+              size: 20,
+              font: helveticaFont,
+              color: textColor,
+            });
+            
+            marketInsightsPage.drawText(trend.name, {
+              x: 90,
+              y: yPos - 20,
+              size: 11,
+              font: helveticaBold,
+              color: primaryColor,
+            });
+            
+            drawWrappedText(
+              marketInsightsPage,
+              trend.description,
+              90,
+              yPos - 35,
+              width - 250,
+              9,
+              helveticaFont,
+              textColor,
+              1.2
+            );
+            
+            marketInsightsPage.drawText(`Impact: ${trend.impact}`, {
+              x: width - 150,
+              y: yPos - 25,
+              size: 10,
+              font: helveticaBold,
+              color: trendColor,
+            });
+            
+            yPos -= 60;
+          });
+        }
+      }
+
+      // Investor Film
+      if (premiumAnalysis.investorFilm) {
+        const filmPage = pdfDoc.addPage(PageSizes.A4);
+        pages.push(filmPage);
+        yPos = drawHeader(filmPage, 'Investerarfilm', 'Koncept & Produktionsguide');
+        
+        const film = premiumAnalysis.investorFilm;
+        
+        // WHY statement
+        if (film.whyStatement) {
+          filmPage.drawRectangle({
+            x: 50,
+            y: yPos - 80,
+            width: width - 100,
+            height: 80,
+            color: accentColor,
+          });
+          
+          filmPage.drawText('VARFÖR VI FINNS', {
+            x: 70,
+            y: yPos - 25,
+            size: 12,
+            font: helveticaBold,
+            color: white,
+          });
+          
+          yPos = drawWrappedText(
+            filmPage,
+            film.whyStatement,
+            70,
+            yPos - 45,
+            width - 140,
+            12,
+            helveticaFont,
+            white,
+            1.5
+          );
+          
+          yPos -= 50;
+        }
+        
+        // SORA AI Prompt
+        if (film.soraPrompt) {
+          filmPage.drawText('SORA AI PROMPT', {
+            x: 50,
+            y: yPos,
+            size: 14,
+            font: helveticaBold,
+            color: primaryColor,
+          });
+          yPos -= 25;
+          
+          filmPage.drawRectangle({
+            x: 50,
+            y: yPos - 100,
+            width: width - 100,
+            height: 100,
+            color: rgb(0.98, 0.98, 1),
+          });
+          
+          yPos = drawWrappedText(
+            filmPage,
+            film.soraPrompt,
+            60,
+            yPos - 20,
+            width - 120,
+            10,
+            helveticaFont,
+            textColor,
+            1.3
+          );
+          
+          yPos -= 80;
+        }
+        
+        // Script structure
+        if (film.scriptStructure) {
+          filmPage.drawText('MANUS STRUKTUR', {
+            x: 50,
+            y: yPos,
+            size: 14,
+            font: helveticaBold,
+            color: primaryColor,
+          });
+          yPos -= 25;
+          
+          film.scriptStructure.forEach((scene: any, index: number) => {
+            filmPage.drawRectangle({
+              x: 50,
+              y: yPos - 40,
+              width: width - 100,
+              height: 40,
+              color: index % 2 === 0 ? white : lightGray,
+            });
+            
+            filmPage.drawText(scene.timeframe, {
+              x: 60,
+              y: yPos - 20,
+              size: 10,
+              font: helveticaBold,
+              color: blueColor,
+            });
+            
+            filmPage.drawText(scene.content, {
+              x: 140,
+              y: yPos - 20,
+              size: 10,
+              font: helveticaFont,
+              color: textColor,
+            });
+            
+            filmPage.drawText(scene.emotion, {
+              x: width - 150,
+              y: yPos - 20,
+              size: 10,
+              font: helveticaFont,
+              color: accentColor,
+            });
+            
+            yPos -= 45;
+          });
+        }
+      }
+
+      // AI Image Prompts - ny sektion
+      if (premiumAnalysis.aiImagePrompts) {
+        const imagePage = pdfDoc.addPage(PageSizes.A4);
+        pages.push(imagePage);
+        yPos = drawHeader(imagePage, 'AI Bildprompts', '10 bilder för marknadsföring');
+        
+        imagePage.drawText('BILDGENERERING MED AI', {
+          x: 50,
+          y: yPos,
+          size: 14,
+          font: helveticaBold,
+          color: primaryColor,
+        });
+        yPos -= 20;
+        
+        imagePage.drawText('Använd dessa prompts i ChatGPT eller Midjourney för att skapa professionella bilder.', {
+          x: 50,
+          y: yPos,
+          size: 11,
+          font: helveticaFont,
+          color: textColor,
+        });
+        yPos -= 30;
+        
+        if (premiumAnalysis.aiImagePrompts.prompts) {
+          premiumAnalysis.aiImagePrompts.prompts.forEach((prompt: any, index: number) => {
+            // Check if we need a new page
+            if (yPos < 200) {
+              const newImagePage = pdfDoc.addPage(PageSizes.A4);
+              pages.push(newImagePage);
+              yPos = drawHeader(newImagePage, 'AI Bildprompts', 'Fortsättning');
+            }
+            
+            // Prompt card
+            const cardHeight = 100;
+            imagePage.drawRectangle({
+              x: 50,
+              y: yPos - cardHeight,
+              width: width - 100,
+              height: cardHeight,
+              color: index % 2 === 0 ? white : rgb(0.98, 0.98, 0.98),
+            });
+            
+            // Icon and title
+            imagePage.drawText(prompt.icon, {
+              x: 60,
+              y: yPos - 25,
+              size: 24,
+              font: helveticaFont,
+              color: textColor,
+            });
+            
+            imagePage.drawText(prompt.title, {
+              x: 90,
+              y: yPos - 25,
+              size: 12,
+              font: helveticaBold,
+              color: primaryColor,
+            });
+            
+            // Usage
+            imagePage.drawText(`Användning: ${prompt.usage}`, {
+              x: 90,
+              y: yPos - 40,
+              size: 10,
+              font: helveticaFont,
+              color: blueColor,
+            });
+            
+            // Prompt text
+            imagePage.drawText('Prompt:', {
+              x: 60,
+              y: yPos - 55,
+              size: 10,
+              font: helveticaBold,
+              color: textColor,
+            });
+            
+            drawWrappedText(
+              imagePage,
+              prompt.prompt,
+              60,
+              yPos - 70,
+              width - 120,
+              9,
+              helveticaFont,
+              textColor,
+              1.2
+            );
+            
+            yPos -= cardHeight + 10;
+          });
+        }
       }
     }
 
