@@ -901,6 +901,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const [marketResult, setMarketResult] = React.useState('');
   const [marketError, setMarketError] = React.useState<string | null>(null);
   const marketRef = useRef<HTMLDivElement>(null);
+  const competitorRef = useRef<HTMLDivElement>(null);
   const [marketBransch, setMarketBransch] = React.useState('');
   const [competitorBransch, setCompetitorBransch] = React.useState('');
   const [showCompetitorPopup, setShowCompetitorPopup] = React.useState(false);
