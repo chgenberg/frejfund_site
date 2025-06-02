@@ -1276,12 +1276,12 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...answers,
-          company_name: company,
+          answers: answers,
+          company: company,
           email: email,
           bransch: bransch,
           omrade: omrade,
-          has_website: hasWebsite,
+          hasWebsite: hasWebsite,
           website_url: websiteUrl
         })
       });
@@ -1312,7 +1312,22 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         console.error('Could not save submission:', saveError);
       }
       
-      setResult(data);
+      // Formatera data för BusinessPlanResult
+      const resultData = {
+        score: 0, // Vi har inte score från API:et
+        answers: {
+          ...data.answers,
+          company_name: data.company,
+          email: data.email,
+          bransch: data.bransch,
+          omrade: data.omrade,
+          hasWebsite: data.hasWebsite
+        },
+        feedback: data.analysis,
+        subscriptionLevel: 'free' // Standard nivå
+      };
+      
+      setResult(resultData);
     } catch (error) {
       clearInterval(messageInterval);
       setShowFinalLoader(false);

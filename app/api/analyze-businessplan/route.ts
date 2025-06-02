@@ -86,7 +86,15 @@ Format the response in clear sections with specific, actionable insights.`;
       }, { status: 400 });
     }
 
-    return NextResponse.json({ analysis });
+    return NextResponse.json({ 
+      analysis,
+      answers,
+      company,
+      email,
+      bransch,
+      omrade,
+      hasWebsite
+    });
   } catch (error) {
     console.error('Error analyzing business plan:', error);
     return NextResponse.json({

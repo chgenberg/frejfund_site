@@ -1,29 +1,31 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { saveCustomerData } from '@/app/utils/fileSystem';
 
 export async function POST(request: Request) {
   try {
     const data = await request.json();
     
-    // Använd alltid lokal submissions mapp
-    const submissionsDir = path.join(process.cwd(), 'submissions');
-    
-    if (!fs.existsSync(submissionsDir)) {
-      fs.mkdirSync(submissionsDir, { recursive: true });
+    // Om email finns, spara som kunddata
+    if (data.email) {
+      const filepath = await saveCustomerData(data.email, data);
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Submission saved successfully',
+        filepath 
+      });
     }
     
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `submission-${timestamp}.json`;
-    const filePath = path.join(submissionsDir, filename);
-    
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
-    
-    console.log(`Submission saved to: ${filePath}`);
-    
-    return NextResponse.json({ success: true, path: filePath });
+    // Om ingen email, returnera framgång ändå
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Submission processed (no email provided)'
+    });
   } catch (error) {
     console.error('Error saving submission:', error);
-    return NextResponse.json({ error: 'Kunde inte spara data' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to save submission' },
+      { status: 500 }
+    );
   }
 } 
