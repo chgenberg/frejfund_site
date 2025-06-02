@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
@@ -107,6 +108,7 @@ function safeRender(value: any) {
 }
 
 export default function BusinessPlanResult({ score, answers, feedback = {} }: ResultProps) {
+  const router = useRouter();
   const [currentSection, setCurrentSection] = useState<'score' | 'insights' | 'actions'>('score');
   const [expandedInsight, setExpandedInsight] = useState<string | null>(null);
   const [animatedScore, setAnimatedScore] = useState(0);
@@ -493,6 +495,19 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
     }
   };
 
+  const handleUpgrade = () => {
+    // Spara analysdata för användning efter betalning
+    localStorage.setItem('pendingPremiumAnalysis', JSON.stringify({
+      score,
+      answers,
+      feedback,
+      timestamp: new Date().toISOString()
+    }));
+    
+    // Navigera till betalningssidan
+    router.push('/kassa/checkout');
+  };
+
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center p-4 overflow-hidden">
       {/* Bakgrundsbild */}
@@ -543,7 +558,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
               </div>
 
               {/* Navigation */}
-              <div className="flex justify-center gap-4">
+              <div className="flex justify-center gap-4 flex-wrap">
                 <button
                   onClick={() => setCurrentSection('insights')}
                   className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
@@ -558,6 +573,33 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   Ladda ner PDF
+                </button>
+              </div>
+
+              {/* Upgrade CTA */}
+              <div className="mt-12 p-8 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-3xl border border-purple-500/30">
+                <h3 className="text-2xl font-bold text-white mb-4">🚀 Få Premium AI-Analys</h3>
+                <p className="text-white/80 mb-6">
+                  Lås upp 50+ sidor djupgående analys, branschspecifika insikter, finansiella projektioner och mycket mer!
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                  {[
+                    { icon: '📊', text: '50+ sidor analys' },
+                    { icon: '🎯', text: 'Branschjämförelser' },
+                    { icon: '📈', text: '3-års prognos' },
+                    { icon: '📞', text: 'Expertsamtal' }
+                  ].map((feature, i) => (
+                    <div key={i} className="text-center">
+                      <div className="text-3xl mb-2">{feature.icon}</div>
+                      <div className="text-white/70 text-sm">{feature.text}</div>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={handleUpgrade}
+                  className="px-12 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg rounded-full hover:shadow-xl hover:scale-105 transition-all"
+                >
+                  Uppgradera för 197 kr →
                 </button>
               </div>
             </>

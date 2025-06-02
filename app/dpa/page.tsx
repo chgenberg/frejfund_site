@@ -11,7 +11,7 @@ export default function DPA() {
         className="object-cover -z-10"
         priority
       />
-      <div className="w-full max-w-4xl mx-auto bg-white/95 rounded-3xl shadow-xl p-8 md:p-12 border border-white/20 backdrop-blur-md">
+      <div className="w-full max-w-4xl mx-auto bg-white/5 rounded-3xl shadow-xl p-8 md:p-12 border border-white/10 backdrop-blur-xl">
         <h1 className="text-3xl md:text-4xl font-extrabold mb-12 text-center text-[#16475b] tracking-tight">
           Databehandlaravtal
           <span className="block text-lg font-normal text-gray-600 mt-2">DPA</span>

@@ -140,7 +140,7 @@ export default function PaymentSuccessPage() {
 
         {/* Call to action */}
         <button
-          onClick={() => router.push('/premium-analysis')}
+          onClick={() => router.push('/premium-analysis-result')}
           className="px-12 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all text-lg animate-slideUp animation-delay-1400"
         >
           Gå till din Premium-analys →

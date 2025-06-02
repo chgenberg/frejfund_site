@@ -895,7 +895,22 @@ function CharacterCounter({ current, max }: { current: number; max: number }) {
   );
 }
 
+// Helper to ensure all values in answers are strings
+function stringifyAnswers(obj: any): any {
+  if (typeof obj !== 'object' || obj === null) return obj;
+  const result: any = {};
+  for (const key in obj) {
+    if (typeof obj[key] === 'object' && obj[key] !== null) {
+      result[key] = JSON.stringify(obj[key]);
+    } else {
+      result[key] = obj[key];
+    }
+  }
+  return result;
+}
+
 export default function BusinessPlanWizard({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const router = useRouter();
   const [answers, setAnswers] = React.useState<{ [key: string]: string }>({});
   const [step, setStep] = React.useState(1);
   const [preStep, setPreStep] = React.useState(true);
@@ -944,23 +959,11 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
 
   const isCurrentStepValid = () => {
     if (!current) return false;
-    
     const answer = answers[current.id];
-    
-    if (current.required && !answer) return false;
-    
-    if (current.type === 'textarea' && current.required) {
-      return answer && answer.trim().length >= 15;
-    }
-    
-    if (current.type === 'text' && current.required) {
-      return answer && answer.trim().length >= 15;
-    }
-    
+    if (current.required && (!answer || answer.trim() === '')) return false;
     if (current.type === 'number' && current.required) {
       return answer !== undefined && answer !== '';
     }
-    
     if (current.type === 'milestone_list' && current.required) {
       try {
         const milestones = JSON.parse(answer as string);
@@ -969,7 +972,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         return false;
       }
     }
-    
     if (current.type === 'capital_matrix' && current.required) {
       try {
         const capital = JSON.parse(answer as string);
@@ -978,7 +980,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         return false;
       }
     }
-    
     if (current.type === 'founder_market_fit' && current.required) {
       try {
         const fit = JSON.parse(answer as string);
@@ -987,7 +988,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         return false;
       }
     }
-    
     return true;
   };
 
@@ -1276,7 +1276,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          answers: answers,
+          answers: stringifyAnswers(answers),
           company: company,
           email: email,
           bransch: bransch,
@@ -1303,7 +1303,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             omrade: omrade,
             has_website: hasWebsite,
             website_url: websiteUrl,
-            answers: answers,
+            answers: stringifyAnswers(answers),
             result: data
           })
         });
@@ -1327,7 +1327,12 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         subscriptionLevel: 'free' // Standard nivå
       };
       
-      setResult(resultData);
+      // Spara resultatet i localStorage
+      localStorage.setItem('latestAnalysisResult', JSON.stringify(resultData));
+      
+      // Stäng modalen och navigera till resultatsidan
+      onClose();
+      router.push('/result');
     } catch (error) {
       clearInterval(messageInterval);
       setShowFinalLoader(false);
@@ -1337,15 +1342,18 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
 
   if (!open) return null;
   
-  // Visa resultat om det finns
-  if (result) {
+  // Loading screen medan vi navigerar
+  if (showFinalLoader) {
     return (
-      <BusinessPlanResult 
-        score={result.score}
-        answers={result.answers}
-        feedback={result.feedback}
-        subscriptionLevel={result.subscriptionLevel}
-      />
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-3xl shadow-2xl border border-white/10 p-8 text-center animate-fadeIn">
+          <div className="w-20 h-20 mx-auto mb-6">
+            <div className="w-full h-full rounded-full border-4 border-purple-500/30 border-t-purple-500 animate-spin"></div>
+          </div>
+          <h3 className="text-2xl font-bold mb-4">AI analyserar din affärsplan...</h3>
+          <p className="text-white/60 animate-pulse">{finalLoaderText}</p>
+        </div>
+      </div>
     );
   }
   
