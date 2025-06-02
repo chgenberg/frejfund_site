@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { OpenAI } from 'openai';
+import { getMarketData, getIndustryBenchmarks, getCompetitorAnalysis, getRegulatoryInfo, getInvestmentTrends } from '../../lib/externalDataSources';
 
 export const runtime = 'nodejs';
 
@@ -68,6 +69,15 @@ export async function POST(request: Request) {
       logoBuffer = Buffer.from(arrayBuffer);
     }
 
+    // Hämta externa data
+    const [marketData, benchmarks, competitorAnalysis, regulations, investmentTrends] = await Promise.all([
+      getMarketData(answers.bransch || 'SaaS', answers.omrade || 'Sverige'),
+      getIndustryBenchmarks(answers.bransch || 'SaaS'),
+      getCompetitorAnalysis(answers.competitors || '', answers.bransch || 'SaaS'),
+      getRegulatoryInfo(answers.bransch || 'SaaS', answers.omrade || 'Sverige'),
+      getInvestmentTrends(answers.bransch || 'SaaS')
+    ]);
+
     // Generera djupgående analys med OpenAI (3x längre)
     const analysisPrompt = `
     Du är en erfaren affärsrådgivare och investerare. Analysera följande affärsplan mycket grundligt och ge konkreta, handlingsorienterade råd.
@@ -80,79 +90,140 @@ export async function POST(request: Request) {
 
     SCORE: ${score}/100
 
-    Skapa en MYCKET OMFATTANDE analys (minst 3000 ord) som inkluderar:
+    EXTERNA MARKNADSDATA:
+    - Total marknadsstorlek: ${(marketData.totalMarketSize / 1000000000).toFixed(1)} miljarder SEK
+    - Marknadstillväxt: ${marketData.growthRate}% årligen
+    - Största aktörer: ${marketData.topPlayers.join(', ')}
+    - Marknadstrender: ${marketData.marketTrends.join(', ')}
+    - Källa: ${marketData.source}
 
-    1. SAMMANFATTNING
-    - Executive summary
+    BRANSCHBENCHMARKS:
+    - Genomsnittlig CAC: ${benchmarks.averageCAC} SEK
+    - Genomsnittlig LTV: ${benchmarks.averageLTV} SEK
+    - Genomsnittlig churn: ${benchmarks.averageChurnRate}% månadsvis
+    - Genomsnittlig bruttomarginal: ${benchmarks.averageGrossMargin}%
+    - Källa: ${benchmarks.source}
+
+    KONKURRENTANALYS:
+    ${competitorAnalysis.map(c => `
+    - ${c.name}: ${c.marketShare.toFixed(1)}% marknadsandel, ${(c.funding/1000000).toFixed(1)}M SEK i finansiering
+      Styrkor: ${c.strengths.join(', ')}
+      Svagheter: ${c.weaknesses.join(', ')}
+    `).join('')}
+
+    REGULATORISKA KRAV:
+    ${regulations.join('\n    - ')}
+
+    INVESTERINGSTRENDER:
+    - Genomsnittlig deal-storlek: ${(investmentTrends.averageDealSize/1000000).toFixed(1)}M SEK
+    - Totalt antal investeringar: ${investmentTrends.totalInvestments}
+    - Topp-investerare: ${investmentTrends.topInvestors.join(', ')}
+    - Källa: ${investmentTrends.source}
+
+    Skapa en MYCKET OMFATTANDE analys (minst 5000 ord) som ska fylla 30 sidor. Använd ovanstående externa data för att göra analysen konkret och datadrivet. Inkludera:
+
+    1. EXECUTIVE SUMMARY (2 sidor)
+    - Sammanfattning av hela analysen
     - Huvudsakliga styrkor och svagheter
-    - Investeringspotential
+    - Investeringspotential och rekommendation
+    - Kritiska framgångsfaktorer
 
-    2. AFFÄRSMODELLANALYS
+    2. FÖRETAGSÖVERSIKT & VISION (3 sidor)
+    - Företagets historia och utveckling
+    - Mission och vision
+    - Värdegrund och företagskultur
+    - Långsiktiga mål (5-10 år)
+
+    3. AFFÄRSMODELLANALYS (4 sidor)
     - Detaljerad genomgång av affärsmodellen
     - Intäktsströmmar och kostnadsstruktur
-    - Skalbarhet och tillväxtpotential
-    - Unit economics
+    - Unit economics breakdown
+    - Skalbarhet och operationell hävstång
+    - Affärsmodell canvas
 
-    3. MARKNADSANALYS
-    - TAM/SAM/SOM validering
-    - Marknadstrender och timing
-    - Konkurrenssituation
-    - Positionering och differentiering
+    4. MARKNADSANALYS & POSITION (5 sidor)
+    - TAM/SAM/SOM djupanalys med källor
+    - Marknadssegmentering
+    - Tillväxttakt och drivkrafter
+    - Porter's Five Forces analys
+    - Konkurrenssituation och positionering
+    - Marknadstrender nästa 5 år
 
-    4. TEAMANALYS
-    - Founder-market fit bedömning
-    - Kompetensluckor
-    - Organisationsstruktur
-    - Rekryteringsbehov
+    5. KUNDANALYS & GO-TO-MARKET (3 sidor)
+    - Kundprofiler och personas
+    - Customer journey mapping
+    - Värdeproposition per segment
+    - Försäljnings- och marknadsföringsstrategi
+    - Distributionskanaler
 
-    5. FINANSIELL ANALYS
+    6. TEAMANALYS & ORGANISATION (3 sidor)
+    - Founder-market fit djupanalys
+    - Teamets styrkor och svagheter
+    - Kompetensluckor och rekryteringsbehov
+    - Organisationsstruktur och kultur
+    - Advisory board och mentorer
+
+    7. FINANSIELL ANALYS & PROJEKTIONER (4 sidor)
+    - Historisk finansiell utveckling
+    - 3-års finansiella projektioner
+    - Olika scenarion (best/base/worst case)
+    - Cash flow analys
+    - Break-even analys
     - Kapitalbehov och användning
-    - Runway och burn rate
-    - Finansiella prognoser
-    - Exit-möjligheter
 
-    6. RISKANALYS
-    - Identifierade risker
-    - Riskbedömning (låg/medel/hög)
+    8. RISKANALYS & MITIGATION (3 sidor)
+    - SWOT-analys
+    - Identifierade risker (marknads-, operations-, finansiella)
+    - Riskmatris (sannolikhet x påverkan)
     - Riskminimeringsstrategier
+    - Beredskapsplaner
 
-    7. KONKRETA FÖRBÄTTRINGSÅTGÄRDER
-    - Prioriterade åtgärder (1-3 månader)
-    - Medellångsiktiga åtgärder (3-12 månader)
-    - Långsiktiga strategiska initiativ
+    9. BRANSCHSPECIFIKA INSIKTER (2 sidor)
+    - Regulatoriska överväganden
+    - Branschspecifika KPIer och benchmarks
+    - Best practices från framgångsrika bolag
+    - Teknologiska trender och disruption
 
-    8. BRANSCHSPECIFIKA REKOMMENDATIONER
-    - Regulatoriska aspekter
-    - Go-to-market strategi
-    - KPI:er och mätning
-    - Prissättningsstrategi
-    - Partnerskap och samarbeten
+    10. INVESTERINGSBEDÖMNING (2 sidor)
+    - Värdering och metodologi
+    - Jämförelse med liknande bolag
+    - Exit-möjligheter och strategier
+    - ROI-potential för investerare
+    - Term sheet rekommendationer
 
-    9. INVESTERINGSBEDÖMNING
-    - Investeringsredo eller ej
-    - Värdering och villkor
-    - Typ av investerare som passar
-    - Förberedelser inför kapitalanskaffning
+    11. STRATEGISKA REKOMMENDATIONER (2 sidor)
+    - Prioriterade åtgärder (0-3 månader)
+    - Medellångsiktiga initiativ (3-12 månader)
+    - Långsiktig strategi (1-3 år)
+    - Milstolpar och KPIer
 
-    10. NÄSTA STEG
-    - Konkret handlingsplan
-    - Milstolpar att uppnå
-    - Resurser som behövs
+    12. APPENDIX & KÄLLHÄNVISNINGAR (1 sida)
+    - Referenser till marknadsstudier
+    - Branschrapporter
+    - Finansiella antaganden
 
-    Var MYCKET specifik och ge konkreta exempel. Undvik generella råd. Basera analysen på den specifika branschen och affärsmodellen.
-    Skriv på svenska och använd en professionell men tillgänglig ton.
+    EXTERNA DATAKÄLLOR ATT REFERERA (simulerade):
+    - SCB Branschstatistik ${new Date().getFullYear()}
+    - McKinsey ${answers.bransch || 'Tech'} Report ${new Date().getFullYear()}
+    - Gartner Market Analysis
+    - CB Insights Industry Trends
+    - PwC Nordic Startup Survey
+
+    Var EXTREMT specifik och detaljerad. Använd konkreta exempel, siffror och jämförelser.
+    Inkludera grafer och tabeller där relevant (beskriv dem i text).
+    Skriv professionellt men tillgängligt på svenska.
     `;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4-turbo-preview', // Använd GPT-4 för premium
       messages: [
         { 
           role: 'system', 
-          content: 'Du är en expert på affärsanalys och investeringar. Ge djupgående, konkreta och handlingsorienterade råd.'
+          content: 'Du är en senior affärsrådgivare med 20+ års erfarenhet av investeringar och företagsutveckling. Ge extremt detaljerade, konkreta och handlingsorienterade råd baserat på best practice och aktuell marknadsinformation.'
         },
         { role: 'user', content: analysisPrompt }
       ],
-      max_tokens: 4000,
+      max_tokens: 8000, // Öka för längre analys
       temperature: 0.7,
     });
 

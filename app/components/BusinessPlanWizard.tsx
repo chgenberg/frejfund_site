@@ -538,13 +538,154 @@ const INVESTOR_QUESTIONS: Question[] = [
   }
 ];
 
-// Funktion för att dynamiskt lägga till branschspecifika frågor
-function getAllQuestions(selectedIndustry: string): Question[] {
-  const industrySpecific: Question[] = [];
-  // Här kan du lägga till logik för att hämta branschspecifika frågor baserat på selectedIndustry
-  // Exempel:
-  // if (selectedIndustry === 'SaaS') industrySpecific = [...];
-  return [...INTRO_QUESTIONS, ...INVESTOR_QUESTIONS, ...industrySpecific];
+// Premium frågor för 30-sidors analys
+const PREMIUM_QUESTIONS: Question[] = [
+  // Finansiella detaljer
+  {
+    id: 'monthly_burn',
+    type: 'number',
+    label: 'Vad är er nuvarande månatliga burn rate (SEK)?',
+    help: 'Total kostnad per månad inklusive alla utgifter',
+    required: true
+  },
+  {
+    id: 'revenue_history',
+    type: 'textarea', 
+    label: 'Beskriv era historiska intäkter (senaste 12 månaderna)',
+    help: 'Ange månad för månad om möjligt, eller kvartalsvis',
+    required: true
+  },
+  {
+    id: 'customer_ltv',
+    type: 'number',
+    label: 'Vad är er genomsnittliga Customer Lifetime Value (SEK)?',
+    help: 'Total intäkt per kund under hela kundrelationen',
+    required: false
+  },
+  {
+    id: 'churn_rate',
+    type: 'number',
+    label: 'Vad är er månatliga churn rate (%)?',
+    help: 'Andel kunder som lämnar er varje månad',
+    required: false
+  },
+  {
+    id: 'cac',
+    type: 'number',
+    label: 'Vad är er Customer Acquisition Cost (SEK)?',
+    help: 'Total kostnad för att värva en ny kund',
+    required: false
+  },
+  
+  // Operationella detaljer
+  {
+    id: 'current_employees',
+    type: 'number',
+    label: 'Hur många anställda har ni idag?',
+    help: 'Inklusive grundare',
+    required: true
+  },
+  {
+    id: 'hiring_plan',
+    type: 'textarea',
+    label: 'Beskriv er rekryteringsplan för nästa 12 månader',
+    help: 'Vilka roller, när och till vilken kostnad',
+    required: true
+  },
+  {
+    id: 'key_suppliers',
+    type: 'textarea',
+    label: 'Vilka är era viktigaste leverantörer/partners?',
+    help: 'Lista namn och vad de levererar',
+    required: true
+  },
+  {
+    id: 'tech_stack',
+    type: 'textarea',
+    label: 'Beskriv er tekniska stack och utvecklingsbehov',
+    help: 'Vilken teknik använder ni och vad behöver utvecklas',
+    required: true
+  },
+  
+  // Strategiska frågor
+  {
+    id: 'international_expansion',
+    type: 'textarea',
+    label: 'Har ni planer för internationell expansion?',
+    help: 'Vilka marknader, när och hur',
+    required: true
+  },
+  {
+    id: 'partnerships',
+    type: 'textarea',
+    label: 'Vilka strategiska partnerskap planerar ni?',
+    help: 'Potentiella partners och samarbetsområden',
+    required: true
+  },
+  {
+    id: 'ip_strategy',
+    type: 'textarea',
+    label: 'Beskriv er IP/patent-strategi',
+    help: 'Befintliga patent, ansökningar och framtida planer',
+    required: true
+  },
+  {
+    id: 'sustainability_goals',
+    type: 'textarea',
+    label: 'Vilka är era hållbarhetsmål?',
+    help: 'ESG-mål och hur ni mäter dem',
+    required: true
+  },
+  
+  // Konkurrensanalys
+  {
+    id: 'competitor_analysis',
+    type: 'textarea',
+    label: 'Gör en djupare analys av era 3 största konkurrenter',
+    help: 'Styrkor, svagheter, marknadsandelar, prissättning',
+    required: true
+  },
+  {
+    id: 'competitive_advantages',
+    type: 'textarea',
+    label: 'Vad är era varaktiga konkurrensfördelar?',
+    help: 'Vad gör er svåra att kopiera på 3-5 års sikt',
+    required: true
+  },
+  
+  // Marknadsvalidering
+  {
+    id: 'customer_interviews',
+    type: 'textarea',
+    label: 'Sammanfatta insikter från kundintervjuer',
+    help: 'Vad har ni lärt er från att prata med potentiella kunder',
+    required: true
+  },
+  {
+    id: 'pilot_results',
+    type: 'textarea',
+    label: 'Resultat från piloter eller testperioder?',
+    help: 'Konkreta resultat och lärdomar',
+    required: false
+  },
+  {
+    id: 'market_timing',
+    type: 'textarea',
+    label: 'Varför är timingen rätt just nu?',
+    help: 'Marknadstrender, teknologiska förändringar, regulatoriska skiften',
+    required: true
+  }
+];
+
+// Kombinera frågor baserat på prenumerationsnivå
+function getAllQuestions(selectedIndustry: string, isPremium: boolean = false): Question[] {
+  const baseQuestions = [...INVESTOR_QUESTIONS];
+  
+  if (isPremium) {
+    return [...baseQuestions, ...PREMIUM_QUESTIONS];
+  }
+  
+  return baseQuestions;
 }
 
 // Add these constants back
