@@ -195,6 +195,175 @@ export const premiumTestData = {
             status: "Completed"
           }
         ]
+      },
+      investorFilm: {
+        whyStatement: "Vi finns för att demokratisera tillgången till kapital. Vi tror att varje lovande företag förtjänar en chans att hitta rätt investerare, oavsett nätverk eller bakgrund. Vår drivkraft är att se innovativa idéer blomstra och skapa jobb och värde för samhället.",
+        emotionalHook: "Tänk dig känslan när en entreprenör får sitt första 'ja' från en investerare. Den där magiska stunden när månader av hårt arbete, sömnlösa nätter och oändliga avslag äntligen leder till genombrott. Det är den känslan vi skapar - varje dag.",
+        targetEmotion: "Hopp, möjlighet och förtroende. Vi vill att investerare ska känna spänningen av att upptäcka nästa unicorn, och att entreprenörer ska känna trygghet i att de presenterar sig för rätt personer.",
+        soraPrompt: `Create a 30-second cinematic video with emotional storytelling:
+
+OPENING (0-5s): Close-up of an entrepreneur's tired eyes looking at rejection emails, slowly zooming out to reveal a small, cluttered home office at night. Soft, melancholic piano music.
+
+TRANSITION (5-10s): The screen lights up with our platform interface. The entrepreneur's face transforms from despair to curiosity. Music shifts to hopeful.
+
+MIDDLE (10-20s): Split screen showing:
+- Left: Entrepreneur refining their pitch with AI assistance
+- Right: Investor receiving a perfectly matched opportunity notification
+Both smile as they see the match score: 94%
+Music builds with orchestral elements.
+
+CLIMAX (20-25s): Virtual meeting room. Handshake moment. Deal terms appear. 
+Text overlay: "15 million SEK investment secured"
+Triumphant music crescendo.
+
+CLOSING (25-30s): Montage of success stories - offices expanding, teams celebrating, products launching.
+Logo reveal with tagline: "Where great ideas meet smart money"
+Emotional voiceover: "Every unicorn started with a single believer. Let us find yours."
+
+Style: Cinematic, warm color grading, mix of real footage feel with subtle tech elements. Focus on human emotions and connections rather than technology.`,
+        scriptStructure: [
+          {
+            timeframe: "Öppning",
+            duration: "0-5 sek",
+            content: "Visa problemet - en entreprenör som får avslag efter avslag. Närbilder på trötta ögon, rejection emails, tom kaffekopp.",
+            emotion: "Frustration, ensamhet"
+          },
+          {
+            timeframe: "Vändpunkt",
+            duration: "5-10 sek",
+            content: "Vår plattform lyser upp skärmen. AI-matchning visar 94% compatibility med en investerare.",
+            emotion: "Hopp, nyfikenhet"
+          },
+          {
+            timeframe: "Transformation",
+            duration: "10-20 sek",
+            content: "Split screen: Entreprenör förbereder pitch med AI-hjälp. Investerare får notifikation om perfekt matchning.",
+            emotion: "Spänning, förväntan"
+          },
+          {
+            timeframe: "Klimax",
+            duration: "20-25 sek",
+            content: "Virtuellt möte. Handskakning. '15 MSEK investering säkrad' visas på skärmen.",
+            emotion: "Glädje, lättnad, triumf"
+          },
+          {
+            timeframe: "Avslutning",
+            duration: "25-30 sek",
+            content: "Montage av framgångssagor. Logo och tagline: 'Where great ideas meet smart money'",
+            emotion: "Inspiration, möjlighet"
+          }
+        ],
+        productionTips: {
+          visual: [
+            "Använd varma färger (guld, orange) för positiva känslor",
+            "Kalla färger (blå, grå) för frustration i början",
+            "Mjuk belysning för att skapa intimitet",
+            "Närbilder på ansikten för emotionell koppling",
+            "Clean, modern kontorsmiljöer som kontrast"
+          ],
+          audio: [
+            "Starta med enkel pianomelodi (moll)",
+            "Bygg gradvis med stråkar när hoppet växer",
+            "Klimax med full orkester",
+            "Använd tystnader för dramatisk effekt",
+            "Autentiska ljud: tangentbord, notifikationer, skratt"
+          ]
+        },
+        storyboard: [
+          { shot: "Entreprenörens ansikte", icon: "😔", duration: "2 sek" },
+          { shot: "Rejection emails", icon: "📧", duration: "3 sek" },
+          { shot: "Platform interface", icon: "💻", duration: "3 sek" },
+          { shot: "AI matching animation", icon: "🤖", duration: "4 sek" },
+          { shot: "Split screen prep", icon: "👥", duration: "5 sek" },
+          { shot: "Virtual meeting", icon: "🤝", duration: "3 sek" },
+          { shot: "Deal celebration", icon: "🎉", duration: "5 sek" },
+          { shot: "Success montage", icon: "🚀", duration: "3 sek" },
+          { shot: "Logo & tagline", icon: "✨", duration: "2 sek" }
+        ]
+      },
+      marketInsights: {
+        marketSize: {
+          current: "5 miljarder SEK",
+          growth: "+18% årligen",
+          projected: "12 miljarder SEK",
+          source: "Källa: Gartner Market Analysis 2024, McKinsey Nordic Tech Report"
+        },
+        keyTrends: [
+          {
+            icon: "🤖",
+            name: "AI-driven automatisering",
+            description: "AI och ML transformerar investeringsprocessen. 75% av VC-bolag planerar att implementera AI-verktyg inom 2 år.",
+            impact: "Hög",
+            timeframe: "1-2 år"
+          },
+          {
+            icon: "🌍",
+            name: "Gränsöverskridande investeringar",
+            description: "Nordiska startups attraherar allt mer internationellt kapital. 40% ökning av utländska investeringar sedan 2022.",
+            impact: "Medium",
+            timeframe: "2-3 år"
+          },
+          {
+            icon: "🌱",
+            name: "Impact investing",
+            description: "ESG-kriterier blir standard. 60% av investerare kräver nu tydlig hållbarhetsprofil.",
+            impact: "Hög",
+            timeframe: "Pågående"
+          },
+          {
+            icon: "💰",
+            name: "Alternative funding",
+            description: "Crowdfunding, revenue-based financing och tokenisering växer snabbt som komplement till traditionell VC.",
+            impact: "Medium",
+            timeframe: "3-5 år"
+          }
+        ],
+        regulatory: [
+          {
+            name: "EU Startup Act",
+            description: "Förenklar gränsöverskridande investeringar och ger skattelättnader för startup-investeringar",
+            impact: "Positive"
+          },
+          {
+            name: "GDPR & Data Protection",
+            description: "Kräver robust datahantering men ökar också förtroende för digitala plattformar",
+            impact: "Neutral"
+          },
+          {
+            name: "MiFID III",
+            description: "Ny finansregulering kan påverka hur investeringsrådgivning ges",
+            impact: "Negative"
+          }
+        ],
+        customerBehavior: [
+          "78% föredrar digital första kontakt med investerare",
+          "Genomsnittlig tid från första kontakt till avslut har minskat från 6 till 4 månader",
+          "92% vill ha transparens kring investeringskriterier innan första mötet",
+          "65% använder redan någon form av digital plattform i fundraising-processen"
+        ],
+        decisionMakers: [
+          {
+            role: "VD/Grundare",
+            priority: "Snabbhet och rätt matchning viktigast"
+          },
+          {
+            role: "CFO",
+            priority: "Fokus på värdering och deal-termer"
+          },
+          {
+            role: "Styrelse",
+            priority: "Investerarens track record och nätverk"
+          }
+        ],
+        competitiveLandscape: {
+          leaders: [
+            { name: "Traditional advisors", share: "35%" },
+            { name: "Direct networking", share: "30%" },
+            { name: "Digital platforms", share: "20%" },
+            { name: "Others", share: "15%" }
+          ],
+          ourAdvantage: "Vi är den enda aktören som kombinerar AI-driven matchning med djup branschkunskap och ett kurerat nätverk av top-tier investerare. Vår teknologi är 10x snabbare än manuella processer och våra matchningar har 3x högre success rate än branschsnittet."
+        }
       }
     }
   }

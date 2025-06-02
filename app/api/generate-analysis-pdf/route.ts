@@ -12,7 +12,11 @@ interface AnalysisData {
 export async function POST(request: Request) {
   try {
     const data: AnalysisData = await request.json();
-    const { score, answers, insights, premiumAnalysis, subscriptionLevel } = data;
+    const { score, answers, insights } = data;
+    
+    // Extract premiumAnalysis from inside answers
+    const premiumAnalysis = answers?.premiumAnalysis;
+    const subscriptionLevel = data.subscriptionLevel || (premiumAnalysis ? 'premium' : 'standard');
 
     // Create a new PDF document
     const pdfDoc = await PDFDocument.create();

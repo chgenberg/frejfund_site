@@ -113,6 +113,8 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
   const [expandedInsight, setExpandedInsight] = useState<string | null>(null);
   const [animatedScore, setAnimatedScore] = useState(0);
   const [showActionModal, setShowActionModal] = useState<any>(null);
+  const [showSoraInfo, setShowSoraInfo] = useState(false);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
   
   const scoreInfo = getScoreInfo(score);
   const typedAnswers = answers as Record<string, any>;
@@ -597,20 +599,40 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                 <div className="mt-12 p-8 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-3xl border border-purple-500/30">
                   <h3 className="text-2xl font-bold text-white mb-4">🚀 Få Premium AI-Analys</h3>
                   <p className="text-white/80 mb-6">
-                    Lås upp 30+ sidor djupgående analys, SWOT, finansiella projektioner, branschbenchmarks och mycket mer!
+                    Lås upp 50+ sidor djupgående analys med AI-genererade insikter speciellt anpassade för ditt företag!
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     {[
-                      { icon: '📊', text: '30+ sidor analys' },
+                      { icon: '📊', text: 'Marknadsinsikter' },
                       { icon: '🎯', text: 'SWOT-analys' },
-                      { icon: '📈', text: '3-års prognos' },
-                      { icon: '💎', text: 'Investeringsförslag' }
+                      { icon: '🎬', text: 'Investerarfilm' },
+                      { icon: '💎', text: 'Benchmarking' }
                     ].map((feature, i) => (
                       <div key={i} className="text-center">
                         <div className="text-3xl mb-2">{feature.icon}</div>
                         <div className="text-white/70 text-sm">{feature.text}</div>
                       </div>
                     ))}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mb-6 text-left">
+                    <div className="space-y-2">
+                      <p className="text-white/90 font-semibold">✅ Inkluderat:</p>
+                      <ul className="text-white/70 text-sm space-y-1">
+                        <li>• 3-års finansiella projektioner</li>
+                        <li>• Detaljerade rekommendationer</li>
+                        <li>• Investeringsförslag</li>
+                        <li>• Riskanalys & mitigering</li>
+                      </ul>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-white/90 font-semibold">🎁 Bonus:</p>
+                      <ul className="text-white/70 text-sm space-y-1">
+                        <li>• SORA AI filmprompt</li>
+                        <li>• Branschspecifika trender</li>
+                        <li>• Konkurrensdynamik</li>
+                        <li>• Regulatorisk översikt</li>
+                      </ul>
+                    </div>
                   </div>
                   <button
                     onClick={handleUpgrade}
@@ -664,7 +686,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
 
               {/* Premium Tabs */}
               <div className="mb-8 flex flex-wrap gap-2 justify-center">
-                {['swot', 'finansiell', 'rekommendationer', 'benchmark', 'investeringsförslag'].map((tab) => (
+                {['swot', 'finansiell', 'rekommendationer', 'benchmark', 'investeringsförslag', 'investerarfilm', 'marknadsinsikter'].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setExpandedInsight(tab)}
@@ -674,7 +696,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                         : 'bg-white/10 text-white/70 hover:bg-white/20'
                     }`}
                   >
-                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                    {tab === 'investerarfilm' ? '🎬 ' : tab === 'marknadsinsikter' ? '📊 ' : ''}{tab.charAt(0).toUpperCase() + tab.slice(1)}
                   </button>
                 ))}
               </div>
@@ -910,15 +932,15 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
               {expandedInsight === 'finansiell' && typedAnswers.financial_projections && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-white mb-6">Finansiella Projektioner (3 år)</h2>
-                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                  <div className="bg-white rounded-2xl p-6 shadow-lg">
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>
                           <tr className="border-b border-gray-300">
-                            <th className="text-left py-3 text-gray-900">Metrik</th>
-                            <th className="text-right py-3 text-gray-900">År 1</th>
-                            <th className="text-right py-3 text-gray-900">År 2</th>
-                            <th className="text-right py-3 text-gray-900">År 3</th>
+                            <th className="text-left py-3 text-gray-900 font-bold">Metrik</th>
+                            <th className="text-right py-3 text-gray-900 font-bold">År 1</th>
+                            <th className="text-right py-3 text-gray-900 font-bold">År 2</th>
+                            <th className="text-right py-3 text-gray-900 font-bold">År 3</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -927,25 +949,25 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                             return (
                               <>
                                 <tr className="border-b border-gray-200">
-                                  <td className="py-3 text-gray-800">Intäkter</td>
+                                  <td className="py-3 text-gray-800 font-medium">Intäkter</td>
                                   <td className="text-right text-gray-900">{(projections.year1?.revenue / 1000000).toFixed(1)} MSEK</td>
                                   <td className="text-right text-gray-900">{(projections.year2?.revenue / 1000000).toFixed(1)} MSEK</td>
                                   <td className="text-right text-gray-900">{(projections.year3?.revenue / 1000000).toFixed(1)} MSEK</td>
                                 </tr>
                                 <tr className="border-b border-gray-200">
-                                  <td className="py-3 text-gray-800">Kostnader</td>
+                                  <td className="py-3 text-gray-800 font-medium">Kostnader</td>
                                   <td className="text-right text-gray-900">{(projections.year1?.costs / 1000000).toFixed(1)} MSEK</td>
                                   <td className="text-right text-gray-900">{(projections.year2?.costs / 1000000).toFixed(1)} MSEK</td>
                                   <td className="text-right text-gray-900">{(projections.year3?.costs / 1000000).toFixed(1)} MSEK</td>
                                 </tr>
                                 <tr className="border-b border-gray-200">
-                                  <td className="py-3 text-gray-800">EBITDA</td>
-                                  <td className="text-right text-red-600">{(projections.year1?.ebitda / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right text-green-600">{(projections.year2?.ebitda / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right text-green-600">{(projections.year3?.ebitda / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="py-3 text-gray-800 font-medium">EBITDA</td>
+                                  <td className="text-right text-red-600 font-bold">{(projections.year1?.ebitda / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right text-green-600 font-bold">{(projections.year2?.ebitda / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right text-green-600 font-bold">{(projections.year3?.ebitda / 1000000).toFixed(1)} MSEK</td>
                                 </tr>
                                 <tr>
-                                  <td className="py-3 text-gray-800">Antal kunder</td>
+                                  <td className="py-3 text-gray-800 font-medium">Antal kunder</td>
                                   <td className="text-right text-gray-900">{projections.year1?.customers}</td>
                                   <td className="text-right text-gray-900">{projections.year2?.customers}</td>
                                   <td className="text-right text-gray-900">{projections.year3?.customers}</td>
@@ -955,6 +977,289 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                           })()}
                         </tbody>
                       </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Investor Film Section - NY */}
+              {expandedInsight === 'investerarfilm' && typedAnswers.premiumAnalysis?.investorFilm && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-2xl font-bold text-white">Emotionell Investerarfilm</h2>
+                    <button
+                      onClick={() => setShowSoraInfo(true)}
+                      className="text-white/70 hover:text-white transition-colors"
+                      title="Vad är SORA AI?"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* SORA Info Modal */}
+                  {showSoraInfo && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowSoraInfo(false)}>
+                      <div className="bg-white rounded-2xl p-6 max-w-md" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold text-gray-900 mb-3">🎬 Om SORA AI</h3>
+                        <p className="text-gray-700 mb-4">
+                          SORA AI är OpenAIs revolutionerande video-genereringsmodell som kan skapa realistiska och fantasifulla videor från textbeskrivningar. 
+                          Perfekt för att skapa professionella investerarfilmer utan dyra produktionskostnader.
+                        </p>
+                        <p className="text-gray-700 mb-4">
+                          Kopiera prompten nedan och använd den i SORA AI när den blir tillgänglig, eller använd den som guide för egen inspelning.
+                        </p>
+                        <button
+                          onClick={() => setShowSoraInfo(false)}
+                          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                        >
+                          Stäng
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Film Concept */}
+                  <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl p-6 border border-purple-500/30">
+                    <h3 className="text-xl font-bold text-white mb-4">🎯 Filmkoncept - Känslodriven berättelse</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-lg font-semibold text-white mb-2">Företagets WHY</h4>
+                        <p className="text-gray-900">{typedAnswers.premiumAnalysis.investorFilm.whyStatement}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-semibold text-white mb-2">Emotionell krok</h4>
+                        <p className="text-gray-900">{typedAnswers.premiumAnalysis.investorFilm.emotionalHook}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-semibold text-white mb-2">Målgruppens känsla</h4>
+                        <p className="text-gray-900">{typedAnswers.premiumAnalysis.investorFilm.targetEmotion}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* SORA AI Prompt */}
+                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">🤖 SORA AI Prompt (30 sekunder)</h3>
+                    <div className="bg-black/20 rounded-xl p-4 mb-4">
+                      <code className="text-green-400 text-sm font-mono whitespace-pre-wrap">
+                        {typedAnswers.premiumAnalysis.investorFilm.soraPrompt}
+                      </code>
+                    </div>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(typedAnswers.premiumAnalysis.investorFilm.soraPrompt);
+                        setCopiedPrompt(true);
+                        setTimeout(() => setCopiedPrompt(false), 2000);
+                      }}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+                    >
+                      {copiedPrompt ? (
+                        <>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Kopierad!
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Kopiera prompt
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* DIY Film Guide */}
+                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">🎥 Gör-det-själv Guide</h3>
+                    <div className="space-y-6">
+                      {/* Script Structure */}
+                      <div>
+                        <h4 className="text-lg font-semibold text-white mb-3">Manuskriptstruktur (30 sek)</h4>
+                        <div className="space-y-3">
+                          {typedAnswers.premiumAnalysis.investorFilm.scriptStructure.map((section: any, i: number) => (
+                            <div key={i} className="bg-white/5 rounded-lg p-4">
+                              <div className="flex justify-between items-start mb-2">
+                                <span className="text-purple-400 font-semibold">{section.timeframe}</span>
+                                <span className="text-gray-500 text-sm">{section.duration}</span>
+                              </div>
+                              <p className="text-gray-900 mb-2">{section.content}</p>
+                              <p className="text-gray-700 text-sm italic">Känsla: {section.emotion}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Production Tips */}
+                      <div>
+                        <h4 className="text-lg font-semibold text-white mb-3">Produktionstips</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-white/5 rounded-lg p-4">
+                            <h5 className="text-white font-semibold mb-2">📹 Visuellt</h5>
+                            <ul className="space-y-2 text-gray-800 text-sm">
+                              {typedAnswers.premiumAnalysis.investorFilm.productionTips.visual.map((tip: string, i: number) => (
+                                <li key={i} className="flex items-start gap-2">
+                                  <span className="text-purple-400 mt-0.5">•</span>
+                                  <span>{tip}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div className="bg-white/5 rounded-lg p-4">
+                            <h5 className="text-white font-semibold mb-2">🎵 Ljud & Musik</h5>
+                            <ul className="space-y-2 text-gray-800 text-sm">
+                              {typedAnswers.premiumAnalysis.investorFilm.productionTips.audio.map((tip: string, i: number) => (
+                                <li key={i} className="flex items-start gap-2">
+                                  <span className="text-purple-400 mt-0.5">•</span>
+                                  <span>{tip}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Storyboard */}
+                      <div>
+                        <h4 className="text-lg font-semibold text-white mb-3">📐 Storyboard-förslag</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {typedAnswers.premiumAnalysis.investorFilm.storyboard.map((scene: any, i: number) => (
+                            <div key={i} className="bg-white/5 rounded-lg p-3 text-center">
+                              <div className="text-3xl mb-2">{scene.icon}</div>
+                              <p className="text-gray-900 text-sm font-medium">{scene.shot}</p>
+                              <p className="text-gray-700 text-xs mt-1">{scene.duration}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Market Insights Section - NY */}
+              {expandedInsight === 'marknadsinsikter' && typedAnswers.premiumAnalysis?.marketInsights && (
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-bold text-white mb-6">📊 Djupgående Marknadsinsikter</h2>
+                  
+                  {/* Market Size Evolution */}
+                  <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl p-6 border border-blue-500/30">
+                    <h3 className="text-xl font-bold text-white mb-4">Marknadsstorlek & Tillväxt</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <div className="text-center">
+                        <p className="text-3xl font-bold text-white">{typedAnswers.premiumAnalysis.marketInsights.marketSize.current}</p>
+                        <p className="text-gray-300 text-sm">Nuvarande marknad</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-3xl font-bold text-green-400">{typedAnswers.premiumAnalysis.marketInsights.marketSize.growth}</p>
+                        <p className="text-gray-300 text-sm">Årlig tillväxt</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-3xl font-bold text-purple-400">{typedAnswers.premiumAnalysis.marketInsights.marketSize.projected}</p>
+                        <p className="text-gray-300 text-sm">Prognos 2027</p>
+                      </div>
+                    </div>
+                    <div className="bg-black/20 rounded-xl p-4">
+                      <p className="text-gray-300 text-sm italic">{typedAnswers.premiumAnalysis.marketInsights.marketSize.source}</p>
+                    </div>
+                  </div>
+
+                  {/* Key Trends */}
+                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">🔮 Viktiga Marknadstrender</h3>
+                    <div className="space-y-4">
+                      {typedAnswers.premiumAnalysis.marketInsights.keyTrends.map((trend: any, i: number) => (
+                        <div key={i} className="bg-white/5 rounded-xl p-4">
+                          <div className="flex items-start gap-3">
+                            <span className="text-2xl">{trend.icon}</span>
+                            <div className="flex-1">
+                              <h4 className="text-lg font-semibold text-white mb-2">{trend.name}</h4>
+                              <p className="text-gray-300 mb-2">{trend.description}</p>
+                              <div className="flex items-center gap-4 text-sm">
+                                <span className="text-green-400">Impact: {trend.impact}</span>
+                                <span className="text-blue-400">Tidshorisont: {trend.timeframe}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Regulatory Landscape */}
+                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">⚖️ Regulatorisk Översikt</h3>
+                    <div className="space-y-3">
+                      {typedAnswers.premiumAnalysis.marketInsights.regulatory.map((reg: any, i: number) => (
+                        <div key={i} className="flex items-start gap-3">
+                          <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                            reg.impact === 'Positive' ? 'bg-green-500/20 text-green-300' : 
+                            reg.impact === 'Neutral' ? 'bg-blue-500/20 text-blue-300' : 
+                            'bg-red-500/20 text-red-300'
+                          }`}>
+                            {reg.impact}
+                          </span>
+                          <div className="flex-1">
+                            <h4 className="text-white font-semibold">{reg.name}</h4>
+                            <p className="text-gray-400 text-sm">{reg.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Customer Insights */}
+                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">🎯 Kundinsikter</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="text-lg font-semibold text-white mb-3">Köpbeteende</h4>
+                        <ul className="space-y-2">
+                          {typedAnswers.premiumAnalysis.marketInsights.customerBehavior.map((behavior: string, i: number) => (
+                            <li key={i} className="text-gray-300 flex items-start gap-2">
+                              <span className="text-purple-400 mt-0.5">•</span>
+                              <span>{behavior}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-semibold text-white mb-3">Beslutsfattare</h4>
+                        <div className="space-y-3">
+                          {typedAnswers.premiumAnalysis.marketInsights.decisionMakers.map((dm: any, i: number) => (
+                            <div key={i} className="bg-white/5 rounded-lg p-3">
+                              <p className="text-white font-medium">{dm.role}</p>
+                              <p className="text-gray-400 text-sm">{dm.priority}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Competitive Dynamics */}
+                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">🏆 Konkurrensdynamik</h3>
+                    <div className="mb-4">
+                      <h4 className="text-lg font-semibold text-white mb-2">Marknadsledare</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {typedAnswers.premiumAnalysis.marketInsights.competitiveLandscape.leaders.map((leader: any, i: number) => (
+                          <div key={i} className="bg-white/5 rounded-lg p-3 text-center">
+                            <p className="text-white font-medium">{leader.name}</p>
+                            <p className="text-purple-400 text-sm">{leader.share}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-semibold text-white mb-2">Vår Konkurrensfördel</h4>
+                      <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-4 border border-purple-500/30">
+                        <p className="text-gray-300">{typedAnswers.premiumAnalysis.marketInsights.competitiveLandscape.ourAdvantage}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
