@@ -98,6 +98,14 @@ const InsightCard = ({
   );
 };
 
+// Helper to safely render values in JSX
+function safeRender(value: any) {
+  if (typeof value === 'string' || typeof value === 'number') return value;
+  if (value === null || value === undefined) return '';
+  if (Array.isArray(value) || typeof value === 'object') return JSON.stringify(value);
+  return String(value);
+}
+
 export default function BusinessPlanResult({ score, answers, feedback = {} }: ResultProps) {
   const [currentSection, setCurrentSection] = useState<'score' | 'insights' | 'actions'>('score');
   const [expandedInsight, setExpandedInsight] = useState<string | null>(null);
@@ -146,13 +154,13 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           {typedAnswers.customer_problem && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Identifierat Problem</h4>
-              <p className="text-white/70">{typedAnswers.customer_problem}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.customer_problem)}</p>
             </div>
           )}
           {typedAnswers.solution && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Er Lösning</h4>
-              <p className="text-white/70">{typedAnswers.solution}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.solution)}</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-500/30">
@@ -176,19 +184,19 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           {typedAnswers.market_size && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Marknadsstorlek</h4>
-              <p className="text-white/70">{typedAnswers.market_size}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.market_size)}</p>
             </div>
           )}
           {typedAnswers.target_customer && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Målgrupp</h4>
-              <p className="text-white/70">{typedAnswers.target_customer}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.target_customer)}</p>
             </div>
           )}
           {typedAnswers.competitors && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Konkurrenssituation</h4>
-              <p className="text-white/70">{typedAnswers.competitors}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.competitors)}</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl border border-green-500/30">
@@ -210,19 +218,19 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           {typedAnswers.revenue_model && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Intäktsmodell</h4>
-              <p className="text-white/70">{typedAnswers.revenue_model}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.revenue_model)}</p>
             </div>
           )}
           {typedAnswers.pricing && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Prissättning</h4>
-              <p className="text-white/70">{typedAnswers.pricing}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.pricing)}</p>
             </div>
           )}
           {typedAnswers.unit_economics && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Enhetsekonomi</h4>
-              <p className="text-white/70">{typedAnswers.unit_economics}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.unit_economics)}</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl border border-yellow-500/30">
@@ -244,7 +252,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           {typedAnswers.traction && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Nuvarande Traction</h4>
-              <p className="text-white/70">{typedAnswers.traction}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.traction)}</p>
             </div>
           )}
           {Array.isArray(milestones) && milestones.length > 0 && (
@@ -253,8 +261,8 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
               <div className="space-y-2">
                 {milestones.map((milestone: any, index: number) => (
                   <div key={index} className="flex justify-between items-center">
-                    <span className="text-white/70">{milestone.milestone}</span>
-                    <span className="text-white/50 text-sm">{milestone.date}</span>
+                    <span className="text-white/70">{safeRender(milestone.milestone)}</span>
+                    <span className="text-white/50 text-sm">{safeRender(milestone.date)}</span>
                   </div>
                 ))}
               </div>
@@ -279,7 +287,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           {typedAnswers.team && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Teamet</h4>
-              <p className="text-white/70">{typedAnswers.team}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.team)}</p>
             </div>
           )}
           {founderFit.score && (
@@ -292,7 +300,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
                   </span>
                 ))}
               </div>
-              <p className="text-white/70">{founderFit.text}</p>
+              <p className="text-white/70">{safeRender(founderFit.text)}</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl border border-purple-500/30">
@@ -313,23 +321,23 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
         <div className="space-y-4">
           {capitalBlock.amount && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Kapitalbehov: {capitalBlock.amount} MSEK</h4>
+              <h4 className="font-semibold text-white/90 mb-2">Kapitalbehov: {safeRender(capitalBlock.amount)} MSEK</h4>
               <div className="space-y-2 mt-3">
                 <div className="flex justify-between">
                   <span className="text-white/70">Produktutveckling</span>
-                  <span className="text-white/90">{capitalBlock.product}%</span>
+                  <span className="text-white/90">{safeRender(capitalBlock.product)}%</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Försäljning & Marketing</span>
-                  <span className="text-white/90">{capitalBlock.sales}%</span>
+                  <span className="text-white/90">{safeRender(capitalBlock.sales)}%</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Team</span>
-                  <span className="text-white/90">{capitalBlock.team}%</span>
+                  <span className="text-white/90">{safeRender(capitalBlock.team)}%</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Övrigt</span>
-                  <span className="text-white/90">{capitalBlock.other}%</span>
+                  <span className="text-white/90">{safeRender(capitalBlock.other)}%</span>
                 </div>
               </div>
             </div>
@@ -337,7 +345,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           {typedAnswers.runway && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Runway</h4>
-              <p className="text-white/70">{typedAnswers.runway} månader med nuvarande burn rate</p>
+              <p className="text-white/70">{safeRender(typedAnswers.runway)} månader med nuvarande burn rate</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-red-500/20 to-pink-500/20 rounded-xl border border-red-500/30">
@@ -359,13 +367,13 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           {typedAnswers.risks && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Identifierade Risker</h4>
-              <p className="text-white/70">{typedAnswers.risks}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.risks)}</p>
             </div>
           )}
           {typedAnswers.moat && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Konkurrensfördel (Moat)</h4>
-              <p className="text-white/70">{typedAnswers.moat}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.moat)}</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-xl border border-orange-500/30">
@@ -387,13 +395,13 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           {typedAnswers.exit_strategy && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Exit Plan</h4>
-              <p className="text-white/70">{typedAnswers.exit_strategy}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.exit_strategy)}</p>
             </div>
           )}
           {typedAnswers.exit_potential && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Potentiella Köpare</h4>
-              <p className="text-white/70">{typedAnswers.exit_potential}</p>
+              <p className="text-white/70">{safeRender(typedAnswers.exit_potential)}</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-xl border border-emerald-500/30">
@@ -497,59 +505,86 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
       />
       <div className="max-w-4xl w-full flex items-center justify-center mx-auto">
         <div className={`bg-white/5 backdrop-blur-xl rounded-3xl p-12 text-center border border-white/10 ${scoreInfo.glow} transition-all duration-1000 w-full`}>
-          {/* Score Circle */}
-          <div className="w-64 h-64 mx-auto mb-8 relative">
-            <CircularProgressbar
-              value={animatedScore}
-              text={`${animatedScore}`}
-              styles={buildStyles({
-                pathColor: scoreInfo.color,
-                textColor: '#ffffff',
-                trailColor: 'rgba(255,255,255,0.1)',
-                textSize: '28px',
-                pathTransitionDuration: 1.5,
-              })}
-            />
-          </div>
+          {currentSection === 'score' ? (
+            <>
+              {/* Score Circle */}
+              <div className="w-64 h-64 mx-auto mb-8 relative">
+                <CircularProgressbar
+                  value={animatedScore}
+                  text={`${animatedScore}`}
+                  styles={buildStyles({
+                    pathColor: scoreInfo.color,
+                    textColor: '#ffffff',
+                    trailColor: 'rgba(255,255,255,0.1)',
+                    textSize: '28px',
+                    pathTransitionDuration: 1.5,
+                  })}
+                />
+              </div>
 
-          {/* Score Label */}
-          <h1 className="text-5xl font-bold text-white mb-4">{scoreInfo.label}</h1>
-          <p className="text-xl text-white/70 mb-12">{scoreInfo.description}</p>
+              {/* Score Label */}
+              <h1 className="text-5xl font-bold text-white mb-4">{scoreInfo.label}</h1>
+              <p className="text-xl text-white/70 mb-12">{scoreInfo.description}</p>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-6 mb-12">
-            <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-              <div className="text-3xl font-bold text-white">{insights.filter(i => i.strength === 'high').length}</div>
-              <div className="text-white/60">Starka områden</div>
-            </div>
-            <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-              <div className="text-3xl font-bold text-white">{Object.keys(answers).length}</div>
-              <div className="text-white/60">Analyserade fält</div>
-            </div>
-            <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-              <div className="text-3xl font-bold text-white">{actionItems.filter(a => a.priority === 'high').length}</div>
-              <div className="text-white/60">Kritiska åtgärder</div>
-            </div>
-          </div>
+              {/* Quick Stats */}
+              <div className="grid grid-cols-3 gap-6 mb-12">
+                <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                  <div className="text-3xl font-bold text-white">{insights.filter(i => i.strength === 'high').length}</div>
+                  <div className="text-white/60">Starka områden</div>
+                </div>
+                <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                  <div className="text-3xl font-bold text-white">{Object.keys(answers).length}</div>
+                  <div className="text-white/60">Analyserade fält</div>
+                </div>
+                <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                  <div className="text-3xl font-bold text-white">{actionItems.filter(a => a.priority === 'high').length}</div>
+                  <div className="text-white/60">Kritiska åtgärder</div>
+                </div>
+              </div>
 
-          {/* Navigation */}
-          <div className="flex justify-center gap-4">
-            <button
-              onClick={() => setCurrentSection('insights')}
-              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
-            >
-              Se Detaljerad Analys →
-            </button>
-            <button
-              onClick={handleDownloadPDF}
-              className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all flex items-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Ladda ner PDF
-            </button>
-          </div>
+              {/* Navigation */}
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={() => setCurrentSection('insights')}
+                  className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+                >
+                  Se Detaljerad Analys →
+                </button>
+                <button
+                  onClick={handleDownloadPDF}
+                  className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Ladda ner PDF
+                </button>
+              </div>
+            </>
+          ) : currentSection === 'insights' ? (
+            <>
+              <h1 className="text-3xl font-bold text-white mb-8">Detaljerad Analys</h1>
+              <div className="space-y-6">
+                {insights.map((insight) => (
+                  <InsightCard
+                    key={insight.id}
+                    title={insight.title}
+                    content={insight.content}
+                    icon={insight.icon}
+                    priority={insight.strength as "high" | "medium" | "low" | undefined}
+                    isExpanded={expandedInsight === insight.id}
+                    onToggle={() => setExpandedInsight(expandedInsight === insight.id ? null : insight.id)}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={() => setCurrentSection('score')}
+                className="mt-8 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all"
+              >
+                Tillbaka
+              </button>
+            </>
+          ) : null}
         </div>
       </div>
     </div>
