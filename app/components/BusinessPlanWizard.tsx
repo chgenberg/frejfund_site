@@ -1620,8 +1620,9 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 rows={6}
                 style={{ minHeight: '150px', maxHeight: '250px', resize: 'vertical' }}
               />
+              {/* Move the AI-fyllt badge below the textarea */}
               {scrapedData && answers[current.id] && (
-                <div className="absolute top-2 right-2">
+                <div className="mt-2 flex items-center">
                   <span className="text-green-400 text-xs">🤖 AI-fyllt</span>
                 </div>
               )}

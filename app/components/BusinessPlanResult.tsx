@@ -247,7 +247,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
               <p className="text-white/70">{typedAnswers.traction}</p>
             </div>
           )}
-          {milestones.length > 0 && (
+          {Array.isArray(milestones) && milestones.length > 0 && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
               <h4 className="font-semibold text-white/90 mb-2">Milestolpar</h4>
               <div className="space-y-2">
