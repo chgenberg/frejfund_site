@@ -6,7 +6,7 @@ export default function LinkedInSharePage() {
   useEffect(() => {
     // Automatisk redirect till LinkedIn-delning efter 2 sekunder
     const timer = setTimeout(() => {
-      const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://frejfund.se')}&title=${encodeURIComponent('Jag analyserade min affärsidé med AI!')}&summary=${encodeURIComponent('Testa att analysera din affärsidé du också! FrejFund hjälper startups att hitta rätt investerare med AI-driven analys. Få din investeringsscore på 10 minuter.')}`;
+      const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://www.frejfund.com')}&title=${encodeURIComponent('Jag analyserade min affärsidé med AI!')}&summary=${encodeURIComponent('Testa att analysera din affärsidé du också! FrejFund hjälper startups att hitta rätt investerare med AI-driven analys. Få din investeringsscore på 10 minuter.')}`;
       window.location.href = shareUrl;
     }, 2000);
     

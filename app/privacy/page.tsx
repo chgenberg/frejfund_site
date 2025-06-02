@@ -17,7 +17,7 @@ export default function PrivacyPage() {
         Du kan när som helst kontakta oss för att få din information raderad.
       </p>
       <p className="mb-4">
-        Kontakt: <a href="mailto:info@frejfund.se" className="underline">info@frejfund.se</a>
+        Kontakt: <a href="mailto:info@frejfund.com" className="underline">info@frejfund.com</a>
       </p>
       {/* ...ev. annan policytext... */}
     </div>

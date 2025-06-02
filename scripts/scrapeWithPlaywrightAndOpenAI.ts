@@ -51,7 +51,7 @@ export async function scrapeAndAnalyze(url: string) {
     console.log('Hämtar webbsida...');
     const response = await fetch(formattedUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; FrejFundBot/1.0; +https://frejfund.se)',
+        'User-Agent': 'Mozilla/5.0 (compatible; FrejFundBot/1.0; +https://www.frejfund.com)',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Accept-Language': 'sv-SE,sv;q=0.9,en-US;q=0.8,en;q=0.7',
       }

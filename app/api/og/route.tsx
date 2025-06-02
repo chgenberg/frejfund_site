@@ -96,7 +96,11 @@ export async function GET(request: NextRequest) {
                 fontFamily: 'system-ui',
               }}
             >
-              FrejFund.se
+              FrejFund.com
+            </div>
+
+            <div style={{ fontSize: 24, color: '#9ca3af', marginTop: 20 }}>
+              www.FrejFund.com
             </div>
           </div>
         </div>
