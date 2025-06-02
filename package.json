@@ -7,7 +7,7 @@
     "prebuild": "npm install",
     "build": "next build",
     "postbuild": "cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/",
-    "start": "node .next/standalone/server.js",
+    "start": "cd .next/standalone && node server.js",
     "lint": "next lint"
   },
   "dependencies": {

@@ -3,11 +3,11 @@ services:
     name: frejfund
     env: node
     buildCommand: npm install && npm run build
-    startCommand: npm start
+    startCommand: cd .next/standalone && node server.js
     envVars:
-      - key: PORT
-        value: 3000
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
     healthCheckPath: /
     autoDeploy: true 
