@@ -9,30 +9,6 @@ export async function POST(req: NextRequest) {
   try {
     const { answers, company, email, bransch, omrade, hasWebsite } = await req.json();
 
-    // Validate that all required questions are answered
-    const requiredQuestions = [
-      'business_idea',
-      'problem_solution',
-      'target_market',
-      'customer_segments',
-      'competitors',
-      'revenue_model',
-      'marketing_strategy',
-      'team',
-      'financial_plan',
-      'funding_needs'
-    ];
-
-    const missingQuestions = requiredQuestions.filter(q => !answers[q] || answers[q].trim().length < 3);
-    
-    if (missingQuestions.length > 0) {
-      return NextResponse.json({
-        error: 'Insufficient information provided',
-        message: 'Please provide more detailed answers to all questions before proceeding.',
-        missingQuestions
-      }, { status: 400 });
-    }
-
     const prompt = `Analyze this business plan for ${company} in the ${bransch} industry:
 
 Business Idea & Solution:
