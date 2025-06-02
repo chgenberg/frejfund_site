@@ -9,10 +9,10 @@ export function middleware(request: NextRequest) {
   console.log('Middleware - Host:', hostname);
   console.log('Middleware - Original URL:', requestUrl);
 
-  // Handle www redirect
-  if (hostname.includes('www.')) {
-    // Create a proper URL without port
-    const cleanHost = hostname.replace('www.', '').split(':')[0]; // Remove www and port
+  // Handle www to non-www redirect
+  if (hostname.startsWith('www.')) {
+    // Create a proper URL without www and without port
+    const cleanHost = hostname.replace('www.', '').split(':')[0];
     const protocol = request.headers.get('x-forwarded-proto') || 'https';
     const pathname = request.nextUrl.pathname;
     const search = request.nextUrl.search;
