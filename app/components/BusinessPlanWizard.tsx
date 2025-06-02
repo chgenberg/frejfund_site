@@ -1263,6 +1263,63 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   useOnClickOutside(marketRef, () => setShowMarketPopup(false));
   useOnClickOutside(competitorRef, () => setShowCompetitorPopup(false));
 
+  const handleSubmit = async () => {
+    setShowFinalLoader(true);
+    let messageIndex = 0;
+    const messageInterval = setInterval(() => {
+      messageIndex = (messageIndex + 1) % finalLoaderMessages.length;
+      setFinalLoaderText(finalLoaderMessages[messageIndex]);
+    }, 2000);
+    
+    try {
+      const response = await fetch('/api/analyze-businessplan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...answers,
+          company_name: company,
+          email: email,
+          bransch: bransch,
+          omrade: omrade,
+          has_website: hasWebsite,
+          website_url: websiteUrl
+        })
+      });
+      
+      const data = await response.json();
+      clearInterval(messageInterval);
+      setShowFinalLoader(false);
+      
+      // Spara submission till Render's persistenta disk
+      try {
+        await fetch('/api/save-submission', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            timestamp: new Date().toISOString(),
+            company_name: company,
+            email: email,
+            bransch: bransch,
+            omrade: omrade,
+            has_website: hasWebsite,
+            website_url: websiteUrl,
+            answers: answers,
+            result: data
+          })
+        });
+        console.log('Submission saved successfully');
+      } catch (saveError) {
+        console.error('Could not save submission:', saveError);
+      }
+      
+      setResult(data);
+    } catch (error) {
+      clearInterval(messageInterval);
+      setShowFinalLoader(false);
+      console.error('Error submitting:', error);
+    }
+  };
+
   if (!open) return null;
   
   // Visa resultat om det finns
@@ -1915,60 +1972,3 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     </div>
   );
 } 
-
-const handleSubmit = async () => {
-  setShowFinalLoader(true);
-  let messageIndex = 0;
-  const messageInterval = setInterval(() => {
-    messageIndex = (messageIndex + 1) % finalLoaderMessages.length;
-    setFinalLoaderText(finalLoaderMessages[messageIndex]);
-  }, 2000);
-  
-  try {
-    const response = await fetch('/api/analyze-businessplan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...answers,
-        company_name: company,
-        email: email,
-        bransch: bransch,
-        omrade: omrade,
-        has_website: hasWebsite,
-        website_url: websiteUrl
-      })
-    });
-    
-    const data = await response.json();
-    clearInterval(messageInterval);
-    setShowFinalLoader(false);
-    
-    // Spara submission till Render's persistenta disk
-    try {
-      await fetch('/api/save-submission', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          timestamp: new Date().toISOString(),
-          company_name: company,
-          email: email,
-          bransch: bransch,
-          omrade: omrade,
-          has_website: hasWebsite,
-          website_url: websiteUrl,
-          answers: answers,
-          result: data
-        })
-      });
-      console.log('Submission saved successfully');
-    } catch (saveError) {
-      console.error('Could not save submission:', saveError);
-    }
-    
-    setResult(data);
-  } catch (error) {
-    clearInterval(messageInterval);
-    setShowFinalLoader(false);
-    console.error('Error submitting:', error);
-  }
-};
