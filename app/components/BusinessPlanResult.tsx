@@ -156,14 +156,14 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
         <div className="space-y-4">
           {typedAnswers.customer_problem && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Identifierat Problem</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.customer_problem)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Identifierat Problem</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.customer_problem)}</p>
             </div>
           )}
           {typedAnswers.solution && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Er Lösning</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.solution)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Er Lösning</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.solution)}</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-500/30">
@@ -186,20 +186,20 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
         <div className="space-y-4">
           {typedAnswers.market_size && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Marknadsstorlek</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.market_size)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Marknadsstorlek</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.market_size)}</p>
             </div>
           )}
           {typedAnswers.target_customer && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Målgrupp</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.target_customer)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Målgrupp</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.target_customer)}</p>
             </div>
           )}
           {typedAnswers.competitors && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Konkurrenssituation</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.competitors)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Konkurrenssituation</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.competitors)}</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl border border-green-500/30">
@@ -220,20 +220,20 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
         <div className="space-y-4">
           {typedAnswers.revenue_model && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Intäktsmodell</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.revenue_model)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Intäktsmodell</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.revenue_model)}</p>
             </div>
           )}
           {typedAnswers.pricing && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Prissättning</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.pricing)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Prissättning</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.pricing)}</p>
             </div>
           )}
           {typedAnswers.unit_economics && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Enhetsekonomi</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.unit_economics)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Enhetsekonomi</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.unit_economics)}</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl border border-yellow-500/30">
@@ -254,18 +254,18 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
         <div className="space-y-4">
           {typedAnswers.traction && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Nuvarande Traction</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.traction)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Nuvarande Traction</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.traction)}</p>
             </div>
           )}
           {Array.isArray(milestones) && milestones.length > 0 && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Milestolpar</h4>
+              <h4 className="font-semibold text-gray-900 mb-2">Milestolpar</h4>
               <div className="space-y-2">
                 {milestones.map((milestone: any, index: number) => (
                   <div key={index} className="flex justify-between items-center">
-                    <span className="text-white/70">{safeRender(milestone.milestone)}</span>
-                    <span className="text-white/50 text-sm">{safeRender(milestone.date)}</span>
+                    <span className="text-gray-800">{safeRender(milestone.milestone)}</span>
+                    <span className="text-gray-600 text-sm">{safeRender(milestone.date)}</span>
                   </div>
                 ))}
               </div>
@@ -324,31 +324,31 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
         <div className="space-y-4">
           {capitalBlock.amount && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Kapitalbehov: {safeRender(capitalBlock.amount)} MSEK</h4>
+              <h4 className="font-semibold text-gray-900 mb-2">Kapitalbehov: {safeRender(capitalBlock.amount)} MSEK</h4>
               <div className="space-y-2 mt-3">
                 <div className="flex justify-between">
-                  <span className="text-white/70">Produktutveckling</span>
-                  <span className="text-white/90">{safeRender(capitalBlock.product)}%</span>
+                  <span className="text-gray-700">Produktutveckling</span>
+                  <span className="text-gray-900">{safeRender(capitalBlock.product)}%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/70">Försäljning & Marketing</span>
-                  <span className="text-white/90">{safeRender(capitalBlock.sales)}%</span>
+                  <span className="text-gray-700">Försäljning & Marketing</span>
+                  <span className="text-gray-900">{safeRender(capitalBlock.sales)}%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/70">Team</span>
-                  <span className="text-white/90">{safeRender(capitalBlock.team)}%</span>
+                  <span className="text-gray-700">Team</span>
+                  <span className="text-gray-900">{safeRender(capitalBlock.team)}%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/70">Övrigt</span>
-                  <span className="text-white/90">{safeRender(capitalBlock.other)}%</span>
+                  <span className="text-gray-700">Övrigt</span>
+                  <span className="text-gray-900">{safeRender(capitalBlock.other)}%</span>
                 </div>
               </div>
             </div>
           )}
           {typedAnswers.runway && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Runway</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.runway)} månader med nuvarande burn rate</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Runway</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.runway)} månader med nuvarande burn rate</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-red-500/20 to-pink-500/20 rounded-xl border border-red-500/30">
@@ -369,14 +369,14 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
         <div className="space-y-4">
           {typedAnswers.risks && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Identifierade Risker</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.risks)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Identifierade Risker</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.risks)}</p>
             </div>
           )}
           {typedAnswers.moat && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Konkurrensfördel (Moat)</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.moat)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Konkurrensfördel (Moat)</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.moat)}</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-xl border border-orange-500/30">
@@ -397,14 +397,14 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
         <div className="space-y-4">
           {typedAnswers.exit_strategy && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Exit Plan</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.exit_strategy)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Exit Plan</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.exit_strategy)}</p>
             </div>
           )}
           {typedAnswers.exit_potential && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Potentiella Köpare</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.exit_potential)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Potentiella Köpare</h4>
+              <p className="text-gray-800">{safeRender(typedAnswers.exit_potential)}</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-xl border border-emerald-500/30">
@@ -472,11 +472,16 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
         },
         body: JSON.stringify({
           score,
-          answers,
+          answers: typedAnswers,
           insights: insights.map(i => ({
             title: i.title,
-            strength: i.strength
-          }))
+            strength: i.strength,
+            content: i.content
+          })),
+          premiumAnalysis: typedAnswers.premiumAnalysis,
+          subscriptionLevel: subscriptionLevel || 'standard',
+          actionItems,
+          scoreInfo
         }),
       });
 
@@ -485,11 +490,13 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'affarsanalys.pdf';
+        a.download = 'frejfund-affarsanalys.pdf';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
+      } else {
+        console.error('PDF generation failed');
       }
     } catch (error) {
       console.error('Error downloading PDF:', error);
@@ -642,14 +649,14 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
               {/* Premium content section */}
               <h1 className="text-3xl font-bold text-white mb-8">🌟 Premium AI-Analys</h1>
               
-              {/* Premium Success Message */}
-              {typedAnswers.paymentSuccess && (
-                <div className="mb-8 p-6 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl border border-green-500/30">
+              {/* Premium Success Message - ändrat för demo */}
+              {isPremium && (
+                <div className="mb-8 p-6 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl border border-purple-500/30">
                   <div className="flex items-center gap-3">
-                    <span className="text-3xl">✅</span>
+                    <span className="text-3xl">🌟</span>
                     <div>
-                      <h3 className="text-xl font-bold text-white">Betalning genomförd!</h3>
-                      <p className="text-white/70">Din premium-analys är nu tillgänglig. Ladda ner PDF för fullständig rapport.</p>
+                      <h3 className="text-xl font-bold text-white">Premium-analys</h3>
+                      <p className="text-white/70">Detta är en demo av vad som ingår i premium-analysen för 197 kr.</p>
                     </div>
                   </div>
                 </div>
@@ -672,62 +679,66 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                 ))}
               </div>
 
-              {/* SWOT Analysis */}
+              {/* SWOT Analysis - förbättrad design */}
               {expandedInsight === 'swot' && typedAnswers.premiumAnalysis?.swot && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-white mb-6">SWOT-Analys</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl p-6 border border-green-500/30">
-                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                        <span className="text-2xl">💪</span> Styrkor
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-start gap-2">
+                        <span className="text-2xl">💪</span> 
+                        <span>Styrkor</span>
                       </h3>
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {typedAnswers.premiumAnalysis.swot.strengths.map((strength: string, i: number) => (
-                          <li key={i} className="text-white/80 flex items-start gap-2">
-                            <span className="text-green-400">•</span>
-                            <span>{strength}</span>
+                          <li key={i} className="text-gray-900 flex items-start gap-3 text-left">
+                            <span className="text-green-600 mt-1">•</span>
+                            <span className="flex-1">{strength}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                     
                     <div className="bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-2xl p-6 border border-red-500/30">
-                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                        <span className="text-2xl">⚠️</span> Svagheter
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-start gap-2">
+                        <span className="text-2xl">⚠️</span> 
+                        <span>Svagheter</span>
                       </h3>
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {typedAnswers.premiumAnalysis.swot.weaknesses.map((weakness: string, i: number) => (
-                          <li key={i} className="text-white/80 flex items-start gap-2">
-                            <span className="text-orange-400">•</span>
-                            <span>{weakness}</span>
+                          <li key={i} className="text-gray-900 flex items-start gap-3 text-left">
+                            <span className="text-orange-600 mt-1">•</span>
+                            <span className="flex-1">{weakness}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                     
                     <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl p-6 border border-blue-500/30">
-                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                        <span className="text-2xl">🎯</span> Möjligheter
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-start gap-2">
+                        <span className="text-2xl">🎯</span> 
+                        <span>Möjligheter</span>
                       </h3>
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {typedAnswers.premiumAnalysis.swot.opportunities.map((opportunity: string, i: number) => (
-                          <li key={i} className="text-white/80 flex items-start gap-2">
-                            <span className="text-blue-400">•</span>
-                            <span>{opportunity}</span>
+                          <li key={i} className="text-gray-900 flex items-start gap-3 text-left">
+                            <span className="text-blue-600 mt-1">•</span>
+                            <span className="flex-1">{opportunity}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                     
                     <div className="bg-gradient-to-br from-yellow-500/20 to-amber-500/20 rounded-2xl p-6 border border-yellow-500/30">
-                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                        <span className="text-2xl">🌪️</span> Hot
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-start gap-2">
+                        <span className="text-2xl">🌪️</span> 
+                        <span>Hot</span>
                       </h3>
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {typedAnswers.premiumAnalysis.swot.threats.map((threat: string, i: number) => (
-                          <li key={i} className="text-white/80 flex items-start gap-2">
-                            <span className="text-yellow-400">•</span>
-                            <span>{threat}</span>
+                          <li key={i} className="text-gray-900 flex items-start gap-3 text-left">
+                            <span className="text-yellow-600 mt-1">•</span>
+                            <span className="flex-1">{threat}</span>
                           </li>
                         ))}
                       </ul>
@@ -736,56 +747,116 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                 </div>
               )}
 
-              {/* Financial Projections */}
-              {expandedInsight === 'finansiell' && typedAnswers.financial_projections && (
+              {/* Benchmark Analysis - ny sektion */}
+              {expandedInsight === 'benchmark' && typedAnswers.premiumAnalysis?.benchmarkAnalysis && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-white mb-6">Finansiella Projektioner (3 år)</h2>
+                  <h2 className="text-2xl font-bold text-white mb-6">Benchmark-Analys</h2>
+                  
+                  {/* Industry Comparison */}
                   <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">Branschjämförelse</h3>
+                    <div className="space-y-4">
+                      {Object.entries(typedAnswers.premiumAnalysis.benchmarkAnalysis.industryComparison).map(([key, data]: [string, any]) => {
+                        if (key === 'metric') return null;
+                        return (
+                          <div key={key} className="grid grid-cols-4 gap-4 items-center p-3 bg-white/5 rounded-xl">
+                            <div className="text-gray-900 font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                            <div className="text-gray-800">Ert bolag: {data.us}</div>
+                            <div className="text-gray-700">Branschsnitt: {data.industry}</div>
+                            <div className={`font-bold ${data.verdict === 'Excellent' || data.verdict === 'Top quartile' || data.verdict === 'Best in class' ? 'text-green-600' : 'text-yellow-600'}`}>
+                              {data.verdict}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Peer Comparison */}
+                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">Jämförelse med konkurrenter</h3>
                     <div className="overflow-x-auto">
-                      <table className="w-full text-white">
+                      <table className="w-full text-gray-900">
                         <thead>
-                          <tr className="border-b border-white/20">
-                            <th className="text-left py-3">Metrik</th>
-                            <th className="text-right py-3">År 1</th>
-                            <th className="text-right py-3">År 2</th>
-                            <th className="text-right py-3">År 3</th>
+                          <tr className="border-b border-gray-300">
+                            <th className="text-left py-3">Företag</th>
+                            <th className="text-right py-3">Finansiering</th>
+                            <th className="text-right py-3">ARR</th>
+                            <th className="text-right py-3">Värdering</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {(() => {
-                            const projections = parseJsonSafely(typedAnswers.financial_projections);
-                            return (
-                              <>
-                                <tr className="border-b border-white/10">
-                                  <td className="py-3">Intäkter</td>
-                                  <td className="text-right">{(projections.year1?.revenue / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right">{(projections.year2?.revenue / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right">{(projections.year3?.revenue / 1000000).toFixed(1)} MSEK</td>
-                                </tr>
-                                <tr className="border-b border-white/10">
-                                  <td className="py-3">Kostnader</td>
-                                  <td className="text-right">{(projections.year1?.costs / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right">{(projections.year2?.costs / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right">{(projections.year3?.costs / 1000000).toFixed(1)} MSEK</td>
-                                </tr>
-                                <tr className="border-b border-white/10">
-                                  <td className="py-3">EBITDA</td>
-                                  <td className="text-right text-red-400">{(projections.year1?.ebitda / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right text-green-400">{(projections.year2?.ebitda / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right text-green-400">{(projections.year3?.ebitda / 1000000).toFixed(1)} MSEK</td>
-                                </tr>
-                                <tr>
-                                  <td className="py-3">Antal kunder</td>
-                                  <td className="text-right">{projections.year1?.customers}</td>
-                                  <td className="text-right">{projections.year2?.customers}</td>
-                                  <td className="text-right">{projections.year3?.customers}</td>
-                                </tr>
-                              </>
-                            );
-                          })()}
+                          {typedAnswers.premiumAnalysis.benchmarkAnalysis.peerComparison.map((peer: any, i: number) => (
+                            <tr key={i} className="border-b border-gray-200">
+                              <td className="py-3">{peer.company}</td>
+                              <td className="text-right">{peer.funding}</td>
+                              <td className="text-right">{peer.revenue}</td>
+                              <td className="text-right">{peer.valuation}</td>
+                            </tr>
+                          ))}
                         </tbody>
                       </table>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Investment Proposal - ny sektion */}
+              {expandedInsight === 'investeringsförslag' && typedAnswers.premiumAnalysis?.investmentProposal && (
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-bold text-white mb-6">Investeringsförslag</h2>
+                  
+                  {/* Investment Ask */}
+                  <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl p-6 border border-purple-500/30">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h3 className="text-lg font-bold text-white mb-2">Investeringsbehov</h3>
+                        <p className="text-3xl font-bold text-white">{typedAnswers.premiumAnalysis.investmentProposal.askAmount}</p>
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-white mb-2">Pre-money värdering</h3>
+                        <p className="text-3xl font-bold text-white">{typedAnswers.premiumAnalysis.investmentProposal.valuation}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Use of Funds */}
+                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">Användning av kapital</h3>
+                    <div className="space-y-3">
+                      {Object.entries(typedAnswers.premiumAnalysis.investmentProposal.useOfFunds).map(([key, value]: [string, any]) => (
+                        <div key={key} className="flex justify-between items-center">
+                          <span className="text-gray-800 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                          <span className="text-gray-900 font-semibold">{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Key Metrics */}
+                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">Nyckeltal</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {Object.entries(typedAnswers.premiumAnalysis.investmentProposal.keyMetrics).map(([key, value]: [string, any]) => (
+                        <div key={key} className="bg-white/5 rounded-xl p-4">
+                          <p className="text-gray-700 text-sm capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                          <p className="text-gray-900 text-xl font-bold">{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Investor Benefits */}
+                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">Fördelar för investerare</h3>
+                    <ul className="space-y-2">
+                      {typedAnswers.premiumAnalysis.investmentProposal.investorBenefits.map((benefit: string, i: number) => (
+                        <li key={i} className="text-gray-900 flex items-start gap-3">
+                          <span className="text-green-600 mt-1">✓</span>
+                          <span>{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               )}
@@ -801,13 +872,13 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                     <div className="space-y-4">
                       {typedAnswers.premiumAnalysis.detailedRecommendations.immediate.map((rec: any, i: number) => (
                         <div key={i} className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                          <h4 className="text-lg font-bold text-white mb-2">{rec.action}</h4>
-                          <div className="space-y-2 text-white/80">
-                            <p><strong>Varför:</strong> {rec.why}</p>
-                            <p><strong>Hur:</strong> {rec.how}</p>
-                            <p><strong>Förväntad effekt:</strong> {rec.impact}</p>
-                            <p><strong>Resurser:</strong> {rec.resources}</p>
-                            <p><strong>Tidsram:</strong> {rec.timeline}</p>
+                          <h4 className="text-lg font-bold text-gray-900 mb-2">{rec.action}</h4>
+                          <div className="space-y-2 text-gray-800">
+                            <p><strong className="text-gray-900">Varför:</strong> {rec.why}</p>
+                            <p><strong className="text-gray-900">Hur:</strong> {rec.how}</p>
+                            <p><strong className="text-gray-900">Förväntad effekt:</strong> {rec.impact}</p>
+                            <p><strong className="text-gray-900">Resurser:</strong> {rec.resources}</p>
+                            <p><strong className="text-gray-900">Tidsram:</strong> {rec.timeline}</p>
                           </div>
                         </div>
                       ))}
@@ -820,16 +891,70 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                     <div className="space-y-4">
                       {typedAnswers.premiumAnalysis.detailedRecommendations.shortTerm.map((rec: any, i: number) => (
                         <div key={i} className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                          <h4 className="text-lg font-bold text-white mb-2">{rec.action}</h4>
-                          <div className="space-y-2 text-white/80">
-                            <p><strong>Varför:</strong> {rec.why}</p>
-                            <p><strong>Hur:</strong> {rec.how}</p>
-                            <p><strong>Förväntad effekt:</strong> {rec.impact}</p>
-                            <p><strong>Resurser:</strong> {rec.resources}</p>
-                            <p><strong>Tidsram:</strong> {rec.timeline}</p>
+                          <h4 className="text-lg font-bold text-gray-900 mb-2">{rec.action}</h4>
+                          <div className="space-y-2 text-gray-800">
+                            <p><strong className="text-gray-900">Varför:</strong> {rec.why}</p>
+                            <p><strong className="text-gray-900">Hur:</strong> {rec.how}</p>
+                            <p><strong className="text-gray-900">Förväntad effekt:</strong> {rec.impact}</p>
+                            <p><strong className="text-gray-900">Resurser:</strong> {rec.resources}</p>
+                            <p><strong className="text-gray-900">Tidsram:</strong> {rec.timeline}</p>
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Financial Projections */}
+              {expandedInsight === 'finansiell' && typedAnswers.financial_projections && (
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-bold text-white mb-6">Finansiella Projektioner (3 år)</h2>
+                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-gray-300">
+                            <th className="text-left py-3 text-gray-900">Metrik</th>
+                            <th className="text-right py-3 text-gray-900">År 1</th>
+                            <th className="text-right py-3 text-gray-900">År 2</th>
+                            <th className="text-right py-3 text-gray-900">År 3</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(() => {
+                            const projections = parseJsonSafely(typedAnswers.financial_projections);
+                            return (
+                              <>
+                                <tr className="border-b border-gray-200">
+                                  <td className="py-3 text-gray-800">Intäkter</td>
+                                  <td className="text-right text-gray-900">{(projections.year1?.revenue / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right text-gray-900">{(projections.year2?.revenue / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right text-gray-900">{(projections.year3?.revenue / 1000000).toFixed(1)} MSEK</td>
+                                </tr>
+                                <tr className="border-b border-gray-200">
+                                  <td className="py-3 text-gray-800">Kostnader</td>
+                                  <td className="text-right text-gray-900">{(projections.year1?.costs / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right text-gray-900">{(projections.year2?.costs / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right text-gray-900">{(projections.year3?.costs / 1000000).toFixed(1)} MSEK</td>
+                                </tr>
+                                <tr className="border-b border-gray-200">
+                                  <td className="py-3 text-gray-800">EBITDA</td>
+                                  <td className="text-right text-red-600">{(projections.year1?.ebitda / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right text-green-600">{(projections.year2?.ebitda / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right text-green-600">{(projections.year3?.ebitda / 1000000).toFixed(1)} MSEK</td>
+                                </tr>
+                                <tr>
+                                  <td className="py-3 text-gray-800">Antal kunder</td>
+                                  <td className="text-right text-gray-900">{projections.year1?.customers}</td>
+                                  <td className="text-right text-gray-900">{projections.year2?.customers}</td>
+                                  <td className="text-right text-gray-900">{projections.year3?.customers}</td>
+                                </tr>
+                              </>
+                            );
+                          })()}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
