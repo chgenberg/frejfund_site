@@ -8,7 +8,7 @@ interface ResultProps {
   score: number;
   answers: Record<string, unknown>;
   feedback?: Record<string, string>;
-  subscriptionLevel?: 'silver' | 'gold' | 'platinum';
+  subscriptionLevel?: 'standard' | 'premium';
 }
 
 const getScoreInfo = (score: number) => {
@@ -107,15 +107,16 @@ function safeRender(value: any) {
   return String(value);
 }
 
-export default function BusinessPlanResult({ score, answers, feedback = {} }: ResultProps) {
+export default function BusinessPlanResult({ score, answers, feedback = {}, subscriptionLevel }: ResultProps) {
   const router = useRouter();
-  const [currentSection, setCurrentSection] = useState<'score' | 'insights' | 'actions'>('score');
+  const [currentSection, setCurrentSection] = useState<'score' | 'insights' | 'actions' | 'premium'>('score');
   const [expandedInsight, setExpandedInsight] = useState<string | null>(null);
   const [animatedScore, setAnimatedScore] = useState(0);
   const [showActionModal, setShowActionModal] = useState<any>(null);
   
   const scoreInfo = getScoreInfo(score);
   const typedAnswers = answers as Record<string, any>;
+  const isPremium = subscriptionLevel === 'premium';
 
   // Parse JSON fields safely
   const parseJsonSafely = (value: any, fallback = {}) => {
@@ -288,21 +289,21 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
         <div className="space-y-4">
           {typedAnswers.team && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Teamet</h4>
-              <p className="text-white/70">{safeRender(typedAnswers.team)}</p>
+              <h4 className="font-semibold text-gray-900 mb-2">Teamet</h4>
+              <p className="text-gray-900">{safeRender(typedAnswers.team)}</p>
             </div>
           )}
           {founderFit.score && (
             <div className="p-4 bg-white/5 rounded-xl backdrop-blur-sm">
-              <h4 className="font-semibold text-white/90 mb-2">Founder-Market Fit</h4>
+              <h4 className="font-semibold text-gray-900 mb-2">Founder-Market Fit</h4>
               <div className="flex items-center gap-2 mb-2">
                 {[...Array(5)].map((_, i) => (
-                  <span key={i} className={`text-2xl ${i < founderFit.score ? 'text-yellow-400' : 'text-white/20'}`}>
+                  <span key={i} className={`text-2xl ${i < founderFit.score ? 'text-yellow-400' : 'text-gray-300'}`}>
                     ★
                   </span>
                 ))}
               </div>
-              <p className="text-white/70">{safeRender(founderFit.text)}</p>
+              <p className="text-gray-900">{safeRender(founderFit.text)}</p>
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl border border-purple-500/30">
@@ -565,6 +566,14 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
                 >
                   Se Detaljerad Analys →
                 </button>
+                {isPremium && (
+                  <button
+                    onClick={() => setCurrentSection('premium')}
+                    className="px-8 py-4 bg-gradient-to-r from-gold-500 to-yellow-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all animate-pulse"
+                  >
+                    🌟 Premium Analys →
+                  </button>
+                )}
                 <button
                   onClick={handleDownloadPDF}
                   className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all flex items-center gap-2"
@@ -576,32 +585,34 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
                 </button>
               </div>
 
-              {/* Upgrade CTA */}
-              <div className="mt-12 p-8 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-3xl border border-purple-500/30">
-                <h3 className="text-2xl font-bold text-white mb-4">🚀 Få Premium AI-Analys</h3>
-                <p className="text-white/80 mb-6">
-                  Lås upp 50+ sidor djupgående analys, branschspecifika insikter, finansiella projektioner och mycket mer!
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                  {[
-                    { icon: '📊', text: '50+ sidor analys' },
-                    { icon: '🎯', text: 'Branschjämförelser' },
-                    { icon: '📈', text: '3-års prognos' },
-                    { icon: '📞', text: 'Expertsamtal' }
-                  ].map((feature, i) => (
-                    <div key={i} className="text-center">
-                      <div className="text-3xl mb-2">{feature.icon}</div>
-                      <div className="text-white/70 text-sm">{feature.text}</div>
-                    </div>
-                  ))}
+              {/* Only show upgrade CTA if NOT premium */}
+              {!isPremium && (
+                <div className="mt-12 p-8 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-3xl border border-purple-500/30">
+                  <h3 className="text-2xl font-bold text-white mb-4">🚀 Få Premium AI-Analys</h3>
+                  <p className="text-white/80 mb-6">
+                    Lås upp 30+ sidor djupgående analys, SWOT, finansiella projektioner, branschbenchmarks och mycket mer!
+                  </p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    {[
+                      { icon: '📊', text: '30+ sidor analys' },
+                      { icon: '🎯', text: 'SWOT-analys' },
+                      { icon: '📈', text: '3-års prognos' },
+                      { icon: '💎', text: 'Investeringsförslag' }
+                    ].map((feature, i) => (
+                      <div key={i} className="text-center">
+                        <div className="text-3xl mb-2">{feature.icon}</div>
+                        <div className="text-white/70 text-sm">{feature.text}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={handleUpgrade}
+                    className="px-12 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg rounded-full hover:shadow-xl hover:scale-105 transition-all"
+                  >
+                    Uppgradera för 197 kr →
+                  </button>
                 </div>
-                <button
-                  onClick={handleUpgrade}
-                  className="px-12 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg rounded-full hover:shadow-xl hover:scale-105 transition-all"
-                >
-                  Uppgradera för 197 kr →
-                </button>
-              </div>
+              )}
             </>
           ) : currentSection === 'insights' ? (
             <>
@@ -619,6 +630,212 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
                   />
                 ))}
               </div>
+              <button
+                onClick={() => setCurrentSection('score')}
+                className="mt-8 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all"
+              >
+                Tillbaka
+              </button>
+            </>
+          ) : currentSection === 'premium' ? (
+            <>
+              {/* Premium content section */}
+              <h1 className="text-3xl font-bold text-white mb-8">🌟 Premium AI-Analys</h1>
+              
+              {/* Premium Success Message */}
+              {typedAnswers.paymentSuccess && (
+                <div className="mb-8 p-6 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl border border-green-500/30">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">✅</span>
+                    <div>
+                      <h3 className="text-xl font-bold text-white">Betalning genomförd!</h3>
+                      <p className="text-white/70">Din premium-analys är nu tillgänglig. Ladda ner PDF för fullständig rapport.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Premium Tabs */}
+              <div className="mb-8 flex flex-wrap gap-2 justify-center">
+                {['swot', 'finansiell', 'rekommendationer', 'benchmark', 'investeringsförslag'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setExpandedInsight(tab)}
+                    className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                      expandedInsight === tab 
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' 
+                        : 'bg-white/10 text-white/70 hover:bg-white/20'
+                    }`}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
+              </div>
+
+              {/* SWOT Analysis */}
+              {expandedInsight === 'swot' && typedAnswers.premiumAnalysis?.swot && (
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-bold text-white mb-6">SWOT-Analys</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl p-6 border border-green-500/30">
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <span className="text-2xl">💪</span> Styrkor
+                      </h3>
+                      <ul className="space-y-2">
+                        {typedAnswers.premiumAnalysis.swot.strengths.map((strength: string, i: number) => (
+                          <li key={i} className="text-white/80 flex items-start gap-2">
+                            <span className="text-green-400">•</span>
+                            <span>{strength}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-2xl p-6 border border-red-500/30">
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <span className="text-2xl">⚠️</span> Svagheter
+                      </h3>
+                      <ul className="space-y-2">
+                        {typedAnswers.premiumAnalysis.swot.weaknesses.map((weakness: string, i: number) => (
+                          <li key={i} className="text-white/80 flex items-start gap-2">
+                            <span className="text-orange-400">•</span>
+                            <span>{weakness}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl p-6 border border-blue-500/30">
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <span className="text-2xl">🎯</span> Möjligheter
+                      </h3>
+                      <ul className="space-y-2">
+                        {typedAnswers.premiumAnalysis.swot.opportunities.map((opportunity: string, i: number) => (
+                          <li key={i} className="text-white/80 flex items-start gap-2">
+                            <span className="text-blue-400">•</span>
+                            <span>{opportunity}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-yellow-500/20 to-amber-500/20 rounded-2xl p-6 border border-yellow-500/30">
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <span className="text-2xl">🌪️</span> Hot
+                      </h3>
+                      <ul className="space-y-2">
+                        {typedAnswers.premiumAnalysis.swot.threats.map((threat: string, i: number) => (
+                          <li key={i} className="text-white/80 flex items-start gap-2">
+                            <span className="text-yellow-400">•</span>
+                            <span>{threat}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Financial Projections */}
+              {expandedInsight === 'finansiell' && typedAnswers.financial_projections && (
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-bold text-white mb-6">Finansiella Projektioner (3 år)</h2>
+                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-white">
+                        <thead>
+                          <tr className="border-b border-white/20">
+                            <th className="text-left py-3">Metrik</th>
+                            <th className="text-right py-3">År 1</th>
+                            <th className="text-right py-3">År 2</th>
+                            <th className="text-right py-3">År 3</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(() => {
+                            const projections = parseJsonSafely(typedAnswers.financial_projections);
+                            return (
+                              <>
+                                <tr className="border-b border-white/10">
+                                  <td className="py-3">Intäkter</td>
+                                  <td className="text-right">{(projections.year1?.revenue / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right">{(projections.year2?.revenue / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right">{(projections.year3?.revenue / 1000000).toFixed(1)} MSEK</td>
+                                </tr>
+                                <tr className="border-b border-white/10">
+                                  <td className="py-3">Kostnader</td>
+                                  <td className="text-right">{(projections.year1?.costs / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right">{(projections.year2?.costs / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right">{(projections.year3?.costs / 1000000).toFixed(1)} MSEK</td>
+                                </tr>
+                                <tr className="border-b border-white/10">
+                                  <td className="py-3">EBITDA</td>
+                                  <td className="text-right text-red-400">{(projections.year1?.ebitda / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right text-green-400">{(projections.year2?.ebitda / 1000000).toFixed(1)} MSEK</td>
+                                  <td className="text-right text-green-400">{(projections.year3?.ebitda / 1000000).toFixed(1)} MSEK</td>
+                                </tr>
+                                <tr>
+                                  <td className="py-3">Antal kunder</td>
+                                  <td className="text-right">{projections.year1?.customers}</td>
+                                  <td className="text-right">{projections.year2?.customers}</td>
+                                  <td className="text-right">{projections.year3?.customers}</td>
+                                </tr>
+                              </>
+                            );
+                          })()}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Detailed Recommendations */}
+              {expandedInsight === 'rekommendationer' && typedAnswers.premiumAnalysis?.detailedRecommendations && (
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-bold text-white mb-6">Detaljerade Rekommendationer</h2>
+                  
+                  {/* Immediate Actions */}
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-4">🚀 Omedelbart (1-2 månader)</h3>
+                    <div className="space-y-4">
+                      {typedAnswers.premiumAnalysis.detailedRecommendations.immediate.map((rec: any, i: number) => (
+                        <div key={i} className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                          <h4 className="text-lg font-bold text-white mb-2">{rec.action}</h4>
+                          <div className="space-y-2 text-white/80">
+                            <p><strong>Varför:</strong> {rec.why}</p>
+                            <p><strong>Hur:</strong> {rec.how}</p>
+                            <p><strong>Förväntad effekt:</strong> {rec.impact}</p>
+                            <p><strong>Resurser:</strong> {rec.resources}</p>
+                            <p><strong>Tidsram:</strong> {rec.timeline}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Short Term Actions */}
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-4">📈 Kort sikt (3-6 månader)</h3>
+                    <div className="space-y-4">
+                      {typedAnswers.premiumAnalysis.detailedRecommendations.shortTerm.map((rec: any, i: number) => (
+                        <div key={i} className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                          <h4 className="text-lg font-bold text-white mb-2">{rec.action}</h4>
+                          <div className="space-y-2 text-white/80">
+                            <p><strong>Varför:</strong> {rec.why}</p>
+                            <p><strong>Hur:</strong> {rec.how}</p>
+                            <p><strong>Förväntad effekt:</strong> {rec.impact}</p>
+                            <p><strong>Resurser:</strong> {rec.resources}</p>
+                            <p><strong>Tidsram:</strong> {rec.timeline}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Back button */}
               <button
                 onClick={() => setCurrentSection('score')}
                 className="mt-8 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all"

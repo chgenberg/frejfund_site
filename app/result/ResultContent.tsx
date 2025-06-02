@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import BusinessPlanResult from '../components/BusinessPlanResult';
 import { testData } from './testData';
+import { premiumTestData } from './premiumTestData';
 
 export default function ResultContent() {
   const [resultData, setResultData] = useState<any>(null);
@@ -24,9 +25,8 @@ export default function ResultContent() {
   // Funktion för att sätta premium-analys och simulera betalning
   const setPremiumTestData = () => {
     if (typeof window !== 'undefined') {
-      const premiumData = { ...testData, subscriptionLevel: 'premium', paymentSuccess: true };
-      localStorage.setItem('latestAnalysisResult', JSON.stringify(premiumData));
-      setResultData(premiumData);
+      localStorage.setItem('latestAnalysisResult', JSON.stringify(premiumTestData));
+      setResultData(premiumTestData);
       setLoading(false);
     }
   };
