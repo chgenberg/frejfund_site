@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { saveCustomerData } from '@/app/utils/fileSystem';
+import { saveCustomerData } from '../../utils/fileSystem';
 
 export async function POST(request: Request) {
   try {
