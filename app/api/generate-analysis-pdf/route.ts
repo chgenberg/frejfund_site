@@ -370,7 +370,7 @@ export async function POST(request: Request) {
     // Add a helper to create section pages
     const createSectionPage = (title: string, subtitle: string, content: any) => {
       const page = pdfDoc.addPage(PageSizes.A4);
-      let yPosition = drawHeader(page, title, subtitle);
+      const yPosition = drawHeader(page, title, subtitle);
       
       // Add content based on the section
       return page;
