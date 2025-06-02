@@ -119,7 +119,14 @@ export async function POST(request: Request) {
     };
 
     const wrapText = (text: string, maxWidth: number, fontSize: number, font: any): string[] => {
-      const words = text.split(' ');
+      // Remove or replace problematic characters
+      const cleanText = text
+        .replace(/\n/g, ' ')     // Replace newlines with spaces
+        .replace(/\r/g, '')      // Remove carriage returns
+        .replace(/\t/g, '  ')    // Replace tabs with spaces
+        .trim();                 // Trim whitespace
+      
+      const words = cleanText.split(' ').filter(word => word.length > 0);
       const lines: string[] = [];
       let currentLine = '';
 
@@ -139,6 +146,17 @@ export async function POST(request: Request) {
       return lines;
     };
 
+    // Helper function to clean text for PDF
+    const cleanTextForPDF = (text: string): string => {
+      if (!text) return '';
+      return text
+        .replace(/\n/g, ' ')
+        .replace(/\r/g, '')
+        .replace(/\t/g, '  ')
+        .replace(/[^\x20-\x7E\xA0-\xFF]/g, '') // Remove non-printable characters
+        .trim();
+    };
+
     const drawWrappedText = (
       page: any, 
       text: string, 
@@ -150,7 +168,8 @@ export async function POST(request: Request) {
       color: any,
       lineHeight: number = 1.5
     ): number => {
-      const lines = wrapText(text, maxWidth, fontSize, font);
+      const cleanedText = cleanTextForPDF(text);
+      const lines = wrapText(cleanedText, maxWidth, fontSize, font);
       let currentY = y;
       
       lines.forEach(line => {
@@ -310,8 +329,8 @@ export async function POST(request: Request) {
     });
 
     // Company info section
-    const companyName = answers.company_name || answers.company || 'Företagsnamn';
-    const industry = answers.industry || answers.bransch || 'Bransch';
+    const companyName = cleanTextForPDF(answers.company_name || answers.company || 'Företagsnamn');
+    const industry = cleanTextForPDF(answers.industry || answers.bransch || 'Bransch');
     
     coverPage.drawRectangle({
       x: 50,
@@ -1230,7 +1249,7 @@ export async function POST(request: Request) {
             color: index % 2 === 0 ? lightGray : white,
           });
 
-          tractionPage.drawText(`${index + 1}. ${milestone.milestone}`, {
+          tractionPage.drawText(`${index + 1}. ${cleanTextForPDF(milestone.milestone)}`, {
             x: 60,
             y: yPos - 15,
             size: 11,
@@ -1238,7 +1257,7 @@ export async function POST(request: Request) {
             color: primaryColor,
           });
 
-          tractionPage.drawText(milestone.date, {
+          tractionPage.drawText(cleanTextForPDF(milestone.date), {
             x: width - 150,
             y: yPos - 15,
             size: 11,
@@ -1606,7 +1625,7 @@ export async function POST(request: Request) {
         premiumAnalysis.swot.strengths.slice(0, 4).forEach((strength: string) => {
           strengthY = drawWrappedText(
             swotPage,
-            `• ${strength}`,
+            `• ${cleanTextForPDF(strength)}`,
             65,
             strengthY,
             boxWidth - 30,
@@ -1874,7 +1893,7 @@ export async function POST(request: Request) {
             });
             
             // Action title
-            recPage.drawText(rec.action, {
+            recPage.drawText(cleanTextForPDF(rec.action), {
               x: 70,
               y: yPos - 20,
               size: 12,
@@ -1933,7 +1952,7 @@ export async function POST(request: Request) {
               color: textColor,
             });
             
-            recPage.drawText(rec.impact, {
+            recPage.drawText(cleanTextForPDF(rec.impact || rec.expectedImpact || ''), {
               x: 170,
               y: detailY - 40,
               size: 9,
@@ -1949,7 +1968,7 @@ export async function POST(request: Request) {
               color: textColor,
             });
             
-            recPage.drawText(rec.timeline, {
+            recPage.drawText(cleanTextForPDF(rec.timeline), {
               x: 120,
               y: detailY - 55,
               size: 9,
