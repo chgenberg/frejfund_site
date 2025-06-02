@@ -571,14 +571,14 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
               <div className="flex justify-center gap-4 flex-wrap">
                 <button
                   onClick={() => setCurrentSection('insights')}
-                  className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+                  className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all flex items-center gap-2"
                 >
                   Se Detaljerad Analys →
                 </button>
                 {isPremium && (
                   <button
                     onClick={() => setCurrentSection('premium')}
-                    className="px-8 py-4 bg-gradient-to-r from-gold-500 to-yellow-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all animate-pulse"
+                    className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
                   >
                     🌟 Premium Analys →
                   </button>
@@ -713,8 +713,8 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                       </h3>
                       <ul className="space-y-3">
                         {typedAnswers.premiumAnalysis.swot.strengths.map((strength: string, i: number) => (
-                          <li key={i} className="text-gray-900 flex items-start gap-3 text-left">
-                            <span className="text-green-600 mt-1">•</span>
+                          <li key={i} className="text-white/90 flex items-start gap-3 text-left">
+                            <span className="text-green-400 mt-1">•</span>
                             <span className="flex-1">{strength}</span>
                           </li>
                         ))}
@@ -728,8 +728,8 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                       </h3>
                       <ul className="space-y-3">
                         {typedAnswers.premiumAnalysis.swot.weaknesses.map((weakness: string, i: number) => (
-                          <li key={i} className="text-gray-900 flex items-start gap-3 text-left">
-                            <span className="text-orange-600 mt-1">•</span>
+                          <li key={i} className="text-white/90 flex items-start gap-3 text-left">
+                            <span className="text-orange-400 mt-1">•</span>
                             <span className="flex-1">{weakness}</span>
                           </li>
                         ))}
@@ -743,8 +743,8 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                       </h3>
                       <ul className="space-y-3">
                         {typedAnswers.premiumAnalysis.swot.opportunities.map((opportunity: string, i: number) => (
-                          <li key={i} className="text-gray-900 flex items-start gap-3 text-left">
-                            <span className="text-blue-600 mt-1">•</span>
+                          <li key={i} className="text-white/90 flex items-start gap-3 text-left">
+                            <span className="text-blue-400 mt-1">•</span>
                             <span className="flex-1">{opportunity}</span>
                           </li>
                         ))}
@@ -758,8 +758,8 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                       </h3>
                       <ul className="space-y-3">
                         {typedAnswers.premiumAnalysis.swot.threats.map((threat: string, i: number) => (
-                          <li key={i} className="text-gray-900 flex items-start gap-3 text-left">
-                            <span className="text-yellow-600 mt-1">•</span>
+                          <li key={i} className="text-white/90 flex items-start gap-3 text-left">
+                            <span className="text-yellow-400 mt-1">•</span>
                             <span className="flex-1">{threat}</span>
                           </li>
                         ))}
@@ -782,10 +782,10 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                         if (key === 'metric') return null;
                         return (
                           <div key={key} className="grid grid-cols-4 gap-4 items-center p-3 bg-white/5 rounded-xl">
-                            <div className="text-gray-900 font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
-                            <div className="text-gray-800">Ert bolag: {data.us}</div>
-                            <div className="text-gray-700">Branschsnitt: {data.industry}</div>
-                            <div className={`font-bold ${data.verdict === 'Excellent' || data.verdict === 'Top quartile' || data.verdict === 'Best in class' ? 'text-green-600' : 'text-yellow-600'}`}>
+                            <div className="text-white font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                            <div className="text-white/80">Ert bolag: {data.us}</div>
+                            <div className="text-white/70">Branschsnitt: {data.industry}</div>
+                            <div className={`font-bold ${data.verdict === 'Excellent' || data.verdict === 'Top quartile' || data.verdict === 'Best in class' ? 'text-green-400' : 'text-yellow-400'}`}>
                               {data.verdict}
                             </div>
                           </div>
@@ -798,22 +798,22 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                   <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
                     <h3 className="text-xl font-bold text-white mb-4">Jämförelse med konkurrenter</h3>
                     <div className="overflow-x-auto">
-                      <table className="w-full text-gray-900">
+                      <table className="w-full text-white">
                         <thead>
-                          <tr className="border-b border-gray-300">
-                            <th className="text-left py-3">Företag</th>
-                            <th className="text-right py-3">Finansiering</th>
-                            <th className="text-right py-3">ARR</th>
-                            <th className="text-right py-3">Värdering</th>
+                          <tr className="border-b border-white/20">
+                            <th className="text-left py-3 text-white">Företag</th>
+                            <th className="text-right py-3 text-white">Finansiering</th>
+                            <th className="text-right py-3 text-white">ARR</th>
+                            <th className="text-right py-3 text-white">Värdering</th>
                           </tr>
                         </thead>
                         <tbody>
                           {typedAnswers.premiumAnalysis.benchmarkAnalysis.peerComparison.map((peer: any, i: number) => (
-                            <tr key={i} className="border-b border-gray-200">
-                              <td className="py-3">{peer.company}</td>
-                              <td className="text-right">{peer.funding}</td>
-                              <td className="text-right">{peer.revenue}</td>
-                              <td className="text-right">{peer.valuation}</td>
+                            <tr key={i} className="border-b border-white/10">
+                              <td className="py-3 text-white/90">{peer.company}</td>
+                              <td className="text-right text-white/80">{peer.funding}</td>
+                              <td className="text-right text-white/80">{peer.revenue}</td>
+                              <td className="text-right text-white/80">{peer.valuation}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -848,8 +848,8 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                     <div className="space-y-3">
                       {Object.entries(typedAnswers.premiumAnalysis.investmentProposal.useOfFunds).map(([key, value]: [string, any]) => (
                         <div key={key} className="flex justify-between items-center">
-                          <span className="text-gray-800 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                          <span className="text-gray-900 font-semibold">{value}</span>
+                          <span className="text-white/80 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                          <span className="text-white font-semibold">{value}</span>
                         </div>
                       ))}
                     </div>
@@ -861,8 +861,8 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {Object.entries(typedAnswers.premiumAnalysis.investmentProposal.keyMetrics).map(([key, value]: [string, any]) => (
                         <div key={key} className="bg-white/5 rounded-xl p-4">
-                          <p className="text-gray-700 text-sm capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
-                          <p className="text-gray-900 text-xl font-bold">{value}</p>
+                          <p className="text-white/70 text-sm capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                          <p className="text-white text-xl font-bold">{value}</p>
                         </div>
                       ))}
                     </div>
@@ -873,8 +873,8 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                     <h3 className="text-xl font-bold text-white mb-4">Fördelar för investerare</h3>
                     <ul className="space-y-2">
                       {typedAnswers.premiumAnalysis.investmentProposal.investorBenefits.map((benefit: string, i: number) => (
-                        <li key={i} className="text-gray-900 flex items-start gap-3">
-                          <span className="text-green-600 mt-1">✓</span>
+                        <li key={i} className="text-white/90 flex items-start gap-3">
+                          <span className="text-green-400 mt-1">✓</span>
                           <span>{benefit}</span>
                         </li>
                       ))}
@@ -894,13 +894,13 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                     <div className="space-y-4">
                       {typedAnswers.premiumAnalysis.detailedRecommendations.immediate.map((rec: any, i: number) => (
                         <div key={i} className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                          <h4 className="text-lg font-bold text-gray-900 mb-2">{rec.action}</h4>
-                          <div className="space-y-2 text-gray-800">
-                            <p><strong className="text-gray-900">Varför:</strong> {rec.why}</p>
-                            <p><strong className="text-gray-900">Hur:</strong> {rec.how}</p>
-                            <p><strong className="text-gray-900">Förväntad effekt:</strong> {rec.impact}</p>
-                            <p><strong className="text-gray-900">Resurser:</strong> {rec.resources}</p>
-                            <p><strong className="text-gray-900">Tidsram:</strong> {rec.timeline}</p>
+                          <h4 className="text-lg font-bold text-white mb-2">{rec.action}</h4>
+                          <div className="space-y-2 text-white/80">
+                            <p><strong className="text-white">Varför:</strong> {rec.why}</p>
+                            <p><strong className="text-white">Hur:</strong> {rec.how}</p>
+                            <p><strong className="text-white">Förväntad effekt:</strong> {rec.impact}</p>
+                            <p><strong className="text-white">Resurser:</strong> {rec.resources}</p>
+                            <p><strong className="text-white">Tidsram:</strong> {rec.timeline}</p>
                           </div>
                         </div>
                       ))}
@@ -913,13 +913,13 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                     <div className="space-y-4">
                       {typedAnswers.premiumAnalysis.detailedRecommendations.shortTerm.map((rec: any, i: number) => (
                         <div key={i} className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                          <h4 className="text-lg font-bold text-gray-900 mb-2">{rec.action}</h4>
-                          <div className="space-y-2 text-gray-800">
-                            <p><strong className="text-gray-900">Varför:</strong> {rec.why}</p>
-                            <p><strong className="text-gray-900">Hur:</strong> {rec.how}</p>
-                            <p><strong className="text-gray-900">Förväntad effekt:</strong> {rec.impact}</p>
-                            <p><strong className="text-gray-900">Resurser:</strong> {rec.resources}</p>
-                            <p><strong className="text-gray-900">Tidsram:</strong> {rec.timeline}</p>
+                          <h4 className="text-lg font-bold text-white mb-2">{rec.action}</h4>
+                          <div className="space-y-2 text-white/80">
+                            <p><strong className="text-white">Varför:</strong> {rec.why}</p>
+                            <p><strong className="text-white">Hur:</strong> {rec.how}</p>
+                            <p><strong className="text-white">Förväntad effekt:</strong> {rec.impact}</p>
+                            <p><strong className="text-white">Resurser:</strong> {rec.resources}</p>
+                            <p><strong className="text-white">Tidsram:</strong> {rec.timeline}</p>
                           </div>
                         </div>
                       ))}

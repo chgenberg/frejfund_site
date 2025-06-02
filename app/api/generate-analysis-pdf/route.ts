@@ -314,10 +314,10 @@ export async function POST(request: Request) {
     yPos -= 30;
 
     const strengths = [
-      answers.customer_problem ? '✓ Tydlig problemidentifiering' : null,
-      answers.solution ? '✓ Väldefinierad lösning' : null,
-      answers.team ? '✓ Erfaret team' : null,
-      answers.market_size ? '✓ Stor marknadspotential' : null,
+      answers.customer_problem ? '[v] Tydlig problemidentifiering' : null,
+      answers.solution ? '[v] Väldefinierad lösning' : null,
+      answers.team ? '[v] Erfaret team' : null,
+      answers.market_size ? '[v] Stor marknadspotential' : null,
     ].filter(Boolean);
 
     strengths.forEach(strength => {
@@ -346,9 +346,9 @@ export async function POST(request: Request) {
     yPos -= 30;
 
     const improvements = [
-      !answers.traction ? '• Bevisa traction med första kunderna' : null,
-      !answers.unit_economics ? '• Dokumentera enhetsekonomi' : null,
-      score < 70 ? '• Stärka investeringspropositionen' : null,
+      !answers.traction ? '- Bevisa traction med första kunderna' : null,
+      !answers.unit_economics ? '- Dokumentera enhetsekonomi' : null,
+      score < 70 ? '- Stärka investeringspropositionen' : null,
     ].filter(Boolean);
 
     improvements.forEach(improvement => {
