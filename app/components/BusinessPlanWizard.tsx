@@ -869,47 +869,61 @@ function useOnClickOutside(ref: any, handler: () => void) {
   }, [ref, handler]);
 }
 
+function CharacterCounter({ current, max }: { current: number; max: number }) {
+  const percentage = Math.min((current / max) * 100, 100);
+  const isComplete = current >= max;
+  
+  return (
+    <div className="mt-2 flex items-center justify-between text-xs">
+      <div className="flex items-center gap-2">
+        <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
+          <div 
+            className={`h-full rounded-full transition-all duration-300 ${
+              isComplete ? 'bg-green-500' : 'bg-purple-500'
+            }`}
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+        <span className={`font-medium ${isComplete ? 'text-green-400' : 'text-white/60'}`}>
+          {current}/{max}
+        </span>
+      </div>
+      {isComplete && (
+        <span className="text-green-400">✓</span>
+      )}
+    </div>
+  );
+}
+
 export default function BusinessPlanWizard({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [answers, setAnswers] = React.useState<{ [key: string]: string }>({});
   const [step, setStep] = React.useState(1);
   const [preStep, setPreStep] = React.useState(true);
   const [preStepPage, setPreStepPage] = React.useState(1);
-  const [result, setResult] = React.useState<any>(null);
-  // Pre-step state
   const [company, setCompany] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [bransch, setBransch] = React.useState('');
   const [omrade, setOmrade] = React.useState('');
   const [privacyChecked, setPrivacyChecked] = React.useState(false);
-  const [hasWebsite, setHasWebsite] = React.useState<null | boolean>(null);
+  const [hasWebsite, setHasWebsite] = React.useState<boolean | null>(null);
   const [websiteUrl, setWebsiteUrl] = React.useState('');
-  const [isScraping, setIsScraping] = React.useState(false);
-  const [scrapeError, setScrapeError] = React.useState<string | null>(null);
-  const [scrapedData, setScrapedData] = React.useState<any>(null);
+  const [showFinalLoader, setShowFinalLoader] = React.useState(false);
+  const [finalLoaderText, setFinalLoaderText] = React.useState('Analyserar dina svar...');
   const [showExample, setShowExample] = React.useState<string | null>(null);
   const [exampleText, setExampleText] = React.useState<string>('');
   const [isLoadingExample, setIsLoadingExample] = React.useState(false);
   const [exampleError, setExampleError] = React.useState<string | null>(null);
-  const exampleRef = useRef<HTMLDivElement>(null);
-  const [fileLoading, setFileLoading] = React.useState(false);
-  const [fileError, setFileError] = React.useState<string | null>(null);
-  const [investorConsent, setInvestorConsent] = React.useState<null | boolean>(null);
-  const [submissionSaved, setSubmissionSaved] = React.useState(false);
-  const [submissionError, setSubmissionError] = React.useState<string | null>(null);
+  const [result, setResult] = React.useState<any>(null);
   const [showMarketPopup, setShowMarketPopup] = React.useState(false);
-  const [marketLoading, setMarketLoading] = React.useState(false);
-  const [marketResult, setMarketResult] = React.useState('');
-  const [marketError, setMarketError] = React.useState<string | null>(null);
+  const [showCompetitorPopup, setShowCompetitorPopup] = React.useState(false);
+  const [isScraping, setIsScraping] = React.useState(false);
+  const [scrapeError, setScrapeError] = React.useState<string | null>(null);
+  const [scrapedData, setScrapedData] = React.useState<any>(null);
+  
+  const exampleRef = useRef<HTMLDivElement>(null);
   const marketRef = useRef<HTMLDivElement>(null);
   const competitorRef = useRef<HTMLDivElement>(null);
-  const [marketBransch, setMarketBransch] = React.useState('');
-  const [competitorBransch, setCompetitorBransch] = React.useState('');
-  const [showCompetitorPopup, setShowCompetitorPopup] = React.useState(false);
-  const [competitorLoading, setCompetitorLoading] = React.useState(false);
-  const [competitorResult, setCompetitorResult] = React.useState('');
-  const [competitorError, setCompetitorError] = React.useState<string | null>(null);
-  const [showFinalLoader, setShowFinalLoader] = React.useState(false);
-  const [finalLoaderText, setFinalLoaderText] = React.useState('Analyserar dina svar...');
+  
   const finalLoaderMessages = [
     'Analyserar dina svar...',
     'Ger praktiska råd kring investeringstips...',
@@ -927,6 +941,55 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     (hasWebsite === false || (hasWebsite === true && websiteUrl.trim().length > 3));
 
   const isPreStep2Valid = bransch && omrade;
+
+  const isCurrentStepValid = () => {
+    if (!current) return false;
+    
+    const answer = answers[current.id];
+    
+    if (current.required && !answer) return false;
+    
+    if (current.type === 'textarea' && current.required) {
+      return answer && answer.trim().length >= 15;
+    }
+    
+    if (current.type === 'text' && current.required) {
+      return answer && answer.trim().length >= 15;
+    }
+    
+    if (current.type === 'number' && current.required) {
+      return answer !== undefined && answer !== '';
+    }
+    
+    if (current.type === 'milestone_list' && current.required) {
+      try {
+        const milestones = JSON.parse(answer as string);
+        return milestones && milestones.length > 0;
+      } catch {
+        return false;
+      }
+    }
+    
+    if (current.type === 'capital_matrix' && current.required) {
+      try {
+        const capital = JSON.parse(answer as string);
+        return capital && capital.amount && capital.product && capital.sales && capital.team && capital.other;
+      } catch {
+        return false;
+      }
+    }
+    
+    if (current.type === 'founder_market_fit' && current.required) {
+      try {
+        const fit = JSON.parse(answer as string);
+        return fit && fit.score && fit.text;
+      } catch {
+        return false;
+      }
+    }
+    
+    return true;
+  };
 
   // Funktioner för att mappa skrapad data till formulärfält
   const mapScrapedDataToAnswers = (scrapedData: any) => {
@@ -1620,7 +1683,10 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 rows={6}
                 style={{ minHeight: '150px', maxHeight: '250px', resize: 'vertical' }}
               />
-              {/* Move the AI-fyllt badge below the textarea */}
+              <CharacterCounter 
+                current={getStringValue(answers[current.id]).length} 
+                max={15} 
+              />
               {scrapedData && answers[current.id] && (
                 <div className="mt-2 flex items-center">
                   <span className="text-green-400 text-xs">🤖 AI-fyllt</span>
@@ -1631,15 +1697,21 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
           
           {/* Text input questions */}
           {isTextQuestion(current) && current.type === "text" && (
-            <input
-              type="text"
-              className={`${inputBase} ${
-                scrapedData && answers[current.id] ? 'border-green-500/50 bg-green-500/10' : ''
-              }`}
-              value={getStringValue(answers[current.id])}
-              onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
-              placeholder={scrapedData && answers[current.id] ? "Automatiskt ifyllt" : "Skriv ditt svar..."}
-            />
+            <div className="relative">
+              <input
+                type="text"
+                className={`${inputBase} ${
+                  scrapedData && answers[current.id] ? 'border-green-500/50 bg-green-500/10' : ''
+                }`}
+                value={getStringValue(answers[current.id])}
+                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+                placeholder={scrapedData && answers[current.id] ? "Automatiskt ifyllt" : "Skriv ditt svar..."}
+              />
+              <CharacterCounter 
+                current={getStringValue(answers[current.id]).length} 
+                max={15} 
+              />
+            </div>
           )}
           
           {/* Number input questions */}
@@ -1753,85 +1825,39 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         </div>
         
         {/* Navigation buttons */}
-        <div className="flex justify-between items-center mt-auto">
+        <div className="flex justify-between mt-8">
           <button
-            type="button"
-            className="px-6 py-3 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-all border border-white/20 disabled:opacity-50"
             onClick={() => setStep(step - 1)}
+            className={`px-6 py-3 rounded-full ${
+              step === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-white/10 hover:bg-white/20'
+            } text-white transition-all`}
             disabled={step === 1}
           >
             ← Tillbaka
           </button>
           
           <button
-            type="button"
-            className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105 disabled:opacity-50"
-            onClick={async () => {
-              if (step < INVESTOR_QUESTIONS.length) {
-                setStep(step + 1);
+            onClick={() => {
+              if (step === INVESTOR_QUESTIONS.length) {
+                handleSubmit();
               } else {
-                // Submit and show loading
-                setShowFinalLoader(true);
-                let messageIndex = 0;
-                const messageInterval = setInterval(() => {
-                  messageIndex = (messageIndex + 1) % finalLoaderMessages.length;
-                  setFinalLoaderText(finalLoaderMessages[messageIndex]);
-                }, 2000);
-                
-                try {
-                  const response = await fetch('/api/analyze-businessplan', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      ...answers,
-                      company_name: company,
-                      email: email,
-                      bransch: bransch,
-                      omrade: omrade,
-                      has_website: hasWebsite,
-                      website_url: websiteUrl
-                    })
-                  });
-                  
-                  const data = await response.json();
-                  clearInterval(messageInterval);
-                  setShowFinalLoader(false);
-                  
-                  // Spara submission till Render's persistenta disk
-                  try {
-                    await fetch('/api/save-submission', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        timestamp: new Date().toISOString(),
-                        company_name: company,
-                        email: email,
-                        bransch: bransch,
-                        omrade: omrade,
-                        has_website: hasWebsite,
-                        website_url: websiteUrl,
-                        answers: answers,
-                        result: data
-                      })
-                    });
-                    console.log('Submission saved successfully');
-                  } catch (saveError) {
-                    console.error('Could not save submission:', saveError);
-                  }
-                  
-                  setResult(data);
-                } catch (error) {
-                  clearInterval(messageInterval);
-                  setShowFinalLoader(false);
-                  console.error('Error submitting:', error);
-                }
+                setStep(step + 1);
               }
             }}
-            disabled={current.required && !answers[current.id]}
+            className={`px-6 py-3 rounded-full ${
+              !isCurrentStepValid() ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:shadow-lg hover:scale-105'
+            } text-white transition-all`}
+            disabled={!isCurrentStepValid()}
           >
-            {step === INVESTOR_QUESTIONS.length ? 'Slutför analys →' : 'Nästa →'}
+            {step === INVESTOR_QUESTIONS.length ? 'Slutför' : 'Nästa →'}
           </button>
         </div>
+        
+        {!isCurrentStepValid() && current.required && (
+          <div className="mt-4 text-red-400 text-sm text-center">
+            Vänligen besvara frågan innan du går vidare
+          </div>
+        )}
       </div>
       
       {/* Example popup */}
@@ -1889,3 +1915,60 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     </div>
   );
 } 
+
+const handleSubmit = async () => {
+  setShowFinalLoader(true);
+  let messageIndex = 0;
+  const messageInterval = setInterval(() => {
+    messageIndex = (messageIndex + 1) % finalLoaderMessages.length;
+    setFinalLoaderText(finalLoaderMessages[messageIndex]);
+  }, 2000);
+  
+  try {
+    const response = await fetch('/api/analyze-businessplan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...answers,
+        company_name: company,
+        email: email,
+        bransch: bransch,
+        omrade: omrade,
+        has_website: hasWebsite,
+        website_url: websiteUrl
+      })
+    });
+    
+    const data = await response.json();
+    clearInterval(messageInterval);
+    setShowFinalLoader(false);
+    
+    // Spara submission till Render's persistenta disk
+    try {
+      await fetch('/api/save-submission', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timestamp: new Date().toISOString(),
+          company_name: company,
+          email: email,
+          bransch: bransch,
+          omrade: omrade,
+          has_website: hasWebsite,
+          website_url: websiteUrl,
+          answers: answers,
+          result: data
+        })
+      });
+      console.log('Submission saved successfully');
+    } catch (saveError) {
+      console.error('Could not save submission:', saveError);
+    }
+    
+    setResult(data);
+  } catch (error) {
+    clearInterval(messageInterval);
+    setShowFinalLoader(false);
+    console.error('Error submitting:', error);
+  }
+};

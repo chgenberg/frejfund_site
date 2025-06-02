@@ -486,360 +486,69 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center px-4 py-20 bg-[#04111d]">
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 20% 50%, rgba(120, 237, 255, 0.2) 0%, transparent 50%),
-                           radial-gradient(circle at 80% 80%, rgba(120, 237, 255, 0.15) 0%, transparent 50%),
-                           radial-gradient(circle at 40% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%)`
-        }}></div>
-      </div>
+    <div className="min-h-screen bg-[#04111d] flex items-center justify-center p-4" style={{
+      backgroundImage: 'url(/bakgrund.png)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    }}>
+      <div className="max-w-4xl w-full">
+        <div className={`bg-white/5 backdrop-blur-xl rounded-3xl p-12 text-center border border-white/10 ${scoreInfo.glow} transition-all duration-1000`}>
+          {/* Score Circle */}
+          <div className="w-64 h-64 mx-auto mb-8 relative">
+            <CircularProgressbar
+              value={animatedScore}
+              text={`${animatedScore}`}
+              styles={buildStyles({
+                pathColor: scoreInfo.color,
+                textColor: '#ffffff',
+                trailColor: 'rgba(255,255,255,0.1)',
+                textSize: '28px',
+                pathTransitionDuration: 1.5,
+              })}
+            />
+          </div>
 
-      {/* Main Container with glass effect */}
-      <div className="w-full max-w-6xl relative z-10">
-        
-        {/* Score Section */}
-        {currentSection === 'score' && (
-          <div className="animate-fadeIn">
-            <div className={`bg-white/5 backdrop-blur-xl rounded-3xl p-12 text-center border border-white/10 ${scoreInfo.glow} transition-all duration-1000`}>
-              {/* Score Circle */}
-              <div className="w-64 h-64 mx-auto mb-8 relative">
-                <CircularProgressbar
-                  value={animatedScore}
-                  text={`${animatedScore}`}
-                  styles={buildStyles({
-                    pathColor: scoreInfo.color,
-                    textColor: '#ffffff',
-                    trailColor: 'rgba(255,255,255,0.1)',
-                    textSize: '28px',
-                    pathTransitionDuration: 1.5,
-                  })}
-                />
-              </div>
+          {/* Score Label */}
+          <h1 className="text-5xl font-bold text-white mb-4">{scoreInfo.label}</h1>
+          <p className="text-xl text-white/70 mb-12">{scoreInfo.description}</p>
 
-              {/* Score Label */}
-              <h1 className="text-5xl font-bold text-white mb-4">{scoreInfo.label}</h1>
-              <p className="text-xl text-white/70 mb-12">{scoreInfo.description}</p>
-
-              {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-6 mb-12">
-                <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                  <div className="text-3xl font-bold text-white">{insights.filter(i => i.strength === 'high').length}</div>
-                  <div className="text-white/60">Starka områden</div>
-                </div>
-                <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                  <div className="text-3xl font-bold text-white">{Object.keys(answers).length}</div>
-                  <div className="text-white/60">Analyserade fält</div>
-                </div>
-                <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                  <div className="text-3xl font-bold text-white">{actionItems.filter(a => a.priority === 'high').length}</div>
-                  <div className="text-white/60">Kritiska åtgärder</div>
-                </div>
-              </div>
-
-              {/* Navigation */}
-              <div className="flex justify-center gap-4 flex-wrap">
-                <button
-                  onClick={() => setCurrentSection('insights')}
-                  className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
-                >
-                  Se Detaljerad Analys →
-                </button>
-                <button
-                  onClick={() => setCurrentSection('actions')}
-                  className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all"
-                >
-                  Nästa Steg
-                </button>
-                <button
-                  onClick={handleDownloadPDF}
-                  className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Ladda ner PDF
-                </button>
-              </div>
+          {/* Quick Stats */}
+          <div className="grid grid-cols-3 gap-6 mb-12">
+            <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+              <div className="text-3xl font-bold text-white">{insights.filter(i => i.strength === 'high').length}</div>
+              <div className="text-white/60">Starka områden</div>
+            </div>
+            <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+              <div className="text-3xl font-bold text-white">{Object.keys(answers).length}</div>
+              <div className="text-white/60">Analyserade fält</div>
+            </div>
+            <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+              <div className="text-3xl font-bold text-white">{actionItems.filter(a => a.priority === 'high').length}</div>
+              <div className="text-white/60">Kritiska åtgärder</div>
             </div>
           </div>
-        )}
 
-        {/* Insights Section */}
-        {currentSection === 'insights' && (
-          <div className="animate-fadeIn">
-            {/* Back button */}
-            <button
-              onClick={() => setCurrentSection('score')}
-              className="mb-6 text-white/60 hover:text-white flex items-center gap-2 transition-colors"
-            >
-              ← Tillbaka till översikt
-            </button>
-
-            <h2 className="text-4xl font-bold text-white mb-8">Detaljerad Analys</h2>
-            
-            <div className="space-y-4">
-              {insights.map((insight) => (
-                <div
-                  key={insight.id}
-                  className={`bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden transition-all duration-300 hover:bg-white/10 ${
-                    expandedInsight === insight.id ? 'ring-2 ring-white/30' : ''
-                  }`}
-                >
-                  <button
-                    onClick={() => setExpandedInsight(expandedInsight === insight.id ? null : insight.id)}
-                    className="w-full p-6 flex items-center justify-between text-left"
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="text-3xl">{insight.icon}</span>
-                      <div>
-                        <h3 className="text-xl font-semibold text-white">{insight.title}</h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          <div className={`w-2 h-2 rounded-full ${
-                            insight.strength === 'high' ? 'bg-green-400' : 
-                            insight.strength === 'medium' ? 'bg-yellow-400' : 'bg-red-400'
-                          }`} />
-                          <span className="text-sm text-white/60">
-                            {insight.strength === 'high' ? 'Starkt område' : 
-                             insight.strength === 'medium' ? 'Kan förbättras' : 'Behöver utveckling'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <svg
-                      className={`w-6 h-6 text-white/60 transition-transform ${
-                        expandedInsight === insight.id ? 'rotate-180' : ''
-                      }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  
-                  {expandedInsight === insight.id && (
-                    <div className="px-6 pb-6">
-                      {insight.content}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Action button */}
-            <div className="mt-8 text-center">
-              <button
-                onClick={() => setCurrentSection('actions')}
-                className="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
-              >
-                Se Rekommenderade Åtgärder →
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Actions Section */}
-        {currentSection === 'actions' && (
-          <div className="animate-fadeIn">
-            {/* Back button */}
+          {/* Navigation */}
+          <div className="flex justify-center gap-4">
             <button
               onClick={() => setCurrentSection('insights')}
-              className="mb-6 text-white/60 hover:text-white flex items-center gap-2 transition-colors"
+              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
             >
-              ← Tillbaka till analys
+              Se Detaljerad Analys →
             </button>
-
-            <h2 className="text-4xl font-bold text-white mb-8">Rekommenderade Nästa Steg</h2>
-            
-            <div className="grid gap-4">
-              {actionItems.map((action, index) => (
-                <div
-                  key={index}
-                  className={`bg-white/5 backdrop-blur-xl rounded-2xl p-6 border ${
-                    action.priority === 'high' 
-                      ? 'border-red-500/30 bg-gradient-to-r from-red-500/10 to-transparent' 
-                      : 'border-white/10'
-                  } hover:bg-white/10 transition-all`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          action.priority === 'high' 
-                            ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
-                            : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
-                        }`}>
-                          {action.priority === 'high' ? 'Hög prioritet' : 'Medium prioritet'}
-                        </span>
-                        <span className="text-white/60 text-sm">{action.timeframe}</span>
-                      </div>
-                      <h3 className="text-xl font-semibold text-white mb-2">{action.title}</h3>
-                      <p className="text-white/70 mb-3">{action.description}</p>
-                      <p className="text-sm text-green-400">✨ {action.impact}</p>
-                    </div>
-                    <div className="ml-4">
-                      <button 
-                        onClick={() => setShowActionModal(action)}
-                        className="p-3 bg-white/10 rounded-full hover:bg-white/20 transition-all group"
-                      >
-                        <svg className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Premium CTA */}
-            <div className="mt-12 bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-3xl p-8 border border-purple-500/30 text-center">
-              <h3 className="text-2xl font-bold text-white mb-4">🚀 Vill du ha en djupare analys?</h3>
-              <p className="text-white/70 mb-6">
-                Få en komplett AI-driven affärsanalys med branschspecifika insikter, 
-                jämförelser med framgångsrika startups och en professionell PDF-rapport.
-              </p>
-              
-              {/* Premium features grid */}
-              <div className="grid md:grid-cols-3 gap-4 mb-8">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <div className="text-2xl mb-2">📄</div>
-                  <h4 className="font-semibold text-white mb-1">PDF-rapport</h4>
-                  <p className="text-white/60 text-sm">Professionell rapport att dela med investerare</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <div className="text-2xl mb-2">📊</div>
-                  <h4 className="font-semibold text-white mb-1">50+ sidor analys</h4>
-                  <p className="text-white/60 text-sm">Djupgående insikter för varje område</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <div className="text-2xl mb-2">💬</div>
-                  <h4 className="font-semibold text-white mb-1">Expertsamtal</h4>
-                  <p className="text-white/60 text-sm">30 min strategisession ingår</p>
-                </div>
-              </div>
-              
-              <a href="/kassa?product=premium-analysis" className="inline-block px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all">
-                Uppgradera för 197 kr
-              </a>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Action Details Modal */}
-      {showActionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-gradient-to-br from-[#0a1628] to-[#04111d] rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden relative animate-fadeIn border border-white/10 flex flex-col">
-            <div className="p-8 pb-0">
-              <button
-                onClick={() => setShowActionModal(null)}
-                className="absolute top-4 right-4 text-white/40 hover:text-white text-2xl transition-colors"
-              >
-                ×
-              </button>
-              
-              <div className="mb-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                    <span className="text-2xl">🎯</span>
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white">{showActionModal.title}</h3>
-                    <p className="text-white/60">{showActionModal.timeframe}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="overflow-y-auto flex-1 px-8 pb-8">
-              <div className="space-y-6">
-                {/* Detaljerad beskrivning */}
-                <div className="bg-white/5 rounded-xl p-6">
-                  <h4 className="text-lg font-semibold text-white mb-3">Vad behöver göras?</h4>
-                  <p className="text-white/70 mb-4">{showActionModal.description}</p>
-                  <div className="space-y-2">
-                    <p className="text-white/60 text-sm">• Identifiera 20 potentiella early adopters</p>
-                    <p className="text-white/60 text-sm">• Erbjud 50% rabatt första 3 månaderna</p>
-                    <p className="text-white/60 text-sm">• Sätt upp strukturerad feedback-process</p>
-                    <p className="text-white/60 text-sm">• Dokumentera alla insikter och case studies</p>
-                  </div>
-                </div>
-
-                {/* Förväntade resultat */}
-                <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl p-6 border border-green-500/30">
-                  <h4 className="text-lg font-semibold text-white mb-3">Förväntade resultat</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <div className="text-2xl font-bold text-green-400">3-5x</div>
-                      <div className="text-white/60 text-sm">Ökad konvertering</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-green-400">+15p</div>
-                      <div className="text-white/60 text-sm">Högre investerarscore</div>
-                    </div>
-                  </div>
-                  <p className="text-white/70 text-sm mt-4">{showActionModal.impact}</p>
-                </div>
-
-                {/* Exempel från andra startups */}
-                <div className="bg-white/5 rounded-xl p-6">
-                  <h4 className="text-lg font-semibold text-white mb-3">Exempel från framgångsrika startups</h4>
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <span className="text-xl">🦄</span>
-                      <div>
-                        <p className="text-white font-medium">Klarna</p>
-                        <p className="text-white/60 text-sm">Började med 10 pilotbutiker, idag värt 6.7 miljarder USD</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="text-xl">🎵</span>
-                      <div>
-                        <p className="text-white font-medium">Spotify</p>
-                        <p className="text-white/60 text-sm">Första 1000 användare gav kritisk feedback för produktutveckling</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Call to action */}
-                <div className="flex gap-4 pt-4">
-                  <button
-                    onClick={() => setShowActionModal(null)}
-                    className="flex-1 px-6 py-3 bg-white/10 rounded-full text-white font-medium hover:bg-white/20 transition-all"
-                  >
-                    Stäng
-                  </button>
-                  <button className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-white font-medium hover:shadow-lg hover:scale-105 transition-all">
-                    Lägg till i min plan
-                  </button>
-                </div>
-              </div>
-            </div>
+            <button
+              onClick={handleDownloadPDF}
+              className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Ladda ner PDF
+            </button>
           </div>
         </div>
-      )}
-
-      {/* CSS for animations */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.6s ease-out;
-        }
-      `}</style>
+      </div>
     </div>
   );
 } 
