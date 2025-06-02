@@ -52,149 +52,150 @@ export const premiumTestData = {
       us: { price: 3, speed: 5, quality: 5, network: 3 },
       traditional: { price: 1, speed: 1, quality: 4, network: 5 },
       platforms: { price: 5, speed: 4, quality: 2, network: 2 }
-    })
-  },
-  // Premium analys-sektioner
-  premiumAnalysis: {
-    swot: {
-      strengths: [
-        "Stark teknisk plattform med skalbar arkitektur",
-        "Erfaret team med branschkunskap",
-        "Bevisad produktmarknadsanpassning",
-        "Höga bruttomarginaler (85%)",
-        "Starka partnerskap med acceleratorer"
-      ],
-      weaknesses: [
-        "Begränsad geografisk närvaro (endast Sverige)",
-        "Beroende av få stora kunder",
-        "Relativt litet team för snabb expansion",
-        "Begränsad marknadsföringsbudget"
-      ],
-      opportunities: [
-        "Expansion till Norden och Europa",
-        "AI-driven pitch-coaching som tillägstjänst",
-        "Strategiska partnerskap med banker",
-        "M&A-rådgivning som ny vertikal",
-        "White-label lösning för större aktörer"
-      ],
-      threats: [
-        "Ekonomisk nedgång påverkar investeringsviljan",
-        "Större tech-bolag kan komma in i marknaden",
-        "Regulatoriska förändringar",
-        "Beroende av AI-teknologi som utvecklas snabbt"
-      ]
-    },
-    detailedRecommendations: {
-      immediate: [
-        {
-          action: "Säkra 5 ankarkunder inom Q1",
-          why: "Skapar trovärdighet och case studies för försäljning",
-          how: "Erbjud 50% rabatt mot testimonials och data",
-          impact: "Ökar konvertering med 30%",
-          resources: "Säljteam + VD",
-          timeline: "4 veckor"
-        },
-        {
-          action: "Implementera automatisk onboarding",
-          why: "Minskar CAC och förbättrar skalbarhet",
-          how: "Bygga self-service flow med AI-guidning",
-          impact: "Reducerar onboarding-tid från 2h till 15min",
-          resources: "Tech-team",
-          timeline: "6 veckor"
-        }
-      ],
-      shortTerm: [
-        {
-          action: "Lansera i Danmark och Norge",
-          why: "Liknande marknad, låg entry barrier",
-          how: "Lokala partnerskap och översättning",
-          impact: "3x addressable market",
-          resources: "200k SEK + 1 FTE",
-          timeline: "Q3 2024"
-        },
-        {
-          action: "Bygga ut AI-coaching modul",
-          why: "Ökar LTV med 50%",
-          how: "Utveckla MVP baserat på befintlig data",
-          impact: "Extra 10k SEK per kund",
-          resources: "Tech-team + extern AI-konsult",
-          timeline: "Q4 2024"
-        }
-      ],
-      longTerm: [
-        {
-          action: "Europeisk expansion",
-          why: "10x större marknad",
-          how: "Serie B funding + lokala team",
-          impact: "500 MSEK ARR potential",
-          resources: "50 MSEK funding",
-          timeline: "2025-2026"
-        }
-      ]
-    },
-    investmentProposal: {
-      askAmount: "15 MSEK",
-      valuation: "60 MSEK pre-money",
-      useOfFunds: {
-        productDevelopment: "40% - AI-förbättringar, nya features",
-        salesMarketing: "35% - Bygga säljteam, marknadsföring",
-        teamExpansion: "20% - Nyckelrekryteringar",
-        other: "5% - Legal, compliance, overhead"
+    }),
+    paymentSuccess: true,
+    // Premium analys-sektioner flyttas till answers
+    premiumAnalysis: {
+      swot: {
+        strengths: [
+          "Stark teknisk plattform med skalbar arkitektur",
+          "Erfaret team med branschkunskap",
+          "Bevisad produktmarknadsanpassning",
+          "Höga bruttomarginaler (85%)",
+          "Starka partnerskap med acceleratorer"
+        ],
+        weaknesses: [
+          "Begränsad geografisk närvaro (endast Sverige)",
+          "Beroende av få stora kunder",
+          "Relativt litet team för snabb expansion",
+          "Begränsad marknadsföringsbudget"
+        ],
+        opportunities: [
+          "Expansion till Norden och Europa",
+          "AI-driven pitch-coaching som tillägstjänst",
+          "Strategiska partnerskap med banker",
+          "M&A-rådgivning som ny vertikal",
+          "White-label lösning för större aktörer"
+        ],
+        threats: [
+          "Ekonomisk nedgång påverkar investeringsviljan",
+          "Större tech-bolag kan komma in i marknaden",
+          "Regulatoriska förändringar",
+          "Beroende av AI-teknologi som utvecklas snabbt"
+        ]
       },
-      keyMetrics: {
-        currentMRR: "400k SEK",
-        targetMRR12Months: "2M SEK",
-        currentCustomers: 50,
-        targetCustomers12Months: 200,
-        burnRate: "800k SEK/månad",
-        monthsRunway: 18
+      detailedRecommendations: {
+        immediate: [
+          {
+            action: "Säkra 5 ankarkunder inom Q1",
+            why: "Skapar trovärdighet och case studies för försäljning",
+            how: "Erbjud 50% rabatt mot testimonials och data",
+            impact: "Ökar konvertering med 30%",
+            resources: "Säljteam + VD",
+            timeline: "4 veckor"
+          },
+          {
+            action: "Implementera automatisk onboarding",
+            why: "Minskar CAC och förbättrar skalbarhet",
+            how: "Bygga self-service flow med AI-guidning",
+            impact: "Reducerar onboarding-tid från 2h till 15min",
+            resources: "Tech-team",
+            timeline: "6 veckor"
+          }
+        ],
+        shortTerm: [
+          {
+            action: "Lansera i Danmark och Norge",
+            why: "Liknande marknad, låg entry barrier",
+            how: "Lokala partnerskap och översättning",
+            impact: "3x addressable market",
+            resources: "200k SEK + 1 FTE",
+            timeline: "Q3 2024"
+          },
+          {
+            action: "Bygga ut AI-coaching modul",
+            why: "Ökar LTV med 50%",
+            how: "Utveckla MVP baserat på befintlig data",
+            impact: "Extra 10k SEK per kund",
+            resources: "Tech-team + extern AI-konsult",
+            timeline: "Q4 2024"
+          }
+        ],
+        longTerm: [
+          {
+            action: "Europeisk expansion",
+            why: "10x större marknad",
+            how: "Serie B funding + lokala team",
+            impact: "500 MSEK ARR potential",
+            resources: "50 MSEK funding",
+            timeline: "2025-2026"
+          }
+        ]
       },
-      investorBenefits: [
-        "Tidigt in i växande marknad",
-        "Skalbar SaaS-modell med höga marginaler",
-        "Erfaret team med tidigare exits",
-        "Tydlig exit-strategi",
-        "Möjlighet till follow-on investeringar"
-      ]
-    },
-    benchmarkAnalysis: {
-      industryComparison: {
-        metric: "vs Industry Average",
-        grossMargin: { us: "85%", industry: "70%", verdict: "Excellent" },
-        cacPayback: { us: "6 months", industry: "14 months", verdict: "Top quartile" },
-        growthRate: { us: "20% MoM", industry: "7% MoM", verdict: "Hypergrowth" },
-        churnRate: { us: "5% annual", industry: "15% annual", verdict: "Best in class" }
+      investmentProposal: {
+        askAmount: "15 MSEK",
+        valuation: "60 MSEK pre-money",
+        useOfFunds: {
+          productDevelopment: "40% - AI-förbättringar, nya features",
+          salesMarketing: "35% - Bygga säljteam, marknadsföring",
+          teamExpansion: "20% - Nyckelrekryteringar",
+          other: "5% - Legal, compliance, overhead"
+        },
+        keyMetrics: {
+          currentMRR: "400k SEK",
+          targetMRR12Months: "2M SEK",
+          currentCustomers: 50,
+          targetCustomers12Months: 200,
+          burnRate: "800k SEK/månad",
+          monthsRunway: 18
+        },
+        investorBenefits: [
+          "Tidigt in i växande marknad",
+          "Skalbar SaaS-modell med höga marginaler",
+          "Erfaret team med tidigare exits",
+          "Tydlig exit-strategi",
+          "Möjlighet till follow-on investeringar"
+        ]
       },
-      peerComparison: [
-        { company: "Similar US startup", funding: "$5M", revenue: "$2M ARR", valuation: "$25M" },
-        { company: "UK competitor", funding: "£3M", revenue: "£1M ARR", valuation: "£15M" },
-        { company: "German player", funding: "€4M", revenue: "€1.5M ARR", valuation: "€20M" }
-      ]
-    },
-    riskMitigation: {
-      identifiedRisks: [
-        {
-          risk: "Teknisk skalbarhet",
-          probability: "Medium",
-          impact: "High",
-          mitigation: "Microservices arkitektur, AWS auto-scaling",
-          status: "In progress"
+      benchmarkAnalysis: {
+        industryComparison: {
+          metric: "vs Industry Average",
+          grossMargin: { us: "85%", industry: "70%", verdict: "Excellent" },
+          cacPayback: { us: "6 months", industry: "14 months", verdict: "Top quartile" },
+          growthRate: { us: "20% MoM", industry: "7% MoM", verdict: "Hypergrowth" },
+          churnRate: { us: "5% annual", industry: "15% annual", verdict: "Best in class" }
         },
-        {
-          risk: "Kundkoncentration",
-          probability: "High",
-          impact: "Medium",
-          mitigation: "Diversifiera kundbas, fokus på SMB",
-          status: "Planned"
-        },
-        {
-          risk: "Regulatorisk compliance",
-          probability: "Low",
-          impact: "High",
-          mitigation: "Legal advisor, GDPR-certifiering",
-          status: "Completed"
-        }
-      ]
+        peerComparison: [
+          { company: "Similar US startup", funding: "$5M", revenue: "$2M ARR", valuation: "$25M" },
+          { company: "UK competitor", funding: "£3M", revenue: "£1M ARR", valuation: "£15M" },
+          { company: "German player", funding: "€4M", revenue: "€1.5M ARR", valuation: "€20M" }
+        ]
+      },
+      riskMitigation: {
+        identifiedRisks: [
+          {
+            risk: "Teknisk skalbarhet",
+            probability: "Medium",
+            impact: "High",
+            mitigation: "Microservices arkitektur, AWS auto-scaling",
+            status: "In progress"
+          },
+          {
+            risk: "Kundkoncentration",
+            probability: "High",
+            impact: "Medium",
+            mitigation: "Diversifiera kundbas, fokus på SMB",
+            status: "Planned"
+          },
+          {
+            risk: "Regulatorisk compliance",
+            probability: "Low",
+            impact: "High",
+            mitigation: "Legal advisor, GDPR-certifiering",
+            status: "Completed"
+          }
+        ]
+      }
     }
   }
 }; 
