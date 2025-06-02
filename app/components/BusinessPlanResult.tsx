@@ -166,8 +166,8 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
             </div>
           )}
           <div className="p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-500/30">
-            <p className="text-blue-300 font-medium">💡 AI Insikt</p>
-            <p className="text-white/80 text-sm mt-2">
+            <p className="text-blue-700 font-medium">💡 AI Insikt</p>
+            <p className="text-gray-900 text-sm mt-2">
               {typedAnswers.customer_problem && typedAnswers.solution 
                 ? "Stark koppling mellan problem och lösning. Överväg att kvantifiera problemets kostnad för kunderna för att göra värdeproposition tydligare."
                 : "Definiera tydligt både problem och lösning för att skapa en övertygande berättelse."}
@@ -203,7 +203,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           )}
           <div className="p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl border border-green-500/30">
             <p className="text-green-300 font-medium">💡 AI Insikt</p>
-            <p className="text-white/80 text-sm mt-2">
+            <p className="text-gray-900 text-sm mt-2">
               Er TAM på 5 miljarder SEK visar på en betydande marknad. Fokusera på att visa hur ni kan ta 10% av SAM inom 3 år - det skulle ge 100 MSEK i årlig omsättning.
             </p>
           </div>
@@ -237,7 +237,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           )}
           <div className="p-4 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl border border-yellow-500/30">
             <p className="text-yellow-300 font-medium">💡 AI Insikt</p>
-            <p className="text-white/80 text-sm mt-2">
+            <p className="text-gray-900 text-sm mt-2">
               SaaS-modell med 5000 kr/månad ger förutsägbara intäkter. Med 200 kunder når ni break-even. Fokusera på att minska churn under 5% månadsvis.
             </p>
           </div>
@@ -272,7 +272,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           )}
           <div className="p-4 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl border border-indigo-500/30">
             <p className="text-indigo-300 font-medium">💡 AI Insikt</p>
-            <p className="text-white/80 text-sm mt-2">
+            <p className="text-gray-900 text-sm mt-2">
               20% månatlig tillväxt är imponerande! Dokumentera kundcase och testimonials. Visa retention rate och Net Promoter Score för att bevisa produktmarknadsanpassning.
             </p>
           </div>
@@ -307,7 +307,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           )}
           <div className="p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl border border-purple-500/30">
             <p className="text-purple-300 font-medium">💡 AI Insikt</p>
-            <p className="text-white/80 text-sm mt-2">
+            <p className="text-gray-900 text-sm mt-2">
               Excellent founder-market fit! VD:s investeringserfarenhet + CTO från Spotify = trovärdig kombination. Överväg att lägga till en säljchef med SaaS-erfarenhet.
             </p>
           </div>
@@ -352,7 +352,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           )}
           <div className="p-4 bg-gradient-to-r from-red-500/20 to-pink-500/20 rounded-xl border border-red-500/30">
             <p className="text-red-300 font-medium">💡 AI Insikt</p>
-            <p className="text-white/80 text-sm mt-2">
+            <p className="text-gray-900 text-sm mt-2">
               15 MSEK ger er 18 månaders runway - perfekt för en seed-runda. Allokering ser bra ut, men överväg att öka sales/marketing till 40% för snabbare tillväxt.
             </p>
           </div>
@@ -380,7 +380,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           )}
           <div className="p-4 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-xl border border-orange-500/30">
             <p className="text-orange-300 font-medium">💡 AI Insikt</p>
-            <p className="text-white/80 text-sm mt-2">
+            <p className="text-gray-900 text-sm mt-2">
               Att ni identifierat risker visar mognad. Fokusera på att bygga teknisk moat genom AI/ML och nätverkseffekter. Patent på kärnteknologi kan stärka positionen.
             </p>
           </div>
@@ -408,7 +408,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
           )}
           <div className="p-4 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-xl border border-emerald-500/30">
             <p className="text-emerald-300 font-medium">💡 AI Insikt</p>
-            <p className="text-white/80 text-sm mt-2">
+            <p className="text-gray-900 text-sm mt-2">
               Trade sale till större fintech-bolag är realistiskt om ni når 100+ MSEK ARR. Bygg relationer tidigt med potentiella köpare som Klarna, Tink eller internationella aktörer.
             </p>
           </div>
