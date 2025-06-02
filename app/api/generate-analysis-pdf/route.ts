@@ -128,19 +128,18 @@ export async function POST(request: Request) {
     });
 
     // Score display with modern design
-    const scoreRadius = 70;
     const scoreX = width / 2;
     const scoreY = height / 2 - 50;
 
-    // Score background circle
-    coverPage.drawCircle({
-      x: scoreX,
-      y: scoreY,
-      size: scoreRadius,
+    // Score background rectangle
+    coverPage.drawRectangle({
+      x: scoreX - 70,
+      y: scoreY - 70,
+      width: 140,
+      height: 140,
       color: rgb(0.1, 0.1, 0.15),
-      opacity: 0.8,
     });
-
+    
     // Score value
     coverPage.drawText(score.toString(), {
       x: scoreX - (score >= 100 ? 35 : 25),
@@ -284,8 +283,6 @@ export async function POST(request: Request) {
       width: width - 100,
       height: 50,
       color: lightGray,
-      borderColor: accentColor,
-      borderWidth: 2,
     });
 
     summaryPage.drawText(`Totalpoäng: ${score}/100`, {
@@ -399,8 +396,15 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('Error generating PDF:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
-      { error: 'Failed to generate PDF' },
+      { 
+        error: 'Failed to generate PDF',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

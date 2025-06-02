@@ -1,11 +1,1 @@
-{
-  "app/result/page.tsx -> ./ResultContent": {
-    "id": 5537,
-    "files": [
-      "static/css/d0320de32467736e.css",
-      "static/chunks/6766-fc01f3e103e2c80e.js",
-      "static/chunks/3247-266d041227c2a5c2.js",
-      "static/chunks/92.d445f8b26aa4a528.js"
-    ]
-  }
-}
+{}

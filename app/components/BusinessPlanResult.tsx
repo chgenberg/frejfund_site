@@ -1026,15 +1026,15 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                     <div className="space-y-4">
                       <div>
                         <h4 className="text-lg font-semibold text-white mb-2">Företagets WHY</h4>
-                        <p className="text-gray-900">{typedAnswers.premiumAnalysis.investorFilm.whyStatement}</p>
+                        <p className="text-white/90">{typedAnswers.premiumAnalysis.investorFilm.whyStatement}</p>
                       </div>
                       <div>
                         <h4 className="text-lg font-semibold text-white mb-2">Emotionell krok</h4>
-                        <p className="text-gray-900">{typedAnswers.premiumAnalysis.investorFilm.emotionalHook}</p>
+                        <p className="text-white/90">{typedAnswers.premiumAnalysis.investorFilm.emotionalHook}</p>
                       </div>
                       <div>
                         <h4 className="text-lg font-semibold text-white mb-2">Målgruppens känsla</h4>
-                        <p className="text-gray-900">{typedAnswers.premiumAnalysis.investorFilm.targetEmotion}</p>
+                        <p className="text-white/90">{typedAnswers.premiumAnalysis.investorFilm.targetEmotion}</p>
                       </div>
                     </div>
                   </div>
@@ -1085,10 +1085,10 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                             <div key={i} className="bg-white/5 rounded-lg p-4">
                               <div className="flex justify-between items-start mb-2">
                                 <span className="text-purple-400 font-semibold">{section.timeframe}</span>
-                                <span className="text-gray-500 text-sm">{section.duration}</span>
+                                <span className="text-white/60 text-sm">{section.duration}</span>
                               </div>
-                              <p className="text-gray-900 mb-2">{section.content}</p>
-                              <p className="text-gray-700 text-sm italic">Känsla: {section.emotion}</p>
+                              <p className="text-white/90 mb-2">{section.content}</p>
+                              <p className="text-white/70 text-sm italic">Känsla: {section.emotion}</p>
                             </div>
                           ))}
                         </div>
@@ -1100,7 +1100,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="bg-white/5 rounded-lg p-4">
                             <h5 className="text-white font-semibold mb-2">📹 Visuellt</h5>
-                            <ul className="space-y-2 text-gray-800 text-sm">
+                            <ul className="space-y-2 text-white/80 text-sm">
                               {typedAnswers.premiumAnalysis.investorFilm.productionTips.visual.map((tip: string, i: number) => (
                                 <li key={i} className="flex items-start gap-2">
                                   <span className="text-purple-400 mt-0.5">•</span>
@@ -1111,7 +1111,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                           </div>
                           <div className="bg-white/5 rounded-lg p-4">
                             <h5 className="text-white font-semibold mb-2">🎵 Ljud & Musik</h5>
-                            <ul className="space-y-2 text-gray-800 text-sm">
+                            <ul className="space-y-2 text-white/80 text-sm">
                               {typedAnswers.premiumAnalysis.investorFilm.productionTips.audio.map((tip: string, i: number) => (
                                 <li key={i} className="flex items-start gap-2">
                                   <span className="text-purple-400 mt-0.5">•</span>
@@ -1130,8 +1130,8 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                           {typedAnswers.premiumAnalysis.investorFilm.storyboard.map((scene: any, i: number) => (
                             <div key={i} className="bg-white/5 rounded-lg p-3 text-center">
                               <div className="text-3xl mb-2">{scene.icon}</div>
-                              <p className="text-gray-900 text-sm font-medium">{scene.shot}</p>
-                              <p className="text-gray-700 text-xs mt-1">{scene.duration}</p>
+                              <p className="text-white/90 text-sm font-medium">{scene.shot}</p>
+                              <p className="text-white/70 text-xs mt-1">{scene.duration}</p>
                             </div>
                           ))}
                         </div>
@@ -1152,19 +1152,19 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                       <div className="text-center">
                         <p className="text-3xl font-bold text-white">{typedAnswers.premiumAnalysis.marketInsights.marketSize.current}</p>
-                        <p className="text-gray-300 text-sm">Nuvarande marknad</p>
+                        <p className="text-white/70 text-sm">Nuvarande marknad</p>
                       </div>
                       <div className="text-center">
                         <p className="text-3xl font-bold text-green-400">{typedAnswers.premiumAnalysis.marketInsights.marketSize.growth}</p>
-                        <p className="text-gray-300 text-sm">Årlig tillväxt</p>
+                        <p className="text-white/70 text-sm">Årlig tillväxt</p>
                       </div>
                       <div className="text-center">
                         <p className="text-3xl font-bold text-purple-400">{typedAnswers.premiumAnalysis.marketInsights.marketSize.projected}</p>
-                        <p className="text-gray-300 text-sm">Prognos 2027</p>
+                        <p className="text-white/70 text-sm">Prognos 2027</p>
                       </div>
                     </div>
                     <div className="bg-black/20 rounded-xl p-4">
-                      <p className="text-gray-300 text-sm italic">{typedAnswers.premiumAnalysis.marketInsights.marketSize.source}</p>
+                      <p className="text-white/60 text-sm italic">{typedAnswers.premiumAnalysis.marketInsights.marketSize.source}</p>
                     </div>
                   </div>
 
@@ -1178,7 +1178,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                             <span className="text-2xl">{trend.icon}</span>
                             <div className="flex-1">
                               <h4 className="text-lg font-semibold text-white mb-2">{trend.name}</h4>
-                              <p className="text-gray-300 mb-2">{trend.description}</p>
+                              <p className="text-white/80 mb-2">{trend.description}</p>
                               <div className="flex items-center gap-4 text-sm">
                                 <span className="text-green-400">Impact: {trend.impact}</span>
                                 <span className="text-blue-400">Tidshorisont: {trend.timeframe}</span>
@@ -1205,7 +1205,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                           </span>
                           <div className="flex-1">
                             <h4 className="text-white font-semibold">{reg.name}</h4>
-                            <p className="text-gray-400 text-sm">{reg.description}</p>
+                            <p className="text-white/70 text-sm">{reg.description}</p>
                           </div>
                         </div>
                       ))}
@@ -1220,7 +1220,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                         <h4 className="text-lg font-semibold text-white mb-3">Köpbeteende</h4>
                         <ul className="space-y-2">
                           {typedAnswers.premiumAnalysis.marketInsights.customerBehavior.map((behavior: string, i: number) => (
-                            <li key={i} className="text-gray-300 flex items-start gap-2">
+                            <li key={i} className="text-white/80 flex items-start gap-2">
                               <span className="text-purple-400 mt-0.5">•</span>
                               <span>{behavior}</span>
                             </li>
@@ -1233,7 +1233,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                           {typedAnswers.premiumAnalysis.marketInsights.decisionMakers.map((dm: any, i: number) => (
                             <div key={i} className="bg-white/5 rounded-lg p-3">
                               <p className="text-white font-medium">{dm.role}</p>
-                              <p className="text-gray-400 text-sm">{dm.priority}</p>
+                              <p className="text-white/70 text-sm">{dm.priority}</p>
                             </div>
                           ))}
                         </div>
@@ -1258,7 +1258,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                     <div>
                       <h4 className="text-lg font-semibold text-white mb-2">Vår Konkurrensfördel</h4>
                       <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-4 border border-purple-500/30">
-                        <p className="text-gray-300">{typedAnswers.premiumAnalysis.marketInsights.competitiveLandscape.ourAdvantage}</p>
+                        <p className="text-white/90">{typedAnswers.premiumAnalysis.marketInsights.competitiveLandscape.ourAdvantage}</p>
                       </div>
                     </div>
                   </div>
