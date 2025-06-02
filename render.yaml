@@ -1,9 +1,11 @@
 services:
   - type: web
-    name: frejfund-site
-    runtime: node
-    buildCommand: npm ci && npm run build
+    name: frejfund
+    env: node
+    buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
+      - key: PORT
+        value: 10000
       - key: NODE_ENV
         value: production 
