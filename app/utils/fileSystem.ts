@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 // Try to use Render's persistent disk first, fall back to local storage
-const DATA_DIR = process.env.NODE_ENV === 'production' ? '/data' : path.join(process.cwd(), 'data');
+const DATA_DIR = process.env.NODE_ENV === 'production' ? '/var/data' : path.join(process.cwd(), 'data');
 
 // Ensure data directories exist
 const ensureDirectories = () => {
