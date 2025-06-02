@@ -702,37 +702,77 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
               )}
 
               {/* Premium Tabs - Enhanced Design */}
-              <div className="mb-10 bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10">
-                <div className="flex flex-wrap gap-3 justify-center">
-                  {[
-                    { id: 'swot', label: 'SWOT', icon: '💪' },
-                    { id: 'finansiell', label: 'Finansiell', icon: '📈' },
-                    { id: 'rekommendationer', label: 'Rekommendationer', icon: '🎯' },
-                    { id: 'benchmark', label: 'Benchmark', icon: '📊' },
-                    { id: 'investeringsförslag', label: 'Investeringsförslag', icon: '💰' },
-                    { id: 'investerarfilm', label: 'Investerarfilm', icon: '🎬' },
-                    { id: 'marknadsinsikter', label: 'Marknadsinsikter', icon: '📊' },
-                    { id: 'ai-bildprompts', label: 'AI Bildprompts', icon: '🎨' }
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setExpandedInsight(tab.id)}
-                      className={`group relative px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 ${
-                        expandedInsight === tab.id 
-                          ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105' 
-                          : 'bg-white/10 text-white/80 hover:bg-white/20 hover:text-white'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2">
-                        <span className="text-xl">{tab.icon}</span>
-                        <span>{tab.label}</span>
-                      </span>
-                      {expandedInsight === tab.id && (
-                        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-full h-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
-                      )}
-                    </button>
-                  ))}
+              <div className="mb-10">
+                {/* Tab Navigation Container */}
+                <div className="bg-gradient-to-r from-purple-900/20 via-pink-900/10 to-purple-900/20 backdrop-blur-xl rounded-3xl p-2 border border-white/20 shadow-2xl">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    {[
+                      { id: 'swot', label: 'SWOT', icon: '💪', description: 'Styrkor & Svagheter' },
+                      { id: 'finansiell', label: 'Finansiell', icon: '📈', description: '3-års projektioner' },
+                      { id: 'rekommendationer', label: 'Rekommendationer', icon: '🎯', description: 'Åtgärdsplan' },
+                      { id: 'benchmark', label: 'Benchmark', icon: '📊', description: 'Branschjämförelse' },
+                      { id: 'investeringsförslag', label: 'Investering', icon: '💰', description: 'Förslag & Villkor' },
+                      { id: 'investerarfilm', label: 'Film', icon: '🎬', description: 'SORA AI Script' },
+                      { id: 'marknadsinsikter', label: 'Marknad', icon: '🔍', description: 'Trender & Analys' },
+                      { id: 'ai-bildprompts', label: 'AI Bilder', icon: '🎨', description: '10 Prompter' }
+                    ].map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setExpandedInsight(tab.id)}
+                        className={`group relative p-4 rounded-2xl transition-all duration-300 transform ${
+                          expandedInsight === tab.id 
+                            ? 'bg-gradient-to-br from-purple-600 via-pink-600 to-purple-600 text-white shadow-2xl scale-[1.02] ring-2 ring-purple-400/50' 
+                            : 'bg-white/5 hover:bg-white/10 text-white/80 hover:text-white hover:scale-[1.01]'
+                        }`}
+                      >
+                        {/* Glowing effect for active tab */}
+                        {expandedInsight === tab.id && (
+                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 opacity-30 blur-xl"></div>
+                        )}
+                        
+                        {/* Content */}
+                        <div className="relative z-10">
+                          <div className="flex flex-col items-center gap-2">
+                            <span className={`text-3xl transition-transform duration-300 ${
+                              expandedInsight === tab.id ? 'scale-125' : 'group-hover:scale-110'
+                            }`}>
+                              {tab.icon}
+                            </span>
+                            <div className="text-center">
+                              <p className={`font-bold text-sm ${
+                                expandedInsight === tab.id ? 'text-white' : 'text-white/90'
+                              }`}>
+                                {tab.label}
+                              </p>
+                              <p className={`text-xs mt-0.5 ${
+                                expandedInsight === tab.id ? 'text-white/90' : 'text-white/60'
+                              }`}>
+                                {tab.description}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Active indicator */}
+                        {expandedInsight === tab.id && (
+                          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 rounded-full animate-pulse"></div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+                
+                {/* Tab Content Indicator */}
+                {expandedInsight && (
+                  <div className="mt-6 text-center">
+                    <div className="inline-flex items-center gap-2 text-white/60 text-sm">
+                      <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
+                      <span>Scrolla för att se innehåll</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* SWOT Analysis - förbättrad design */}
@@ -813,6 +853,573 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                         </ul>
                       </div>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Financial Projections Section */}
+              {expandedInsight === 'finansiell' && (
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl p-8 backdrop-blur-lg border border-purple-500/20">
+                    <h2 className="text-3xl font-bold text-white mb-8 text-center">Finansiella Projektioner (3 år)</h2>
+                    
+                    {typedAnswers.premiumAnalysis?.financialProjections ? (
+                      <>
+                        {/* Revenue Projections */}
+                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 mb-6">
+                          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <span className="text-2xl">💰</span>
+                            Omsättningsprognoser (MSEK)
+                          </h3>
+                          <div className="grid grid-cols-3 gap-4">
+                            {['year1', 'year2', 'year3'].map((year, i) => (
+                              <div key={year} className="bg-black/30 rounded-xl p-4 text-center">
+                                <p className="text-white/60 text-sm mb-1">År {i + 1}</p>
+                                <p className="text-3xl font-bold text-green-400">
+                                  {typedAnswers.premiumAnalysis.financialProjections.revenue[year]}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Costs & EBITDA */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                            <h3 className="text-xl font-bold text-white mb-4">Kostnader (MSEK)</h3>
+                            <div className="space-y-3">
+                              {['year1', 'year2', 'year3'].map((year, i) => (
+                                <div key={year} className="flex justify-between items-center">
+                                  <span className="text-white/70">År {i + 1}</span>
+                                  <span className="text-xl font-semibold text-red-400">
+                                    {typedAnswers.premiumAnalysis.financialProjections.costs[year]}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                            <h3 className="text-xl font-bold text-white mb-4">EBITDA (MSEK)</h3>
+                            <div className="space-y-3">
+                              {['year1', 'year2', 'year3'].map((year, i) => (
+                                <div key={year} className="flex justify-between items-center">
+                                  <span className="text-white/70">År {i + 1}</span>
+                                  <span className={`text-xl font-semibold ${
+                                    typedAnswers.premiumAnalysis.financialProjections.ebitda[year].startsWith('-') 
+                                      ? 'text-red-400' 
+                                      : 'text-green-400'
+                                  }`}>
+                                    {typedAnswers.premiumAnalysis.financialProjections.ebitda[year]}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Customer Projections */}
+                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                          <h3 className="text-xl font-bold text-white mb-4">Kundtillväxt</h3>
+                          <div className="grid grid-cols-3 gap-4">
+                            {['year1', 'year2', 'year3'].map((year, i) => (
+                              <div key={year} className="text-center">
+                                <p className="text-white/60 text-sm mb-1">År {i + 1}</p>
+                                <p className="text-2xl font-bold text-blue-400">
+                                  {typedAnswers.premiumAnalysis.financialProjections.customerProjections[year]}
+                                </p>
+                                <p className="text-white/60 text-sm">kunder</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-12">
+                        <span className="text-6xl mb-4 block">📊</span>
+                        <p className="text-white/60 text-lg">Finansiella projektioner genereras när du uppgraderar till Premium</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Recommendations Section */}
+              {expandedInsight === 'rekommendationer' && (
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl p-8 backdrop-blur-lg border border-purple-500/20">
+                    <h2 className="text-3xl font-bold text-white mb-8 text-center">Detaljerade Rekommendationer</h2>
+                    
+                    {typedAnswers.premiumAnalysis?.detailedRecommendations ? (
+                      <>
+                        {/* Immediate Actions */}
+                        <div className="mb-8">
+                          <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                            <span className="text-3xl">🚀</span>
+                            Omedelbara Åtgärder (1-2 månader)
+                          </h3>
+                          <div className="space-y-4">
+                            {typedAnswers.premiumAnalysis.detailedRecommendations.immediate.map((action: any, i: number) => (
+                              <div key={i} className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-purple-500/30 transition-all">
+                                <h4 className="text-lg font-bold text-white mb-3">{action.action}</h4>
+                                <div className="space-y-3 text-white/80">
+                                  <div>
+                                    <span className="font-semibold text-purple-400">Varför:</span> {action.why}
+                                  </div>
+                                  <div>
+                                    <span className="font-semibold text-blue-400">Hur:</span> {action.how}
+                                  </div>
+                                  <div>
+                                    <span className="font-semibold text-green-400">Förväntad effekt:</span> {action.expectedImpact}
+                                  </div>
+                                  <div className="flex items-center gap-4 mt-4">
+                                    <span className="px-3 py-1 bg-purple-500/20 rounded-full text-purple-300 text-sm">
+                                      {action.resources}
+                                    </span>
+                                    <span className="px-3 py-1 bg-blue-500/20 rounded-full text-blue-300 text-sm">
+                                      {action.timeline}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Short-term Actions */}
+                        <div>
+                          <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                            <span className="text-3xl">📈</span>
+                            Kortsiktiga Åtgärder (3-6 månader)
+                          </h3>
+                          <div className="space-y-4">
+                            {typedAnswers.premiumAnalysis.detailedRecommendations.shortTerm.map((action: any, i: number) => (
+                              <div key={i} className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-blue-500/30 transition-all">
+                                <h4 className="text-lg font-bold text-white mb-3">{action.action}</h4>
+                                <div className="space-y-3 text-white/80">
+                                  <div>
+                                    <span className="font-semibold text-purple-400">Varför:</span> {action.why}
+                                  </div>
+                                  <div>
+                                    <span className="font-semibold text-blue-400">Hur:</span> {action.how}
+                                  </div>
+                                  <div>
+                                    <span className="font-semibold text-green-400">Förväntad effekt:</span> {action.expectedImpact}
+                                  </div>
+                                  <div className="flex items-center gap-4 mt-4">
+                                    <span className="px-3 py-1 bg-purple-500/20 rounded-full text-purple-300 text-sm">
+                                      {action.resources}
+                                    </span>
+                                    <span className="px-3 py-1 bg-blue-500/20 rounded-full text-blue-300 text-sm">
+                                      {action.timeline}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-12">
+                        <span className="text-6xl mb-4 block">🎯</span>
+                        <p className="text-white/60 text-lg">Detaljerade rekommendationer genereras när du uppgraderar till Premium</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Benchmark Section */}
+              {expandedInsight === 'benchmark' && (
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl p-8 backdrop-blur-lg border border-purple-500/20">
+                    <h2 className="text-3xl font-bold text-white mb-8 text-center">Benchmark-Analys</h2>
+                    
+                    {typedAnswers.premiumAnalysis?.benchmarkAnalysis ? (
+                      <>
+                        {/* Industry Comparison */}
+                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 mb-6">
+                          <h3 className="text-xl font-bold text-white mb-4">Branschjämförelse</h3>
+                          {typedAnswers.premiumAnalysis.benchmarkAnalysis.industryComparison.map((metric: any, i: number) => (
+                            <div key={i} className="mb-4">
+                              <div className="flex justify-between items-center mb-2">
+                                <span className="text-white/80">{metric.metric}</span>
+                                <span className={`font-bold ${
+                                  metric.position === 'Över genomsnitt' ? 'text-green-400' :
+                                  metric.position === 'Under genomsnitt' ? 'text-red-400' :
+                                  'text-yellow-400'
+                                }`}>
+                                  {metric.position}
+                                </span>
+                              </div>
+                              <div className="bg-black/30 rounded-full h-4 overflow-hidden">
+                                <div 
+                                  className={`h-full transition-all duration-1000 ${
+                                    metric.position === 'Över genomsnitt' ? 'bg-gradient-to-r from-green-500 to-emerald-500' :
+                                    metric.position === 'Under genomsnitt' ? 'bg-gradient-to-r from-red-500 to-orange-500' :
+                                    'bg-gradient-to-r from-yellow-500 to-amber-500'
+                                  }`}
+                                  style={{ width: `${metric.percentile}%` }}
+                                />
+                              </div>
+                              <div className="flex justify-between mt-1">
+                                <span className="text-white/60 text-sm">Er: {metric.yourValue}</span>
+                                <span className="text-white/60 text-sm">Bransch: {metric.industryAverage}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Peer Comparison */}
+                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                          <h3 className="text-xl font-bold text-white mb-4">Konkurrentjämförelse</h3>
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-white/80">
+                              <thead>
+                                <tr className="border-b border-white/20">
+                                  <th className="text-left py-3">Företag</th>
+                                  <th className="text-center py-3">Omsättning</th>
+                                  <th className="text-center py-3">Tillväxt</th>
+                                  <th className="text-center py-3">Marknadsandel</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {typedAnswers.premiumAnalysis.benchmarkAnalysis.peerComparison.map((peer: any, i: number) => (
+                                  <tr key={i} className={`border-b border-white/10 ${peer.isYou ? 'bg-purple-500/20' : ''}`}>
+                                    <td className="py-3">
+                                      {peer.company}
+                                      {peer.isYou && <span className="ml-2 text-purple-400">(Ni)</span>}
+                                    </td>
+                                    <td className="text-center py-3">{peer.revenue}</td>
+                                    <td className="text-center py-3">
+                                      <span className={peer.growth.includes('+') ? 'text-green-400' : 'text-red-400'}>
+                                        {peer.growth}
+                                      </span>
+                                    </td>
+                                    <td className="text-center py-3">{peer.marketShare}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-12">
+                        <span className="text-6xl mb-4 block">📊</span>
+                        <p className="text-white/60 text-lg">Benchmark-analys genereras när du uppgraderar till Premium</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Investment Proposal Section */}
+              {expandedInsight === 'investeringsförslag' && (
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl p-8 backdrop-blur-lg border border-purple-500/20">
+                    <h2 className="text-3xl font-bold text-white mb-8 text-center">Investeringsförslag</h2>
+                    
+                    {typedAnswers.premiumAnalysis?.investmentProposal ? (
+                      <>
+                        {/* Investment Ask */}
+                        <div className="bg-gradient-to-r from-purple-600/30 to-pink-600/30 rounded-2xl p-6 border border-purple-500/40 mb-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                              <h3 className="text-lg font-bold text-white mb-2">Investeringsbehov</h3>
+                              <p className="text-4xl font-bold text-white">
+                                {typedAnswers.premiumAnalysis.investmentProposal.askAmount} MSEK
+                              </p>
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-bold text-white mb-2">Värdering</h3>
+                              <p className="text-4xl font-bold text-white">
+                                {typedAnswers.premiumAnalysis.investmentProposal.valuation} MSEK
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Use of Funds */}
+                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 mb-6">
+                          <h3 className="text-xl font-bold text-white mb-4">Användning av Kapital</h3>
+                          <div className="space-y-4">
+                            {Object.entries(typedAnswers.premiumAnalysis.investmentProposal.useOfFunds).map(([key, value]) => {
+                              const labels: any = {
+                                productDevelopment: 'Produktutveckling',
+                                salesMarketing: 'Försäljning & Marknadsföring',
+                                teamExpansion: 'Teamutbyggnad',
+                                other: 'Övrigt'
+                              };
+                              return (
+                                <div key={key}>
+                                  <div className="flex justify-between items-center mb-1">
+                                    <span className="text-white/80">{labels[key]}</span>
+                                    <span className="text-white font-bold">{value as string}%</span>
+                                  </div>
+                                  <div className="bg-black/30 rounded-full h-3 overflow-hidden">
+                                    <div 
+                                      className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-1000"
+                                      style={{ width: `${value}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Key Metrics */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                          {Object.entries(typedAnswers.premiumAnalysis.investmentProposal.keyMetrics).map(([key, value]) => {
+                            const labels: any = {
+                              currentMRR: 'Nuvarande MRR',
+                              targetMRR12Months: 'Mål MRR (12 mån)',
+                              currentCustomers: 'Nuvarande kunder',
+                              targetCustomers12Months: 'Mål kunder (12 mån)',
+                              burnRate: 'Burn rate',
+                              monthsRunway: 'Månader runway'
+                            };
+                            return (
+                              <div key={key} className="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                                <p className="text-white/60 text-sm mb-1">{labels[key]}</p>
+                                <p className="text-2xl font-bold text-white">{value as string}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Investor Benefits */}
+                        <div className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 rounded-2xl p-6 border border-green-500/40">
+                          <h3 className="text-xl font-bold text-white mb-4">Fördelar för Investerare</h3>
+                          <ul className="space-y-3">
+                            {typedAnswers.premiumAnalysis.investmentProposal.investorBenefits.map((benefit: string, i: number) => (
+                              <li key={i} className="flex items-start gap-3 text-white/90">
+                                <span className="text-green-400 text-xl mt-0.5">✓</span>
+                                <span>{benefit}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-12">
+                        <span className="text-6xl mb-4 block">💰</span>
+                        <p className="text-white/60 text-lg">Investeringsförslag genereras när du uppgraderar till Premium</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Investor Film Section */}
+              {expandedInsight === 'investerarfilm' && (
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl p-8 backdrop-blur-lg border border-purple-500/20">
+                    <div className="flex items-center gap-3 mb-6">
+                      <h2 className="text-3xl font-bold text-white">Investerarfilm - Koncept & Guide</h2>
+                      <button
+                        onClick={() => setShowSoraInfo(true)}
+                        className="text-white/70 hover:text-white transition-colors"
+                        title="Om SORA AI"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* SORA Info Modal */}
+                    {showSoraInfo && (
+                      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowSoraInfo(false)}>
+                        <div className="bg-white rounded-2xl p-6 max-w-md" onClick={(e) => e.stopPropagation()}>
+                          <h3 className="text-xl font-bold text-gray-900 mb-3">🎬 Om SORA AI</h3>
+                          <p className="text-gray-700 mb-4">
+                            SORA är OpenAI:s avancerade AI-modell för videogenerering. Med en textprompt kan SORA skapa 
+                            realistiska och kreativa videor upp till 60 sekunder långa.
+                          </p>
+                          <p className="text-gray-700 mb-4">
+                            Perfekt för att skapa en professionell investerarfilm utan dyra produktionskostnader!
+                          </p>
+                          <button
+                            onClick={() => setShowSoraInfo(false)}
+                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                          >
+                            Stäng
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {typedAnswers.premiumAnalysis?.investorFilm ? (
+                      <>
+                        {/* WHY Statement */}
+                        <div className="bg-gradient-to-r from-purple-600/30 to-pink-600/30 rounded-2xl p-6 border border-purple-500/40 mb-6">
+                          <h3 className="text-xl font-bold text-white mb-3">🎯 Ert "Varför"</h3>
+                          <p className="text-xl text-white/90 italic">"{typedAnswers.premiumAnalysis.investorFilm.whyStatement}"</p>
+                        </div>
+
+                        {/* SORA AI Prompt */}
+                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 mb-6">
+                          <h3 className="text-xl font-bold text-white mb-4">🤖 SORA AI Prompt (30 sekunder)</h3>
+                          <div className="bg-black/30 rounded-xl p-4 mb-4">
+                            <p className="text-green-400 font-mono text-sm leading-relaxed">
+                              {typedAnswers.premiumAnalysis.investorFilm.soraPrompt}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(typedAnswers.premiumAnalysis.investorFilm.soraPrompt);
+                              setCopiedPrompt(true);
+                              setTimeout(() => setCopiedPrompt(false), 2000);
+                            }}
+                            className="px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 rounded-lg transition-colors flex items-center gap-2"
+                          >
+                            {copiedPrompt ? (
+                              <>
+                                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span className="text-green-400">Kopierad!</span>
+                              </>
+                            ) : (
+                              <>
+                                <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                <span className="text-white/70">Kopiera prompt</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Script Structure */}
+                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 mb-6">
+                          <h3 className="text-xl font-bold text-white mb-4">📝 Manusstruktur</h3>
+                          <div className="space-y-3">
+                            {typedAnswers.premiumAnalysis.investorFilm.scriptStructure.map((scene: any, i: number) => (
+                              <div key={i} className="flex items-start gap-4 bg-black/20 rounded-lg p-4">
+                                <div className="bg-purple-500/20 rounded-full px-3 py-1 text-sm font-bold text-purple-300">
+                                  {scene.timeframe}
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-white/90">{scene.content}</p>
+                                  <p className="text-white/60 text-sm mt-1">Känsla: {scene.emotion}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Production Tips */}
+                        <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-2xl p-6 border border-blue-500/40">
+                          <h3 className="text-xl font-bold text-white mb-4">🎥 Produktionstips</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {typedAnswers.premiumAnalysis.investorFilm.productionTips.map((tip: any, i: number) => (
+                              <div key={i} className="flex items-start gap-3">
+                                <span className="text-blue-400 text-xl">{tip.icon}</span>
+                                <div>
+                                  <h4 className="text-white font-semibold">{tip.category}</h4>
+                                  <p className="text-white/70 text-sm">{tip.tip}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-12">
+                        <span className="text-6xl mb-4 block">🎬</span>
+                        <p className="text-white/60 text-lg">Investerarfilm-koncept genereras när du uppgraderar till Premium</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Market Insights Section */}
+              {expandedInsight === 'marknadsinsikter' && (
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl p-8 backdrop-blur-lg border border-purple-500/20">
+                    <h2 className="text-3xl font-bold text-white mb-8 text-center">Marknadsinsikter</h2>
+                    
+                    {typedAnswers.premiumAnalysis?.marketInsights ? (
+                      <>
+                        {/* Market Size */}
+                        <div className="bg-gradient-to-r from-blue-600/30 to-purple-600/30 rounded-2xl p-6 border border-blue-500/40 mb-6">
+                          <h3 className="text-xl font-bold text-white mb-4">Marknadsstorlek & Tillväxt</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="text-center">
+                              <p className="text-white/60 text-sm mb-1">Nuvarande marknad</p>
+                              <p className="text-3xl font-bold text-white">{typedAnswers.premiumAnalysis.marketInsights.marketSize.current}</p>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-white/60 text-sm mb-1">Årlig tillväxt</p>
+                              <p className="text-3xl font-bold text-green-400">{typedAnswers.premiumAnalysis.marketInsights.marketSize.growth}</p>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-white/60 text-sm mb-1">Prognos 2027</p>
+                              <p className="text-3xl font-bold text-blue-400">{typedAnswers.premiumAnalysis.marketInsights.marketSize.projected}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Key Trends */}
+                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 mb-6">
+                          <h3 className="text-xl font-bold text-white mb-4">Viktiga Trender</h3>
+                          <div className="space-y-4">
+                            {typedAnswers.premiumAnalysis.marketInsights.keyTrends.map((trend: any, i: number) => (
+                              <div key={i} className="bg-black/20 rounded-xl p-4">
+                                <div className="flex items-start gap-3">
+                                  <span className="text-3xl">{trend.icon}</span>
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between mb-2">
+                                      <h4 className="text-lg font-bold text-white">{trend.name}</h4>
+                                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                                        trend.impact === 'Hög' ? 'bg-red-500/20 text-red-300' :
+                                        trend.impact === 'Medium' ? 'bg-yellow-500/20 text-yellow-300' :
+                                        'bg-green-500/20 text-green-300'
+                                      }`}>
+                                        Impact: {trend.impact}
+                                      </span>
+                                    </div>
+                                    <p className="text-white/80">{trend.description}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Competitive Dynamics */}
+                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                          <h3 className="text-xl font-bold text-white mb-4">Konkurrensdynamik</h3>
+                          <div className="bg-black/20 rounded-xl p-4">
+                            <p className="text-white/80 mb-4">{typedAnswers.premiumAnalysis.marketInsights.competitiveDynamics.overview}</p>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <h4 className="text-white font-semibold mb-2">Marknadsledare:</h4>
+                                <ul className="space-y-1">
+                                  {typedAnswers.premiumAnalysis.marketInsights.competitiveDynamics.marketLeaders.map((leader: string, i: number) => (
+                                    <li key={i} className="text-white/70 text-sm">• {leader}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <div>
+                                <h4 className="text-white font-semibold mb-2">Er positionering:</h4>
+                                <p className="text-white/70 text-sm">{typedAnswers.premiumAnalysis.marketInsights.competitiveDynamics.yourPosition}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-12">
+                        <span className="text-6xl mb-4 block">🔍</span>
+                        <p className="text-white/60 text-lg">Marknadsinsikter genereras när du uppgraderar till Premium</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -955,18 +1562,17 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                   </div>
                 </div>
               )}
-
-              {/* Back button */}
-              <button
-                onClick={() => setCurrentSection('score')}
-                className="mt-8 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all"
-              >
-                Tillbaka
-              </button>
             </>
           ) : null}
         </div>
       </div>
+      {/* Back button */}
+      <button
+        onClick={() => setCurrentSection('score')}
+        className="mt-8 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all"
+      >
+        Tillbaka
+      </button>
     </div>
   );
 } 

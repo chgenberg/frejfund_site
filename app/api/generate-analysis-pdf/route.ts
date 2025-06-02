@@ -13,6 +13,8 @@ interface AnalysisData {
 
 export async function POST(request: Request) {
   try {
+    console.log('Starting PDF generation...');
+    
     const data: AnalysisData = await request.json();
     const { score, answers, insights, actionItems, scoreInfo } = data;
     
@@ -22,6 +24,7 @@ export async function POST(request: Request) {
     
     console.log('PDF Generation - Premium Analysis:', premiumAnalysis ? 'Found' : 'Not found');
     console.log('PDF Generation - Subscription Level:', subscriptionLevel);
+    console.log('PDF Generation - Score:', score);
 
     // Create a new PDF document
     const pdfDoc = await PDFDocument.create();
