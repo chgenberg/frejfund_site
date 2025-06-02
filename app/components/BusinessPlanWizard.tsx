@@ -1453,19 +1453,14 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         console.error('Could not save submission:', saveError);
       }
       
-      // Formatera data för BusinessPlanResult
+      // Data är redan i rätt format från API:et
       const resultData = {
-        score: 0, // Vi har inte score från API:et
-        answers: {
-          ...data.answers,
-          company_name: data.company,
-          email: data.email,
-          bransch: data.bransch,
-          omrade: data.omrade,
-          hasWebsite: data.hasWebsite
-        },
-        feedback: data.analysis,
-        subscriptionLevel: 'free' // Standard nivå
+        score: data.score,
+        answers: data.answers,
+        feedback: data.feedback,
+        insights: data.insights,
+        actionItems: data.actionItems,
+        subscriptionLevel: data.subscriptionLevel
       };
       
       // Spara resultatet i localStorage

@@ -32,22 +32,26 @@ export default function PremiumAnalysisResultPage() {
   
   const generateDeepAnalysis = async (data: any) => {
     try {
-      const response = await fetch('/api/generate-deep-analysis', {
+      const response = await fetch('/api/generate-premium-analysis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          answers: data.answers,
-          score: data.score,
-          feedback: data.feedback
+          existingAnalysis: data
         })
       });
       
       if (response.ok) {
         const result = await response.json();
         setDeepAnalysis(result);
+        // Spara premium-analysen i localStorage för att kunna visa den i ResultContent
+        localStorage.setItem('latestAnalysisResult', JSON.stringify(result));
+        // Redirect till resultat-sidan som nu visar premium-innehåll
+        setTimeout(() => {
+          router.push('/result');
+        }, 1000);
       }
     } catch (error) {
-      console.error('Error generating deep analysis:', error);
+      console.error('Error generating premium analysis:', error);
     } finally {
       setTimeout(() => setIsGenerating(false), 2000);
     }

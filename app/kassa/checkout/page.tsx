@@ -13,10 +13,22 @@ export default function CheckoutPage() {
     company: ''
   });
 
-  const handlePayment = async () => {
+  const handleMockPayment = () => {
     setIsProcessing(true);
+    
     // Simulera betalningsprocess
     setTimeout(() => {
+      // Markera att användaren har betalat för premium
+      const pendingAnalysis = localStorage.getItem('pendingPremiumAnalysis');
+      if (pendingAnalysis) {
+        const data = JSON.parse(pendingAnalysis);
+        localStorage.setItem('pendingPremiumAnalysis', JSON.stringify({
+          ...data,
+          hasPaid: true,
+          paymentDate: new Date().toISOString()
+        }));
+      }
+      
       // Redirect till success-sidan
       router.push('/kassa/success');
     }, 2000);
@@ -75,7 +87,7 @@ export default function CheckoutPage() {
           <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10">
             <h3 className="text-2xl font-bold text-white mb-6">Slutför köp</h3>
             
-            <form onSubmit={(e) => { e.preventDefault(); handlePayment(); }} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleMockPayment(); }} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-white/70 text-sm mb-2">Förnamn</label>

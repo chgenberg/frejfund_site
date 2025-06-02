@@ -115,6 +115,8 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
   const [showActionModal, setShowActionModal] = useState<any>(null);
   const [showSoraInfo, setShowSoraInfo] = useState(false);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
+  const [showImagePromptsInfo, setShowImagePromptsInfo] = useState(false);
+  const [copiedImagePrompt, setCopiedImagePrompt] = useState<number | null>(null);
   
   const scoreInfo = getScoreInfo(score);
   const typedAnswers = answers as Record<string, any>;
@@ -606,7 +608,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                       { icon: '📊', text: 'Marknadsinsikter' },
                       { icon: '🎯', text: 'SWOT-analys' },
                       { icon: '🎬', text: 'Investerarfilm' },
-                      { icon: '💎', text: 'Benchmarking' }
+                      { icon: '🎨', text: 'AI Bildprompts' }
                     ].map((feature, i) => (
                       <div key={i} className="text-center">
                         <div className="text-3xl mb-2">{feature.icon}</div>
@@ -628,7 +630,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                       <p className="text-white/90 font-semibold">🎁 Bonus:</p>
                       <ul className="text-white/70 text-sm space-y-1">
                         <li>• SORA AI filmprompt</li>
-                        <li>• Branschspecifika trender</li>
+                        <li>• 10 AI bildprompts</li>
                         <li>• Konkurrensdynamik</li>
                         <li>• Regulatorisk översikt</li>
                       </ul>
@@ -669,596 +671,274 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
           ) : currentSection === 'premium' ? (
             <>
               {/* Premium content section */}
-              <h1 className="text-3xl font-bold text-white mb-8">🌟 Premium AI-Analys</h1>
+              <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-8">
+                ✨ Premium AI-Analys
+              </h1>
               
               {/* Premium Success Message - ändrat för demo */}
               {isPremium && (
-                <div className="mb-8 p-6 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl border border-purple-500/30">
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">🌟</span>
+                <div className="mb-8 p-6 bg-gradient-to-br from-purple-600/30 via-pink-600/20 to-purple-600/30 rounded-3xl border border-purple-500/40 backdrop-blur-lg shadow-2xl">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-lg">
+                      <span className="text-4xl">🌟</span>
+                    </div>
                     <div>
-                      <h3 className="text-xl font-bold text-white">Premium-analys</h3>
-                      <p className="text-white/70">Detta är en demo av vad som ingår i premium-analysen för 197 kr.</p>
+                      <h3 className="text-2xl font-bold text-white mb-1">Premium-analys Aktiverad</h3>
+                      <p className="text-white/80">Detta är en demo av vad som ingår i premium-analysen för 197 kr.</p>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Premium Tabs */}
-              <div className="mb-8 flex flex-wrap gap-2 justify-center">
-                {['swot', 'finansiell', 'rekommendationer', 'benchmark', 'investeringsförslag', 'investerarfilm', 'marknadsinsikter'].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setExpandedInsight(tab)}
-                    className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                      expandedInsight === tab 
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' 
-                        : 'bg-white/10 text-white/70 hover:bg-white/20'
-                    }`}
-                  >
-                    {tab === 'investerarfilm' ? '🎬 ' : tab === 'marknadsinsikter' ? '📊 ' : ''}{tab.charAt(0).toUpperCase() + tab.slice(1)}
-                  </button>
-                ))}
+              {/* Premium Tabs - Enhanced Design */}
+              <div className="mb-10 bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div className="flex flex-wrap gap-3 justify-center">
+                  {[
+                    { id: 'swot', label: 'SWOT', icon: '💪' },
+                    { id: 'finansiell', label: 'Finansiell', icon: '📈' },
+                    { id: 'rekommendationer', label: 'Rekommendationer', icon: '🎯' },
+                    { id: 'benchmark', label: 'Benchmark', icon: '📊' },
+                    { id: 'investeringsförslag', label: 'Investeringsförslag', icon: '💰' },
+                    { id: 'investerarfilm', label: 'Investerarfilm', icon: '🎬' },
+                    { id: 'marknadsinsikter', label: 'Marknadsinsikter', icon: '📊' },
+                    { id: 'ai-bildprompts', label: 'AI Bildprompts', icon: '🎨' }
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setExpandedInsight(tab.id)}
+                      className={`group relative px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 ${
+                        expandedInsight === tab.id 
+                          ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105' 
+                          : 'bg-white/10 text-white/80 hover:bg-white/20 hover:text-white'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className="text-xl">{tab.icon}</span>
+                        <span>{tab.label}</span>
+                      </span>
+                      {expandedInsight === tab.id && (
+                        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-full h-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* SWOT Analysis - förbättrad design */}
               {expandedInsight === 'swot' && typedAnswers.premiumAnalysis?.swot && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-white mb-6">SWOT-Analys</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl p-6 border border-green-500/30">
-                      <h3 className="text-xl font-bold text-white mb-4 flex items-start gap-2">
-                        <span className="text-2xl">💪</span> 
-                        <span>Styrkor</span>
-                      </h3>
-                      <ul className="space-y-3">
-                        {typedAnswers.premiumAnalysis.swot.strengths.map((strength: string, i: number) => (
-                          <li key={i} className="text-white/90 flex items-start gap-3 text-left">
-                            <span className="text-green-400 mt-1">•</span>
-                            <span className="flex-1">{strength}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-2xl p-6 border border-red-500/30">
-                      <h3 className="text-xl font-bold text-white mb-4 flex items-start gap-2">
-                        <span className="text-2xl">⚠️</span> 
-                        <span>Svagheter</span>
-                      </h3>
-                      <ul className="space-y-3">
-                        {typedAnswers.premiumAnalysis.swot.weaknesses.map((weakness: string, i: number) => (
-                          <li key={i} className="text-white/90 flex items-start gap-3 text-left">
-                            <span className="text-orange-400 mt-1">•</span>
-                            <span className="flex-1">{weakness}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl p-6 border border-blue-500/30">
-                      <h3 className="text-xl font-bold text-white mb-4 flex items-start gap-2">
-                        <span className="text-2xl">🎯</span> 
-                        <span>Möjligheter</span>
-                      </h3>
-                      <ul className="space-y-3">
-                        {typedAnswers.premiumAnalysis.swot.opportunities.map((opportunity: string, i: number) => (
-                          <li key={i} className="text-white/90 flex items-start gap-3 text-left">
-                            <span className="text-blue-400 mt-1">•</span>
-                            <span className="flex-1">{opportunity}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-yellow-500/20 to-amber-500/20 rounded-2xl p-6 border border-yellow-500/30">
-                      <h3 className="text-xl font-bold text-white mb-4 flex items-start gap-2">
-                        <span className="text-2xl">🌪️</span> 
-                        <span>Hot</span>
-                      </h3>
-                      <ul className="space-y-3">
-                        {typedAnswers.premiumAnalysis.swot.threats.map((threat: string, i: number) => (
-                          <li key={i} className="text-white/90 flex items-start gap-3 text-left">
-                            <span className="text-yellow-400 mt-1">•</span>
-                            <span className="flex-1">{threat}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Benchmark Analysis - ny sektion */}
-              {expandedInsight === 'benchmark' && typedAnswers.premiumAnalysis?.benchmarkAnalysis && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-white mb-6">Benchmark-Analys</h2>
-                  
-                  {/* Industry Comparison */}
-                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                    <h3 className="text-xl font-bold text-white mb-4">Branschjämförelse</h3>
-                    <div className="space-y-4">
-                      {Object.entries(typedAnswers.premiumAnalysis.benchmarkAnalysis.industryComparison).map(([key, data]: [string, any]) => {
-                        if (key === 'metric') return null;
-                        return (
-                          <div key={key} className="grid grid-cols-4 gap-4 items-center p-3 bg-white/5 rounded-xl">
-                            <div className="text-white font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
-                            <div className="text-white/80">Ert bolag: {data.us}</div>
-                            <div className="text-white/70">Branschsnitt: {data.industry}</div>
-                            <div className={`font-bold ${data.verdict === 'Excellent' || data.verdict === 'Top quartile' || data.verdict === 'Best in class' ? 'text-green-400' : 'text-yellow-400'}`}>
-                              {data.verdict}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Peer Comparison */}
-                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                    <h3 className="text-xl font-bold text-white mb-4">Jämförelse med konkurrenter</h3>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-white">
-                        <thead>
-                          <tr className="border-b border-white/20">
-                            <th className="text-left py-3 text-white">Företag</th>
-                            <th className="text-right py-3 text-white">Finansiering</th>
-                            <th className="text-right py-3 text-white">ARR</th>
-                            <th className="text-right py-3 text-white">Värdering</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {typedAnswers.premiumAnalysis.benchmarkAnalysis.peerComparison.map((peer: any, i: number) => (
-                            <tr key={i} className="border-b border-white/10">
-                              <td className="py-3 text-white/90">{peer.company}</td>
-                              <td className="text-right text-white/80">{peer.funding}</td>
-                              <td className="text-right text-white/80">{peer.revenue}</td>
-                              <td className="text-right text-white/80">{peer.valuation}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Investment Proposal - ny sektion */}
-              {expandedInsight === 'investeringsförslag' && typedAnswers.premiumAnalysis?.investmentProposal && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-white mb-6">Investeringsförslag</h2>
-                  
-                  {/* Investment Ask */}
-                  <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl p-6 border border-purple-500/30">
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl p-8 backdrop-blur-lg border border-purple-500/20">
+                    <h2 className="text-3xl font-bold text-white mb-8 text-center">SWOT-Analys</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <h3 className="text-lg font-bold text-white mb-2">Investeringsbehov</h3>
-                        <p className="text-3xl font-bold text-white">{typedAnswers.premiumAnalysis.investmentProposal.askAmount}</p>
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold text-white mb-2">Pre-money värdering</h3>
-                        <p className="text-3xl font-bold text-white">{typedAnswers.premiumAnalysis.investmentProposal.valuation}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Use of Funds */}
-                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                    <h3 className="text-xl font-bold text-white mb-4">Användning av kapital</h3>
-                    <div className="space-y-3">
-                      {Object.entries(typedAnswers.premiumAnalysis.investmentProposal.useOfFunds).map(([key, value]: [string, any]) => (
-                        <div key={key} className="flex justify-between items-center">
-                          <span className="text-white/80 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                          <span className="text-white font-semibold">{value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Key Metrics */}
-                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                    <h3 className="text-xl font-bold text-white mb-4">Nyckeltal</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {Object.entries(typedAnswers.premiumAnalysis.investmentProposal.keyMetrics).map(([key, value]: [string, any]) => (
-                        <div key={key} className="bg-white/5 rounded-xl p-4">
-                          <p className="text-white/70 text-sm capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
-                          <p className="text-white text-xl font-bold">{value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Investor Benefits */}
-                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                    <h3 className="text-xl font-bold text-white mb-4">Fördelar för investerare</h3>
-                    <ul className="space-y-2">
-                      {typedAnswers.premiumAnalysis.investmentProposal.investorBenefits.map((benefit: string, i: number) => (
-                        <li key={i} className="text-white/90 flex items-start gap-3">
-                          <span className="text-green-400 mt-1">✓</span>
-                          <span>{benefit}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              )}
-
-              {/* Detailed Recommendations */}
-              {expandedInsight === 'rekommendationer' && typedAnswers.premiumAnalysis?.detailedRecommendations && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-white mb-6">Detaljerade Rekommendationer</h2>
-                  
-                  {/* Immediate Actions */}
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-4">🚀 Omedelbart (1-2 månader)</h3>
-                    <div className="space-y-4">
-                      {typedAnswers.premiumAnalysis.detailedRecommendations.immediate.map((rec: any, i: number) => (
-                        <div key={i} className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                          <h4 className="text-lg font-bold text-white mb-2">{rec.action}</h4>
-                          <div className="space-y-2 text-white/80">
-                            <p><strong className="text-white">Varför:</strong> {rec.why}</p>
-                            <p><strong className="text-white">Hur:</strong> {rec.how}</p>
-                            <p><strong className="text-white">Förväntad effekt:</strong> {rec.impact}</p>
-                            <p><strong className="text-white">Resurser:</strong> {rec.resources}</p>
-                            <p><strong className="text-white">Tidsram:</strong> {rec.timeline}</p>
+                      {/* Strengths */}
+                      <div className="bg-gradient-to-br from-green-600/30 to-emerald-600/20 rounded-2xl p-6 border border-green-500/40 backdrop-blur-md transform hover:scale-105 transition-all">
+                        <h3 className="text-2xl font-bold text-white mb-5 flex items-center gap-3">
+                          <div className="p-2 bg-green-500 rounded-lg shadow-lg">
+                            <span className="text-2xl">💪</span>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Short Term Actions */}
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-4">📈 Kort sikt (3-6 månader)</h3>
-                    <div className="space-y-4">
-                      {typedAnswers.premiumAnalysis.detailedRecommendations.shortTerm.map((rec: any, i: number) => (
-                        <div key={i} className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                          <h4 className="text-lg font-bold text-white mb-2">{rec.action}</h4>
-                          <div className="space-y-2 text-white/80">
-                            <p><strong className="text-white">Varför:</strong> {rec.why}</p>
-                            <p><strong className="text-white">Hur:</strong> {rec.how}</p>
-                            <p><strong className="text-white">Förväntad effekt:</strong> {rec.impact}</p>
-                            <p><strong className="text-white">Resurser:</strong> {rec.resources}</p>
-                            <p><strong className="text-white">Tidsram:</strong> {rec.timeline}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Financial Projections */}
-              {expandedInsight === 'finansiell' && typedAnswers.financial_projections && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-white mb-6">Finansiella Projektioner (3 år)</h2>
-                  <div className="bg-white rounded-2xl p-6 shadow-lg">
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b border-gray-300">
-                            <th className="text-left py-3 text-gray-900 font-bold">Metrik</th>
-                            <th className="text-right py-3 text-gray-900 font-bold">År 1</th>
-                            <th className="text-right py-3 text-gray-900 font-bold">År 2</th>
-                            <th className="text-right py-3 text-gray-900 font-bold">År 3</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {(() => {
-                            const projections = parseJsonSafely(typedAnswers.financial_projections);
-                            return (
-                              <>
-                                <tr className="border-b border-gray-200">
-                                  <td className="py-3 text-gray-800 font-medium">Intäkter</td>
-                                  <td className="text-right text-gray-900">{(projections.year1?.revenue / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right text-gray-900">{(projections.year2?.revenue / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right text-gray-900">{(projections.year3?.revenue / 1000000).toFixed(1)} MSEK</td>
-                                </tr>
-                                <tr className="border-b border-gray-200">
-                                  <td className="py-3 text-gray-800 font-medium">Kostnader</td>
-                                  <td className="text-right text-gray-900">{(projections.year1?.costs / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right text-gray-900">{(projections.year2?.costs / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right text-gray-900">{(projections.year3?.costs / 1000000).toFixed(1)} MSEK</td>
-                                </tr>
-                                <tr className="border-b border-gray-200">
-                                  <td className="py-3 text-gray-800 font-medium">EBITDA</td>
-                                  <td className="text-right text-red-600 font-bold">{(projections.year1?.ebitda / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right text-green-600 font-bold">{(projections.year2?.ebitda / 1000000).toFixed(1)} MSEK</td>
-                                  <td className="text-right text-green-600 font-bold">{(projections.year3?.ebitda / 1000000).toFixed(1)} MSEK</td>
-                                </tr>
-                                <tr>
-                                  <td className="py-3 text-gray-800 font-medium">Antal kunder</td>
-                                  <td className="text-right text-gray-900">{projections.year1?.customers}</td>
-                                  <td className="text-right text-gray-900">{projections.year2?.customers}</td>
-                                  <td className="text-right text-gray-900">{projections.year3?.customers}</td>
-                                </tr>
-                              </>
-                            );
-                          })()}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Investor Film Section - NY */}
-              {expandedInsight === 'investerarfilm' && typedAnswers.premiumAnalysis?.investorFilm && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-2xl font-bold text-white">Emotionell Investerarfilm</h2>
-                    <button
-                      onClick={() => setShowSoraInfo(true)}
-                      className="text-white/70 hover:text-white transition-colors"
-                      title="Vad är SORA AI?"
-                    >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* SORA Info Modal */}
-                  {showSoraInfo && (
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowSoraInfo(false)}>
-                      <div className="bg-white rounded-2xl p-6 max-w-md" onClick={(e) => e.stopPropagation()}>
-                        <h3 className="text-xl font-bold text-gray-900 mb-3">🎬 Om SORA AI</h3>
-                        <p className="text-gray-700 mb-4">
-                          SORA AI är OpenAIs revolutionerande video-genereringsmodell som kan skapa realistiska och fantasifulla videor från textbeskrivningar. 
-                          Perfekt för att skapa professionella investerarfilmer utan dyra produktionskostnader.
-                        </p>
-                        <p className="text-gray-700 mb-4">
-                          Kopiera prompten nedan och använd den i SORA AI när den blir tillgänglig, eller använd den som guide för egen inspelning.
-                        </p>
-                        <button
-                          onClick={() => setShowSoraInfo(false)}
-                          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                        >
-                          Stäng
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Film Concept */}
-                  <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl p-6 border border-purple-500/30">
-                    <h3 className="text-xl font-bold text-white mb-4">🎯 Filmkoncept - Känslodriven berättelse</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="text-lg font-semibold text-white mb-2">Företagets WHY</h4>
-                        <p className="text-white/90">{typedAnswers.premiumAnalysis.investorFilm.whyStatement}</p>
-                      </div>
-                      <div>
-                        <h4 className="text-lg font-semibold text-white mb-2">Emotionell krok</h4>
-                        <p className="text-white/90">{typedAnswers.premiumAnalysis.investorFilm.emotionalHook}</p>
-                      </div>
-                      <div>
-                        <h4 className="text-lg font-semibold text-white mb-2">Målgruppens känsla</h4>
-                        <p className="text-white/90">{typedAnswers.premiumAnalysis.investorFilm.targetEmotion}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* SORA AI Prompt */}
-                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                    <h3 className="text-xl font-bold text-white mb-4">🤖 SORA AI Prompt (30 sekunder)</h3>
-                    <div className="bg-black/20 rounded-xl p-4 mb-4">
-                      <code className="text-green-400 text-sm font-mono whitespace-pre-wrap">
-                        {typedAnswers.premiumAnalysis.investorFilm.soraPrompt}
-                      </code>
-                    </div>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(typedAnswers.premiumAnalysis.investorFilm.soraPrompt);
-                        setCopiedPrompt(true);
-                        setTimeout(() => setCopiedPrompt(false), 2000);
-                      }}
-                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
-                    >
-                      {copiedPrompt ? (
-                        <>
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          Kopierad!
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                          Kopiera prompt
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  {/* DIY Film Guide */}
-                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                    <h3 className="text-xl font-bold text-white mb-4">🎥 Gör-det-själv Guide</h3>
-                    <div className="space-y-6">
-                      {/* Script Structure */}
-                      <div>
-                        <h4 className="text-lg font-semibold text-white mb-3">Manuskriptstruktur (30 sek)</h4>
-                        <div className="space-y-3">
-                          {typedAnswers.premiumAnalysis.investorFilm.scriptStructure.map((section: any, i: number) => (
-                            <div key={i} className="bg-white/5 rounded-lg p-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <span className="text-purple-400 font-semibold">{section.timeframe}</span>
-                                <span className="text-white/60 text-sm">{section.duration}</span>
-                              </div>
-                              <p className="text-white/90 mb-2">{section.content}</p>
-                              <p className="text-white/70 text-sm italic">Känsla: {section.emotion}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Production Tips */}
-                      <div>
-                        <h4 className="text-lg font-semibold text-white mb-3">Produktionstips</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="bg-white/5 rounded-lg p-4">
-                            <h5 className="text-white font-semibold mb-2">📹 Visuellt</h5>
-                            <ul className="space-y-2 text-white/80 text-sm">
-                              {typedAnswers.premiumAnalysis.investorFilm.productionTips.visual.map((tip: string, i: number) => (
-                                <li key={i} className="flex items-start gap-2">
-                                  <span className="text-purple-400 mt-0.5">•</span>
-                                  <span>{tip}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div className="bg-white/5 rounded-lg p-4">
-                            <h5 className="text-white font-semibold mb-2">🎵 Ljud & Musik</h5>
-                            <ul className="space-y-2 text-white/80 text-sm">
-                              {typedAnswers.premiumAnalysis.investorFilm.productionTips.audio.map((tip: string, i: number) => (
-                                <li key={i} className="flex items-start gap-2">
-                                  <span className="text-purple-400 mt-0.5">•</span>
-                                  <span>{tip}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Storyboard */}
-                      <div>
-                        <h4 className="text-lg font-semibold text-white mb-3">📐 Storyboard-förslag</h4>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                          {typedAnswers.premiumAnalysis.investorFilm.storyboard.map((scene: any, i: number) => (
-                            <div key={i} className="bg-white/5 rounded-lg p-3 text-center">
-                              <div className="text-3xl mb-2">{scene.icon}</div>
-                              <p className="text-white/90 text-sm font-medium">{scene.shot}</p>
-                              <p className="text-white/70 text-xs mt-1">{scene.duration}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Market Insights Section - NY */}
-              {expandedInsight === 'marknadsinsikter' && typedAnswers.premiumAnalysis?.marketInsights && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-white mb-6">📊 Djupgående Marknadsinsikter</h2>
-                  
-                  {/* Market Size Evolution */}
-                  <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl p-6 border border-blue-500/30">
-                    <h3 className="text-xl font-bold text-white mb-4">Marknadsstorlek & Tillväxt</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                      <div className="text-center">
-                        <p className="text-3xl font-bold text-white">{typedAnswers.premiumAnalysis.marketInsights.marketSize.current}</p>
-                        <p className="text-white/70 text-sm">Nuvarande marknad</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-3xl font-bold text-green-400">{typedAnswers.premiumAnalysis.marketInsights.marketSize.growth}</p>
-                        <p className="text-white/70 text-sm">Årlig tillväxt</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-3xl font-bold text-purple-400">{typedAnswers.premiumAnalysis.marketInsights.marketSize.projected}</p>
-                        <p className="text-white/70 text-sm">Prognos 2027</p>
-                      </div>
-                    </div>
-                    <div className="bg-black/20 rounded-xl p-4">
-                      <p className="text-white/60 text-sm italic">{typedAnswers.premiumAnalysis.marketInsights.marketSize.source}</p>
-                    </div>
-                  </div>
-
-                  {/* Key Trends */}
-                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                    <h3 className="text-xl font-bold text-white mb-4">🔮 Viktiga Marknadstrender</h3>
-                    <div className="space-y-4">
-                      {typedAnswers.premiumAnalysis.marketInsights.keyTrends.map((trend: any, i: number) => (
-                        <div key={i} className="bg-white/5 rounded-xl p-4">
-                          <div className="flex items-start gap-3">
-                            <span className="text-2xl">{trend.icon}</span>
-                            <div className="flex-1">
-                              <h4 className="text-lg font-semibold text-white mb-2">{trend.name}</h4>
-                              <p className="text-white/80 mb-2">{trend.description}</p>
-                              <div className="flex items-center gap-4 text-sm">
-                                <span className="text-green-400">Impact: {trend.impact}</span>
-                                <span className="text-blue-400">Tidshorisont: {trend.timeframe}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Regulatory Landscape */}
-                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                    <h3 className="text-xl font-bold text-white mb-4">⚖️ Regulatorisk Översikt</h3>
-                    <div className="space-y-3">
-                      {typedAnswers.premiumAnalysis.marketInsights.regulatory.map((reg: any, i: number) => (
-                        <div key={i} className="flex items-start gap-3">
-                          <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                            reg.impact === 'Positive' ? 'bg-green-500/20 text-green-300' : 
-                            reg.impact === 'Neutral' ? 'bg-blue-500/20 text-blue-300' : 
-                            'bg-red-500/20 text-red-300'
-                          }`}>
-                            {reg.impact}
-                          </span>
-                          <div className="flex-1">
-                            <h4 className="text-white font-semibold">{reg.name}</h4>
-                            <p className="text-white/70 text-sm">{reg.description}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Customer Insights */}
-                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                    <h3 className="text-xl font-bold text-white mb-4">🎯 Kundinsikter</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <h4 className="text-lg font-semibold text-white mb-3">Köpbeteende</h4>
-                        <ul className="space-y-2">
-                          {typedAnswers.premiumAnalysis.marketInsights.customerBehavior.map((behavior: string, i: number) => (
-                            <li key={i} className="text-white/80 flex items-start gap-2">
-                              <span className="text-purple-400 mt-0.5">•</span>
-                              <span>{behavior}</span>
+                          <span>Styrkor</span>
+                        </h3>
+                        <ul className="space-y-3">
+                          {typedAnswers.premiumAnalysis.swot.strengths.map((strength: string, i: number) => (
+                            <li key={i} className="text-white/90 flex items-start gap-3 text-left bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors">
+                              <span className="text-green-400 mt-1 text-xl">✓</span>
+                              <span className="flex-1">{strength}</span>
                             </li>
                           ))}
                         </ul>
                       </div>
-                      <div>
-                        <h4 className="text-lg font-semibold text-white mb-3">Beslutsfattare</h4>
-                        <div className="space-y-3">
-                          {typedAnswers.premiumAnalysis.marketInsights.decisionMakers.map((dm: any, i: number) => (
-                            <div key={i} className="bg-white/5 rounded-lg p-3">
-                              <p className="text-white font-medium">{dm.role}</p>
-                              <p className="text-white/70 text-sm">{dm.priority}</p>
-                            </div>
+                      
+                      {/* Weaknesses */}
+                      <div className="bg-gradient-to-br from-red-600/30 to-orange-600/20 rounded-2xl p-6 border border-red-500/40 backdrop-blur-md transform hover:scale-105 transition-all">
+                        <h3 className="text-2xl font-bold text-white mb-5 flex items-center gap-3">
+                          <div className="p-2 bg-red-500 rounded-lg shadow-lg">
+                            <span className="text-2xl">⚠️</span>
+                          </div>
+                          <span>Svagheter</span>
+                        </h3>
+                        <ul className="space-y-3">
+                          {typedAnswers.premiumAnalysis.swot.weaknesses.map((weakness: string, i: number) => (
+                            <li key={i} className="text-white/90 flex items-start gap-3 text-left bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors">
+                              <span className="text-red-400 mt-1 text-xl">!</span>
+                              <span className="flex-1">{weakness}</span>
+                            </li>
                           ))}
-                        </div>
+                        </ul>
+                      </div>
+                      
+                      {/* Opportunities */}
+                      <div className="bg-gradient-to-br from-blue-600/30 to-purple-600/20 rounded-2xl p-6 border border-blue-500/40 backdrop-blur-md transform hover:scale-105 transition-all">
+                        <h3 className="text-2xl font-bold text-white mb-5 flex items-center gap-3">
+                          <div className="p-2 bg-blue-500 rounded-lg shadow-lg">
+                            <span className="text-2xl">🎯</span>
+                          </div>
+                          <span>Möjligheter</span>
+                        </h3>
+                        <ul className="space-y-3">
+                          {typedAnswers.premiumAnalysis.swot.opportunities.map((opportunity: string, i: number) => (
+                            <li key={i} className="text-white/90 flex items-start gap-3 text-left bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors">
+                              <span className="text-blue-400 mt-1 text-xl">→</span>
+                              <span className="flex-1">{opportunity}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      {/* Threats */}
+                      <div className="bg-gradient-to-br from-yellow-600/30 to-amber-600/20 rounded-2xl p-6 border border-yellow-500/40 backdrop-blur-md transform hover:scale-105 transition-all">
+                        <h3 className="text-2xl font-bold text-white mb-5 flex items-center gap-3">
+                          <div className="p-2 bg-yellow-500 rounded-lg shadow-lg">
+                            <span className="text-2xl">🌪️</span>
+                          </div>
+                          <span>Hot</span>
+                        </h3>
+                        <ul className="space-y-3">
+                          {typedAnswers.premiumAnalysis.swot.threats.map((threat: string, i: number) => (
+                            <li key={i} className="text-white/90 flex items-start gap-3 text-left bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors">
+                              <span className="text-yellow-400 mt-1 text-xl">⚡</span>
+                              <span className="flex-1">{threat}</span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
 
-                  {/* Competitive Dynamics */}
-                  <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                    <h3 className="text-xl font-bold text-white mb-4">🏆 Konkurrensdynamik</h3>
-                    <div className="mb-4">
-                      <h4 className="text-lg font-semibold text-white mb-2">Marknadsledare</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        {typedAnswers.premiumAnalysis.marketInsights.competitiveLandscape.leaders.map((leader: any, i: number) => (
-                          <div key={i} className="bg-white/5 rounded-lg p-3 text-center">
-                            <p className="text-white font-medium">{leader.name}</p>
-                            <p className="text-purple-400 text-sm">{leader.share}</p>
-                          </div>
-                        ))}
+              {/* AI Image Prompts Section - NEW */}
+              {expandedInsight === 'ai-bildprompts' && typedAnswers.premiumAnalysis?.aiImagePrompts && (
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl p-8 backdrop-blur-lg border border-purple-500/20">
+                    <div className="flex items-center gap-3 mb-6">
+                      <h2 className="text-3xl font-bold text-white">AI Bildgenerering för Marknadsföring</h2>
+                      <button
+                        onClick={() => setShowImagePromptsInfo(true)}
+                        className="text-white/70 hover:text-white transition-colors"
+                        title="Om AI bildgenerering"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Info Modal */}
+                    {showImagePromptsInfo && (
+                      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowImagePromptsInfo(false)}>
+                        <div className="bg-white rounded-2xl p-6 max-w-md" onClick={(e) => e.stopPropagation()}>
+                          <h3 className="text-xl font-bold text-gray-900 mb-3">🎨 Om AI Bildgenerering</h3>
+                          <p className="text-gray-700 mb-4">
+                            Använd ChatGPT DALL-E 3 eller Midjourney för att skapa professionella bilder för ert företag. 
+                            Bilderna är designade för att förmedla rätt känsla till det limbiska systemet - utan text i bilderna.
+                          </p>
+                          <p className="text-gray-700 mb-4">
+                            Perfekt för sociala medier, hemsidan, presentationer och marknadsföringsmaterial.
+                          </p>
+                          <button
+                            onClick={() => setShowImagePromptsInfo(false)}
+                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                          >
+                            Stäng
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Introduction */}
+                    <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl p-6 border border-purple-500/30 mb-8">
+                      <h3 className="text-xl font-bold text-white mb-3">🌟 Känslodriven Visuell Kommunikation</h3>
+                      <p className="text-white/90 mb-3">
+                        10 professionella AI-bildprompts anpassade för {typedAnswers.company_name || 'ert företag'}. 
+                        Varje bild är noggrant utformad för att väcka rätt känslor hos er målgrupp och stärka ert varumärke.
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="px-3 py-1 bg-purple-500/30 rounded-full text-white/90 text-sm">Utan text i bilderna</span>
+                        <span className="px-3 py-1 bg-pink-500/30 rounded-full text-white/90 text-sm">Limbiska systemet</span>
+                        <span className="px-3 py-1 bg-blue-500/30 rounded-full text-white/90 text-sm">Sociala medier</span>
+                        <span className="px-3 py-1 bg-green-500/30 rounded-full text-white/90 text-sm">Hemsida</span>
                       </div>
                     </div>
-                    <div>
-                      <h4 className="text-lg font-semibold text-white mb-2">Vår Konkurrensfördel</h4>
-                      <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-4 border border-purple-500/30">
-                        <p className="text-white/90">{typedAnswers.premiumAnalysis.marketInsights.competitiveLandscape.ourAdvantage}</p>
+
+                    {/* Image Prompts Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {typedAnswers.premiumAnalysis.aiImagePrompts.prompts.map((prompt: any, i: number) => (
+                        <div key={i} className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-purple-500/30 transition-all">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-lg">
+                                <span className="text-2xl">{prompt.icon}</span>
+                              </div>
+                              <div>
+                                <h4 className="text-lg font-bold text-white">{prompt.title}</h4>
+                                <p className="text-white/60 text-sm">{prompt.usage}</p>
+                              </div>
+                            </div>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              prompt.emotion === 'trust' ? 'bg-blue-500/20 text-blue-300' :
+                              prompt.emotion === 'excitement' ? 'bg-orange-500/20 text-orange-300' :
+                              prompt.emotion === 'innovation' ? 'bg-purple-500/20 text-purple-300' :
+                              prompt.emotion === 'security' ? 'bg-green-500/20 text-green-300' :
+                              'bg-pink-500/20 text-pink-300'
+                            }`}>
+                              {prompt.emotion}
+                            </span>
+                          </div>
+                          
+                          <div className="bg-black/30 rounded-xl p-4 mb-4">
+                            <p className="text-green-400 text-sm font-mono leading-relaxed">
+                              {prompt.prompt}
+                            </p>
+                          </div>
+                          
+                          <div className="flex items-center justify-between">
+                            <div className="flex flex-wrap gap-2">
+                              {prompt.keywords.map((keyword: string, j: number) => (
+                                <span key={j} className="text-xs text-white/60 bg-white/5 px-2 py-1 rounded">
+                                  {keyword}
+                                </span>
+                              ))}
+                            </div>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(prompt.prompt);
+                                setCopiedImagePrompt(i);
+                                setTimeout(() => setCopiedImagePrompt(null), 2000);
+                              }}
+                              className="p-2 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 transition-colors"
+                              title="Kopiera prompt"
+                            >
+                              {copiedImagePrompt === i ? (
+                                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              ) : (
+                                <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Usage Guide */}
+                    <div className="mt-8 bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                      <h3 className="text-xl font-bold text-white mb-4">📚 Användningsguide</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-white/5 rounded-lg p-4">
+                          <h4 className="text-white font-semibold mb-2">1. Kopiera Prompt</h4>
+                          <p className="text-white/70 text-sm">Klicka på kopiera-ikonen för att kopiera en prompt till urklipp.</p>
+                        </div>
+                        <div className="bg-white/5 rounded-lg p-4">
+                          <h4 className="text-white font-semibold mb-2">2. Använd AI-verktyg</h4>
+                          <p className="text-white/70 text-sm">Klistra in i ChatGPT DALL-E 3, Midjourney eller liknande.</p>
+                        </div>
+                        <div className="bg-white/5 rounded-lg p-4">
+                          <h4 className="text-white font-semibold mb-2">3. Publicera</h4>
+                          <p className="text-white/70 text-sm">Använd bilderna på sociala medier, hemsida och i marknadsföring.</p>
+                        </div>
                       </div>
                     </div>
                   </div>

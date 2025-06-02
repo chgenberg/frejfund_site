@@ -364,6 +364,90 @@ Style: Cinematic, warm color grading, mix of real footage feel with subtle tech 
           ],
           ourAdvantage: "Vi är den enda aktören som kombinerar AI-driven matchning med djup branschkunskap och ett kurerat nätverk av top-tier investerare. Vår teknologi är 10x snabbare än manuella processer och våra matchningar har 3x högre success rate än branschsnittet."
         }
+      },
+      aiImagePrompts: {
+        prompts: [
+          {
+            title: "Förtroende & Partnerskap",
+            icon: "🤝",
+            usage: "LinkedIn, hemsida, investerarpresentationer",
+            emotion: "trust",
+            keywords: ["förtroende", "partnerskap", "professionell"],
+            prompt: "Professional business handshake between two people in modern glass office, golden hour lighting streaming through windows, bokeh background with city skyline, warm color palette, photorealistic style, shallow depth of field focusing on joined hands, subtle lens flare, corporate but human feeling"
+          },
+          {
+            title: "Innovation & Teknik",
+            icon: "🚀",
+            usage: "Twitter, tech-bloggar, produktlanseringar",
+            emotion: "innovation",
+            keywords: ["innovation", "framtid", "teknologi"],
+            prompt: "Abstract visualization of AI neural networks connecting dots of light, purple and blue gradient colors, floating holographic data streams, futuristic but approachable design, soft glow effects, clean minimalist background, sense of movement and progress, no text or numbers"
+          },
+          {
+            title: "Tillväxt & Framgång",
+            icon: "📈",
+            usage: "Instagram, success stories, case studies",
+            emotion: "excitement",
+            keywords: ["tillväxt", "framgång", "utveckling"],
+            prompt: "Ascending geometric shapes forming an upward arrow pattern, gradient from deep blue at bottom to bright gold at top, abstract representation of growth, dynamic composition with motion blur effects, inspirational and energetic feeling, modern art style"
+          },
+          {
+            title: "Team & Gemenskap",
+            icon: "👥",
+            usage: "Facebook, kulturinnehåll, rekrytering",
+            emotion: "belonging",
+            keywords: ["team", "gemenskap", "tillsammans"],
+            prompt: "Diverse group of professionals collaborating around modern conference table, natural lighting, genuine smiles and engagement, laptops and notebooks visible, plants in background, warm and inclusive atmosphere, candid documentary style photography"
+          },
+          {
+            title: "Säkerhet & Stabilitet",
+            icon: "🛡️",
+            usage: "Företagshemsida, investerarmaterial",
+            emotion: "security",
+            keywords: ["säkerhet", "stabilitet", "trygghet"],
+            prompt: "Solid geometric fortress made of translucent crystal, soft blue and white color scheme, protective shield effect with subtle glow, minimalist environment, conveying strength and reliability without being aggressive, elegant architectural visualization"
+          },
+          {
+            title: "Vision & Möjligheter",
+            icon: "🌟",
+            usage: "Instagram stories, inspirerande innehåll",
+            emotion: "inspiration",
+            keywords: ["vision", "möjligheter", "drömmar"],
+            prompt: "Person standing on mountain peak at sunrise, arms outstretched, vast landscape below covered in morning mist, warm golden and orange tones, silhouette effect, epic and aspirational feeling, wide angle lens perspective"
+          },
+          {
+            title: "Nätverk & Kopplingar",
+            icon: "🌐",
+            usage: "LinkedIn, nätverksevent, partnerships",
+            emotion: "connection",
+            keywords: ["nätverk", "kopplingar", "relationer"],
+            prompt: "Interconnected nodes forming organic network pattern, soft purple and teal colors, gentle pulsing light traveling between connections, three-dimensional depth, abstract but warm feeling, suggesting human connections not just technology"
+          },
+          {
+            title: "Problemlösning",
+            icon: "💡",
+            usage: "Bloggposter, produktförklaringar",
+            emotion: "clarity",
+            keywords: ["lösning", "insikt", "eureka"],
+            prompt: "Glowing lightbulb transforming into butterfly, metaphorical transformation from idea to reality, soft yellow and white tones with touches of rainbow colors, magical realism style, uplifting and optimistic mood"
+          },
+          {
+            title: "Kundresa & Upplevelse",
+            icon: "🎯",
+            usage: "Customer success, testimonials",
+            emotion: "satisfaction",
+            keywords: ["kundresa", "upplevelse", "nöjdhet"],
+            prompt: "Winding path through beautiful landscape leading to glowing destination, seasons changing along the path showing progression, warm earth tones, aerial perspective, journey metaphor, inviting and rewarding feeling"
+          },
+          {
+            title: "Firande & Milstolpar",
+            icon: "🎉",
+            usage: "Sociala medier vid framgångar",
+            emotion: "joy",
+            keywords: ["firande", "framgång", "glädje"],
+            prompt: "Confetti explosion in slow motion with golden and silver particles, champagne glasses toasting in soft focus background, celebration atmosphere, luxury feeling but approachable, bokeh effects, pure joy and achievement emotion"
+          }
+        ]
       }
     }
   }
