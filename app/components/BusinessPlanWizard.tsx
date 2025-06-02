@@ -881,9 +881,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const [bransch, setBransch] = React.useState('');
   const [omrade, setOmrade] = React.useState('');
   const [privacyChecked, setPrivacyChecked] = React.useState(false);
-  const [linkedinChecked, setLinkedinChecked] = React.useState(false);
-  const [showLinkedinInfo, setShowLinkedinInfo] = React.useState(false);
-  const linkedinInfoRef = useRef<HTMLDivElement>(null);
   const [hasWebsite, setHasWebsite] = React.useState<null | boolean>(null);
   const [websiteUrl, setWebsiteUrl] = React.useState('');
   const [isScraping, setIsScraping] = React.useState(false);
@@ -905,11 +902,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const [marketError, setMarketError] = React.useState<string | null>(null);
   const marketRef = useRef<HTMLDivElement>(null);
   const [marketBransch, setMarketBransch] = React.useState('');
-  const [linkedinInput, setLinkedinInput] = React.useState('');
-  const [linkedinLoading, setLinkedinLoading] = React.useState(false);
-  const [linkedinResult, setLinkedinResult] = React.useState('');
-  const [linkedinError, setLinkedinError] = React.useState<string | null>(null);
-  const competitorRef = useRef<HTMLDivElement>(null);
   const [competitorBransch, setCompetitorBransch] = React.useState('');
   const [showCompetitorPopup, setShowCompetitorPopup] = React.useState(false);
   const [competitorLoading, setCompetitorLoading] = React.useState(false);
@@ -930,7 +922,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     company.trim().length > 1 &&
     /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) &&
     privacyChecked &&
-    linkedinChecked &&
     hasWebsite !== null &&
     (hasWebsite === false || (hasWebsite === true && websiteUrl.trim().length > 3));
 
@@ -1207,7 +1198,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   useOnClickOutside(exampleRef, () => setShowExample(null));
   useOnClickOutside(marketRef, () => setShowMarketPopup(false));
   useOnClickOutside(competitorRef, () => setShowCompetitorPopup(false));
-  useOnClickOutside(linkedinInfoRef, () => setShowLinkedinInfo(false));
 
   if (!open) return null;
   
@@ -1411,62 +1401,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                 Jag godkänner att mina uppgifter behandlas enligt <a href="/privacy" className="text-purple-400 underline hover:text-purple-300">integritetspolicyn</a>
               </span>
             </label>
-          </div>
-          
-          <div className="mb-6">
-            <div className="flex items-center">
-              <label className="flex items-center cursor-pointer group flex-1">
-                <input
-                  type="checkbox"
-                  className="mr-3 w-5 h-5 text-purple-500 bg-white/10 border-2 border-white/30 rounded focus:ring-purple-500 focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#04111d] transition-all"
-                  checked={linkedinChecked}
-                  onChange={e => setLinkedinChecked(e.target.checked)}
-                />
-                <span className="text-sm text-white/80 group-hover:text-white transition-colors">
-                  Dela FrejFund på LinkedIn
-                </span>
-              </label>
-              <button
-                type="button"
-                className="ml-2 text-purple-400 hover:text-purple-300 transition-colors"
-                onClick={() => setShowLinkedinInfo(true)}
-                aria-label="Information om LinkedIn-delning"
-              >
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                  <text x="12" y="16" textAnchor="middle" fontSize="14" fill="currentColor">?</text>
-                </svg>
-              </button>
-            </div>
-            
-            {linkedinChecked && (
-              <div className="mt-3 animate-fadeIn">
-                <a
-                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://www.frejfund.com')}&title=${encodeURIComponent('Jag analyserade min affärsidé med AI!')}&summary=${encodeURIComponent('Testa att analysera din affärsidé du också! FrejFund hjälper startups att hitta rätt investerare med AI-driven analys. Få din investeringsscore på 10 minuter.')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#0077b5] hover:bg-[#006399] text-white rounded-xl transition-all transform hover:scale-105"
-                  onClick={(e) => {
-                    // Öppna LinkedIn-delning i nytt fönster
-                    e.preventDefault();
-                    const width = 600;
-                    const height = 600;
-                    const left = (window.innerWidth - width) / 2;
-                    const top = (window.innerHeight - height) / 2;
-                    window.open(
-                      e.currentTarget.href,
-                      'linkedin-share',
-                      `width=${width},height=${height},left=${left},top=${top}`
-                    );
-                  }}
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                  </svg>
-                  Dela på LinkedIn
-                </a>
-              </div>
-            )}
           </div>
           
           <div className="flex justify-between mt-8">
@@ -1947,51 +1881,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             </div>
             <h3 className="text-2xl font-bold mb-2">{finalLoaderText}</h3>
             <p className="text-white/60">Detta tar vanligtvis 20-30 sekunder</p>
-          </div>
-        </div>
-      )}
-      
-      {/* LinkedIn info popup */}
-      {showLinkedinInfo && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 p-4">
-          <div ref={linkedinInfoRef} className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-2xl shadow-xl border border-white/10 max-w-md w-full p-6 animate-fadeIn">
-            <button
-              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
-              onClick={() => setShowLinkedinInfo(false)}
-            >
-              ✕
-            </button>
-            
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#0077b5]/20 flex items-center justify-center">
-                <svg className="w-8 h-8 text-[#0077b5]" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Varför ber vi om detta?</h3>
-            </div>
-            
-            <div className="space-y-4 text-white/80">
-              <p>
-                Vi på FrejFund vill hjälpa så många entreprenörer som möjligt att få rätt finansiering för sina affärsidéer. 
-              </p>
-              <p>
-                <strong className="text-white">Det är väldigt lite för dig</strong> - bara ett klick för att dela vår tjänst.
-              </p>
-              <p>
-                <strong className="text-white">Men det betyder väldigt mycket för oss</strong> - varje delning hjälper fler entreprenörer att hitta oss och få den hjälp de behöver.
-              </p>
-              <p className="text-sm italic">
-                Tillsammans kan vi bygga ett starkare startup-ekosystem i Sverige! 🚀
-              </p>
-            </div>
-            
-            <button
-              className="w-full mt-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:shadow-lg transition-all"
-              onClick={() => setShowLinkedinInfo(false)}
-            >
-              Förstått!
-            </button>
           </div>
         </div>
       )}
