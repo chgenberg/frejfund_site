@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PDFDocument, StandardFonts, rgb, PageSizes } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, PageSizes, PDFPage } from 'pdf-lib';
 
 interface AnalysisData {
   score: number;
@@ -144,8 +144,7 @@ export async function POST(request: Request) {
     };
 
     // Track pages for numbering
-    let pageCount = 0;
-    const pages: any[] = [];
+    const pages: PDFPage[] = [];
 
     // ===== COVER PAGE =====
     const coverPage = pdfDoc.addPage(PageSizes.A4);
@@ -667,7 +666,7 @@ export async function POST(request: Request) {
 
     // Score visualization
     const centerX = width / 2;
-    let scoreVisualizationY = yPos - 30;
+    const scoreVisualizationY = yPos - 30;
 
     // Main score display
     scorePage.drawRectangle({
