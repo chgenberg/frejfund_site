@@ -486,14 +486,17 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
   };
 
   return (
-    <div className="min-h-screen bg-[#04111d] flex items-center justify-center p-4" style={{
-      backgroundImage: 'url(/bakgrund.png)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
-    }}>
-      <div className="max-w-4xl w-full">
-        <div className={`bg-white/5 backdrop-blur-xl rounded-3xl p-12 text-center border border-white/10 ${scoreInfo.glow} transition-all duration-1000`}>
+    <div className="relative min-h-screen w-full flex items-center justify-center p-4 overflow-hidden">
+      {/* Bakgrundsbild */}
+      <Image
+        src="/bakgrund.png"
+        alt="Bakgrund"
+        fill
+        className="object-cover -z-10"
+        priority
+      />
+      <div className="max-w-4xl w-full flex items-center justify-center mx-auto">
+        <div className={`bg-white/5 backdrop-blur-xl rounded-3xl p-12 text-center border border-white/10 ${scoreInfo.glow} transition-all duration-1000 w-full`}>
           {/* Score Circle */}
           <div className="w-64 h-64 mx-auto mb-8 relative">
             <CircularProgressbar
