@@ -2,32 +2,12 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const hostname = request.headers.get('host') || '';
-  const requestUrl = request.url;
-  
-  // Log for debugging
-  console.log('Middleware - Host:', hostname);
-  console.log('Middleware - Original URL:', requestUrl);
-
-  // Handle www to non-www redirect
-  if (hostname.startsWith('www.')) {
-    // Create a proper URL without www and without port
-    const cleanHost = hostname.replace('www.', '').split(':')[0];
-    const protocol = request.headers.get('x-forwarded-proto') || 'https';
-    const pathname = request.nextUrl.pathname;
-    const search = request.nextUrl.search;
-    
-    const redirectUrl = `${protocol}://${cleanHost}${pathname}${search}`;
-    console.log('Redirecting to:', redirectUrl);
-    
-    return NextResponse.redirect(redirectUrl, 301);
-  }
-
   // Health check endpoint
   if (request.nextUrl.pathname === '/health') {
     return new NextResponse('OK', { status: 200 });
   }
 
+  // Ingen redirect behövs - Render hanterar frejfund.com → www.frejfund.com
   return NextResponse.next();
 }
 
