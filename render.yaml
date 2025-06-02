@@ -6,6 +6,8 @@ services:
     startCommand: npm start
     envVars:
       - key: PORT
-        value: 10000
+        value: 3000
       - key: NODE_ENV
-        value: production 
+        value: production
+    healthCheckPath: /
+    autoDeploy: true 
