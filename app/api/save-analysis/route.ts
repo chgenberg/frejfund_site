@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { supabase } from '../../../lib/supabase';
 
 // OBS: Detta är en mockad version. Implementera med Supabase enligt DATABASE_SETUP.md
 
 interface SaveAnalysisRequest {
-  userId?: string; // Kommer från Supabase Auth
   companyName: string;
   industry: string;
   score: number;
@@ -18,42 +18,53 @@ export async function POST(request: NextRequest) {
   try {
     const data: SaveAnalysisRequest = await request.json();
     
-    // TODO: Implementera med Supabase
-    // const { data: analysis, error } = await supabase
-    //   .from('analyses')
-    //   .insert({
-    //     user_id: data.userId,
-    //     company_name: data.companyName,
-    //     industry: data.industry,
-    //     score: data.score,
-    //     answers: data.answers,
-    //     insights: data.insights,
-    //     action_items: data.actionItems,
-    //     is_premium: data.isPremium,
-    //     premium_analysis: data.premiumAnalysis,
-    //     title: `${data.companyName} - Affärsanalys`,
-    //     description: `Score: ${data.score}/100`
-    //   })
-    //   .select()
-    //   .single();
+    // Hämta användaren
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    // Mockad respons
-    const mockAnalysis = {
-      id: 'mock-' + Date.now(),
-      created_at: new Date().toISOString(),
-      ...data
-    };
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'Du måste vara inloggad för att spara analyser' },
+        { status: 401 }
+      );
+    }
+    
+    // Spara analysen
+    const { data: analysis, error } = await supabase
+      .from('analyses')
+      .insert({
+        user_id: user.id,
+        company_name: data.companyName,
+        industry: data.industry,
+        score: data.score,
+        answers: data.answers,
+        insights: data.insights,
+        action_items: data.actionItems,
+        is_premium: data.isPremium,
+        premium_analysis: data.premiumAnalysis,
+        title: `${data.companyName} - Affärsanalys`,
+        description: `Score: ${data.score}/100`
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Supabase error:', error);
+      return NextResponse.json(
+        { error: 'Kunde inte spara analysen' },
+        { status: 500 }
+      );
+    }
     
     return NextResponse.json({ 
       success: true, 
-      analysis: mockAnalysis,
-      message: 'Analys sparad! (OBS: Detta är en demo. Implementera databas enligt DATABASE_SETUP.md)'
+      analysis,
+      message: 'Analys sparad! Du kan nu se den i din dashboard.'
     });
     
   } catch (error) {
     console.error('Error saving analysis:', error);
     return NextResponse.json(
-      { error: 'Failed to save analysis' },
+      { error: 'Ett fel uppstod vid sparning' },
       { status: 500 }
     );
   }

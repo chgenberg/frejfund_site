@@ -512,8 +512,14 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
 
       const data = await response.json();
       
-      if (data.success) {
-        setSaveMessage('✅ Analys sparad! Logga in för att se alla dina analyser.');
+      if (response.status === 401) {
+        setSaveMessage('🔐 Du behöver logga in för att spara analysen.');
+        // Öppna login i ny flik efter 2 sekunder
+        setTimeout(() => {
+          window.open('/auth/login', '_blank');
+        }, 2000);
+      } else if (data.success) {
+        setSaveMessage('✅ Analys sparad! Du kan nu se den i din dashboard.');
         
         // Visa meddelande i 5 sekunder
         setTimeout(() => {
