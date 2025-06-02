@@ -11,50 +11,108 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { answers, applicationType } = await req.json();
+    const data = await req.json();
+    
+    // Helper function to parse JSON safely
+    const parseJsonSafely = (value: any, fallback: any = null) => {
+      try {
+        return value ? JSON.parse(value) : fallback;
+      } catch {
+        return fallback;
+      }
+    };
+    
+    // Parse complex fields
+    const milestones = parseJsonSafely(data.milestones, []);
+    const capitalBlock = parseJsonSafely(data.capital_block, {});
+    const founderFit = parseJsonSafely(data.founder_market_fit, {});
+    const esg = parseJsonSafely(data.esg, {});
 
     // Skapa en strukturerad prompt för OpenAI
-    const prompt = `Du är en expert på att analysera affärsplaner. Här är informationen från en affärsplan:
+    const prompt = `Du är en expert på att analysera affärsplaner för investerare. Analysera följande information:
 
-Företagsnamn: ${answers.company_name}
+Företagsnamn: ${data.company_name || 'Ej angivet'}
+Bransch: ${data.bransch || 'Ej angivet'}
+Område: ${data.omrade || 'Ej angivet'}
 
-Affärsidé:
-${Object.entries(answers.business_idea || {}).map(([key, value]) => `${key}: ${value}`).join('\n')}
+AFFÄRSIDÉ & VÄRDE:
+${data.company_value || 'Ej angivet'}
 
-Kundsegment:
-${Object.entries(answers.customer_segments || {}).map(([key, value]) => `${key}: ${value}`).join('\n')}
+PROBLEM & LÖSNING:
+Problem: ${data.customer_problem || 'Ej angivet'}
+Bevis för problem: ${data.problem_evidence || 'Ej angivet'}
+Marknadsgap: ${data.market_gap || 'Ej angivet'}
+Lösning: ${data.solution || 'Ej angivet'}
+Varför nu: ${data.why_now || 'Ej angivet'}
 
-Problem & Lösning:
-${Object.entries(answers.problem_solution || {}).map(([key, value]) => `${key}: ${value}`).join('\n')}
+MARKNAD:
+Målgrupp: ${data.target_customer || 'Ej angivet'}
+Marknadsstorlek: ${data.market_size || 'Ej angivet'}
+Trender: ${data.market_trends || 'Ej angivet'}
 
-Marknadsanalys:
-${Object.entries(answers.market_analysis || {}).map(([key, value]) => `${key}: ${value}`).join('\n')}
+TRACTION & AFFÄRSMODELL:
+Nuvarande traction: ${data.traction || 'Ej angivet'}
+Intäktsmodell: ${data.revenue_block || 'Ej angivet'}
+Runway: ${data.runway || 'Ej angivet'} månader
 
-Affärsmodell:
-${Object.entries(answers.business_model || {}).map(([key, value]) => `${key}: ${value}`).join('\n')}
+TILLVÄXTPLAN:
+${data.growth_plan || 'Ej angivet'}
 
-Team:
-${Object.entries(answers.team || {}).map(([key, value]) => `${key}: ${value}`).join('\n')}
+MILSTOLPAR:
+${milestones && milestones.length > 0 ? milestones.map((m: any) => `- ${m.milestone || ''} (${m.date || ''})`).join('\n') : 'Inga milstolpar angivna'}
 
-Finansiering:
-${Object.entries(answers.funding_details || {}).map(([key, value]) => `${key}: ${value}`).join('\n')}
+TEAM:
+${data.team || 'Ej angivet'}
+Founder-Market Fit: ${founderFit?.score || 'Ej angivet'}/5
+${founderFit?.text || ''}
+Teamkompetenser: ${data.team_skills || 'Ej angivet'}
+Rekryteringsplan: ${data.hiring_plan || 'Ej angivet'}
+Styrelse/Rådgivare: ${data.board_advisors || 'Ej angivet'}
 
-Ge en detaljerad analys av affärsplanen med följande struktur:
+KONKURRENS & MOAT:
+Konkurrenter: ${data.competitors || 'Ej angivet'}
+Unik lösning: ${data.unique_solution || 'Ej angivet'}
+IP/Patent: ${data.ip_rights || 'Ej angivet'}
+
+FINANSIERING:
+Kapitalbehov: ${capitalBlock?.amount || 'Ej angivet'} MSEK
+Användning: 
+- Produktutveckling: ${capitalBlock?.product || '0'}%
+- Försäljning/Marketing: ${capitalBlock?.sales || '0'}%
+- Team: ${capitalBlock?.team || '0'}%
+- Övrigt: ${capitalBlock?.other || '0'}%
+Sannolikhet för mer kapital: ${capitalBlock?.probability || 'Ej angivet'}/5
+
+EXIT & RISKER:
+Exit-strategi: ${data.exit_strategy || 'Ej angivet'}
+Huvudrisker: ${data.main_risks || 'Ej angivet'}
+
+ESG:
+${esg?.miljö ? '✓ Miljö' : ''} ${esg?.socialt ? '✓ Socialt' : ''} ${esg?.governance ? '✓ Styrning' : ''}
+${esg?.text || 'Inga ESG-initiativ beskrivna'}
+
+ÖVRIGT:
+${data.anything_else || 'Ingen ytterligare information'}
+
+Ge en detaljerad investeringsanalys med följande struktur:
 1. Sammanfattning (max 200 ord)
-2. Styrkor (3-5 punkter)
-3. Svagheter (3-5 punkter)
-4. Förbättringsområden (3-5 konkreta förslag)
-5. Investeringspotential (1-5, där 5 är högst, med motivering)
-6. Rekommendationer för ${applicationType === 'almi' ? 'Almi' : 'investerare'} (3-5 konkreta förslag)
+2. Styrkor (3-5 konkreta punkter)
+3. Svagheter (3-5 konkreta punkter)
+4. Förbättringsområden (3-5 specifika förslag)
+5. Investeringspotential (1-5, där 5 är högst, med detaljerad motivering)
+6. Rekommendationer för investerare (3-5 konkreta förslag)
 7. Helhetsbetyg (1-100) med motivering
 
-Betygsätt följande områden (1-100) och beräkna ett genomsnitt:
-- Affärsidé och unik säljpunkt
-- Marknadsanalys och kundsegment
-- Affärsmodell och intäktsströmmar
-- Team och kompetens
-- Finansiering och resursplan
-- Risker och hantering
+Inkludera också:
+- Betygsätt följande områden (1-100):
+  * Problem/Lösning fit
+  * Marknadspotential
+  * Affärsmodell & skalbarhet
+  * Team & kompetens
+  * Traction & bevis
+  * Konkurrensfördel
+  * Finansiell plan
+  * Exit-potential
 
 Svara på svenska och formatera svaret som ett JSON-objekt med följande nycklar: 
 summary, strengths, weaknesses, improvements, investment_potential, recommendations, total_score, score_breakdown, score_explanation.`;
@@ -68,7 +126,7 @@ summary, strengths, weaknesses, improvements, investment_potential, recommendati
       body: JSON.stringify({
         model: 'gpt-4-1106-preview',
         messages: [
-          { role: 'system', content: 'Du är en expert på affärsplaner och investeringsanalys. Svara ENDAST med JSON-objektet som efterfrågas, utan någon annan text eller förklaringar.' },
+          { role: 'system', content: 'Du är en erfaren investeringsanalytiker specialiserad på startups. Svara ENDAST med JSON-objektet som efterfrågas, utan någon annan text eller förklaringar.' },
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,
@@ -86,69 +144,49 @@ summary, strengths, weaknesses, improvements, investment_potential, recommendati
       );
     }
 
-    const data = await response.json();
-    const content = data.choices[0].message.content;
+    const responseData = await response.json();
+    const content = responseData.choices[0].message.content;
 
     try {
-      // Ta bort eventuella markdown-markeringar eller extra text
-      let cleanedContent = content;
+      const analysis = JSON.parse(content);
       
-      // Om innehållet börjar med "Betyg" eller annan text, försök hitta JSON-delen
-      if (!content.trim().startsWith('{')) {
-        // Leta efter första { och sista }
-        const jsonStart = content.indexOf('{');
-        const jsonEnd = content.lastIndexOf('}');
-        
-        if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-          cleanedContent = content.substring(jsonStart, jsonEnd + 1);
-        }
-      }
-      
-      // Ta bort eventuella markdown code blocks
-      cleanedContent = cleanedContent.replace(/```json\s*/g, '').replace(/```/g, '').trim();
-      
-      // Försök parsa JSON-svaret
-      const analysis = JSON.parse(cleanedContent);
-      
-      // Säkerställ att alla förväntade fält finns
-      const defaultAnalysis = {
-        summary: analysis.summary || 'Ingen sammanfattning tillgänglig',
-        strengths: analysis.strengths || [],
-        weaknesses: analysis.weaknesses || [],
-        improvements: analysis.improvements || [],
-        investment_potential: analysis.investment_potential || 3,
-        recommendations: analysis.recommendations || [],
-        total_score: analysis.total_score || 75,
-        score_breakdown: analysis.score_breakdown || {},
-        score_explanation: analysis.score_explanation || 'Ingen förklaring tillgänglig'
+      // Create final response with both analysis and original answers
+      const finalResponse = {
+        score: analysis.total_score || 75,
+        answers: data, // Return all the original answers
+        feedback: {
+          summary: analysis.summary,
+          strengths: analysis.strengths,
+          weaknesses: analysis.weaknesses,
+          improvements: analysis.improvements,
+          recommendations: analysis.recommendations,
+          score_explanation: analysis.score_explanation
+        },
+        analysis: analysis
       };
       
-      return NextResponse.json(defaultAnalysis);
+      return NextResponse.json(finalResponse);
     } catch (e) {
       console.error('Failed to parse OpenAI response:', e);
-      console.error('Raw content:', content);
       
-      // Om parsning misslyckas helt, returnera en standardanalys
+      // Return a default response if parsing fails
       return NextResponse.json({
-        summary: 'Analysen kunde inte genomföras korrekt.',
-        strengths: ['Affärsidén har dokumenterats', 'Team finns på plats'],
-        weaknesses: ['Analysen kunde inte slutföras helt'],
-        improvements: ['Försök igen eller kontakta support'],
-        investment_potential: 3,
-        recommendations: ['Se över affärsplanen och försök igen'],
-        total_score: 60,
-        score_breakdown: {
-          'Affärsidé': 60,
-          'Marknadsanalys': 60,
-          'Team': 60
-        },
-        score_explanation: 'Standardbetyg på grund av tekniskt fel'
+        score: 60,
+        answers: data,
+        feedback: {
+          summary: 'Analysen kunde inte genomföras korrekt på grund av ett tekniskt fel.',
+          strengths: ['Affärsidén har dokumenterats', 'Grundläggande information finns'],
+          weaknesses: ['Analysen kunde inte slutföras'],
+          improvements: ['Försök igen eller kontakta support'],
+          recommendations: ['Kontrollera all information och försök igen'],
+          score_explanation: 'Standardbetyg på grund av tekniskt fel'
+        }
       });
     }
   } catch (error) {
     console.error('Error analyzing business plan:', error);
     return NextResponse.json(
-      { error: 'Failed to analyze business plan' },
+      { error: 'Failed to analyze business plan', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
