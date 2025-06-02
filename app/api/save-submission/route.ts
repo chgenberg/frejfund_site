@@ -6,9 +6,8 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
     
-    // Använd Render's disk mount path om den finns, annars lokal submissions mapp
-    const baseDir = process.env.RENDER ? '/opt/render/project/src/data' : process.cwd();
-    const submissionsDir = path.join(baseDir, 'submissions');
+    // Använd alltid lokal submissions mapp
+    const submissionsDir = path.join(process.cwd(), 'submissions');
     
     if (!fs.existsSync(submissionsDir)) {
       fs.mkdirSync(submissionsDir, { recursive: true });

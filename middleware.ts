@@ -2,23 +2,29 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const url = request.nextUrl;
   const hostname = request.headers.get('host') || '';
-
+  const requestUrl = request.url;
+  
   // Log for debugging
   console.log('Middleware - Host:', hostname);
-  console.log('Middleware - URL:', url.toString());
+  console.log('Middleware - Original URL:', requestUrl);
 
-  // Redirect www to non-www
+  // Handle www redirect
   if (hostname.includes('www.')) {
-    const newUrl = new URL(request.url);
-    newUrl.host = hostname.replace('www.', '');
-    console.log('Redirecting to:', newUrl.toString());
-    return NextResponse.redirect(newUrl, 301);
+    // Create a proper URL without port
+    const cleanHost = hostname.replace('www.', '').split(':')[0]; // Remove www and port
+    const protocol = request.headers.get('x-forwarded-proto') || 'https';
+    const pathname = request.nextUrl.pathname;
+    const search = request.nextUrl.search;
+    
+    const redirectUrl = `${protocol}://${cleanHost}${pathname}${search}`;
+    console.log('Redirecting to:', redirectUrl);
+    
+    return NextResponse.redirect(redirectUrl, 301);
   }
 
   // Health check endpoint
-  if (url.pathname === '/health') {
+  if (request.nextUrl.pathname === '/health') {
     return new NextResponse('OK', { status: 200 });
   }
 
