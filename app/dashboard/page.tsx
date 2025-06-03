@@ -6,6 +6,9 @@ import Image from 'next/image'
 import { supabase, Analysis } from '../../lib/supabase'
 import Link from 'next/link'
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default function Dashboard() {
   const router = useRouter()
   const [analyses, setAnalyses] = useState<Analysis[]>([])

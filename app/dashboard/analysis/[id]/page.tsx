@@ -7,6 +7,9 @@ import BusinessPlanResult from '../../../components/BusinessPlanResult'
 import Image from 'next/image'
 import Link from 'next/link'
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default function AnalysisDetailPage() {
   const router = useRouter()
   const params = useParams()
