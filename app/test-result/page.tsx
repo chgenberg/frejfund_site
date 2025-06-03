@@ -4,6 +4,9 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 import { FaCheckCircle, FaExclamationTriangle, FaLightbulb, FaChartBar, FaUsers, FaMoneyBill, FaLeaf, FaRoad, FaSignOutAlt, FaDownload, FaRedo, FaFilePdf, FaChevronDown, FaChevronUp, FaUpload } from 'react-icons/fa';
 import BusinessPlanResult from '../components/BusinessPlanResult';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 const COLORS = ['#16475b', '#7edcff', '#eaf6fa', '#fbbf24', '#10b981', '#ef4444'];
 
 const sectionConfig = [

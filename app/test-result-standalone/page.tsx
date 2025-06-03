@@ -2,6 +2,8 @@
 import BusinessPlanResult from '../components/BusinessPlanResult';
 import '../globals.css'; // Importera CSS direkt
 
+export const dynamic = 'force-dynamic';
+
 export default function TestResultStandalonePage() {
   // Omfattande dummy data för test
   const dummyData = {

@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 export default function TestScrapePage() {
   const [url, setUrl] = useState('');
   const [result, setResult] = useState<any>(null);

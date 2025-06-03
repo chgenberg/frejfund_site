@@ -1,6 +1,8 @@
 "use client";
 import React, { useState } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 export default function TestInputPage() {
   const [value, setValue] = useState('');
 
