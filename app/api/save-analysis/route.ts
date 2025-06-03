@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '../../../lib/supabase';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
 // OBS: Detta är en mockad version. Implementera med Supabase enligt DATABASE_SETUP.md
 
@@ -17,6 +18,9 @@ interface SaveAnalysisRequest {
 export async function POST(request: NextRequest) {
   try {
     const data: SaveAnalysisRequest = await request.json();
+    
+    // Skapa Supabase client med cookies
+    const supabase = createRouteHandlerClient({ cookies });
     
     // Hämta användaren
     const { data: { user }, error: userError } = await supabase.auth.getUser();
