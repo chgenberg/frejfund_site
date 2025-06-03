@@ -1,6 +1,6 @@
+"use client";
 export const dynamic = 'force-dynamic';
 
-"use client";
 import Image from "next/image";
 import { useState } from "react";
 import BusinessPlanWizard from "./components/BusinessPlanWizard";
