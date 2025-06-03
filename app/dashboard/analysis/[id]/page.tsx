@@ -1,20 +1,24 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { supabase, Analysis } from '../../../../lib/supabase'
 import BusinessPlanResult from '../../../components/BusinessPlanResult'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export default function AnalysisDetailPage({ params }: { params: { id: string } }) {
+export default function AnalysisDetailPage() {
   const router = useRouter()
+  const params = useParams()
+  const id = params.id as string
   const [analysis, setAnalysis] = useState<Analysis | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchAnalysis()
-  }, [params.id])
+    if (id) {
+      fetchAnalysis()
+    }
+  }, [id])
 
   const fetchAnalysis = async () => {
     try {
@@ -27,7 +31,7 @@ export default function AnalysisDetailPage({ params }: { params: { id: string } 
       const { data, error } = await supabase
         .from('analyses')
         .select('*')
-        .eq('id', params.id)
+        .eq('id', id)
         .eq('user_id', user.id)
         .single()
 
@@ -48,7 +52,7 @@ export default function AnalysisDetailPage({ params }: { params: { id: string } 
 
   const handleUpgradeToPremium = () => {
     // Spara analysis ID för uppgradering efter betalning
-    localStorage.setItem('upgradeAnalysisId', params.id)
+    localStorage.setItem('upgradeAnalysisId', id)
     router.push('/kassa/checkout')
   }
 
