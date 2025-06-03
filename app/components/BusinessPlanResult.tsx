@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import AuthModal from './AuthModal';
+import { supabase } from '../../lib/supabase';
 
 interface ResultProps {
   score: number;
@@ -117,10 +119,31 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [showImagePromptsInfo, setShowImagePromptsInfo] = useState(false);
   const [copiedImagePrompt, setCopiedImagePrompt] = useState<number | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
+  const [user, setUser] = useState<any>(null);
   
   const scoreInfo = getScoreInfo(score);
   const typedAnswers = answers as Record<string, any>;
   const isPremium = subscriptionLevel === 'premium';
+
+  // Check if user is logged in
+  useEffect(() => {
+    checkUser();
+    
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+  };
 
   // Parse JSON fields safely
   const parseJsonSafely = (value: any, fallback = {}) => {
@@ -484,11 +507,17 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
   const [saveMessage, setSaveMessage] = React.useState('');
 
   const handleSaveAnalysis = async () => {
+    // Check if user is logged in
+    if (!user) {
+      setAuthMode('signup');
+      setShowAuthModal(true);
+      return;
+    }
+
     setIsSaving(true);
     setSaveMessage('');
     
     try {
-      // För demo - senare implementera med Supabase Auth för userId
       const response = await fetch('/api/save-analysis', {
         method: 'POST',
         headers: {
@@ -512,13 +541,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
 
       const data = await response.json();
       
-      if (response.status === 401) {
-        setSaveMessage('🔐 Du behöver logga in för att spara analysen.');
-        // Öppna login i ny flik efter 2 sekunder
-        setTimeout(() => {
-          window.open('/auth/login', '_blank');
-        }, 2000);
-      } else if (data.success) {
+      if (data.success) {
         setSaveMessage('✅ Analys sparad! Du kan nu se den i din dashboard.');
         
         // Visa meddelande i 5 sekunder
@@ -643,6 +666,25 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                 </div>
               )}
 
+              {/* Smart CTA for creating account if not logged in */}
+              {!user && (
+                <div className="mt-8 p-6 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl border border-blue-500/30">
+                  <h3 className="text-xl font-bold text-white mb-3">💾 Spara din analys</h3>
+                  <p className="text-white/80 mb-4">
+                    Skapa ett gratis konto för att spara din analys och få tillgång till din personliga dashboard.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setAuthMode('signup');
+                      setShowAuthModal(true);
+                    }}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+                  >
+                    Skapa konto & spara analys
+                  </button>
+                </div>
+              )}
+
               {/* Only show upgrade CTA if NOT premium */}
               {!isPremium && (
                 <div className="mt-12 p-8 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-3xl border border-purple-500/30">
@@ -746,6 +788,26 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                       { id: 'swot', label: 'SWOT', icon: '💪', description: 'Styrkor & Svagheter' },
                       { id: 'finansiell', label: 'Finansiell', icon: '📈', description: '3-års projektioner' },
                       { id: 'rekommendationer', label: 'Rekommendationer', icon: '🎯', description: 'Åtgärdsplan' },
+                      { id: 'ai-bildprompts', label: 'AI Bilder', icon: '🎨', description: 'Marknadsföring' }
+                    ].map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setExpandedInsight(tab.id)}
+                        className={`p-4 rounded-2xl text-center transition-all ${
+                          expandedInsight === tab.id
+                            ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-white'
+                            : 'text-white/60 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        <div className="text-2xl mb-2">{tab.icon}</div>
+                        <div className="font-semibold">{tab.label}</div>
+                        <div className="text-xs opacity-75">{tab.description}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               {/* Market Insights Section */}
               {expandedInsight === 'marknadsinsikter' && (
                 <div className="space-y-6 animate-fadeIn">
@@ -832,7 +894,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
                 </div>
               )}
 
-              {/* AI Image Prompts Section - NEW */}
+              {/* AI Image Prompts Section */}
               {expandedInsight === 'ai-bildprompts' && typedAnswers.premiumAnalysis?.aiImagePrompts && (
                 <div className="space-y-6 animate-fadeIn">
                   <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl p-8 backdrop-blur-lg border border-purple-500/20">
@@ -974,13 +1036,14 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
           ) : null}
         </div>
       </div>
-      {/* Back button */}
-      <button
-        onClick={() => setCurrentSection('score')}
-        className="mt-8 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all"
-      >
-        Tillbaka
-      </button>
+      
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        defaultMode={authMode}
+        onSuccess={handleSaveAnalysis}
+      />
     </div>
   );
 } 
