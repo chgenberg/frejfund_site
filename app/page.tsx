@@ -5,6 +5,9 @@ import BusinessPlanWizard from "./components/BusinessPlanWizard";
 import Link from 'next/link'
 import Header from './components/Header'
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
   const [showWizard, setShowWizard] = useState(false);
 
