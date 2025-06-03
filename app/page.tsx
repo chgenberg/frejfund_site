@@ -1,12 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 "use client";
 import Image from "next/image";
 import { useState } from "react";
 import BusinessPlanWizard from "./components/BusinessPlanWizard";
 import Link from 'next/link'
 import Header from './components/Header'
-
-// Force dynamic rendering for this page
-export const dynamic = 'force-dynamic'
 
 export default function Home() {
   const [showWizard, setShowWizard] = useState(false);
