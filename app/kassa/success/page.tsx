@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export default function PaymentSuccessPage() {
   const router = useRouter();
   const [showContent, setShowContent] = useState(false);
