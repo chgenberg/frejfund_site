@@ -37,7 +37,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login', redi
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
           },
         })
         if (error) throw error
@@ -75,7 +75,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login', redi
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
         },
       })
       if (error) throw error

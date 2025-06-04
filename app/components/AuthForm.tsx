@@ -24,7 +24,7 @@ export default function AuthForm({ mode = 'login' }: { mode?: 'login' | 'signup'
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
           },
         })
         if (error) throw error
