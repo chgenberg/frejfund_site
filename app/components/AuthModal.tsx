@@ -21,6 +21,10 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login', redi
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
 
+  const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL
+    ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+    : (typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined);
+
   useEffect(() => {
     setMode(defaultMode)
   }, [defaultMode])
@@ -37,7 +41,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login', redi
           email,
           password,
           options: {
-            emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
+            emailRedirectTo: redirectUrl,
           },
         })
         if (error) throw error
@@ -75,7 +79,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login', redi
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
+          emailRedirectTo: redirectUrl,
         },
       })
       if (error) throw error

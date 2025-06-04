@@ -12,6 +12,10 @@ export default function AuthForm({ mode = 'login' }: { mode?: 'login' | 'signup'
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
 
+  const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL
+    ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+    : (typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined);
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -24,7 +28,7 @@ export default function AuthForm({ mode = 'login' }: { mode?: 'login' | 'signup'
           email,
           password,
           options: {
-            emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
+            emailRedirectTo: redirectUrl,
           },
         })
         if (error) throw error

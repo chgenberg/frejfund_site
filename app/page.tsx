@@ -31,6 +31,11 @@ export default function Home() {
           Starta analys
         </button>
 
+        {/* Brain image under knappen */}
+        <div className="z-10 flex justify-center w-full mt-6">
+          <Image src="/brain.png" alt="Brain" width={120} height={80} className="opacity-90" />
+        </div>
+
         <BusinessPlanWizard open={showWizard} onClose={() => setShowWizard(false)} />
       </main>
     </>
