@@ -6,6 +6,7 @@ import Chatbot from './components/Chatbot'
 import LoginModal from './components/LoginModal'
 import Image from 'next/image'
 import { AuthProvider } from './context/AuthContext'
+import OverlayNavbar from './components/OverlayNavbar'
 
 const nunito = Nunito({ subsets: ['latin'], weight: ['400', '600', '700'] })
 
@@ -53,6 +54,7 @@ export default function RootLayout({
             priority
           />
           <LoginModal />
+          <OverlayNavbar />
           <main className="flex-grow relative z-10">
             {children}
           </main>
