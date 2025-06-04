@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Nunito } from 'next/font/google'
 import './globals.css'
-import OverlayNavbar from './components/OverlayNavbar'
 import Footer from './components/Footer'
 import Chatbot from './components/Chatbot'
 import LoginModal from './components/LoginModal'
@@ -53,7 +52,6 @@ export default function RootLayout({
             className="object-cover -z-10 fixed inset-0"
             priority
           />
-          <OverlayNavbar />
           <LoginModal />
           <main className="flex-grow relative z-10">
             {children}
