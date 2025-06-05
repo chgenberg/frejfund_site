@@ -1145,11 +1145,11 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const progress = Math.round((step / INVESTOR_QUESTIONS.length) * 100);
 
   const isPreStep1Valid =
-    answers.company_name.trim().length > 1 &&
-    /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(answers.email) &&
+    (answers.company_name || '').trim().length > 1 &&
+    /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(answers.email || '') &&
     privacyChecked &&
     hasWebsite !== null &&
-    (hasWebsite === false || (hasWebsite === true && websiteUrl.trim().length > 3));
+    (hasWebsite === false || (hasWebsite === true && (websiteUrl || '').trim().length > 3));
 
   const isPreStep2Valid = selectedIndustry && selectedArea;
 
@@ -1180,16 +1180,16 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
 
     if (typeof answer === 'object') {
       if (current.type === 'milestone_list') {
-        return answer.every((item: any) => item.milestone?.trim() && item.date?.trim());
+        return answer.every((item: any) => (item.milestone || '').trim() && (item.date || '').trim());
       }
       if (current.type === 'capital_matrix') {
-        return Object.values(answer).every((val: any) => val?.trim());
+        return Object.values(answer).every((val: any) => (val || '').trim());
       }
       if (current.type === 'esg_checkbox') {
-        return answer.text?.trim();
+        return (answer.text || '').trim();
       }
       if (current.type === 'founder_market_fit') {
-        return answer.text?.trim();
+        return (answer.text || '').trim();
       }
     }
 
