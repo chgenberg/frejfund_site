@@ -1154,36 +1154,45 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const isPreStep2Valid = selectedIndustry && selectedArea;
 
   const isCurrentStepValid = () => {
-    if (!current) return false;
+    if (preStep) {
+      if (preStepPage === 1) {
+        return selectedIndustry?.trim() && selectedArea?.trim();
+      }
+      if (preStepPage === 2) {
+        return answers.company_name?.trim();
+      }
+      return true;
+    }
+
+    const current = INVESTOR_QUESTIONS[step - 1] as Question;
+    if (!current.required) return true;
+
     const answer = answers[current.id];
-    if (current.required && (!answer || answer.trim() === '')) return false;
-    if (current.type === 'number' && current.required) {
-      return answer !== undefined && answer !== '';
+    if (!answer) return false;
+
+    if (typeof answer === 'string') {
+      return answer.trim().length >= 10;
     }
-    if (current.type === 'milestone_list' && current.required) {
-      try {
-        const milestones = JSON.parse(answer as string);
-        return milestones && milestones.length > 0;
-      } catch {
-        return false;
+
+    if (Array.isArray(answer)) {
+      return answer.length > 0;
+    }
+
+    if (typeof answer === 'object') {
+      if (current.type === 'milestone_list') {
+        return answer.every((item: any) => item.milestone?.trim() && item.date?.trim());
+      }
+      if (current.type === 'capital_matrix') {
+        return Object.values(answer).every((val: any) => val?.trim());
+      }
+      if (current.type === 'esg_checkbox') {
+        return answer.text?.trim();
+      }
+      if (current.type === 'founder_market_fit') {
+        return answer.text?.trim();
       }
     }
-    if (current.type === 'capital_matrix' && current.required) {
-      try {
-        const capital = JSON.parse(answer as string);
-        return capital && capital.amount && capital.product && capital.sales && capital.team && capital.other;
-      } catch {
-        return false;
-      }
-    }
-    if (current.type === 'founder_market_fit' && current.required) {
-      try {
-        const fit = JSON.parse(answer as string);
-        return fit && fit.score && fit.text;
-      } catch {
-        return false;
-      }
-    }
+
     return true;
   };
 
