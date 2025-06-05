@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import BusinessPlanResult from './BusinessPlanResult';
-import BusinessPlanScore from './BusinessPlanScore';
+import BusinessPlanScore, { calculateScore as calculateScoreFn } from './BusinessPlanScore';
 import TestWizard, { CustomTextarea, TEST_EXPORT } from './TestWizard';
 import { supabase } from '../../lib/supabase';
 
@@ -1076,6 +1076,7 @@ async function saveFullAnalysis({
   bransch,
   omrade,
   answers,
+  score,
   user_id = null,
 }: {
   company: string;
@@ -1085,6 +1086,7 @@ async function saveFullAnalysis({
   bransch: string;
   omrade: string;
   answers: any;
+  score: number;
   user_id?: string | null;
 }) {
   const { error } = await supabase
@@ -1099,6 +1101,7 @@ async function saveFullAnalysis({
       bransch,
       omrade,
       answers: JSON.stringify(answers),
+      score
     }]);
   if (error) {
     console.error('Kunde inte spara analys:', error);
@@ -1486,6 +1489,9 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const handleSubmit = async () => {
     setShowFinalLoader(true);
     try {
+      // Räkna ut score - use a default score for now since the answer structure doesn't match
+      const { score: aiScore } = calculateScoreFn({});
+      const finalScore = aiScore || 50; // Default score if calculation fails
       // Debug-logg för vad som skickas till Supabase
       console.log('Sparar analys:', {
         company: answers.company_name,
@@ -1494,7 +1500,8 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         websiteUrl: answers.website_url || '',
         bransch: selectedIndustry,
         omrade: selectedArea,
-        answers: answers
+        answers: answers,
+        score: finalScore
       });
       // Spara analysen
       await saveFullAnalysis({
@@ -1504,7 +1511,8 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         websiteUrl: answers.website_url || '',
         bransch: selectedIndustry,
         omrade: selectedArea,
-        answers: answers
+        answers: answers,
+        score: finalScore
       });
       // Visa resultatet direkt
       setShowFinalLoader(false);

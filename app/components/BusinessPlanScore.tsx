@@ -23,7 +23,7 @@ interface ScoreProps {
   };
 }
 
-const calculateScore = (answers: ScoreProps['answers']) => {
+export const calculateScore = (answers: ScoreProps['answers']) => {
   // Baspoäng per kategori (0-25)
   const teamScore = calculateTeamScore(answers);
   const problemSolutionScore = calculateProblemSolutionScore(answers);
