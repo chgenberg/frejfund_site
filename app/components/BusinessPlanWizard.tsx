@@ -1,10 +1,9 @@
-"use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import BusinessPlanResult from './BusinessPlanResult';
 import BusinessPlanScore, { calculateScore as calculateScoreFn } from './BusinessPlanScore';
 import TestWizard, { CustomTextarea, TEST_EXPORT } from './TestWizard';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../lib/supabase';
 
 const BRANSCHER = [
   'SaaS', 'Tech', 'Konsumentvaror', 'Hälsa', 'Fintech', 'Industri', 'Tjänster', 'Utbildning', 'Energi', 'Annat'
@@ -216,10 +215,36 @@ const touchTarget = "min-h-[44px]";
 const transitionBase = "transition-all duration-200 ease-in-out";
 
 // Update the input base styles for dark theme
-const inputBase = `w-full px-4 py-3 rounded-2xl bg-white/10 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] border border-white/20 text-white placeholder-white/40 transition-all duration-200 backdrop-blur-md ${mobileInput} ${touchTarget} ${focusRing} hover:bg-white/15 hover:border-white/30`;
+const inputBase = `
+  w-full px-4 py-3 
+  bg-white/5 
+  border border-white/10 
+  rounded-xl
+  text-white
+  placeholder-white/40
+  focus:outline-none 
+  focus:ring-2 
+  focus:ring-purple-500/50 
+  focus:border-transparent
+  transition-all
+  duration-200
+`;
 
 // Update the select base styles
-const selectBase = `${inputBase} appearance-none pr-10 cursor-pointer`;
+const selectBase = `
+  w-full px-4 py-3 
+  bg-white/5 
+  border border-white/10 
+  rounded-xl
+  text-white
+  appearance-none
+  focus:outline-none 
+  focus:ring-2 
+  focus:ring-purple-500/50 
+  focus:border-transparent
+  transition-all
+  duration-200
+`;
 
 // Add new feedback styles
 const successState = "border-green-500 bg-green-500/10";
@@ -1144,7 +1169,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     'Sammanställer din investeringsprofil...'
   ];
 
-  const current: Question = INVESTOR_QUESTIONS[step - 1];
+  const current: Question = INVESTOR_QUESTIONS[step];  // Ta bort -1
   const progress = Math.round((step / INVESTOR_QUESTIONS.length) * 100);
 
   const isPreStep1Valid =
@@ -1167,7 +1192,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
       return true;
     }
 
-    const current = INVESTOR_QUESTIONS[step - 1] as Question;
+    const current = INVESTOR_QUESTIONS[step] as Question;
     if (!current.required) return true;
 
     const answer = answers[current.id];
@@ -1489,28 +1514,45 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const handleSubmit = async () => {
     setShowFinalLoader(true);
     try {
-      // Räkna ut score på ett säkert sätt
-      let aiScore = 50;
-      try {
-        const result = calculateScoreFn(answers);
-        aiScore = Number.isFinite(result?.score) ? result.score : 50;
-      } catch {
-        aiScore = 50;
-      }
-      const finalScore = aiScore;
+      // Felsökningsblock för score
+      let finalScore = 50; // Default värde
+      let scoreSource = "default 50";
+      let calcResult: any = null;
 
-      // Debug-logg för vad som skickas till Supabase
-      console.log('Sparar analys:', {
-        company: answers.company_name,
-        email: answers.email,
-        hasWebsite: answers.has_website === 'yes',
-        websiteUrl: answers.website_url || '',
-        bransch: selectedIndustry,
-        omrade: selectedArea,
-        answers: answers,
-        score: finalScore
+      try {
+        calcResult = calculateScoreFn(answers);
+        console.log("DEBUG: calculateScoreFn result:", calcResult);
+        
+        if (calcResult && typeof calcResult.score === 'number' && Number.isFinite(calcResult.score)) {
+          finalScore = Math.round(calcResult.score); // Säkerställ heltal
+          scoreSource = "calculated";
+        } else {
+          console.warn("DEBUG: Invalid score from calculateScoreFn:", calcResult);
+          finalScore = 50;
+          scoreSource = "fallback 50";
+        }
+      } catch (e) {
+        console.error("DEBUG: Error in calculateScoreFn:", e);
+        finalScore = 50;
+        scoreSource = "exception fallback 50";
+      }
+
+      // Logga ALLT innan vi skickar till Supabase
+      console.log("DEBUG: Skickar till Supabase:", {
+        finalScore,
+        typeofFinalScore: typeof finalScore,
+        isFinite: Number.isFinite(finalScore),
+        calcResult,
+        answers,
+        scoreSource
       });
-      // Spara analysen
+
+      // Säkerställ att score är ett giltigt nummer innan vi skickar
+      if (!Number.isFinite(finalScore)) {
+        console.error("DEBUG: Invalid finalScore, using fallback 50");
+        finalScore = 50;
+      }
+
       await saveFullAnalysis({
         company: answers.company_name,
         email: answers.email,
@@ -1521,7 +1563,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         answers: answers,
         score: finalScore
       });
-      // Visa resultatet direkt
+
       setShowFinalLoader(false);
       setResult({
         // ... mock eller faktisk analysdata ...
@@ -1897,166 +1939,127 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     );
   };
 
+  console.log("DEBUG: current question", current);
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        {/* ... existing code ... */}
-        
-        {/* Form inputs - Add a container with min-height to keep consistent size */}
-        <div className="flex-1 min-h-[200px] mb-6">
-          {/* Textarea questions */}
-          {isTextQuestion(current) && current.type === "textarea" && (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+      <div className="bg-[#101624] rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/10 text-white">
+        {/* --- Lägg till detta block ovanför svarsrutan --- */}
+        {current && (
+          <div className="mb-8">
+            <label className="block text-xl font-semibold text-white mb-3">
+              {current.label}
+            </label>
+            {current.help && (
+              <div className="text-sm text-white/60 mb-4">{current.help}</div>
+            )}
             <div className="relative">
-              <textarea
-                className={`${inputBase} ${
-                  scrapedData && answers[current.id] ? 'border-green-500/50 bg-green-500/10' : ''
-                }`}
-                value={getStringValue(answers[current.id])}
-                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
-                placeholder={scrapedData && answers[current.id] ? "Automatiskt ifyllt - redigera efter behov" : "Skriv ditt svar här..."}
-                rows={6}
-                style={{ minHeight: '150px', maxHeight: '250px', resize: 'vertical' }}
-              />
-              <CharacterCounter 
-                current={getStringValue(answers[current.id]).length} 
-                max={10} 
-              />
-              {scrapedData && answers[current.id] && (
-                <div className="mt-2 flex items-center">
-                  <span className="text-green-400 text-xs">🤖 AI-fyllt</span>
+              {/* Textarea */}
+              {isTextQuestion(current) && current.type === "textarea" && (
+                <textarea
+                  className={`${inputBase} bg-[#182032] border-white/20 text-white placeholder-white/40`}
+                  value={getStringValue(answers[current.id])}
+                  onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+                  placeholder={scrapedData && answers[current.id] ? "Automatiskt ifyllt - redigera efter behov" : "Skriv ditt svar här..."}
+                  rows={6}
+                  style={{ minHeight: '150px', maxHeight: '250px', resize: 'vertical' }}
+                />
+              )}
+              {/* Text input */}
+              {isTextQuestion(current) && current.type === "text" && (
+                <input
+                  type="text"
+                  className={`${inputBase} bg-[#182032] border-white/20 text-white placeholder-white/40`}
+                  value={getStringValue(answers[current.id])}
+                  onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+                  placeholder={scrapedData && answers[current.id] ? "Automatiskt ifyllt" : "Skriv ditt svar..."}
+                />
+              )}
+              {/* Number input */}
+              {isTextQuestion(current) && current.type === "number" && (
+                <div className="flex items-center gap-4">
+                  <input
+                    type="number"
+                    className={`${inputBase} bg-[#182032] border-white/20 text-white placeholder-white/40 max-w-[200px] text-center text-2xl font-bold`}
+                    value={getStringValue(answers[current.id])}
+                    onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+                    placeholder="0"
+                    min="0"
+                  />
+                  {current.id === 'runway' && (
+                    <span className="text-white/60 text-lg">månader</span>
+                  )}
+                  {current.id === 'founder_equity' && (
+                    <span className="text-white/60 text-lg">%</span>
+                  )}
+                </div>
+              )}
+              {/* Select */}
+              {isSelectQuestion(current) && current.type === "select" && (
+                <div className="relative">
+                  <select
+                    className={`${selectBase} bg-[#182032] border-white/20 text-white`}
+                    value={getStringValue(answers[current.id])}
+                    onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
+                  >
+                    <option value="">Välj ett alternativ...</option>
+                    {current.options.map(opt => (
+                      <option key={opt} value={opt} className="bg-[#182032] text-white">{opt}</option>
+                    ))}
+                  </select>
+                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/60">
+                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                      <path d="M8 10l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                </div>
+              )}
+              {/* Radio */}
+              {isSelectQuestion(current) && current.type === "radio" && (
+                <div className="space-y-3">
+                  {current.options.map(opt => (
+                    <label key={opt} className="flex items-center gap-3 cursor-pointer group">
+                      <div className="relative">
+                        <input
+                          type="radio"
+                          name={current.id}
+                          value={opt}
+                          checked={getStringValue(answers[current.id]) === opt}
+                          onChange={() => setAnswers({ ...answers, [current.id]: opt })}
+                          className="sr-only"
+                        />
+                        <div className={`w-6 h-6 rounded-full border-2 transition-all ${
+                          getStringValue(answers[current.id]) === opt
+                            ? 'border-purple-500 bg-purple-500'
+                            : 'border-white/30 bg-[#182032] group-hover:border-purple-400'
+                        }`}>
+                          {getStringValue(answers[current.id]) === opt && (
+                            <div className="w-full h-full rounded-full flex items-center justify-center">
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-white/80 group-hover:text-white transition-colors">{opt}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+              {/* Character counter */}
+              {isTextQuestion(current) && (
+                <div className="mt-2 flex items-center justify-between">
+                  <CharacterCounter 
+                    current={getStringValue(answers[current.id]).length} 
+                    max={10} 
+                  />
+                  {scrapedData && answers[current.id] && (
+                    <span className="text-green-400 text-xs">🤖 AI-fyllt</span>
+                  )}
                 </div>
               )}
             </div>
-          )}
-          
-          {/* Text input questions */}
-          {isTextQuestion(current) && current.type === "text" && (
-            <div className="relative">
-              <input
-                type="text"
-                className={`${inputBase} ${
-                  scrapedData && answers[current.id] ? 'border-green-500/50 bg-green-500/10' : ''
-                }`}
-                value={getStringValue(answers[current.id])}
-                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
-                placeholder={scrapedData && answers[current.id] ? "Automatiskt ifyllt" : "Skriv ditt svar..."}
-              />
-              <CharacterCounter 
-                current={getStringValue(answers[current.id]).length} 
-                max={10} 
-              />
-            </div>
-          )}
-          
-          {/* Number input questions */}
-          {isTextQuestion(current) && current.type === "number" && (
-            <div className="flex items-center gap-4">
-              <input
-                type="number"
-                className={`${inputBase} max-w-[200px] text-center text-2xl font-bold ${
-                  scrapedData && answers[current.id] ? 'border-green-500/50 bg-green-500/10' : ''
-                }`}
-                value={getStringValue(answers[current.id])}
-                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
-                placeholder="0"
-                min="0"
-              />
-              {current.id === 'runway' && (
-                <span className="text-white/60 text-lg">månader</span>
-              )}
-              {current.id === 'founder_equity' && (
-                <span className="text-white/60 text-lg">%</span>
-              )}
-            </div>
-          )}
-          
-          {/* Select questions */}
-          {isSelectQuestion(current) && current.type === "select" && (
-            <div className="relative">
-              <select
-                className={`${selectBase} ${
-                  answers[current.id] ? 'border-purple-500/50' : ''
-                }`}
-                value={getStringValue(answers[current.id])}
-                onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
-              >
-                <option value="">Välj ett alternativ...</option>
-                {current.options.map(opt => (
-                  <option key={opt} value={opt} className="bg-[#04111d] text-white">{opt}</option>
-                ))}
-              </select>
-              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/60">
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                  <path d="M8 10l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </span>
-            </div>
-          )}
-          
-          {/* Radio questions */}
-          {isSelectQuestion(current) && current.type === "radio" && (
-            <div className="space-y-3">
-              {current.options.map(opt => (
-                <label key={opt} className="flex items-center gap-3 cursor-pointer group">
-                  <div className="relative">
-                    <input
-                      type="radio"
-                      name={current.id}
-                      value={opt}
-                      checked={getStringValue(answers[current.id]) === opt}
-                      onChange={() => setAnswers({ ...answers, [current.id]: opt })}
-                      className="sr-only"
-                    />
-                    <div className={`w-6 h-6 rounded-full border-2 transition-all ${
-                      getStringValue(answers[current.id]) === opt
-                        ? 'border-purple-500 bg-purple-500'
-                        : 'border-white/30 bg-white/10 group-hover:border-purple-400'
-                    }`}>
-                      {getStringValue(answers[current.id]) === opt && (
-                        <div className="w-full h-full rounded-full flex items-center justify-center">
-                          <div className="w-2 h-2 bg-white rounded-full"></div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <span className="text-white/80 group-hover:text-white transition-colors">{opt}</span>
-                </label>
-              ))}
-            </div>
-          )}
-          
-          {/* Milestone list */}
-          {isMilestoneQuestion(current) && (
-            <MilestoneList
-              value={answers[current.id] ? JSON.parse(answers[current.id] as string) : [{ milestone: '', date: '' }]}
-              onChange={val => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
-            />
-          )}
-          
-          {/* Capital matrix */}
-          {isCapitalQuestion(current) && (
-            <CapitalMatrix
-              value={answers[current.id] ? JSON.parse(answers[current.id] as string) : { amount: '', product: '', sales: '', team: '', other: '', probability: '3' }}
-              onChange={val => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
-            />
-          )}
-          
-          {/* ESG checkbox */}
-          {isESGQuestion(current) && (
-            <ESGCheckbox
-              value={answers[current.id] ? JSON.parse(answers[current.id] as string) : { miljö: false, socialt: false, governance: false, text: '' }}
-              onChange={val => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
-            />
-          )}
-          
-          {/* Founder market fit */}
-          {isFounderMarketFitQuestion(current) && (
-            <FounderMarketFit
-              value={answers[current.id] ? JSON.parse(answers[current.id] as string) : { score: '', text: '' }}
-              onChange={val => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
-            />
-          )}
-        </div>
+          </div>
+        )}
         
         {/* Navigation buttons */}
         {renderButtons()}
