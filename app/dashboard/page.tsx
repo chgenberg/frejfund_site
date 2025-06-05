@@ -4,10 +4,75 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { supabase, Analysis } from '../../lib/supabase'
-import Link from 'next/link'
+import BusinessPlanWizard from '../components/BusinessPlanWizard'
+import PremiumModal from '../components/PremiumModal'
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
+
+function ProfileSettingsModal({ open, onClose, userEmail, setUserEmail }: { open: boolean, onClose: () => void, userEmail: string, setUserEmail: (email: string) => void }) {
+  const [email, setEmail] = useState(userEmail);
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleEmailChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+    setError('');
+    try {
+      const { error } = await supabase.auth.updateUser({ email });
+      if (error) throw error;
+      setMessage('E-post uppdaterad!');
+      setUserEmail(email);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+    setError('');
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      setMessage('Lösenord uppdaterat!');
+      setPassword('');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-3xl p-8 max-w-md w-full border border-white/10 shadow-2xl relative">
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-black text-2xl font-bold">×</button>
+        <h2 className="text-2xl font-bold mb-6 text-center text-[#16475b]">Profilinställningar</h2>
+        <form onSubmit={handleEmailChange} className="mb-6">
+          <label className="block mb-2 font-semibold">E-postadress</label>
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-4 py-2 border rounded mb-2" />
+          <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-all" disabled={loading}>Uppdatera e-post</button>
+        </form>
+        <form onSubmit={handlePasswordChange}>
+          <label className="block mb-2 font-semibold">Nytt lösenord</label>
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-4 py-2 border rounded mb-2" />
+          <button type="submit" className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 transition-all" disabled={loading}>Uppdatera lösenord</button>
+        </form>
+        {message && <div className="mt-4 text-green-600 text-center">{message}</div>}
+        {error && <div className="mt-4 text-red-600 text-center">{error}</div>}
+      </div>
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const router = useRouter()
@@ -15,6 +80,9 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [userEmail, setUserEmail] = useState('')
   const [filterPremium, setFilterPremium] = useState<'all' | 'premium' | 'standard'>('all')
+  const [showWizard, setShowWizard] = useState(false)
+  const [showProfile, setShowProfile] = useState(false)
+  const [showPremiumModal, setShowPremiumModal] = useState(false)
 
   useEffect(() => {
     checkUser()
@@ -79,30 +147,14 @@ export default function Dashboard() {
       />
       
       <div className="relative z-10">
-        {/* Header */}
-        <header className="bg-black/20 backdrop-blur-xl border-b border-white/10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-4">
-                <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-                  FrejFund Dashboard
-                </h1>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-white/60 text-sm">{userEmail}</span>
-                <button
-                  onClick={handleSignOut}
-                  className="px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all"
-                >
-                  Logga ut
-                </button>
-              </div>
-            </div>
-          </div>
-        </header>
-
+        {/* Profilinställningsknapp borttagen, modal öppnas nu från OverlayNavbar */}
         {/* Main Content */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-32">
+          {/* DASHBOARD-rubrik centrerad ovanför statistikrutorna */}
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 uppercase tracking-widest text-center mb-10">
+            DASHBOARD
+          </h1>
+
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
@@ -196,19 +248,12 @@ export default function Dashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               <p className="text-white/60 text-lg">Inga analyser hittades</p>
-              <Link
-                href="/"
-                className="inline-block mt-4 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all"
-              >
-                Skapa din första analys
-              </Link>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredAnalyses.map((analysis) => (
-                <Link
+                <div
                   key={analysis.id}
-                  href={`/dashboard/analysis/${analysis.id}`}
                   className="group"
                 >
                   <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:bg-white/10 hover:border-purple-500/50 transition-all duration-300 transform hover:scale-105">
@@ -220,9 +265,12 @@ export default function Dashboard() {
                         <p className="text-white/60 text-sm">{analysis.industry}</p>
                       </div>
                       {analysis.is_premium && (
-                        <span className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold rounded-full">
+                        <button 
+                          onClick={() => setShowPremiumModal(true)}
+                          className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all cursor-pointer"
+                        >
                           Premium
-                        </span>
+                        </button>
                       )}
                     </div>
                     
@@ -251,23 +299,27 @@ export default function Dashboard() {
                       </span>
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           )}
 
           {/* Create New Analysis CTA */}
           <div className="mt-12 text-center">
-            <Link
-              href="/"
+            <button
+              onClick={() => setShowWizard(true)}
               className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Skapa ny analys
-            </Link>
+            </button>
           </div>
+          {/* BusinessPlanWizard-modal */}
+          <BusinessPlanWizard open={showWizard} onClose={() => setShowWizard(false)} />
+          {/* Premium Modal */}
+          <PremiumModal open={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
         </main>
       </div>
     </div>
