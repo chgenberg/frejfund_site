@@ -1491,7 +1491,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     try {
       // Räkna ut score - use a default score for now since the answer structure doesn't match
       const { score: aiScore } = calculateScoreFn({});
-      const finalScore = aiScore || 50; // Default score if calculation fails
+      const finalScore = Number.isFinite(aiScore) ? aiScore : 50; // Default score if calculation fails
       // Debug-logg för vad som skickas till Supabase
       console.log('Sparar analys:', {
         company: answers.company_name,
