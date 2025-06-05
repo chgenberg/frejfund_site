@@ -7,6 +7,7 @@ import LoginModal from './components/LoginModal'
 import Image from 'next/image'
 import { AuthProvider } from './context/AuthContext'
 import OverlayNavbar from './components/OverlayNavbar'
+import { setupAuthListener } from './lib/auth'
 
 const nunito = Nunito({ subsets: ['latin'], weight: ['400', '600', '700'] })
 
@@ -41,6 +42,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Sätt upp auth-listen när appen startar
+  if (typeof window !== 'undefined') {
+    setupAuthListener();
+  }
+
   return (
     <html lang="sv">
       <body className={`${nunito.className} min-h-screen flex flex-col bg-black relative`}>

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import BusinessPlanResult from './BusinessPlanResult';
 import BusinessPlanScore from './BusinessPlanScore';
 import TestWizard, { CustomTextarea, TEST_EXPORT } from './TestWizard';
+import { supabase } from '../../lib/supabase';
 
 const BRANSCHER = [
   'SaaS', 'Tech', 'Konsumentvaror', 'Hälsa', 'Fintech', 'Industri', 'Tjänster', 'Utbildning', 'Energi', 'Annat'
@@ -1050,6 +1051,60 @@ function stringifyAnswers(obj: any): any {
   return result;
 }
 
+// Lägg till denna funktion i komponenten
+async function saveAnonymousAnalysis({ company, email, hasWebsite, websiteUrl }: { company: string; email: string; hasWebsite: boolean | null; websiteUrl: string }) {
+  const { error } = await supabase
+    .from('analyses')
+    .insert([{
+      user_id: null,
+      anonymous: true,
+      anonymous_email: email,
+      company_name: company,
+      has_website: hasWebsite,
+      website_url: websiteUrl,
+    }]);
+  if (error) {
+    console.error('Kunde inte spara analys:', error);
+  }
+}
+
+async function saveFullAnalysis({
+  company,
+  email,
+  hasWebsite,
+  websiteUrl,
+  bransch,
+  omrade,
+  answers,
+  user_id = null,
+}: {
+  company: string;
+  email: string;
+  hasWebsite: boolean | null;
+  websiteUrl: string;
+  bransch: string;
+  omrade: string;
+  answers: any;
+  user_id?: string | null;
+}) {
+  const { error } = await supabase
+    .from('analyses')
+    .insert([{
+      user_id,
+      anonymous: !user_id,
+      anonymous_email: email,
+      company_name: company,
+      has_website: hasWebsite,
+      website_url: websiteUrl,
+      bransch,
+      omrade,
+      answers: JSON.stringify(answers),
+    }]);
+  if (error) {
+    console.error('Kunde inte spara analys:', error);
+  }
+}
+
 export default function BusinessPlanWizard({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
   const [answers, setAnswers] = React.useState<{ [key: string]: string }>({});
@@ -1405,74 +1460,30 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   useOnClickOutside(competitorRef, () => setShowCompetitorPopup(false));
 
   const handleSubmit = async () => {
-    setShowFinalLoader(true);
-    let messageIndex = 0;
-    const messageInterval = setInterval(() => {
-      messageIndex = (messageIndex + 1) % finalLoaderMessages.length;
-      setFinalLoaderText(finalLoaderMessages[messageIndex]);
-    }, 2000);
-    
-    try {
-      const response = await fetch('/api/analyze-businessplan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          answers: stringifyAnswers(answers),
-          company: company,
-          email: email,
-          bransch: bransch,
-          omrade: omrade,
-          hasWebsite: hasWebsite,
-          website_url: websiteUrl
-        })
-      });
-      
-      const data = await response.json();
-      clearInterval(messageInterval);
-      setShowFinalLoader(false);
-      
-      // Spara submission till Render's persistenta disk
+    if (!isCurrentStepValid()) return;
+
+    if (step === INVESTOR_QUESTIONS.length) {
       try {
-        await fetch('/api/save-submission', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            timestamp: new Date().toISOString(),
-            company_name: company,
-            email: email,
-            bransch: bransch,
-            omrade: omrade,
-            has_website: hasWebsite,
-            website_url: websiteUrl,
-            answers: stringifyAnswers(answers),
-            result: data
-          })
+        // Spara hela analysen med alla svar
+        await saveFullAnalysis({
+          company,
+          email,
+          hasWebsite,
+          websiteUrl,
+          bransch,
+          omrade,
+          answers: stringifyAnswers(answers), // Konvertera alla svar till strängformat
+          user_id: null // Om användaren är anonym
         });
-        console.log('Submission saved successfully');
-      } catch (saveError) {
-        console.error('Could not save submission:', saveError);
+
+        // Navigera till dashboard eller visa bekräftelse
+        router.push('/dashboard');
+        onClose();
+      } catch (error) {
+        console.error('Error saving analysis:', error);
       }
-      
-      // Data är redan i rätt format från API:et
-      const resultData = {
-        score: data.score,
-        answers: data.answers,
-        feedback: data.feedback,
-        insights: data.insights,
-        actionItems: data.actionItems,
-        subscriptionLevel: data.subscriptionLevel
-      };
-      
-      // Spara resultatet i localStorage
-      localStorage.setItem('latestAnalysisResult', JSON.stringify(resultData));
-      
-      // Stäng modalen och navigera till resultatsidan
-      onClose();
-      router.push('/result');
-    } catch (error) {
-      clearInterval(messageInterval);
-      setShowFinalLoader(false);
-      console.error('Error submitting:', error);
+    } else {
+      setStep(step + 1);
     }
   };
 
@@ -1690,7 +1701,10 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             >Avbryt</button>
             <button
               className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-full shadow-lg hover:shadow-xl disabled:opacity-50 transition-all transform hover:scale-105"
-              onClick={() => setPreStepPage(2)}
+              onClick={async () => {
+                await saveAnonymousAnalysis({ company, email, hasWebsite, websiteUrl });
+                setPreStepPage(2);
+              }}
               disabled={!isPreStep1Valid}
             >Nästa →</button>
           </div>

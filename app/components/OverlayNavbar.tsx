@@ -52,6 +52,11 @@ export default function OverlayNavbar() {
     setLogoError(true);
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.reload();
+  };
+
   return (
     <>
       {/* Hamburgarmeny */}
@@ -110,17 +115,19 @@ export default function OverlayNavbar() {
 
       {/* Knappar + logotyp uppe till höger */}
       <div className="fixed top-6 right-6 z-[100] flex items-center gap-4">
-        {/* Profile icon button */}
-        <button
-          className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all border border-white/20 flex items-center justify-center"
-          onClick={() => setShowProfile(true)}
-          aria-label="Profilinställningar"
-        >
-          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" />
-            <path d="M4 20c0-4 4-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="2" />
-          </svg>
-        </button>
+        {/* Profile icon button - endast för inloggade */}
+        {isLoggedIn && (
+          <button
+            className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all border border-white/20 flex items-center justify-center"
+            onClick={() => setShowProfile(true)}
+            aria-label="Profilinställningar"
+          >
+            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" />
+              <path d="M4 20c0-4 4-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="2" />
+            </svg>
+          </button>
+        )}
         {/* Premium upgrade button - visas endast för inloggade icke-premium användare */}
         {isLoggedIn && !hasPremium && (
           <button
@@ -133,8 +140,8 @@ export default function OverlayNavbar() {
             Uppgradera till Premium
           </button>
         )}
-        {/* Skapa konto */}
-        {!isLoggedIn && (
+        {/* Skapa konto och Logga in - endast för utloggade */}
+        {!isLoggedIn ? (
           <>
             <button
               className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all font-semibold"
@@ -150,6 +157,13 @@ export default function OverlayNavbar() {
               Logga in
             </button>
           </>
+        ) : (
+          <button
+            className="px-4 py-2 text-white/80 hover:text-white transition-colors font-semibold border border-white/20 rounded-lg"
+            onClick={handleSignOut}
+          >
+            Logga ut
+          </button>
         )}
         {/* Logotyp */}
         <Link href="/" className="flex items-center justify-end" style={{height: '56px', width: '176px'}}>
@@ -172,7 +186,9 @@ export default function OverlayNavbar() {
       </div>
 
       {/* Profile Modal */}
-      <ProfileSettingsModal open={showProfile} onClose={() => setShowProfile(false)} userEmail={userEmail} setUserEmail={setUserEmail} />
+      {isLoggedIn && (
+        <ProfileSettingsModal open={showProfile} onClose={() => setShowProfile(false)} userEmail={userEmail} setUserEmail={setUserEmail} />
+      )}
       {/* Premium Modal */}
       <PremiumModal open={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
       {/* Auth Modal */}

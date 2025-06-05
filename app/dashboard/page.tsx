@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { supabase, Analysis } from '../../lib/supabase'
 import BusinessPlanWizard from '../components/BusinessPlanWizard'
-import PremiumModal from '../components/PremiumModal'
+// import PremiumModal from '../components/PremiumModal' // Temporarily comment out until PremiumModal is created
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -319,7 +319,7 @@ export default function Dashboard() {
           {/* BusinessPlanWizard-modal */}
           <BusinessPlanWizard open={showWizard} onClose={() => setShowWizard(false)} />
           {/* Premium Modal */}
-          <PremiumModal open={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
+          {/* <PremiumModal open={showPremiumModal} onClose={() => setShowPremiumModal(false)} /> */}
         </main>
       </div>
     </div>
