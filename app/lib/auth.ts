@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from './supabase';
 
 export async function claimAnonymousAnalyses(user: { id: string; email: string } | null) {
   if (!user?.email || !user?.id) return;

@@ -1,7 +1,1 @@
-{
-  "/kontakt/page": "app/kontakt/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/qa/page": "app/qa/page.js",
-  "/pitch-pingvinen/page": "app/pitch-pingvinen/page.js",
-  "/om-oss/page": "app/om-oss/page.js"
-}
+{}
