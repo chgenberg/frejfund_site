@@ -11,28 +11,25 @@ export default function Home() {
 
   return (
     <>
-      <main className="relative min-h-screen flex flex-col items-center justify-center p-4 pt-20 w-full h-full">
-        {/* Bakgrundsbild */}
-        <Image
-          src="/bakgrund.png"
-          alt="Bakgrund"
-          fill
-          className="object-cover -z-10 fixed inset-0 w-full h-full"
-          priority
-        />
-
-        {/* centrala knappen */}
-        <div className="flex flex-col items-center justify-center w-full h-full z-10">
+      <main className="min-h-screen flex flex-col items-center justify-center w-full">
+        {/* Brain med knapp centrerad ovanpå */}
+        <div className="relative flex items-center justify-center w-full h-full z-10" style={{ minHeight: 900 }}>
+          <Image
+            src="/brain.png"
+            alt="Brain"
+            width={2400}
+            height={1800}
+            className="opacity-95 drop-shadow-lg"
+            priority
+          />
           <button
-            className="rounded-full bg-[#16475b] px-8 py-4 font-bold uppercase tracking-widest text-white shadow-lg transition-colors hover:bg-[#7edcff] hover:text-[#04121d] text-lg sm:text-xl mb-6"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#16475b] px-10 py-5 font-bold uppercase tracking-widest text-white shadow-lg transition-colors hover:bg-[#7edcff] hover:text-[#04121d] text-2xl sm:text-3xl"
             onClick={() => setShowWizard(true)}
+            style={{ minWidth: 260 }}
           >
             Starta analys
           </button>
-          {/* Brain image under knappen */}
-          <Image src="/brain.png" alt="Brain" width={120} height={80} className="opacity-90" />
         </div>
-
         <BusinessPlanWizard open={showWizard} onClose={() => setShowWizard(false)} />
       </main>
     </>

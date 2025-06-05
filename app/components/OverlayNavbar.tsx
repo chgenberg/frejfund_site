@@ -2,11 +2,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useLoginModal } from './LoginModal';
+import AuthModal from './AuthModal';
 
 export default function OverlayNavbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
 
   const handleLogoError = () => {
     console.error('Logo failed to load');
@@ -69,24 +71,48 @@ export default function OverlayNavbar() {
         )}
       </div>
 
-      {/* Logotyp */}
-      <Link href="/" className="fixed top-6 right-6 z-[100] flex items-center justify-end" style={{height: '56px', width: '176px'}}>
-        {!logoError ? (
-          <div className="relative w-full h-full">
-            <Image
-              src="/logo.png"
-              alt="Frejfund Logo"
-              fill
-              sizes="(max-width: 768px) 120px, 180px"
-              className="object-contain cursor-pointer"
-              priority
-              onError={handleLogoError}
-            />
-          </div>
-        ) : (
-          <span className="text-white text-xl font-bold bg-black/30 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20 cursor-pointer">Frejfund</span>
-        )}
-      </Link>
+      {/* Knappar + logotyp uppe till höger */}
+      <div className="fixed top-6 right-6 z-[100] flex items-center gap-4">
+        {/* Skapa konto */}
+        <button
+          className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all font-semibold"
+          onClick={() => { setAuthMode('signup'); setShowAuthModal(true); }}
+        >
+          Skapa konto
+        </button>
+        {/* Logga in */}
+        <button
+          className="px-4 py-2 text-white/80 hover:text-white transition-colors font-semibold"
+          onClick={() => { setAuthMode('login'); setShowAuthModal(true); }}
+        >
+          Logga in
+        </button>
+        {/* Logotyp */}
+        <Link href="/" className="flex items-center justify-end" style={{height: '56px', width: '176px'}}>
+          {!logoError ? (
+            <div className="relative w-full h-full">
+              <Image
+                src="/logo.png"
+                alt="Frejfund Logo"
+                fill
+                sizes="(max-width: 768px) 120px, 180px"
+                className="object-contain cursor-pointer"
+                priority
+                onError={handleLogoError}
+              />
+            </div>
+          ) : (
+            <span className="text-white text-xl font-bold bg-black/30 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20 cursor-pointer">Frejfund</span>
+          )}
+        </Link>
+      </div>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        defaultMode={authMode}
+      />
     </>
   );
 } 
