@@ -1638,13 +1638,13 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                         const mappedData = mapScrapedDataToAnswers(data.data);
                         setAnswers(mappedData.answers);
                         if (mappedData.detectedCompany) {
-                          setCompany(mappedData.detectedCompany);
+                          setAnswers({ ...answers, company_name: mappedData.detectedCompany });
                         }
                         if (mappedData.detectedBransch) {
-                          setBransch(mappedData.detectedBransch);
+                          setSelectedIndustry(mappedData.detectedBransch);
                         }
                         if (mappedData.detectedOmrade) {
-                          setOmrade(mappedData.detectedOmrade);
+                          setSelectedArea(mappedData.detectedOmrade);
                         }
                       } else {
                         setScrapeError(data.error || 'Kunde inte hämta data från hemsidan');
@@ -1756,7 +1756,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             <label className="block font-semibold mb-3 text-white/90">Bransch</label>
             <div className="relative">
               <select
-                className={`${selectBase} ${bransch ? 'border-purple-500/50' : ''}`}
+                className={`${selectBase} ${selectedIndustry ? 'border-purple-500/50' : ''}`}
                 value={selectedIndustry}
                 onChange={e => setSelectedIndustry(e.target.value)}
               >
@@ -1777,7 +1777,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             <label className="block font-semibold mb-3 text-white/90">Område</label>
             <div className="relative">
               <select
-                className={`${selectBase} ${omrade ? 'border-purple-500/50' : ''}`}
+                className={`${selectBase} ${selectedArea ? 'border-purple-500/50' : ''}`}
                 value={selectedArea}
                 onChange={e => setSelectedArea(e.target.value)}
               >
