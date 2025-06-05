@@ -109,7 +109,7 @@ const QUESTIONS: Question[] = [
   { id: 'exit_strategy', label: 'Vad är er exit-strategi för investerare?', type: 'textarea', required: false, help: 'Beskriv möjliga exitmöjligheter på sikt.' },
   { id: 'main_risks', label: 'Vilka är de största riskerna i er affär?', type: 'textarea', required: true, help: 'Identifiera de viktigaste riskfaktorerna och hur ni planerar att hantera dem.' },
   { id: 'esg', label: 'Hur adresserar ni hållbarhet och ESG?', type: 'esg_checkbox', required: false, help: 'Kryssa i vad som är relevant och beskriv kort.' },
-  { id: 'tax_incentives', label: 'Finns det några skattemässiga incitament eller stöd kopplade till investeringen?', type: 'textarea', required: false, help: 'T.ex. bidrag, stöd, skattelättnader. (Visas bara för SaaS/Fintech)' },
+  { id: 'tax_incentives', label: 'Finns det några skattemässiga incitament eller stöd kopplade till investeringen?', type: 'textarea', required: false, help: 'T.ex. bidrag, stöd, skattelättnader.' },
   { id: 'anything_else', label: 'Vill du dela med dig av någonting mer?', type: 'textarea', required: false, help: 'Något du vill förtydliga, komplettera eller lyfta fram?' }
 ];
 
@@ -527,7 +527,7 @@ const INVESTOR_QUESTIONS: Question[] = [
     label: 'Finns det några skattemässiga incitament eller stöd kopplade till investeringen?',
     type: 'textarea',
     required: false,
-    help: 'T.ex. bidrag, stöd, skattelättnader. (Visas bara för SaaS/Fintech)'
+    help: 'T.ex. bidrag, stöd, skattelättnader.'
   },
   // Sista öppna frågan
   {
@@ -1107,19 +1107,19 @@ async function saveFullAnalysis({
 
 export default function BusinessPlanWizard({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
-  const [answers, setAnswers] = React.useState<{ [key: string]: string }>({});
+  const [answers, setAnswers] = React.useState<Record<string, any>>({});
+  const [aiFilled, setAiFilled] = React.useState<{ [key: string]: boolean }>({});
+  const [triedNext, setTriedNext] = React.useState(false);
   const [step, setStep] = React.useState(1);
   const [preStep, setPreStep] = React.useState(true);
   const [preStepPage, setPreStepPage] = React.useState(1);
-  const [company, setCompany] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [bransch, setBransch] = React.useState('');
-  const [omrade, setOmrade] = React.useState('');
+  const [showFinalLoader, setShowFinalLoader] = React.useState(false);
+  const [finalLoaderText, setFinalLoaderText] = React.useState('Analyserar dina svar...');
+  const [selectedIndustry, setSelectedIndustry] = React.useState('');
+  const [selectedArea, setSelectedArea] = React.useState('');
   const [privacyChecked, setPrivacyChecked] = React.useState(false);
   const [hasWebsite, setHasWebsite] = React.useState<boolean | null>(null);
   const [websiteUrl, setWebsiteUrl] = React.useState('');
-  const [showFinalLoader, setShowFinalLoader] = React.useState(false);
-  const [finalLoaderText, setFinalLoaderText] = React.useState('Analyserar dina svar...');
   const [showExample, setShowExample] = React.useState<string | null>(null);
   const [exampleText, setExampleText] = React.useState<string>('');
   const [isLoadingExample, setIsLoadingExample] = React.useState(false);
@@ -1145,13 +1145,13 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const progress = Math.round((step / INVESTOR_QUESTIONS.length) * 100);
 
   const isPreStep1Valid =
-    company.trim().length > 1 &&
-    /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) &&
+    answers.company_name.trim().length > 1 &&
+    /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(answers.email) &&
     privacyChecked &&
     hasWebsite !== null &&
     (hasWebsite === false || (hasWebsite === true && websiteUrl.trim().length > 3));
 
-  const isPreStep2Valid = bransch && omrade;
+  const isPreStep2Valid = selectedIndustry && selectedArea;
 
   const isCurrentStepValid = () => {
     if (!current) return false;
@@ -1189,247 +1189,262 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
 
   // Funktioner för att mappa skrapad data till formulärfält
   const mapScrapedDataToAnswers = (scrapedData: any) => {
-    const mappedAnswers: { [key: string]: string } = {};
+    if (!scrapedData) return {
+      answers: {},
+      detectedCompany: '',
+      detectedBransch: '',
+      detectedOmrade: ''
+    };
+    
+    const newAnswers = { ...answers };
+    const newAiFilled = { ...aiFilled };
     let detectedCompany = '';
     let detectedBransch = '';
     let detectedOmrade = '';
     
-    if (scrapedData) {
-      // Direkt mappning för fält som matchar exakt
-      const directMappings = {
-        'company_value': scrapedData.company_value,
-        'customer_problem': scrapedData.customer_problem,
-        'problem_evidence': scrapedData.problem_evidence,
-        'market_gap': scrapedData.market_gap,
-        'solution': scrapedData.solution,
-        'why_now': scrapedData.why_now,
-        'target_customer': scrapedData.target_customer,
-        'market_size': scrapedData.market_size,
-        'market_trends': scrapedData.market_trends,
-        'traction': scrapedData.traction,
-        'revenue_block': scrapedData.revenue_block,
-        'growth_plan': scrapedData.growth_plan,
-        'team': scrapedData.team,
-        'team_skills': scrapedData.team_skills,
-        'competitors': scrapedData.competitors,
-        'unique_solution': scrapedData.unique_solution,
-        'main_risks': scrapedData.main_risks
+    // Direkt mappning för fält som matchar exakt
+    const directMappings = {
+      'company_value': scrapedData.company_value,
+      'customer_problem': scrapedData.customer_problem,
+      'problem_evidence': scrapedData.problem_evidence,
+      'market_gap': scrapedData.market_gap,
+      'solution': scrapedData.solution,
+      'why_now': scrapedData.why_now,
+      'target_customer': scrapedData.target_customer,
+      'market_size': scrapedData.market_size,
+      'market_trends': scrapedData.market_trends,
+      'traction': scrapedData.traction,
+      'revenue_block': scrapedData.revenue_block,
+      'growth_plan': scrapedData.growth_plan,
+      'team': scrapedData.team,
+      'team_skills': scrapedData.team_skills,
+      'competitors': scrapedData.competitors,
+      'unique_solution': scrapedData.unique_solution,
+      'main_risks': scrapedData.main_risks
+    };
+
+    Object.entries(directMappings).forEach(([key, value]) => {
+      if (value && value !== 'Ej angivet' && value !== 'Information saknas') {
+        newAnswers[key] = value;
+        newAiFilled[key] = true;
+      }
+    });
+
+    // Speciella mappningar
+    if (scrapedData.ip_rights && scrapedData.ip_rights !== 'Ej angivet') {
+      newAnswers['ip_rights'] = scrapedData.ip_rights.toLowerCase().includes('ja') || 
+                               scrapedData.ip_rights.toLowerCase().includes('patent') ? 'Ja' : 'Nej';
+    }
+
+    // ESG-mappning
+    if (scrapedData.esg && scrapedData.esg !== 'Ej angivet') {
+      const esgData = {
+        miljö: scrapedData.esg.toLowerCase().includes('miljö') || 
+               scrapedData.esg.toLowerCase().includes('sustainability') ||
+               scrapedData.esg.toLowerCase().includes('hållbar'),
+        socialt: scrapedData.esg.toLowerCase().includes('social') || 
+                scrapedData.esg.toLowerCase().includes('samhälle'),
+        governance: scrapedData.esg.toLowerCase().includes('governance') || 
+                   scrapedData.esg.toLowerCase().includes('styrning'),
+        text: scrapedData.esg
       };
+      newAnswers['esg'] = JSON.stringify(esgData);
+    }
 
-      // Fyll i direkta mappningar
-      Object.entries(directMappings).forEach(([key, value]) => {
-        if (value && value !== 'Ej angivet' && value !== 'Information saknas') {
-          mappedAnswers[key] = value;
-        }
-      });
+    // Founder market fit - sätt default värden baserat på team-info
+    if (scrapedData.team && scrapedData.team !== 'Ej angivet') {
+      const founderFit = {
+        score: '3', // Default score
+        text: scrapedData.team_skills || scrapedData.team || 'Teamet har relevant erfarenhet inom branschen.'
+      };
+      newAnswers['founder_market_fit'] = JSON.stringify(founderFit);
+    }
 
-      // Speciella mappningar
-      if (scrapedData.ip_rights && scrapedData.ip_rights !== 'Ej angivet') {
-        mappedAnswers['ip_rights'] = scrapedData.ip_rights.toLowerCase().includes('ja') || 
-                                     scrapedData.ip_rights.toLowerCase().includes('patent') ? 'Ja' : 'Nej';
-      }
-
-      // ESG-mappning
-      if (scrapedData.esg && scrapedData.esg !== 'Ej angivet') {
-        const esgData = {
-          miljö: scrapedData.esg.toLowerCase().includes('miljö') || 
-                 scrapedData.esg.toLowerCase().includes('sustainability') ||
-                 scrapedData.esg.toLowerCase().includes('hållbar'),
-          socialt: scrapedData.esg.toLowerCase().includes('social') || 
-                  scrapedData.esg.toLowerCase().includes('samhälle'),
-          governance: scrapedData.esg.toLowerCase().includes('governance') || 
-                     scrapedData.esg.toLowerCase().includes('styrning'),
-          text: scrapedData.esg
-        };
-        mappedAnswers['esg'] = JSON.stringify(esgData);
-      }
-
-      // Founder market fit - sätt default värden baserat på team-info
-      if (scrapedData.team && scrapedData.team !== 'Ej angivet') {
-        const founderFit = {
-          score: '3', // Default score
-          text: scrapedData.team_skills || scrapedData.team || 'Teamet har relevant erfarenhet inom branschen.'
-        };
-        mappedAnswers['founder_market_fit'] = JSON.stringify(founderFit);
-      }
-
-      // Milstones - skapa från future_plans eller growth_plan
-      if (scrapedData.future_plans || scrapedData.growth_plan) {
-        const milestonesText = scrapedData.future_plans || scrapedData.growth_plan;
+    // Milstones - skapa från future_plans eller growth_plan
+    if (scrapedData.future_plans || scrapedData.growth_plan) {
+      const milestonesText = scrapedData.future_plans || scrapedData.growth_plan;
+      
+      // Försök att extrahera intelligenta milstones från texten
+      const extractMilestones = (text: string) => {
+        const milestones = [];
+        const lowerText = text.toLowerCase();
         
-        // Försök att extrahera intelligenta milstones från texten
-        const extractMilestones = (text: string) => {
-          const milestones = [];
-          const lowerText = text.toLowerCase();
-          
-          // Sök efter nyckelord som indikerar milestones
-          const milestonePatterns = [
-            { keywords: ['lansering', 'launch', 'släpp'], milestone: 'Produktlansering', date: 'Q2 2024' },
-            { keywords: ['kund', 'customer', 'client'], milestone: 'Första betalande kund', date: 'Q1 2024' },
-            { keywords: ['expansion', 'expandera', 'nya marknader'], milestone: 'Marknadsexpansion', date: 'Q3 2024' },
-            { keywords: ['anställ', 'rekrytera', 'hiring'], milestone: 'Teamutbyggnad', date: 'Q2 2024' },
-            { keywords: ['finansiering', 'funding', 'kapital'], milestone: 'Finansieringsrunda', date: 'Q1 2024' },
-            { keywords: ['partner', 'samarbete', 'partnership'], milestone: 'Strategiska partnerskap', date: 'Q3 2024' },
-            { keywords: ['certifiering', 'godkännande', 'approval'], milestone: 'Regulatoriskt godkännande', date: 'Q4 2024' },
-            { keywords: ['break-even', 'vinst', 'profit'], milestone: 'Break-even', date: 'Q4 2024' },
-            { keywords: ['internationell', 'global', 'export'], milestone: 'Internationell expansion', date: 'H2 2024' }
-          ];
-          
-          milestonePatterns.forEach(pattern => {
-            if (pattern.keywords.some(keyword => lowerText.includes(keyword))) {
-              milestones.push({
-                milestone: pattern.milestone,
-                date: pattern.date
-              });
-            }
-          });
-          
-          // Om inga specifika milstones hittades, använd generiska baserat på bransch
-          if (milestones.length === 0) {
-            if (scrapedData.industry?.toLowerCase().includes('tech') || scrapedData.industry?.toLowerCase().includes('saas')) {
-              milestones.push(
-                { milestone: 'Beta-lansering', date: 'Q2 2024' },
-                { milestone: '100 aktiva användare', date: 'Q3 2024' },
-                { milestone: 'Första MRR milestone', date: 'Q4 2024' }
-              );
-            } else if (scrapedData.industry?.toLowerCase().includes('konsument')) {
-              milestones.push(
-                { milestone: 'Produktlansering', date: 'Q2 2024' },
-                { milestone: 'E-handelsplattform live', date: 'Q3 2024' },
-                { milestone: '1000 sålda produkter', date: 'Q4 2024' }
-              );
-            } else {
-              milestones.push(
-                { milestone: 'Första pilotprojekt', date: 'Q2 2024' },
-                { milestone: 'Marknadsvalidering', date: 'Q3 2024' },
-                { milestone: 'Skalning av verksamhet', date: 'Q4 2024' }
-              );
-            }
+        // Sök efter nyckelord som indikerar milestones
+        const milestonePatterns = [
+          { keywords: ['lansering', 'launch', 'släpp'], milestone: 'Produktlansering', date: 'Q2 2024' },
+          { keywords: ['kund', 'customer', 'client'], milestone: 'Första betalande kund', date: 'Q1 2024' },
+          { keywords: ['expansion', 'expandera', 'nya marknader'], milestone: 'Marknadsexpansion', date: 'Q3 2024' },
+          { keywords: ['anställ', 'rekrytera', 'hiring'], milestone: 'Teamutbyggnad', date: 'Q2 2024' },
+          { keywords: ['finansiering', 'funding', 'kapital'], milestone: 'Finansieringsrunda', date: 'Q1 2024' },
+          { keywords: ['partner', 'samarbete', 'partnership'], milestone: 'Strategiska partnerskap', date: 'Q3 2024' },
+          { keywords: ['certifiering', 'godkännande', 'approval'], milestone: 'Regulatoriskt godkännande', date: 'Q4 2024' },
+          { keywords: ['break-even', 'vinst', 'profit'], milestone: 'Break-even', date: 'Q4 2024' },
+          { keywords: ['internationell', 'global', 'export'], milestone: 'Internationell expansion', date: 'H2 2024' }
+        ];
+        
+        milestonePatterns.forEach(pattern => {
+          if (pattern.keywords.some(keyword => lowerText.includes(keyword))) {
+            milestones.push({
+              milestone: pattern.milestone,
+              date: pattern.date
+            });
           }
-          
-          // Begränsa till max 3 milstones
-          return milestones.slice(0, 3);
-        };
+        });
         
-        const intelligentMilestones = extractMilestones(milestonesText);
-        mappedAnswers['milestones'] = JSON.stringify(intelligentMilestones);
-      }
-
-      // Capital matrix - skapa från finansiell info
-      if (scrapedData.financial_info || scrapedData.revenue_block || scrapedData.growth_plan) {
-        let amount = '5'; // Default 5 MSEK
-        let product = '40';
-        let sales = '30';
-        let team = '25';
-        let other = '5';
-        
-        // Justera baserat på bransch
-        if (scrapedData.industry) {
-          const industry = scrapedData.industry.toLowerCase();
-          if (industry.includes('saas') || industry.includes('tech')) {
-            product = '50'; // Mer på produktutveckling för tech
-            sales = '35';
-            team = '15';
-            amount = '8'; // Högre kapitalbehov för tech
-          } else if (industry.includes('konsument') || industry.includes('handel')) {
-            product = '25';
-            sales = '45'; // Mer på marknadsföring för konsumentvaror
-            team = '25';
-            other = '5';
-          } else if (industry.includes('fintech')) {
-            product = '45';
-            sales = '25';
-            team = '20';
-            other = '10'; // Mer för compliance/regulatoriska kostnader
-            amount = '10';
+        // Om inga specifika milstones hittades, använd generiska baserat på bransch
+        if (milestones.length === 0) {
+          if (scrapedData.industry?.toLowerCase().includes('tech') || scrapedData.industry?.toLowerCase().includes('saas')) {
+            milestones.push(
+              { milestone: 'Beta-lansering', date: 'Q2 2024' },
+              { milestone: '100 aktiva användare', date: 'Q3 2024' },
+              { milestone: 'Första MRR milestone', date: 'Q4 2024' }
+            );
+          } else if (scrapedData.industry?.toLowerCase().includes('konsument')) {
+            milestones.push(
+              { milestone: 'Produktlansering', date: 'Q2 2024' },
+              { milestone: 'E-handelsplattform live', date: 'Q3 2024' },
+              { milestone: '1000 sålda produkter', date: 'Q4 2024' }
+            );
+          } else {
+            milestones.push(
+              { milestone: 'Första pilotprojekt', date: 'Q2 2024' },
+              { milestone: 'Marknadsvalidering', date: 'Q3 2024' },
+              { milestone: 'Skalning av verksamhet', date: 'Q4 2024' }
+            );
           }
         }
         
-        // Justera baserat på tillväxtplan
-        if (scrapedData.growth_plan) {
-          const growthText = scrapedData.growth_plan.toLowerCase();
-          if (growthText.includes('expansion') || growthText.includes('international')) {
-            amount = String(parseInt(amount) + 3); // Mer kapital för expansion
-            sales = String(Math.min(parseInt(sales) + 10, 100));
-          }
-          if (growthText.includes('hiring') || growthText.includes('rekrytering')) {
-            team = String(Math.min(parseInt(team) + 10, 100));
-          }
-        }
-        
-        // Justera baserat på traction
-        if (scrapedData.traction) {
-          const tractionText = scrapedData.traction.toLowerCase();
-          if (tractionText.includes('revenue') || tractionText.includes('intäkt') || 
-              tractionText.includes('customer') || tractionText.includes('kund')) {
-            // Har redan traction, kan fokusera mer på tillväxt
-            sales = String(Math.min(parseInt(sales) + 5, 100));
-            product = String(Math.max(parseInt(product) - 5, 0));
-          }
-        }
-        
-        const capitalMatrix = {
-          amount,
-          product,
-          sales,
-          team,
-          other,
-          probability: scrapedData.main_risks ? '4' : '3' // Högre risk om de identifierat risker
-        };
-        mappedAnswers['capital_block'] = JSON.stringify(capitalMatrix);
-      }
+        // Begränsa till max 3 milstones
+        return milestones.slice(0, 3);
+      };
+      
+      const intelligentMilestones = extractMilestones(milestonesText);
+      newAnswers['milestones'] = JSON.stringify(intelligentMilestones);
+    }
 
-      // Spara företagsnamn från scraped data (returnera istället för att sätta direkt)
-      if (scrapedData.company_name && scrapedData.company_name !== 'Ej angivet') {
-        detectedCompany = scrapedData.company_name;
-      }
-
-      // Automatisk bransch- och områdesigenkänning
-      if (scrapedData.industry && scrapedData.industry !== 'Ej angivet') {
-        const industryMap: { [key: string]: string } = {
-          'saas': 'SaaS',
-          'tech': 'Tech', 
-          'teknologi': 'Tech',
-          'konsumentvaror': 'Konsumentvaror',
-          'hälsa': 'Hälsa',
-          'fintech': 'Fintech',
-          'finansiell': 'Fintech',
-          'industri': 'Industri',
-          'tjänster': 'Tjänster',
-          'utbildning': 'Utbildning',
-          'energi': 'Energi'
-        };
-        
-        const detectedIndustry = Object.entries(industryMap).find(([key]) => 
-          scrapedData.industry.toLowerCase().includes(key)
-        );
-        
-        if (detectedIndustry) {
-          detectedBransch = detectedIndustry[1];
+    // Capital matrix - skapa från finansiell info
+    if (scrapedData.financial_info || scrapedData.revenue_block || scrapedData.growth_plan) {
+      let amount = '5'; // Default 5 MSEK
+      let product = '40';
+      let sales = '30';
+      let team = '25';
+      let other = '5';
+      
+      // Justera baserat på bransch
+      if (scrapedData.industry) {
+        const industry = scrapedData.industry.toLowerCase();
+        if (industry.includes('saas') || industry.includes('tech')) {
+          product = '50'; // Mer på produktutveckling för tech
+          sales = '35';
+          team = '15';
+          amount = '8'; // Högre kapitalbehov för tech
+        } else if (industry.includes('konsument') || industry.includes('handel')) {
+          product = '25';
+          sales = '45'; // Mer på marknadsföring för konsumentvaror
+          team = '25';
+          other = '5';
+        } else if (industry.includes('fintech')) {
+          product = '45';
+          sales = '25';
+          team = '20';
+          other = '10'; // Mer för compliance/regulatoriska kostnader
+          amount = '10';
         }
       }
-
-      if (scrapedData.area && scrapedData.area !== 'Ej angivet') {
-        const areaMap: { [key: string]: string } = {
-          'sverige': 'Sverige',
-          'norden': 'Norden',
-          'europa': 'Europa', 
-          'global': 'Globalt',
-          'internationell': 'Globalt'
-        };
-        
-        const detectedArea = Object.entries(areaMap).find(([key]) => 
-          scrapedData.area.toLowerCase().includes(key)
-        );
-        
-        if (detectedArea) {
-          detectedOmrade = detectedArea[1];
+      
+      // Justera baserat på tillväxtplan
+      if (scrapedData.growth_plan) {
+        const growthText = scrapedData.growth_plan.toLowerCase();
+        if (growthText.includes('expansion') || growthText.includes('international')) {
+          amount = String(parseInt(amount) + 3); // Mer kapital för expansion
+          sales = String(Math.min(parseInt(sales) + 10, 100));
         }
+        if (growthText.includes('hiring') || growthText.includes('rekrytering')) {
+          team = String(Math.min(parseInt(team) + 10, 100));
+        }
+      }
+      
+      // Justera baserat på traction
+      if (scrapedData.traction) {
+        const tractionText = scrapedData.traction.toLowerCase();
+        if (tractionText.includes('revenue') || tractionText.includes('intäkt') || 
+            tractionText.includes('customer') || tractionText.includes('kund')) {
+          // Har redan traction, kan fokusera mer på tillväxt
+          sales = String(Math.min(parseInt(sales) + 5, 100));
+          product = String(Math.max(parseInt(product) - 5, 0));
+        }
+      }
+      
+      const capitalMatrix = {
+        amount,
+        product,
+        sales,
+        team,
+        other,
+        probability: scrapedData.main_risks ? '4' : '3' // Högre risk om de identifierat risker
+      };
+      newAnswers['capital_block'] = JSON.stringify(capitalMatrix);
+    }
+
+    // Spara företagsnamn från scraped data
+    if (scrapedData.company_name && scrapedData.company_name !== 'Ej angivet') {
+      detectedCompany = scrapedData.company_name;
+      newAnswers['company_name'] = scrapedData.company_name;
+      newAiFilled['company_name'] = true;
+    }
+
+    // Automatisk bransch- och områdesigenkänning
+    if (scrapedData.industry && scrapedData.industry !== 'Ej angivet') {
+      const industryMap: { [key: string]: string } = {
+        'saas': 'SaaS',
+        'tech': 'Tech', 
+        'teknologi': 'Tech',
+        'konsumentvaror': 'Konsumentvaror',
+        'hälsa': 'Hälsa',
+        'fintech': 'Fintech',
+        'finansiell': 'Fintech',
+        'industri': 'Industri',
+        'tjänster': 'Tjänster',
+        'utbildning': 'Utbildning',
+        'energi': 'Energi'
+      };
+      
+      const detectedIndustry = Object.entries(industryMap).find(([key]) => 
+        scrapedData.industry.toLowerCase().includes(key)
+      );
+      
+      if (detectedIndustry) {
+        detectedBransch = detectedIndustry[1];
+        newAnswers['bransch'] = detectedIndustry[1];
+        newAiFilled['bransch'] = true;
       }
     }
 
+    if (scrapedData.area && scrapedData.area !== 'Ej angivet') {
+      const areaMap: { [key: string]: string } = {
+        'sverige': 'Sverige',
+        'norden': 'Norden',
+        'europa': 'Europa', 
+        'global': 'Globalt',
+        'internationell': 'Globalt'
+      };
+      
+      const detectedArea = Object.entries(areaMap).find(([key]) => 
+        scrapedData.area.toLowerCase().includes(key)
+      );
+      
+      if (detectedArea) {
+        detectedOmrade = detectedArea[1];
+        newAnswers['omrade'] = detectedArea[1];
+        newAiFilled['omrade'] = true;
+      }
+    }
+
+    setAnswers(newAnswers);
+    setAiFilled(newAiFilled);
+
     return {
-      answers: mappedAnswers,
+      answers: newAnswers,
       detectedCompany,
       detectedBransch,
       detectedOmrade
@@ -1460,30 +1475,36 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   useOnClickOutside(competitorRef, () => setShowCompetitorPopup(false));
 
   const handleSubmit = async () => {
-    if (!isCurrentStepValid()) return;
+    setShowFinalLoader(true);
+    try {
+      // Spara analysen
+      await saveFullAnalysis({
+        company: answers.company_name,
+        email: answers.email,
+        hasWebsite: answers.has_website === 'yes',
+        websiteUrl: answers.website_url || '',
+        bransch: selectedIndustry,
+        omrade: selectedArea,
+        answers: answers
+      });
+      
+      // Visa resultatet direkt
+      setShowFinalLoader(false);
+      setResult({
+        // ... mock eller faktisk analysdata ...
+      });
+    } catch (error) {
+      console.error('Error saving analysis:', error);
+      setShowFinalLoader(false);
+    }
+  };
 
-    if (step === INVESTOR_QUESTIONS.length) {
-      try {
-        // Spara hela analysen med alla svar
-        await saveFullAnalysis({
-          company,
-          email,
-          hasWebsite,
-          websiteUrl,
-          bransch,
-          omrade,
-          answers: stringifyAnswers(answers), // Konvertera alla svar till strängformat
-          user_id: null // Om användaren är anonym
-        });
-
-        // Navigera till dashboard eller visa bekräftelse
-        router.push('/dashboard');
-        onClose();
-      } catch (error) {
-        console.error('Error saving analysis:', error);
-      }
-    } else {
+  // Lägg till triedNext i handleNext
+  const handleNext = () => {
+    setTriedNext(true);
+    if (isCurrentStepValid()) {
       setStep(step + 1);
+      setTriedNext(false);
     }
   };
 
@@ -1663,8 +1684,8 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               type="text"
               className={inputBase}
               placeholder="Ange företagets namn"
-              value={company}
-              onChange={e => setCompany(e.target.value)}
+              value={answers.company_name}
+              onChange={e => setAnswers({ ...answers, company_name: e.target.value })}
             />
           </div>
           
@@ -1675,8 +1696,8 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               type="email"
               className={inputBase}
               placeholder="din@epost.se"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              value={answers.email}
+              onChange={e => setAnswers({ ...answers, email: e.target.value })}
             />
           </div>
           
@@ -1702,7 +1723,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             <button
               className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-full shadow-lg hover:shadow-xl disabled:opacity-50 transition-all transform hover:scale-105"
               onClick={async () => {
-                await saveAnonymousAnalysis({ company, email, hasWebsite, websiteUrl });
+                await saveAnonymousAnalysis({ company: answers.company_name, email: answers.email, hasWebsite, websiteUrl });
                 setPreStepPage(2);
               }}
               disabled={!isPreStep1Valid}
@@ -1736,8 +1757,8 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             <div className="relative">
               <select
                 className={`${selectBase} ${bransch ? 'border-purple-500/50' : ''}`}
-                value={bransch}
-                onChange={e => setBransch(e.target.value)}
+                value={selectedIndustry}
+                onChange={e => setSelectedIndustry(e.target.value)}
               >
                 <option value="">Välj bransch...</option>
                 {BRANSCHER.map(b => (
@@ -1757,8 +1778,8 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
             <div className="relative">
               <select
                 className={`${selectBase} ${omrade ? 'border-purple-500/50' : ''}`}
-                value={omrade}
-                onChange={e => setOmrade(e.target.value)}
+                value={selectedArea}
+                onChange={e => setSelectedArea(e.target.value)}
               >
                 <option value="">Välj område...</option>
                 {OMRADEN.map(o => (
@@ -1791,112 +1812,62 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   
   if (step > 0 && !current) return null;
   
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-3xl shadow-2xl border border-white/10 max-w-xl w-full p-6 md:p-8 relative animate-fadeIn flex flex-col justify-between max-h-[90vh] overflow-y-auto">
-        {/* Background glow effect */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-xl -z-10"></div>
-        
+  // Ändra renderingen av knappar för fråga 14 och 17
+  const renderButtons = () => {
+    if (current.id === 'main_risks') {
+      return (
+        <div className="mt-8 flex justify-between">
+          <button
+            onClick={() => setStep(step - 1)}
+            className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+          >
+            Tillbaka
+          </button>
+        </div>
+      );
+    }
+
+    if (current.id === 'anything_else') {
+      return (
+        <div className="mt-8 flex justify-between">
+          <button
+            onClick={() => setStep(step - 1)}
+            className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+          >
+            Tillbaka
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Skicka
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="mt-8 flex justify-between">
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-white/60 text-2xl font-bold hover:text-white transition-colors"
-          aria-label="Stäng"
-        >×</button>
-        
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-white/60 font-medium text-sm">Fråga {step} av {INVESTOR_QUESTIONS.length}</span>
-            <span className="text-white/80 font-bold text-sm">{progress}%</span>
-          </div>
-          <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${progress}%` }}
-              role="progressbar"
-              aria-valuenow={progress}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            />
-          </div>
-        </div>
-        
-        <div id="wizard-description">
-          <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-2xl font-bold">{current.label}</h2>
-            {scrapedData && answers[current.id] && (
-              <span className="ml-2 inline-flex items-center px-3 py-1 rounded-full text-xs bg-green-500/20 text-green-300 border border-green-500/30">
-                <span className="mr-1">🤖</span>
-                Automatiskt ifyllt
-              </span>
-            )}
-            <button
-              type="button"
-              className="ml-auto text-purple-400 hover:text-purple-300 text-xl transition-colors"
-              aria-label="Visa exempel"
-              onClick={() => setShowExample(current.id)}
-            >
-              <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                <text x="12" y="16" textAnchor="middle" fontSize="14" fill="currentColor">?</text>
-              </svg>
-            </button>
-          </div>
-          
-          <div className="mb-6 text-sm text-white/60">
-            {current.help}
-            {scrapedData && answers[current.id] && (
-              <div className="mt-3 p-3 bg-green-500/10 border border-green-500/30 rounded-xl">
-                <div className="text-green-300 text-xs">
-                  <strong>Automatiskt ifyllt från:</strong> {scrapedData._metadata?.source_url}
-                </div>
-              </div>
-            )}
-            {scrapedData && !answers[current.id] && websiteUrl && (
-              <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-                <div className="text-blue-300 text-xs mb-2">
-                  Detta fält kunde inte fyllas i automatiskt från hemsidan.
-                </div>
-                <button
-                  type="button"
-                  className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1.5 rounded-full hover:shadow-lg transition-all"
-                  onClick={async () => {
-                    setIsLoadingExample(true);
-                    try {
-                      const response = await fetch('/api/ai-suggest', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                          questionId: current.id, 
-                          websiteUrl,
-                          scrapedData: scrapedData,
-                          questionText: current.label
-                        })
-                      });
-                      const data = await response.json();
-                      if (data.suggestion) {
-                        setAnswers({ ...answers, [current.id]: data.suggestion });
-                      }
-                    } catch (error) {
-                      console.error('Kunde inte hämta AI-förslag:', error);
-                    } finally {
-                      setIsLoadingExample(false);
-                    }
-                  }}
-                  disabled={isLoadingExample}
-                >
-                  {isLoadingExample ? (
-                    <span className="flex items-center gap-2">
-                      <span className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></span>
-                      Genererar...
-                    </span>
-                  ) : (
-                    'AI-förslag för detta fält'
-                  )}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+          onClick={() => setStep(step - 1)}
+          className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+        >
+          Tillbaka
+        </button>
+        <button
+          onClick={handleNext}
+          className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Nästa
+        </button>
+      </div>
+    );
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        {/* ... existing code ... */}
         
         {/* Form inputs - Add a container with min-height to keep consistent size */}
         <div className="flex-1 min-h-[200px] mb-6">
@@ -1915,7 +1886,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               />
               <CharacterCounter 
                 current={getStringValue(answers[current.id]).length} 
-                max={15} 
+                max={10} 
               />
               {scrapedData && answers[current.id] && (
                 <div className="mt-2 flex items-center">
@@ -1939,7 +1910,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               />
               <CharacterCounter 
                 current={getStringValue(answers[current.id]).length} 
-                max={15} 
+                max={10} 
               />
             </div>
           )}
@@ -2055,93 +2026,15 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         </div>
         
         {/* Navigation buttons */}
-        <div className="flex justify-between mt-8">
-          <button
-            onClick={() => setStep(step - 1)}
-            className={`px-6 py-3 rounded-full ${
-              step === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-white/10 hover:bg-white/20'
-            } text-white transition-all`}
-            disabled={step === 1}
-          >
-            ← Tillbaka
-          </button>
-          
-          <button
-            onClick={() => {
-              if (step === INVESTOR_QUESTIONS.length) {
-                handleSubmit();
-              } else {
-                setStep(step + 1);
-              }
-            }}
-            className={`px-6 py-3 rounded-full ${
-              !isCurrentStepValid() ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:shadow-lg hover:scale-105'
-            } text-white transition-all`}
-            disabled={!isCurrentStepValid()}
-          >
-            {step === INVESTOR_QUESTIONS.length ? 'Slutför' : 'Nästa →'}
-          </button>
-        </div>
+        {renderButtons()}
         
-        {!isCurrentStepValid() && current.required && (
+        {/* Visa varning endast om triedNext är true */}
+        {!isCurrentStepValid() && current.required && triedNext && (
           <div className="mt-4 text-red-400 text-sm text-center">
             Vänligen besvara frågan innan du går vidare
           </div>
         )}
       </div>
-      
-      {/* Example popup */}
-      {showExample && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 p-4">
-          <div ref={exampleRef} className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-2xl shadow-xl border border-white/10 max-w-lg w-full p-6 animate-fadeIn">
-            <h3 className="text-xl font-bold mb-4">Exempel för "{current.label}"</h3>
-            {isLoadingExample ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-              </div>
-            ) : exampleError ? (
-              <p className="text-red-400">{exampleError}</p>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-white/80">{exampleText}</p>
-                <button
-                  className="w-full py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:shadow-lg transition-all"
-                  onClick={() => {
-                    setAnswers({ ...answers, [current.id]: exampleText });
-                    setShowExample(null);
-                  }}
-                >
-                  Använd detta exempel
-                </button>
-              </div>
-            )}
-            <button
-              className="absolute top-4 right-4 text-white/60 hover:text-white"
-              onClick={() => setShowExample(null)}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
-      
-      {/* Final loader */}
-      {showFinalLoader && (
-        <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-3xl shadow-2xl border border-white/10 p-8 max-w-md w-full text-center">
-            <div className="mb-6">
-              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center animate-pulse">
-                <svg className="w-10 h-10 text-white animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              </div>
-            </div>
-            <h3 className="text-2xl font-bold mb-2">{finalLoaderText}</h3>
-            <p className="text-white/60">Detta tar vanligtvis 20-30 sekunder</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 } 
