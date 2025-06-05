@@ -7,7 +7,12 @@ const nextConfig = {
     },
   },
   images: {
-    domains: ['localhost', 'frejfund.com', 'www.frejfund.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**', // eller specificera domäner
+      },
+    ],
   },
 }
 
