@@ -1994,6 +1994,25 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                   )}
                 </div>
               )}
+              {/* Milestone list */}
+              {isMilestoneQuestion(current) && (
+                <MilestoneList
+                  value={answers[current.id] ? JSON.parse(answers[current.id] as string) : [{ milestone: '', date: '' }]}
+                  onChange={val => setAnswers({ ...answers, [current.id]: JSON.stringify(val) })}
+                />
+              )}
+              {/* Character counter only for text/textareas */}
+              {isTextQuestion(current) && current.type !== "number" && (
+                <div className="mt-2 flex items-center justify-between">
+                  <CharacterCounter 
+                    current={getStringValue(answers[current.id]).length} 
+                    max={10} 
+                  />
+                  {scrapedData && answers[current.id] && (
+                    <span className="text-green-400 text-xs">🤖 AI-fyllt</span>
+                  )}
+                </div>
+              )}
               {/* Select */}
               {isSelectQuestion(current) && current.type === "select" && (
                 <div className="relative">
@@ -2043,18 +2062,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                       <span className="text-white/80 group-hover:text-white transition-colors">{opt}</span>
                     </label>
                   ))}
-                </div>
-              )}
-              {/* Character counter */}
-              {isTextQuestion(current) && (
-                <div className="mt-2 flex items-center justify-between">
-                  <CharacterCounter 
-                    current={getStringValue(answers[current.id]).length} 
-                    max={10} 
-                  />
-                  {scrapedData && answers[current.id] && (
-                    <span className="text-green-400 text-xs">🤖 AI-fyllt</span>
-                  )}
                 </div>
               )}
             </div>
