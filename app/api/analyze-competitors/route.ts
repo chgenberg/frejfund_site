@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { scrapeAndAnalyze } from '../../../scripts/scrapeWithPlaywrightAndOpenAI';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -42,6 +41,7 @@ export async function POST(req: NextRequest) {
   const results = [];
   for (const c of competitors) {
     try {
+      const { scrapeAndAnalyze } = await import('../../../scrapeWithPlaywrightAndOpenAI');
       await scrapeAndAnalyze(c.url);
       // GPT-prompt för analys
       const analysisPrompt = `Besök denna URL: ${c.url}. Sammanfatta företagets erbjudande, styrkor, svagheter och möjligheter i 2-3 meningar. Svara på svenska. Om sidan inte kan nås, skriv 'Kunde inte analysera'.`;

@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { scrapeAndAnalyze } from '../../../scripts/scrapeWithPlaywrightAndOpenAI';
 
 export async function POST(request: Request) {
   try {
@@ -13,6 +12,7 @@ export async function POST(request: Request) {
     }
 
     console.log('Testar skrapning av:', url);
+    const { scrapeAndAnalyze } = await import('../../../scrapeWithPlaywrightAndOpenAI');
     const result = await scrapeAndAnalyze(url);
     
     return NextResponse.json(result);
