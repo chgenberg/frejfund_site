@@ -129,7 +129,7 @@ export default function OverlayNavbar() {
           </button>
         )}
         {/* Premium upgrade button - visas endast för inloggade icke-premium användare */}
-        {isLoggedIn && !hasPremium && (
+        {isLoggedIn && !hasPremium && !showPremiumModal && (
           <button
             className="px-4 py-2 bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all font-semibold flex items-center gap-2 animate-pulse hover:animate-none"
             onClick={() => setShowPremiumModal(true)}

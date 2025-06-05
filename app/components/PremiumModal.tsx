@@ -30,7 +30,6 @@ export default function PremiumModal({ open, onClose }: PremiumModalProps) {
               <p className="text-gray-600 text-sm">Skapa hur många affärsplaner du vill</p>
             </div>
           </div>
-          
           <div className="flex items-start gap-3">
             <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -40,54 +39,13 @@ export default function PremiumModal({ open, onClose }: PremiumModalProps) {
               <p className="text-gray-600 text-sm">Få djupare analyser och rekommendationer</p>
             </div>
           </div>
-          
-          <div className="flex items-start gap-3">
-            <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <div>
-              <h3 className="font-semibold text-gray-900">Exportera till PDF</h3>
-              <p className="text-gray-600 text-sm">Ladda ner professionella rapporter</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3">
-            <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <div>
-              <h3 className="font-semibold text-gray-900">Prioriterad support</h3>
-              <p className="text-gray-600 text-sm">Få hjälp när du behöver det</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3">
-            <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <div>
-              <h3 className="font-semibold text-gray-900">Avancerade mallar</h3>
-              <p className="text-gray-600 text-sm">Använd branschspecifika affärsplansmallar</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3">
-            <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <div>
-              <h3 className="font-semibold text-gray-900">Teamsamarbete</h3>
-              <p className="text-gray-600 text-sm">Bjud in kollegor att granska och redigera</p>
-            </div>
-          </div>
         </div>
         
         <div className="text-center">
-          <p className="text-3xl font-bold text-gray-900 mb-2">199 kr/månad</p>
+          <p className="text-3xl font-bold text-gray-900 mb-2">197 kr engångsavgift</p>
           <button className="w-full px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all">
             Börja din Premium-resa
           </button>
-          <p className="text-sm text-gray-500 mt-2">Avsluta när som helst</p>
         </div>
       </div>
     </div>
