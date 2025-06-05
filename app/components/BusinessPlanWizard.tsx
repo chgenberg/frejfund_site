@@ -1486,6 +1486,16 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const handleSubmit = async () => {
     setShowFinalLoader(true);
     try {
+      // Debug-logg för vad som skickas till Supabase
+      console.log('Sparar analys:', {
+        company: answers.company_name,
+        email: answers.email,
+        hasWebsite: answers.has_website === 'yes',
+        websiteUrl: answers.website_url || '',
+        bransch: selectedIndustry,
+        omrade: selectedArea,
+        answers: answers
+      });
       // Spara analysen
       await saveFullAnalysis({
         company: answers.company_name,
@@ -1496,7 +1506,6 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
         omrade: selectedArea,
         answers: answers
       });
-      
       // Visa resultatet direkt
       setShowFinalLoader(false);
       setResult({
