@@ -1133,6 +1133,35 @@ async function saveFullAnalysis({
   }
 }
 
+// Add this new component at the top level of the file, before the main component
+const LoadingPopup = ({ progress, status }: { progress: number; status: string }) => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+    <div className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-3xl shadow-2xl border border-white/10 p-8 max-w-md w-full mx-4 relative animate-fadeIn">
+      <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-xl -z-10"></div>
+      
+      <div className="text-center mb-6">
+        <h3 className="text-xl font-bold mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+          Analyserar hemsida
+        </h3>
+        <p className="text-white/60">{status}</p>
+      </div>
+      
+      <div className="relative h-2 bg-white/10 rounded-full overflow-hidden mb-4">
+        <div 
+          className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500 ease-out"
+          style={{ width: `${progress}%` }}
+        ></div>
+      </div>
+      
+      <div className="flex justify-center gap-2">
+        <div className={`w-2 h-2 rounded-full ${progress >= 33 ? 'bg-purple-500' : 'bg-white/20'}`}></div>
+        <div className={`w-2 h-2 rounded-full ${progress >= 66 ? 'bg-purple-500' : 'bg-white/20'}`}></div>
+        <div className={`w-2 h-2 rounded-full ${progress >= 100 ? 'bg-purple-500' : 'bg-white/20'}`}></div>
+      </div>
+    </div>
+  </div>
+);
+
 export default function BusinessPlanWizard({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
   const [answers, setAnswers] = React.useState<Record<string, any>>({});
@@ -1158,6 +1187,8 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
   const [isScraping, setIsScraping] = React.useState(false);
   const [scrapeError, setScrapeError] = React.useState<string | null>(null);
   const [scrapedData, setScrapedData] = React.useState<any>(null);
+  const [scrapeProgress, setScrapeProgress] = React.useState(0);
+  const [scrapeStatus, setScrapeStatus] = React.useState('');
   
   const exampleRef = useRef<HTMLDivElement>(null);
   const marketRef = useRef<HTMLDivElement>(null);
@@ -1583,6 +1614,56 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
     }
   };
 
+  // Update the website scraping button click handler
+  const handleWebsiteScrape = async () => {
+    setIsScraping(true);
+    setScrapeError(null);
+    setScrapeProgress(0);
+    setScrapeStatus('Analyserar din hemsida...');
+    
+    try {
+      const res = await fetch('/api/scrape-website', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: websiteUrl })
+      });
+      
+      setScrapeProgress(33);
+      setScrapeStatus('Läser in företagsdata...');
+      
+      const data = await res.json();
+      
+      setScrapeProgress(66);
+      setScrapeStatus('Lägger in datan i formuläret...');
+      
+      if (data.success && data.data) {
+        setScrapedData(data.data);
+        const mappedData = mapScrapedDataToAnswers(data.data);
+        setAnswers(prev => ({ ...prev, ...mappedData.answers }));
+        if (mappedData.detectedCompany) {
+          setAnswers(prev => ({ ...prev, company_name: mappedData.detectedCompany }));
+        }
+        if (mappedData.detectedBransch) {
+          setSelectedIndustry(mappedData.detectedBransch);
+        }
+        if (mappedData.detectedOmrade) {
+          setSelectedArea(mappedData.detectedOmrade);
+        }
+      } else {
+        setScrapeError(data.error || 'Kunde inte hämta data från hemsidan');
+      }
+    } catch (error) {
+      console.error('Scraping error:', error);
+      setScrapeError('Ett fel uppstod vid hämtning av data');
+    } finally {
+      setScrapeProgress(100);
+      setTimeout(() => {
+        setIsScraping(false);
+        setScrapeProgress(0);
+      }, 500);
+    }
+  };
+
   if (!open) return null;
   
   // Loading screen medan vi navigerar
@@ -1698,38 +1779,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                   type="button"
                   className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-2xl px-6 py-3 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 transform hover:scale-105"
                   disabled={!websiteUrl || isScraping}
-                  onClick={async () => {
-                    setIsScraping(true);
-                    setScrapeError(null);
-                    try {
-                      const res = await fetch('/api/scrape-website', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ url: websiteUrl })
-                      });
-                      const data = await res.json();
-                      if (data.success) {
-                        setScrapedData(data.data);
-                        const mappedData = mapScrapedDataToAnswers(data.data);
-                        setAnswers(mappedData.answers);
-                        if (mappedData.detectedCompany) {
-                          setAnswers({ ...answers, company_name: mappedData.detectedCompany });
-                        }
-                        if (mappedData.detectedBransch) {
-                          setSelectedIndustry(mappedData.detectedBransch);
-                        }
-                        if (mappedData.detectedOmrade) {
-                          setSelectedArea(mappedData.detectedOmrade);
-                        }
-                      } else {
-                        setScrapeError(data.error || 'Kunde inte hämta data från hemsidan');
-                      }
-                    } catch (error) {
-                      setScrapeError('Ett fel uppstod vid hämtning av data');
-                    } finally {
-                      setIsScraping(false);
-                    }
-                  }}
+                  onClick={handleWebsiteScrape}
                 >
                   {isScraping ? (
                     <div className="flex flex-col items-center gap-2">
