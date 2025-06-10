@@ -704,14 +704,8 @@ const PREMIUM_QUESTIONS: Question[] = [
 ];
 
 // Kombinera frågor baserat på prenumerationsnivå
-function getAllQuestions(selectedIndustry: string, isPremium: boolean = false): Question[] {
-  const baseQuestions = [...INVESTOR_QUESTIONS];
-  
-  if (isPremium) {
-    return [...baseQuestions, ...PREMIUM_QUESTIONS];
-  }
-  
-  return baseQuestions;
+function getAllQuestions(selectedIndustry: string): Question[] {
+  return [...INVESTOR_QUESTIONS];
 }
 
 // Add these constants back
@@ -2007,6 +2001,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               {/* Textarea */}
               {isTextQuestion(current) && current.type === "textarea" && (
                 <textarea
+                  key={current.id}
                   className={`${inputBase} bg-[#182032] border-white/20 text-white placeholder-white/40`}
                   value={getStringValue(answers[current.id])}
                   onChange={e => setAnswers({ ...answers, [current.id]: e.target.value })}
@@ -2018,6 +2013,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
               {/* Text input */}
               {isTextQuestion(current) && current.type === "text" && (
                 <input
+                  key={current.id}
                   type="text"
                   className={`${inputBase} bg-[#182032] border-white/20 text-white placeholder-white/40`}
                   value={getStringValue(answers[current.id])}
@@ -2058,7 +2054,7 @@ export default function BusinessPlanWizard({ open, onClose }: { open: boolean; o
                     current={getStringValue(answers[current.id]).length} 
                     max={10} 
                   />
-                  {scrapedData && answers[current.id] && (
+                  {aiFilled[current.id] && (
                     <span className="text-green-400 text-xs">🤖 AI-fyllt</span>
                   )}
                 </div>

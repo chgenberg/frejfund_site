@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-4-1106-preview',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: 'Du är en erfaren investerare och pedagogisk affärscoach. Svara ENDAST med JSON-objektet som efterfrågas, utan någon annan text eller förklaringar.' },
           { role: 'user', content: prompt }

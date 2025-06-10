@@ -11,7 +11,6 @@ interface ResultProps {
   score: number;
   answers: Record<string, unknown>;
   feedback?: Record<string, string>;
-  subscriptionLevel?: 'standard' | 'premium';
 }
 
 const getScoreInfo = (score: number) => {
@@ -110,9 +109,9 @@ function safeRender(value: any) {
   return String(value);
 }
 
-export default function BusinessPlanResult({ score, answers, feedback = {}, subscriptionLevel }: ResultProps) {
+export default function BusinessPlanResult({ score, answers, feedback = {} }: ResultProps) {
   const router = useRouter();
-  const [currentSection, setCurrentSection] = useState<'score' | 'insights' | 'actions' | 'premium'>('score');
+  const [currentSection, setCurrentSection] = useState<'score' | 'insights' | 'actions' | 'market' | 'financial' | 'ai'>('score');
   const [expandedInsight, setExpandedInsight] = useState<string | null>(null);
   const [animatedScore, setAnimatedScore] = useState(0);
   const [showActionModal, setShowActionModal] = useState<any>(null);
@@ -123,10 +122,10 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
   const [user, setUser] = useState<any>(null);
+  const [saveMessage, setSaveMessage] = useState<string>('');
   
   const scoreInfo = getScoreInfo(score);
   const typedAnswers = answers as Record<string, any>;
-  const isPremium = subscriptionLevel === 'premium';
 
   // Check if user is logged in
   useEffect(() => {
@@ -491,22 +490,6 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
     }
   ];
 
-  const handleUpgrade = () => {
-    // Spara analysdata för användning efter betalning
-    localStorage.setItem('pendingPremiumAnalysis', JSON.stringify({
-      score,
-      answers,
-      feedback,
-      timestamp: new Date().toISOString()
-    }));
-    
-    // Navigera till betalningssidan
-    router.push('/kassa/checkout');
-  };
-
-  const [isSaving, setIsSaving] = React.useState(false);
-  const [saveMessage, setSaveMessage] = React.useState('');
-
   const handleSaveAnalysis = async () => {
     // Check if user is logged in
     if (!user) {
@@ -515,9 +498,6 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
       return;
     }
 
-    setIsSaving(true);
-    setSaveMessage('');
-    
     try {
       const response = await fetch('/api/save-analysis', {
         method: 'POST',
@@ -535,7 +515,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
             content: i.content
           })),
           actionItems,
-          isPremium,
+          isPremium: false,
           premiumAnalysis: typedAnswers.premiumAnalysis
         }),
       });
@@ -543,501 +523,430 @@ export default function BusinessPlanResult({ score, answers, feedback = {}, subs
       const data = await response.json();
       
       if (data.success) {
-        setSaveMessage('✅ Analys sparad! Du kan nu se den i din dashboard.');
-        
-        // Visa meddelande i 5 sekunder
-        setTimeout(() => {
-          setSaveMessage('');
-        }, 5000);
+        // Show success message
+        console.log('Analysis saved successfully');
+        setSaveMessage('✅ Analysen har sparats');
       } else {
-        setSaveMessage('❌ Kunde inte spara analysen. Försök igen.');
+        console.error('Error saving analysis');
+        setSaveMessage('❌ Det gick inte att spara analysen');
       }
     } catch (error) {
       console.error('Error saving analysis:', error);
-      setSaveMessage('❌ Ett fel uppstod. Försök igen senare.');
-    } finally {
-      setIsSaving(false);
+      setSaveMessage('❌ Det gick inte att spara analysen');
     }
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center p-4 overflow-hidden">
-      {/* Bakgrundsbild */}
-      <Image
-        src="/bakgrund.png"
-        alt="Bakgrund"
-        fill
-        className="object-cover -z-10"
-        priority
-      />
-      <div className="max-w-4xl w-full flex items-center justify-center mx-auto">
-        <div className={`bg-white/5 backdrop-blur-xl rounded-3xl p-12 text-center border border-white/10 ${scoreInfo.glow} transition-all duration-1000 w-full`}>
-          {currentSection === 'score' ? (
-            <>
-              {/* Score Circle */}
-              <div className="w-64 h-64 mx-auto mb-8 relative">
-                <CircularProgressbar
-                  value={animatedScore}
-                  text={`${animatedScore}`}
-                  styles={buildStyles({
-                    pathColor: scoreInfo.color,
-                    textColor: '#ffffff',
-                    trailColor: 'rgba(255,255,255,0.1)',
-                    textSize: '28px',
-                    pathTransitionDuration: 1.5,
-                  })}
-                />
-              </div>
-
-              {/* Score Label */}
-              <h1 className="text-5xl font-bold text-white mb-4">{scoreInfo.label}</h1>
-              <p className="text-xl text-white/70 mb-12">{scoreInfo.description}</p>
-
-              {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-6 mb-12">
-                <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                  <div className="text-3xl font-bold text-white">{insights.filter(i => i.strength === 'high').length}</div>
-                  <div className="text-white/60">Starka områden</div>
-                </div>
-                <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                  <div className="text-3xl font-bold text-white">{Object.keys(answers).length}</div>
-                  <div className="text-white/60">Analyserade fält</div>
-                </div>
-                <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                  <div className="text-3xl font-bold text-white">{actionItems.filter(a => a.priority === 'high').length}</div>
-                  <div className="text-white/60">Kritiska åtgärder</div>
-                </div>
-              </div>
-
-              {/* Navigation */}
-              <div className="flex justify-center gap-4 flex-wrap">
-                <button
-                  onClick={() => setCurrentSection('insights')}
-                  className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all flex items-center gap-2"
-                >
-                  Se Detaljerad Analys →
-                </button>
-                
-                {/* Save Analysis Button */}
-                <button
-                  onClick={handleSaveAnalysis}
-                  disabled={isSaving}
-                  className={`px-8 py-4 ${
-                    isSaving 
-                      ? 'bg-gray-500/20 cursor-not-allowed' 
-                      : 'bg-green-500/20 hover:bg-green-500/30'
-                  } backdrop-blur-sm text-white font-semibold rounded-full border border-green-500/30 transition-all flex items-center gap-2`}
-                >
-                  {isSaving ? (
-                    <>
-                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Sparar...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2" />
-                      </svg>
-                      Spara Analys
-                    </>
-                  )}
-                </button>
-                
-                {isPremium && (
-                  <button
-                    onClick={() => setCurrentSection('premium')}
-                    className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
-                  >
-                    🌟 Premium Analys →
-                  </button>
-                )}
-              </div>
-
-              {/* Save Message */}
-              {saveMessage && (
-                <div className={`mt-4 px-6 py-3 rounded-full text-white font-medium animate-fadeIn ${
-                  saveMessage.includes('✅') 
-                    ? 'bg-green-500/30 border border-green-500/50' 
-                    : 'bg-red-500/30 border border-red-500/50'
-                }`}>
-                  {saveMessage}
-                </div>
-              )}
-
-              {/* Smart CTA for creating account if not logged in */}
-              {!user && (
-                <div className="mt-8 p-6 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl border border-blue-500/30">
-                  <h3 className="text-xl font-bold text-white mb-3">💾 Spara din analys</h3>
-                  <p className="text-white/80 mb-4">
-                    Skapa ett gratis konto för att spara din analys och få tillgång till din personliga dashboard.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setAuthMode('signup');
-                      setShowAuthModal(true);
-                    }}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
-                  >
-                    Skapa konto & spara analys
-                  </button>
-                </div>
-              )}
-
-              {/* Only show upgrade CTA if NOT premium */}
-              {!isPremium && (
-                <div className="mt-12 p-8 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-3xl border border-purple-500/30">
-                  <h3 className="text-2xl font-bold text-white mb-4">🚀 Få Premium AI-Analys</h3>
-                  <p className="text-white/80 mb-6">
-                    Lås upp 50+ sidor djupgående analys med AI-genererade insikter speciellt anpassade för ditt företag!
-                  </p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    {[
-                      { icon: '📊', text: 'Marknadsinsikter' },
-                      { icon: '🎯', text: 'SWOT-analys' },
-                      { icon: '🎬', text: 'Investerarfilm' },
-                      { icon: '💾', text: 'Sparad analys' }
-                    ].map((feature, i) => (
-                      <div key={i} className="text-center">
-                        <div className="text-3xl mb-2">{feature.icon}</div>
-                        <div className="text-white/70 text-sm">{feature.text}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 mb-6 text-left">
-                    <div className="space-y-2">
-                      <p className="text-white/90 font-semibold">✅ Inkluderat:</p>
-                      <ul className="text-white/70 text-sm space-y-1">
-                        <li>• 50+ sidor analys</li>
-                        <li>• 3-års finansiella projektioner</li>
-                        <li>• Detaljerade rekommendationer</li>
-                        <li>• Investeringsförslag</li>
-                      </ul>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-white/90 font-semibold">🎁 Bonus:</p>
-                      <ul className="text-white/70 text-sm space-y-1">
-                        <li>• SORA AI filmprompt</li>
-                        <li>• 10 AI bildprompts</li>
-                        <li>• Konkurrensdynamik</li>
-                        <li>• Tillgång för alltid</li>
-                      </ul>
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleUpgrade}
-                    className="px-12 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg rounded-full hover:shadow-xl hover:scale-105 transition-all"
-                  >
-                    Uppgradera för 197 kr →
-                  </button>
-                </div>
-              )}
-            </>
-          ) : currentSection === 'insights' ? (
-            <>
-              <h1 className="text-3xl font-bold text-white mb-8">Detaljerad Analys</h1>
-              <div className="space-y-6">
-                {insights.map((insight) => (
-                  <InsightCard
-                    key={insight.id}
-                    title={insight.title}
-                    content={insight.content}
-                    icon={insight.icon}
-                    priority={insight.strength as "high" | "medium" | "low" | undefined}
-                    isExpanded={expandedInsight === insight.id}
-                    onToggle={() => setExpandedInsight(expandedInsight === insight.id ? null : insight.id)}
+    <div className="min-h-screen bg-[#04111d] text-white">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {currentSection === 'score' ? (
+          <>
+            {/* Score Section */}
+            <div className="text-center mb-12">
+              <h1 className="text-4xl font-bold mb-4">Din Affärsplan</h1>
+              <div className="inline-block">
+                <div className="w-48 h-48 mx-auto">
+                  <CircularProgressbar
+                    value={animatedScore}
+                    text={`${animatedScore}%`}
+                    styles={buildStyles({
+                      pathColor: scoreInfo.color,
+                      textColor: scoreInfo.color,
+                      trailColor: 'rgba(255, 255, 255, 0.1)',
+                    })}
                   />
-                ))}
+                </div>
+                <p className="text-xl font-semibold mt-4">{scoreInfo.label}</p>
               </div>
+            </div>
+
+            {/* Navigation */}
+            <div className="flex flex-wrap gap-4 justify-center">
               <button
                 onClick={() => setCurrentSection('score')}
-                className="mt-8 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all"
+                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
               >
-                Tillbaka
+                📊 Poäng & Analys
               </button>
-            </>
-          ) : currentSection === 'premium' ? (
-            <>
-              {/* Premium content section */}
-              <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-8">
-                ✨ Premium AI-Analys
-              </h1>
-              
-              {/* Premium Success Message - ändrat för demo */}
-              {isPremium && (
-                <div className="mb-8 p-6 bg-gradient-to-br from-purple-600/30 via-pink-600/20 to-purple-600/30 rounded-3xl border border-purple-500/40 backdrop-blur-lg shadow-2xl">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-lg">
-                      <span className="text-4xl">🌟</span>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-white mb-1">Premium-analys Aktiverad</h3>
-                      <p className="text-white/80">Din analys är sparad i ditt konto och du har tillgång till alla premium-funktioner.</p>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <button
+                onClick={() => setCurrentSection('insights')}
+                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+              >
+                💡 Insikter & Rekommendationer
+              </button>
+              <button
+                onClick={() => setCurrentSection('actions')}
+                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+              >
+                🎯 Nästa Steg
+              </button>
+              <button
+                onClick={() => setCurrentSection('market')}
+                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+              >
+                📈 Marknadsanalys
+              </button>
+              <button
+                onClick={() => setCurrentSection('financial')}
+                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+              >
+                💰 Finansiell Analys
+              </button>
+              <button
+                onClick={() => setCurrentSection('ai')}
+                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+              >
+                🎨 AI Bildgenerering
+              </button>
+            </div>
 
-              {/* Premium Tabs - Enhanced Design */}
-              <div className="mb-10">
-                {/* Tab Navigation Container */}
-                <div className="bg-gradient-to-r from-purple-900/20 via-pink-900/10 to-purple-900/20 backdrop-blur-xl rounded-3xl p-2 border border-white/20 shadow-2xl">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                    {[
-                      { id: 'swot', label: 'SWOT', icon: '💪', description: 'Styrkor & Svagheter' },
-                      { id: 'finansiell', label: 'Finansiell', icon: '📈', description: '3-års projektioner' },
-                      { id: 'rekommendationer', label: 'Rekommendationer', icon: '🎯', description: 'Åtgärdsplan' },
-                      { id: 'ai-bildprompts', label: 'AI Bilder', icon: '🎨', description: 'Marknadsföring' }
-                    ].map((tab) => (
-                      <button
-                        key={tab.id}
-                        onClick={() => setExpandedInsight(tab.id)}
-                        className={`p-4 rounded-2xl text-center transition-all ${
-                          expandedInsight === tab.id
-                            ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-white'
-                            : 'text-white/60 hover:text-white hover:bg-white/5'
-                        }`}
-                      >
-                        <div className="text-2xl mb-2">{tab.icon}</div>
-                        <div className="font-semibold">{tab.label}</div>
-                        <div className="text-xs opacity-75">{tab.description}</div>
-                      </button>
-                    ))}
+            {/* Save Message */}
+            {saveMessage && (
+              <div className={`mt-4 px-6 py-3 rounded-full text-white font-medium animate-fadeIn ${
+                saveMessage.includes('✅') 
+                  ? 'bg-green-500/30 border border-green-500/50' 
+                  : 'bg-red-500/30 border border-red-500/50'
+              }`}>
+                {saveMessage}
+              </div>
+            )}
+
+            {/* Smart CTA for creating account if not logged in */}
+            {!user && (
+              <div className="mt-8 p-6 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl border border-blue-500/30">
+                <h3 className="text-xl font-bold text-white mb-3">💾 Spara din analys</h3>
+                <p className="text-white/80 mb-4">
+                  Skapa ett gratis konto för att spara din analys och få tillgång till din personliga dashboard.
+                </p>
+                <button
+                  onClick={() => {
+                    setAuthMode('signup');
+                    setShowAuthModal(true);
+                  }}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+                >
+                  Skapa konto & spara analys
+                </button>
+              </div>
+            )}
+          </>
+        ) : currentSection === 'insights' ? (
+          <>
+            <h1 className="text-3xl font-bold text-white mb-8">Detaljerad Analys</h1>
+            <div className="space-y-6">
+              {insights.map((insight) => (
+                <InsightCard
+                  key={insight.id}
+                  title={insight.title}
+                  content={insight.content}
+                  icon={insight.icon}
+                  priority={insight.strength as "high" | "medium" | "low" | undefined}
+                  isExpanded={expandedInsight === insight.id}
+                  onToggle={() => setExpandedInsight(expandedInsight === insight.id ? null : insight.id)}
+                />
+              ))}
+            </div>
+            <button
+              onClick={() => setCurrentSection('score')}
+              className="mt-8 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all"
+            >
+              Tillbaka
+            </button>
+          </>
+        ) : currentSection === 'actions' ? (
+          <>
+            {/* Action Items Section */}
+            <h1 className="text-3xl font-bold text-white mb-8">Nästa Steg</h1>
+            <div className="space-y-6">
+              {actionItems.map((item) => (
+                <div key={item.title} className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                  <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-white/80">{item.description}</p>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setCurrentSection('score')}
+              className="mt-8 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transition-all"
+            >
+              Tillbaka
+            </button>
+          </>
+        ) : currentSection === 'market' ? (
+          <>
+            {/* Market Analysis Section */}
+            <h1 className="text-3xl font-bold text-white mb-8">Marknadsanalys</h1>
+            <div className="space-y-6">
+              {/* Market Size */}
+              <div className="bg-gradient-to-r from-blue-600/30 to-purple-600/30 rounded-2xl p-6 border border-blue-500/40 mb-6">
+                <h3 className="text-xl font-bold text-white mb-4">Marknadsstorlek & Tillväxt</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <p className="text-white/60 text-sm mb-1">Nuvarande marknad</p>
+                    <p className="text-3xl font-bold text-white">{typedAnswers.market_size}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-white/60 text-sm mb-1">Årlig tillväxt</p>
+                    <p className="text-3xl font-bold text-green-400">15%</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-white/60 text-sm mb-1">Prognos 2027</p>
+                    <p className="text-3xl font-bold text-blue-400">{typedAnswers.market_size * 1.75}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Market Insights Section */}
-              {expandedInsight === 'marknadsinsikter' && (
-                <div className="space-y-6 animate-fadeIn">
-                  <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl p-8 backdrop-blur-lg border border-purple-500/20">
-                    <h2 className="text-3xl font-bold text-white mb-8 text-center">Marknadsinsikter</h2>
-                    
-                    {typedAnswers.premiumAnalysis?.marketInsights ? (
-                      <>
-                        {/* Market Size */}
-                        <div className="bg-gradient-to-r from-blue-600/30 to-purple-600/30 rounded-2xl p-6 border border-blue-500/40 mb-6">
-                          <h3 className="text-xl font-bold text-white mb-4">Marknadsstorlek & Tillväxt</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="text-center">
-                              <p className="text-white/60 text-sm mb-1">Nuvarande marknad</p>
-                              <p className="text-3xl font-bold text-white">{typedAnswers.premiumAnalysis.marketInsights.marketSize.current}</p>
-                            </div>
-                            <div className="text-center">
-                              <p className="text-white/60 text-sm mb-1">Årlig tillväxt</p>
-                              <p className="text-3xl font-bold text-green-400">{typedAnswers.premiumAnalysis.marketInsights.marketSize.growth}</p>
-                            </div>
-                            <div className="text-center">
-                              <p className="text-white/60 text-sm mb-1">Prognos 2027</p>
-                              <p className="text-3xl font-bold text-blue-400">{typedAnswers.premiumAnalysis.marketInsights.marketSize.projected}</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Key Trends */}
-                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 mb-6">
-                          <h3 className="text-xl font-bold text-white mb-4">Viktiga Trender</h3>
-                          <div className="space-y-4">
-                            {typedAnswers.premiumAnalysis.marketInsights.keyTrends.map((trend: any, i: number) => (
-                              <div key={i} className="bg-black/20 rounded-xl p-4">
-                                <div className="flex items-start gap-3">
-                                  <span className="text-3xl">{trend.icon}</span>
-                                  <div className="flex-1">
-                                    <div className="flex items-center justify-between mb-2">
-                                      <h4 className="text-lg font-bold text-white">{trend.name}</h4>
-                                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                                        trend.impact === 'Hög' ? 'bg-red-500/20 text-red-300' :
-                                        trend.impact === 'Medium' ? 'bg-yellow-500/20 text-yellow-300' :
-                                        'bg-green-500/20 text-green-300'
-                                      }`}>
-                                        Impact: {trend.impact}
-                                      </span>
-                                    </div>
-                                    <p className="text-white/80">{trend.description}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Competitive Dynamics */}
-                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-                          <h3 className="text-xl font-bold text-white mb-4">Konkurrensdynamik</h3>
-                          <div className="bg-black/20 rounded-xl p-4">
-                            <p className="text-white/80 mb-4">{typedAnswers.premiumAnalysis.marketInsights.competitiveDynamics.overview}</p>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <h4 className="text-white font-semibold mb-2">Marknadsledare:</h4>
-                                <ul className="space-y-1">
-                                  {typedAnswers.premiumAnalysis.marketInsights.competitiveDynamics.marketLeaders.map((leader: string, i: number) => (
-                                    <li key={i} className="text-white/70 text-sm">• {leader}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                              <div>
-                                <h4 className="text-white font-semibold mb-2">Er positionering:</h4>
-                                <p className="text-white/70 text-sm">{typedAnswers.premiumAnalysis.marketInsights.competitiveDynamics.yourPosition}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="text-center py-12">
-                        <span className="text-6xl mb-4 block">🔍</span>
-                        <p className="text-white/60 text-lg">Marknadsinsikter genereras när du uppgraderar till Premium</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* AI Image Prompts Section */}
-              {expandedInsight === 'ai-bildprompts' && typedAnswers.premiumAnalysis?.aiImagePrompts && (
-                <div className="space-y-6 animate-fadeIn">
-                  <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl p-8 backdrop-blur-lg border border-purple-500/20">
-                    <div className="flex items-center gap-3 mb-6">
-                      <h2 className="text-3xl font-bold text-white">AI Bildgenerering för Marknadsföring</h2>
-                      <button
-                        onClick={() => setShowImagePromptsInfo(true)}
-                        className="text-white/70 hover:text-white transition-colors"
-                        title="Om AI bildgenerering"
-                      >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    {/* Info Modal */}
-                    {showImagePromptsInfo && (
-                      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowImagePromptsInfo(false)}>
-                        <div className="bg-white rounded-2xl p-6 max-w-md" onClick={(e) => e.stopPropagation()}>
-                          <h3 className="text-xl font-bold text-gray-900 mb-3">🎨 Om AI Bildgenerering</h3>
-                          <p className="text-gray-700 mb-4">
-                            Använd ChatGPT DALL-E 3 eller Midjourney för att skapa professionella bilder för ert företag. 
-                            Bilderna är designade för att förmedla rätt känsla till det limbiska systemet - utan text i bilderna.
-                          </p>
-                          <p className="text-gray-700 mb-4">
-                            Perfekt för sociala medier, hemsidan, presentationer och marknadsföringsmaterial.
-                          </p>
-                          <button
-                            onClick={() => setShowImagePromptsInfo(false)}
-                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                          >
-                            Stäng
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Introduction */}
-                    <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl p-6 border border-purple-500/30 mb-8">
-                      <h3 className="text-xl font-bold text-white mb-3">🌟 Känslodriven Visuell Kommunikation</h3>
-                      <p className="text-white/90 mb-3">
-                        10 professionella AI-bildprompts anpassade för {typedAnswers.company_name || 'ert företag'}. 
-                        Varje bild är noggrant utformad för att väcka rätt känslor hos er målgrupp och stärka ert varumärke.
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="px-3 py-1 bg-purple-500/30 rounded-full text-white/90 text-sm">Utan text i bilderna</span>
-                        <span className="px-3 py-1 bg-pink-500/30 rounded-full text-white/90 text-sm">Limbiska systemet</span>
-                        <span className="px-3 py-1 bg-blue-500/30 rounded-full text-white/90 text-sm">Sociala medier</span>
-                        <span className="px-3 py-1 bg-green-500/30 rounded-full text-white/90 text-sm">Hemsida</span>
-                      </div>
-                    </div>
-
-                    {/* Image Prompts Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {typedAnswers.premiumAnalysis.aiImagePrompts.prompts.map((prompt: any, i: number) => (
-                        <div key={i} className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-purple-500/30 transition-all">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-lg">
-                                <span className="text-2xl">{prompt.icon}</span>
-                              </div>
-                              <div>
-                                <h4 className="text-lg font-bold text-white">{prompt.title}</h4>
-                                <p className="text-white/60 text-sm">{prompt.usage}</p>
-                              </div>
-                            </div>
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              prompt.emotion === 'trust' ? 'bg-blue-500/20 text-blue-300' :
-                              prompt.emotion === 'excitement' ? 'bg-orange-500/20 text-orange-300' :
-                              prompt.emotion === 'innovation' ? 'bg-purple-500/20 text-purple-300' :
-                              prompt.emotion === 'security' ? 'bg-green-500/20 text-green-300' :
-                              'bg-pink-500/20 text-pink-300'
+              {/* Key Trends */}
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 mb-6">
+                <h3 className="text-xl font-bold text-white mb-4">Viktiga Trender</h3>
+                <div className="space-y-4">
+                  {[
+                    { icon: '🚀', name: 'Digital Transformation', impact: 'Hög', description: 'Snabb övergång till digitala lösningar' },
+                    { icon: '🌍', name: 'Globalisering', impact: 'Medium', description: 'Ökad internationell konkurrens' },
+                    { icon: '🤖', name: 'AI & Automatisering', impact: 'Hög', description: 'AI-drivna lösningar blir standard' }
+                  ].map((trend, i) => (
+                    <div key={i} className="bg-black/20 rounded-xl p-4">
+                      <div className="flex items-start gap-3">
+                        <span className="text-3xl">{trend.icon}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-lg font-bold text-white">{trend.name}</h4>
+                            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                              trend.impact === 'Hög' ? 'bg-red-500/20 text-red-300' :
+                              trend.impact === 'Medium' ? 'bg-yellow-500/20 text-yellow-300' :
+                              'bg-green-500/20 text-green-300'
                             }`}>
-                              {prompt.emotion}
+                              Impact: {trend.impact}
                             </span>
                           </div>
-                          
-                          <div className="bg-black/30 rounded-xl p-4 mb-4">
-                            <p className="text-green-400 text-sm font-mono leading-relaxed">
-                              {prompt.prompt}
-                            </p>
-                          </div>
-                          
-                          <div className="flex items-center justify-between">
-                            <div className="flex flex-wrap gap-2">
-                              {prompt.keywords.map((keyword: string, j: number) => (
-                                <span key={j} className="text-xs text-white/60 bg-white/5 px-2 py-1 rounded">
-                                  {keyword}
-                                </span>
-                              ))}
-                            </div>
-                            <button
-                              onClick={() => {
-                                navigator.clipboard.writeText(prompt.prompt);
-                                setCopiedImagePrompt(i);
-                                setTimeout(() => setCopiedImagePrompt(null), 2000);
-                              }}
-                              className="p-2 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 transition-colors"
-                              title="Kopiera prompt"
-                            >
-                              {copiedImagePrompt === i ? (
-                                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                              ) : (
-                                <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                </svg>
-                              )}
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Usage Guide */}
-                    <div className="mt-8 bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-                      <h3 className="text-xl font-bold text-white mb-4">📚 Användningsguide</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-white/5 rounded-lg p-4">
-                          <h4 className="text-white font-semibold mb-2">1. Kopiera Prompt</h4>
-                          <p className="text-white/70 text-sm">Klicka på kopiera-ikonen för att kopiera en prompt till urklipp.</p>
-                        </div>
-                        <div className="bg-white/5 rounded-lg p-4">
-                          <h4 className="text-white font-semibold mb-2">2. Använd AI-verktyg</h4>
-                          <p className="text-white/70 text-sm">Klistra in i ChatGPT DALL-E 3, Midjourney eller liknande.</p>
-                        </div>
-                        <div className="bg-white/5 rounded-lg p-4">
-                          <h4 className="text-white font-semibold mb-2">3. Publicera</h4>
-                          <p className="text-white/70 text-sm">Använd bilderna på sociala medier, hemsida och i marknadsföring.</p>
+                          <p className="text-white/80">{trend.description}</p>
                         </div>
                       </div>
                     </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Competitive Analysis */}
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                <h3 className="text-xl font-bold text-white mb-4">Konkurrensdynamik</h3>
+                <div className="bg-black/20 rounded-xl p-4">
+                  <p className="text-white/80 mb-4">
+                    Marknaden är i en fas av snabb tillväxt med flera nyckelspelare som konkurrerar om marknadsandelar.
+                    Er positionering fokuserar på unika värdeerbjudanden och teknologisk innovation.
+                  </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="text-white font-semibold mb-2">Marknadsledare:</h4>
+                      <ul className="space-y-1">
+                        <li className="text-white/70 text-sm">• Etablerade företag med stor marknadsandel</li>
+                        <li className="text-white/70 text-sm">• Tech-jättar som expanderar</li>
+                        <li className="text-white/70 text-sm">• Innovativa startups</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold mb-2">Er positionering:</h4>
+                      <p className="text-white/70 text-sm">
+                        Unik kombination av teknologisk innovation och kundfokus, med potential att ta marknadsandelar från etablerade spelare.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              )}
-            </>
-          ) : null}
-        </div>
+              </div>
+            </div>
+          </>
+        ) : currentSection === 'financial' ? (
+          <>
+            {/* Financial Analysis Section */}
+            <h1 className="text-3xl font-bold text-white mb-8">Finansiell Analys</h1>
+            <div className="space-y-6">
+              {/* Financial Projections */}
+              <div className="bg-gradient-to-r from-green-600/30 to-blue-600/30 rounded-2xl p-6 border border-green-500/40 mb-6">
+                <h3 className="text-xl font-bold text-white mb-4">3-års Finansiell Prognos</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <p className="text-white/60 text-sm mb-1">År 1</p>
+                    <p className="text-3xl font-bold text-white">5 MSEK</p>
+                    <p className="text-white/60 text-sm">Intäkter</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-white/60 text-sm mb-1">År 2</p>
+                    <p className="text-3xl font-bold text-white">25 MSEK</p>
+                    <p className="text-white/60 text-sm">Intäkter</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-white/60 text-sm mb-1">År 3</p>
+                    <p className="text-3xl font-bold text-white">75 MSEK</p>
+                    <p className="text-white/60 text-sm">Intäkter</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Key Metrics */}
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                <h3 className="text-xl font-bold text-white mb-4">Viktiga Finansiella Nyckeltal</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-black/20 rounded-xl p-4">
+                    <h4 className="text-white font-semibold mb-2">Lönsamhet</h4>
+                    <ul className="space-y-2">
+                      <li className="flex justify-between">
+                        <span className="text-white/70">Bruttomarginal</span>
+                        <span className="text-white font-semibold">65%</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span className="text-white/70">EBITDA-marginal</span>
+                        <span className="text-white font-semibold">25%</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span className="text-white/70">Rörelsemarginal</span>
+                        <span className="text-white font-semibold">20%</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="bg-black/20 rounded-xl p-4">
+                    <h4 className="text-white font-semibold mb-2">Efficiency</h4>
+                    <ul className="space-y-2">
+                      <li className="flex justify-between">
+                        <span className="text-white/70">CAC</span>
+                        <span className="text-white font-semibold">15 000 SEK</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span className="text-white/70">LTV</span>
+                        <span className="text-white font-semibold">75 000 SEK</span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span className="text-white/70">LTV:CAC Ratio</span>
+                        <span className="text-white font-semibold">5:1</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : currentSection === 'ai' ? (
+          <>
+            {/* AI Image Generation Section */}
+            <h1 className="text-3xl font-bold text-white mb-8">AI Bildgenerering för Marknadsföring</h1>
+            <div className="space-y-6">
+              {/* Introduction */}
+              <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl p-6 border border-purple-500/30 mb-8">
+                <h3 className="text-xl font-bold text-white mb-3">🌟 Känslodriven Visuell Kommunikation</h3>
+                <p className="text-white/90 mb-3">
+                  10 professionella AI-bildprompts anpassade för {typedAnswers.company_name || 'ert företag'}. 
+                  Varje bild är noggrant utformad för att väcka rätt känslor hos er målgrupp och stärka ert varumärke.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 bg-purple-500/30 rounded-full text-white/90 text-sm">Utan text i bilderna</span>
+                  <span className="px-3 py-1 bg-pink-500/30 rounded-full text-white/90 text-sm">Limbiska systemet</span>
+                  <span className="px-3 py-1 bg-blue-500/30 rounded-full text-white/90 text-sm">Sociala medier</span>
+                  <span className="px-3 py-1 bg-green-500/30 rounded-full text-white/90 text-sm">Hemsida</span>
+                </div>
+              </div>
+
+              {/* Image Prompts Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  {
+                    icon: '🎯',
+                    title: 'Vision & Mål',
+                    usage: 'Hemsida & Presentationer',
+                    emotion: 'trust',
+                    prompt: 'Professional business visualization showing growth and success, minimalist design, corporate colors, high-end photography style',
+                    keywords: ['professional', 'growth', 'success', 'minimalist']
+                  },
+                  {
+                    icon: '💡',
+                    title: 'Innovation',
+                    usage: 'Sociala Medier',
+                    emotion: 'excitement',
+                    prompt: 'Cutting-edge technology visualization, abstract representation of innovation, modern design, vibrant colors',
+                    keywords: ['innovation', 'technology', 'modern', 'vibrant']
+                  }
+                ].map((prompt, i) => (
+                  <div key={i} className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-purple-500/30 transition-all">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-lg">
+                          <span className="text-2xl">{prompt.icon}</span>
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-bold text-white">{prompt.title}</h4>
+                          <p className="text-white/60 text-sm">{prompt.usage}</p>
+                        </div>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        prompt.emotion === 'trust' ? 'bg-blue-500/20 text-blue-300' :
+                        prompt.emotion === 'excitement' ? 'bg-orange-500/20 text-orange-300' :
+                        prompt.emotion === 'innovation' ? 'bg-purple-500/20 text-purple-300' :
+                        prompt.emotion === 'security' ? 'bg-green-500/20 text-green-300' :
+                        'bg-pink-500/20 text-pink-300'
+                      }`}>
+                        {prompt.emotion}
+                      </span>
+                    </div>
+                    
+                    <div className="bg-black/30 rounded-xl p-4 mb-4">
+                      <p className="text-green-400 text-sm font-mono leading-relaxed">
+                        {prompt.prompt}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap gap-2">
+                        {prompt.keywords.map((keyword: string, j: number) => (
+                          <span key={j} className="text-xs text-white/60 bg-white/5 px-2 py-1 rounded">
+                            {keyword}
+                          </span>
+                        ))}
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(prompt.prompt);
+                          setCopiedImagePrompt(i);
+                          setTimeout(() => setCopiedImagePrompt(null), 2000);
+                        }}
+                        className="p-2 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 transition-colors"
+                        title="Kopiera prompt"
+                      >
+                        {copiedImagePrompt === i ? (
+                          <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Usage Guide */}
+              <div className="mt-8 bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                <h3 className="text-xl font-bold text-white mb-4">📚 Användningsguide</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-white/5 rounded-lg p-4">
+                    <h4 className="text-white font-semibold mb-2">1. Kopiera Prompt</h4>
+                    <p className="text-white/70 text-sm">Klicka på kopiera-ikonen för att kopiera en prompt till urklipp.</p>
+                  </div>
+                  <div className="bg-white/5 rounded-lg p-4">
+                    <h4 className="text-white font-semibold mb-2">2. Använd AI-verktyg</h4>
+                    <p className="text-white/70 text-sm">Klistra in i ChatGPT DALL-E 3, Midjourney eller liknande.</p>
+                  </div>
+                  <div className="bg-white/5 rounded-lg p-4">
+                    <h4 className="text-white font-semibold mb-2">3. Publicera</h4>
+                    <p className="text-white/70 text-sm">Använd bilderna på sociala medier, hemsida och i marknadsföring.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : null}
       </div>
-      
+
       {/* Auth Modal */}
       <AuthModal
         isOpen={showAuthModal}
