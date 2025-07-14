@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import AuthModal from './AuthModal';
 import ProfileSettingsModal from './ProfileSettingsModal';
-import { supabase } from '../../lib/supabase';
 import { usePathname, useRouter } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../../lib/supabase';
