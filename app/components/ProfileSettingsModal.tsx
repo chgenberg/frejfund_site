@@ -1,4 +1,5 @@
 "use client"
+
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 
@@ -50,17 +51,17 @@ export default function ProfileSettingsModal({ open, onClose, userEmail, setUser
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-black text-2xl font-bold">×</button>
         <h2 className="text-2xl font-bold mb-6 text-center text-[#16475b]">Profilinställningar</h2>
         <form onSubmit={handleEmailChange} className="mb-6">
-          <label className="block mb-2 font-semibold text-gray-900">E-postadress</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-4 py-2 border rounded mb-2 text-gray-900" />
+          <label className="block mb-2 font-semibold">E-postadress</label>
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-4 py-2 border rounded mb-2" />
           <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-all" disabled={loading}>Uppdatera e-post</button>
         </form>
         <form onSubmit={handlePasswordChange}>
-          <label className="block mb-2 font-semibold text-gray-900">Nytt lösenord</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-4 py-2 border rounded mb-2 text-gray-900" />
+          <label className="block mb-2 font-semibold">Nytt lösenord</label>
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-4 py-2 border rounded mb-2" />
           <button type="submit" className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 transition-all" disabled={loading}>Uppdatera lösenord</button>
         </form>
-        {message && <div className="mt-4 text-green-700 text-center font-semibold">{message}</div>}
-        {error && <div className="mt-4 text-red-700 text-center font-semibold">{error}</div>}
+        {message && <div className="mt-4 text-green-600 text-center">{message}</div>}
+        {error && <div className="mt-4 text-red-600 text-center">{error}</div>}
       </div>
     </div>
   );
