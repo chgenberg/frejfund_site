@@ -32,6 +32,7 @@ pnpm-debug.log*
 .env
 .env.*
 aff/src/.env
+!/.env.production
 
 # vercel
 .vercel
