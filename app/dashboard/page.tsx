@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { supabase, Analysis } from '../../lib/supabase'
+import { getSupabaseClient, Analysis } from '../../lib/supabase'
 import BusinessPlanWizard from '../components/BusinessPlanWizard'
 import ProfileSettingsModal from '../components/ProfileSettingsModal'
 import Link from 'next/link'
@@ -25,6 +25,7 @@ export default function Dashboard() {
   }, [])
 
   const checkUser = async () => {
+    const supabase = getSupabaseClient();
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       router.push('/auth/login')
@@ -35,6 +36,7 @@ export default function Dashboard() {
 
   const fetchAnalyses = async () => {
     try {
+      const supabase = getSupabaseClient();
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
@@ -54,6 +56,7 @@ export default function Dashboard() {
   }
 
   const handleSignOut = async () => {
+    const supabase = getSupabaseClient();
     await supabase.auth.signOut()
     router.push('/')
   }

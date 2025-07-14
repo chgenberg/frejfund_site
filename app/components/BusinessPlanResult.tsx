@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import AuthModal from './AuthModal';
-import { supabase } from '../../lib/supabase';
+import { getSupabaseClient } from '../../lib/supabase';
 
 interface ResultProps {
   score: number;
@@ -129,6 +129,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
   useEffect(() => {
     checkUser();
     
+    const supabase = getSupabaseClient();
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user || null);
     });
@@ -139,6 +140,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
   }, []);
 
   const checkUser = async () => {
+    const supabase = getSupabaseClient();
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user);
   };
@@ -221,6 +223,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
     }
 
     try {
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('analyses')
         .insert([{

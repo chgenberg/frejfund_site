@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
+import { getSupabaseClient } from '../../lib/supabase';
 
 interface AuthModalProps {
   isOpen: boolean
@@ -29,11 +30,11 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login', redi
     setMode(defaultMode)
   }, [defaultMode])
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-    setMessage('')
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    const supabase = getSupabaseClient();
 
     try {
       if (mode === 'signup') {
@@ -123,7 +124,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login', redi
           </p>
         </div>
 
-        <form onSubmit={handleAuth} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-white/80 text-sm font-medium mb-2">
               E-postadress

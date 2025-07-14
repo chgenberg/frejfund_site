@@ -1,11 +1,12 @@
 // Denna komponent används inte längre. Lämna filen tom eller kommentera ut allt innehåll.
 
-'use client'
+"use client"
 
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { supabase } from '../../lib/supabase'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
+import { getSupabaseClient } from '../../lib/supabase'
 import AuthModal from './AuthModal'
 
 export default function Header() {
@@ -15,9 +16,14 @@ export default function Header() {
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
 
   useEffect(() => {
-    checkUser()
+    const fetchUser = async () => {
+      const supabase = getSupabaseClient();
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    fetchUser()
     
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: authListener } = getSupabaseClient().auth.onAuthStateChange((event, session) => {
       setUser(session?.user || null)
     })
 
@@ -26,15 +32,10 @@ export default function Header() {
     }
   }, [])
 
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    setUser(user)
-  }
-
   const handleSignOut = async () => {
+    const supabase = getSupabaseClient();
     await supabase.auth.signOut()
-    setUser(null)
-    router.push('/')
+    router.push("/")
   }
 
   const openAuthModal = (mode: 'login' | 'signup') => {

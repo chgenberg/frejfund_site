@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from '../../lib/supabase';
+'use client';
+import { getSupabaseClient } from '../../lib/supabase';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Question,
   BusinessPlanAnswers,
@@ -126,8 +127,20 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [showMarketPopup, setShowMarketPopup] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   const current: Question = INVESTOR_QUESTIONS[step];
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const supabase = getSupabaseClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setIsLoggedIn(true);
+      }
+    };
+    checkUser();
+  }, []);
 
   const isCurrentStepValid = () => {
     if (!current.required) return true;
@@ -158,6 +171,61 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
   };
   
   if (!open) return null;
+
+  const saveAndAnalyze = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      let userId = null;
+      let anonymousEmail = null;
+
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        userId = user.id;
+      } else if (answers.email) {
+        anonymousEmail = answers.email;
+      }
+
+      const { data, error } = await supabase.from('analyses').insert({
+        user_id: userId,
+        company_name: answers.company_name,
+        company_value: answers.company_value,
+        customer_problem: answers.customer_problem,
+        problem_evidence: answers.problem_evidence,
+        market_gap: answers.market_gap,
+        solution: answers.solution,
+        why_now: answers.why_now,
+        target_customer: answers.target_customer,
+        market_size: answers.market_size,
+        market_size_estimate: answers.market_size_estimate,
+        market_trends: answers.market_trends,
+        traction: answers.traction,
+        revenue_block: answers.revenue_block,
+        runway: answers.runway,
+        growth_plan: answers.growth_plan,
+        milestones: JSON.stringify(answers.milestones),
+        team: answers.team,
+        founder_equity: answers.founder_equity,
+        founder_market_fit: JSON.stringify(answers.founder_market_fit),
+        created_at: new Date().toISOString(),
+        status: 'pending', // Or 'completed', 'failed'
+      });
+
+      if (error) {
+        console.error('Error saving analysis:', error);
+        alert('Fel vid sparande av affärsplan.');
+        return;
+      }
+
+      alert('Affärsplan sparad! Analysen genereras...');
+      // Redirect to analysis page or show loading state
+      // For now, we'll just close the wizard
+      onClose();
+    } catch (error) {
+      console.error('Error saving analysis:', error);
+      alert('Fel vid sparande av affärsplan.');
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">

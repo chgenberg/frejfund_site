@@ -5,6 +5,9 @@ import Image from 'next/image';
 import AuthModal from './AuthModal';
 import ProfileSettingsModal from './ProfileSettingsModal';
 import { supabase } from '../../lib/supabase';
+import { usePathname, useRouter } from 'next/navigation';
+import { User } from '@supabase/supabase-js';
+import { getSupabaseClient } from '../../lib/supabase';
 
 export default function OverlayNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,12 +17,24 @@ export default function OverlayNavbar() {
   const [showProfile, setShowProfile] = useState(false);
   const [userEmail, setUserEmail] = useState('test@demo.se');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    checkUserStatus();
+    const fetchUser = async () => {
+      const supabase = getSupabaseClient();
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+    };
+
+    fetchUser();
     
+    const supabase = getSupabaseClient();
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsLoggedIn(!!session?.user);
+      setUser(session?.user ?? null);
+      if(event === 'SIGNED_OUT') {
+        router.push('/');
+      }
     });
 
     return () => {
@@ -28,6 +43,7 @@ export default function OverlayNavbar() {
   }, []);
 
   const checkUserStatus = async () => {
+    const supabase = getSupabaseClient();
     const { data: { user } } = await supabase.auth.getUser();
     setIsLoggedIn(!!user);
   };
@@ -38,8 +54,9 @@ export default function OverlayNavbar() {
   };
 
   const handleSignOut = async () => {
+    const supabase = getSupabaseClient();
     await supabase.auth.signOut();
-    window.location.reload();
+    router.push('/');
   };
 
   return (

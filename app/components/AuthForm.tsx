@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '../../lib/supabase'
+import { getSupabaseClient } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
 export default function AuthForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
@@ -24,6 +24,7 @@ export default function AuthForm({ mode = 'login' }: { mode?: 'login' | 'signup'
 
     try {
       if (mode === 'signup') {
+        const supabase = getSupabaseClient();
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -34,6 +35,7 @@ export default function AuthForm({ mode = 'login' }: { mode?: 'login' | 'signup'
         if (error) throw error
         setMessage('Kolla din e-post för att bekräfta ditt konto!')
       } else {
+        const supabase = getSupabaseClient();
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,

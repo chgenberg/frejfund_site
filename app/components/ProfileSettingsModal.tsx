@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { getSupabaseClient } from '../../lib/supabase';
 
 export default function ProfileSettingsModal({ open, onClose, userEmail, setUserEmail }: { open: boolean, onClose: () => void, userEmail: string, setUserEmail: (email: string) => void }) {
   const [email, setEmail] = useState(userEmail);
@@ -16,6 +16,7 @@ export default function ProfileSettingsModal({ open, onClose, userEmail, setUser
     setMessage('');
     setError('');
     try {
+      const supabase = getSupabaseClient();
       const { error } = await supabase.auth.updateUser({ email });
       if (error) throw error;
       setMessage('E-post uppdaterad!');
@@ -33,6 +34,7 @@ export default function ProfileSettingsModal({ open, onClose, userEmail, setUser
     setMessage('');
     setError('');
     try {
+      const supabase = getSupabaseClient();
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       setMessage('Lösenord uppdaterat!');
