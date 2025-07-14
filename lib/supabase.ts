@@ -29,6 +29,7 @@ export interface Analysis {
   action_items?: any
   title?: string
   description?: string
+  is_premium: boolean
 }
 
 export interface Payment {
