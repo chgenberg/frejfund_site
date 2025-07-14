@@ -5,8 +5,6 @@ import { getMarketData, getIndustryBenchmarks, getCompetitorAnalysis, getRegulat
 
 export const runtime = 'nodejs';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 // Helper to sanitize text for PDF (remove/replace unsupported chars)
 function sanitizeText(text: string): string {
   // Replace smart quotes, dashes, and common Unicode with ASCII equivalents
@@ -50,6 +48,8 @@ function parseTextWithBold(text: string) {
 }
 
 export async function POST(request: Request) {
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
   try {
     const formData = await request.formData();
     const answersStr = formData.get('answers') as string;
