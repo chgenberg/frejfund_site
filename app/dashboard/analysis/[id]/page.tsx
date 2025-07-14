@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { supabase, Analysis } from '../../../../lib/supabase'
+import { getSupabaseClient, Analysis } from '../../../../lib/supabase'
 import BusinessPlanResult from '../../../components/BusinessPlanResult'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -16,6 +16,9 @@ export default function AnalysisDetailPage() {
   const id = params.id as string
   const [analysis, setAnalysis] = useState<Analysis | null>(null)
   const [loading, setLoading] = useState(true)
+
+  // Get Supabase client once per render
+  const supabase = getSupabaseClient()
 
   useEffect(() => {
     if (id) {
