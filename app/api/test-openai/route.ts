@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function GET() {
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+  
   try {
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: "Say hello!" }],
