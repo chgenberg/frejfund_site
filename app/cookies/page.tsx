@@ -7,46 +7,12 @@ export default function Cookies() {
         <h1 className="text-3xl md:text-4xl font-extrabold mb-12 text-center text-[#16475b] tracking-tight">
           Cookiepolicy
         </h1>
-        
-        <div className="space-y-10 text-gray-800">
-          <div className="bg-white/50 rounded-2xl p-6 border border-gray-100">
-            <div className="overflow-x-auto rounded-xl border border-gray-100">
-              <table className="min-w-full border-collapse">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="border-b p-3 text-left text-sm font-semibold text-gray-600">Typ av cookie</th>
-                    <th className="border-b p-3 text-left text-sm font-semibold text-gray-600">Exempel</th>
-                    <th className="border-b p-3 text-left text-sm font-semibold text-gray-600">Syfte</th>
-                    <th className="border-b p-3 text-left text-sm font-semibold text-gray-600">Lagringstid</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  <tr className="hover:bg-gray-50/50">
-                    <td className="p-3 text-sm">Nödvändiga</td>
-                    <td className="p-3 text-sm">__host-next-auth.csrf</td>
-                    <td className="p-3 text-sm">inloggning & säkerhet</td>
-                    <td className="p-3 text-sm">session</td>
-                  </tr>
-                  <tr className="hover:bg-gray-50/50">
-                    <td className="p-3 text-sm">Analys</td>
-                    <td className="p-3 text-sm">_ga, _hjSession</td>
-                    <td className="p-3 text-sm">besöksstatistik</td>
-                    <td className="p-3 text-sm">1–24 mån</td>
-                  </tr>
-                  <tr className="hover:bg-gray-50/50">
-                    <td className="p-3 text-sm">Marknadsföring</td>
-                    <td className="p-3 text-sm">fbp, ttclid</td>
-                    <td className="p-3 text-sm">riktad annonsering</td>
-                    <td className="p-3 text-sm">3 mån</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
+        <div className="space-y-6 text-gray-800">
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">
-            <h2 className="text-xl font-bold mb-4 text-[#16475b]">Hur du hanterar cookies</h2>
-            <p className="leading-relaxed">Vid första besöket visas vår cookie-banner. Du kan när som helst ändra eller återkalla samtycke via "Cookieinställningar" i sidfoten eller i din webbläsare. Christopher Genberg AB är personuppgiftsansvarig för behandlingen av cookies.</p>
+            <h2 className="text-xl font-bold mb-4 text-[#16475b]">Användning av Cookies</h2>
+            <p className="mb-4">
+              Vi använder oss av cookies (kakor) för att förbättra din upplevelse. Genom att använda vår tjänst godkänner du vår användning av cookies.
+            </p>
           </section>
         </div>
       </div>

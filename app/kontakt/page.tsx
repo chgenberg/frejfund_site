@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 
 export default function Kontakt() {
   const [formData, setFormData] = useState({
@@ -27,31 +26,11 @@ export default function Kontakt() {
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center px-2 py-12">
       <h1 className="text-3xl md:text-4xl font-extrabold text-[#16475b] tracking-widest text-center mb-10 mt-2 uppercase">KONTAKT</h1>
-      {/* Bakgrundsbild */}
-      <Image
-        src="/bakgrund.png"
-        alt="Kontakt bakgrund"
-        fill
-        className="object-cover -z-10"
-        priority
-      />
-      <div className="flex flex-col gap-10 w-full max-w-2xl items-center bg-white/90 rounded-3xl shadow-xl p-10 border border-gray-200 backdrop-blur-md">
-        <div className="text-center">
-          <h1 className="text-3xl font-extrabold mb-4 text-[#01121f]">Christopher Genberg AB</h1>
-          <p className="text-lg text-gray-800 font-medium mb-2">Södra Skjutbanevägen 10<br />439 55 Åsa, Sverige</p>
-          <a href="mailto:info@christophergenberg.se" className="text-lg text-[#16475b] underline font-semibold">info@christophergenberg.se</a>
-        </div>
-        <div className="w-full h-72 rounded-2xl overflow-hidden shadow-lg border border-gray-300">
-          <iframe
-            title="Google Maps Södra Skjutbanevägen 10, Åsa"
-            src="https://www.google.com/maps?q=Södra+Skjutbanevägen+10,+439+55+Åsa,+Sverige&output=embed"
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
+      {/* Background Image */}
+      <div className="w-full max-w-sm">
+        <div className="mb-4 text-center">
+          <h2 className="text-xl font-bold text-[#16475b] tracking-wide">Har du frågor?</h2>
+          <p className="text-[#16475b]/80 mt-1">Fyll i formuläret så återkommer vi inom kort.</p>
         </div>
         {/* Kontaktformulär */}
         <div className="w-full mt-6">

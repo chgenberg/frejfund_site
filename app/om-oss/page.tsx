@@ -21,7 +21,7 @@ export default function About() {
         {/* Moln 1 - Moved up */}
         <div className="bg-white/90 rounded-[3rem] shadow-2xl border border-gray-200 px-8 py-8 max-w-2xl w-full text-center backdrop-blur-md mt-12">
           <p className="text-lg text-[#16475b]/80 max-w-2xl text-center">
-    Vi är ett passionerat team av entreprenörer, investerare och AI-experter som brinner för att demokratisera tillgången till kapital. Vårt mål är att ge alla en ärlig chans att förverkliga sina affärsdrömmar.
+    Vi är ett team av entreprenörer, investerare och AI-experter.
 </p>
         </div>
         {/* Moln 2 */}

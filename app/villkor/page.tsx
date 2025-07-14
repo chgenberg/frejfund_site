@@ -60,7 +60,7 @@ export default function Terms() {
           <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">
             <h2 className="text-xl font-bold mb-4 text-[#16475b]">Cookies</h2>
             <p className="mb-4">
-                Vi använder oss av cookies (kakor) för att förbättra din upplevelse. Genom att använda vår tjänst godkänner du vår användning av cookies.
+                Denna webbplats använder cookies för att förbättra din upplevelse. Genom att använda webbplatsen godkänner du vår användning av cookies.
             </p>
           </section>
         </div>
