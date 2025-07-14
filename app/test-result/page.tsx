@@ -116,6 +116,7 @@ export default function TestResultPage() {
       <BusinessPlanResult 
         score={dummyData.score}
         answers={dummyData.answers}
+        subscriptionLevel="standard"
       />
     </div>
   );
