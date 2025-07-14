@@ -1,39 +1,33 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
-import { useRouter } from 'next/navigation'
+'use client';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '../../lib/supabase';
 
 interface AuthModalProps {
-  isOpen: boolean
-  onClose: () => void
-  defaultMode?: 'login' | 'signup'
-  redirectTo?: string
-  onSuccess?: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  defaultMode?: 'login' | 'signup';
+  onSuccess?: () => void;
 }
 
-export default function AuthModal({ isOpen, onClose, defaultMode = 'login', redirectTo, onSuccess }: AuthModalProps) {
-  const router = useRouter()
-  const [mode, setMode] = useState<'login' | 'signup'>(defaultMode)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [message, setMessage] = useState('')
-
-  const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL
-    ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
-    : (typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined);
+export default function AuthModal({ isOpen, onClose, defaultMode = 'signup', onSuccess }: AuthModalProps) {
+  const [mode, setMode] = useState(defaultMode);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    setMode(defaultMode)
-  }, [defaultMode])
+    setMode(defaultMode);
+  }, [defaultMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
+    setError('');
+    setMessage('');
     const supabase = getSupabaseClient();
 
     try {
@@ -41,72 +35,34 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login', redi
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: {
-            emailRedirectTo: redirectUrl,
-          },
-        })
-        if (error) throw error
-        setMessage('Kolla din e-post för att bekräfta ditt konto!')
+        });
+        if (error) throw error;
+        setMessage('Kolla din e-post för att bekräfta ditt konto!');
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
-        })
-        if (error) throw error
-        
-        // Success - close modal and redirect/callback
-        onClose()
-        if (onSuccess) {
-          onSuccess()
-        } else if (redirectTo) {
-          router.push(redirectTo)
-        } else {
-          router.push('/dashboard')
-        }
+        });
+        if (error) throw error;
+        setMessage('Inloggad! Omdirigerar...');
+        if (onSuccess) onSuccess();
+        onClose();
+        router.push('/dashboard');
       }
     } catch (error: any) {
-      setError(error.message)
+      setError(error.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
-  const handleMagicLink = async () => {
-    setLoading(true)
-    setError('')
-    setMessage('')
-
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: redirectUrl,
-        },
-      })
-      if (error) throw error
-      setMessage('Kolla din e-post för en magic link!')
-    } catch (error: any) {
-      setError(error.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (!isOpen) return null
+  };
+  
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      
-      {/* Modal */}
-      <div className="relative bg-gradient-to-br from-purple-900/90 via-black/90 to-purple-900/90 rounded-3xl p-8 max-w-md w-full border border-white/10 shadow-2xl animate-slideUp">
-        {/* Close button */}
-        <button
-          onClick={onClose}
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-[#04111d] border border-white/10 rounded-2xl p-8 max-w-md w-full relative">
+        <button 
+          onClick={onClose} 
           className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,15 +70,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login', redi
           </svg>
         </button>
 
-        {/* Logo */}
-        <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-            FrejFund
-          </h2>
-          <p className="text-white/60 mt-2">
-            {mode === 'login' ? 'Välkommen tillbaka!' : 'Skapa ditt konto'}
-          </p>
-        </div>
+        <h2 className="text-2xl font-bold text-center mb-6 text-white">{mode === 'signup' ? 'Skapa konto' : 'Logga in'}</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -191,31 +139,12 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login', redi
           </button>
         </form>
 
-        {/* Magic Link Option */}
-        <div className="mt-4">
-          <button
-            onClick={handleMagicLink}
-            disabled={loading || !email}
-            className="w-full py-2 text-white/60 hover:text-white text-sm transition-colors"
-          >
-            Eller få en magic link via e-post
-          </button>
-        </div>
-
-        {/* Toggle mode */}
         <div className="mt-6 text-center">
-          <p className="text-white/60 text-sm">
-            {mode === 'login' ? 'Har du inget konto?' : 'Har du redan ett konto?'}
-            {' '}
-            <button
-              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-              className="text-purple-400 hover:text-purple-300 font-semibold transition-colors"
-            >
-              {mode === 'login' ? 'Skapa konto' : 'Logga in'}
-            </button>
-          </p>
+          <button onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="text-sm text-white/60 hover:text-white">
+            {mode === 'login' ? 'Inget konto? Skapa ett här.' : 'Har du redan ett konto? Logga in.'}
+          </button>
         </div>
       </div>
     </div>
-  )
+  );
 } 
