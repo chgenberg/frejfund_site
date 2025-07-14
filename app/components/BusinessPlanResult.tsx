@@ -10,6 +10,7 @@ interface ResultProps {
   score: number;
   answers: Record<string, unknown>;
   feedback?: Record<string, string>;
+  subscriptionLevel: string;
 }
 
 const getScoreInfo = (score: number) => {
