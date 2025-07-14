@@ -123,23 +123,14 @@ const calculateMarketScore = (answers: ScoreProps['answers']) => {
   return Math.min(25, score);
 };
 
-const getScoreLabel = (score: number) => {
-  if (score >= 95) return { emoji: '🏆', label: 'Top 1%', cta: 'VIP-snabbfil – vi pingar VC-scouts redan i dag.' };
-  if (score >= 85) return { emoji: '🚀', label: 'Deal-ready', cta: 'Klicka för varm intro till vårt investerarnätverk.' };
-  if (score >= 75) return { emoji: '⭐', label: 'Investable with guidance', cta: 'Vi matchar dig med ängel/ALMI – låt oss polera pitchen först.' };
-  if (score >= 50) return { emoji: '⚙️', label: 'Potential, men kräver jobb', cta: 'Få en 30-dagars handlingsplan + coach.' };
-  return { emoji: '🚧', label: 'Under byggtid', cta: 'Här är topp 3 luckor att åtgärda – boka workshop.' };
-};
-
 export default function BusinessPlanScore({ answers }: ScoreProps) {
   const { score, details } = calculateScore(answers);
-  const { emoji, label, cta } = getScoreLabel(score);
-
+  
   return (
     <div className="bg-white rounded-xl p-6 shadow-lg">
       <div className="text-center mb-6">
-        <div className="text-4xl mb-2">{emoji}</div>
-        <h2 className="text-2xl font-bold text-[#16475b] mb-2">{label}</h2>
+        <div className="text-4xl mb-2"></div>
+        <h2 className="text-2xl font-bold text-[#16475b] mb-2"></h2>
         <div className="text-4xl font-bold text-[#16475b]">{score}</div>
       </div>
 
@@ -173,13 +164,6 @@ export default function BusinessPlanScore({ answers }: ScoreProps) {
             <div className="bg-[#16475b] h-2 rounded-full" style={{ width: `${(details.market / 25) * 100}%` }}></div>
           </div>
         </div>
-      </div>
-
-      <div className="mt-6 text-center">
-        <p className="text-sm text-[#16475b] mb-4">{cta}</p>
-        <button className="bg-[#16475b] text-white font-bold rounded-full px-6 py-2 shadow hover:bg-[#16475b] hover:text-white transition-colors">
-          Boka möte
-        </button>
       </div>
     </div>
   );

@@ -1,30 +1,14 @@
 "use client";
 import { useState } from "react";
 
-const AVERAGES = {
-  none: 0.7,
-  incubator: 2.0,
-  frejfund: 3.0,
-};
-
-function getChance(requested: number, average: number) {
-  // Enkel modell: om requested <= average => 80%, annars fallande logik
-  if (requested <= average) return 80;
-  if (requested > average * 2.5) return 5;
-  if (requested > average * 2) return 15;
-  if (requested > average * 1.5) return 30;
-  if (requested > average * 1.2) return 50;
-  return 65;
-}
-
 export default function CapitalChanceCalculator() {
   const [showPopup, setShowPopup] = useState(false);
   const [input, setInput] = useState(1500000);
+  
   const requestedMSEK = input / 1_000_000;
-
-  const chanceNone = getChance(requestedMSEK, AVERAGES.none);
-  const chanceIncubator = getChance(requestedMSEK, AVERAGES.incubator);
-  const chanceFrejfund = getChance(requestedMSEK, AVERAGES.frejfund);
+  const chanceNone = 50;
+  const chanceIncubator = 70;
+  const chanceFrejfund = 85;
 
   return (
     <div className="w-full flex flex-col items-center gap-4 mt-8">

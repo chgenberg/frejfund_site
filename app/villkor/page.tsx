@@ -56,6 +56,13 @@ export default function Terms() {
             <h2 className="text-xl font-bold mb-4 text-[#16475b]">Tvist</h2>
             <p className="leading-relaxed">Svensk lag gäller. Tvister avgörs av Stockholms tingsrätt.</p>
           </section>
+
+          <section className="bg-white/50 rounded-2xl p-6 border border-gray-100">
+            <h2 className="text-xl font-bold mb-4 text-[#16475b]">Cookies</h2>
+            <p className="mb-4">
+                Vi använder oss av cookies (kakor) för att förbättra din upplevelse. Genom att använda vår tjänst godkänner du vår användning av cookies.
+            </p>
+          </section>
         </div>
       </div>
     </div>

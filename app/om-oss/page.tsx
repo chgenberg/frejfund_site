@@ -20,10 +20,9 @@ export default function About() {
       <div className="flex flex-col gap-20 w-full max-w-4xl items-center">
         {/* Moln 1 - Moved up */}
         <div className="bg-white/90 rounded-[3rem] shadow-2xl border border-gray-200 px-8 py-8 max-w-2xl w-full text-center backdrop-blur-md mt-12">
-          <p className="text-lg text-gray-800 font-medium">
-            <span className="text-2xl font-extrabold text-[#01121f] block mb-2">Varför finns FrejFund?</span>
-            För att idéer som får hjärtat att rusa inte ska fastna i byråkratiskt kärr. Vi brinner för den där rastlösa lusten som väcker entreprenörer mitt i natten – oavsett om det är första gången de vågar kalla sig företagare eller om de redan hunnit resa bolag och kraschlanda några gånger. I varje sådan hjärna pulserar samma urkraft: viljan att bygga något som ännu saknas i världen. Den kraften vill vi skydda och förstärka, inte se den tyna bort i Excel-ångest eller investerarjargong.
-          </p>
+          <p className="text-lg text-[#16475b]/80 max-w-2xl text-center">
+    Vi är ett passionerat team av entreprenörer, investerare och AI-experter som brinner för att demokratisera tillgången till kapital. Vårt mål är att ge alla en ärlig chans att förverkliga sina affärsdrömmar.
+</p>
         </div>
         {/* Moln 2 */}
         <div className="bg-white/80 rounded-[2.5rem] shadow-xl border border-gray-100 px-8 py-8 max-w-2xl w-full text-center backdrop-blur-sm mt-[-2rem] ml-auto">
