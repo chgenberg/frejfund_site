@@ -136,7 +136,7 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
       <div className="container mx-auto px-4 py-8">
         {/* Header with Overall Score */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-8">Investeringsanalys</h1>
+          <h1 className="text-4xl font-bold text-white mb-8">Investeringsanalys!</h1>
           
           <div className="inline-block">
             <div className="w-48 h-48 relative">
