@@ -67,6 +67,38 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
     }
   };
 
+  const fillTestData = () => {
+    const dummy: Record<string, any> = {};
+    INVESTOR_QUESTION_SECTIONS.forEach(section => {
+      section.questions.forEach(q => {
+        switch (q.type) {
+          case 'number':
+            dummy[q.id] = 42;
+            break;
+          case 'scale':
+            dummy[q.id] = 3;
+            break;
+          case 'percentage':
+            dummy[q.id] = 50;
+            break;
+          case 'select':
+            dummy[q.id] = q.options?.[0] || '';
+            break;
+          case 'multi_input':
+            const multi: Record<string, any> = {};
+            q.multiInputs?.forEach(mi => {
+              multi[mi.id] = mi.type === 'percentage' ? 50 : 10;
+            });
+            dummy[q.id] = multi;
+            break;
+          default:
+            dummy[q.id] = 'Testdata';
+        }
+      });
+    });
+    setAnswers(dummy);
+  };
+
   return (
     <div className="fixed inset-0 z-50 overflow-auto bg-black/90 backdrop-blur-xl">
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -77,6 +109,7 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-2xl font-bold text-white">Investeringsanalys</h2>
+                  <button onClick={fillTestData} className="text-xs text-white/60 hover:text-white bg-white/10 px-3 py-1 rounded-lg mr-2">Testdata</button>
                   <button onClick={onClose} className="text-white/60 hover:text-white">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
