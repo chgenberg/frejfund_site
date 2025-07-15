@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { INVESTOR_QUESTION_SECTIONS } from './InvestorQuestions';
 import { getSupabaseClient } from '../../lib/supabase';
+import MobileOptimizedWizard from './MobileOptimizedWizard';
 
 const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const [currentSection, setCurrentSection] = useState(0);
@@ -10,9 +11,24 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   if (!open) return null;
+
+  // Use mobile-optimized wizard for mobile devices
+  if (isMobile) {
+    return <MobileOptimizedWizard open={open} onClose={onClose} />;
+  }
 
   const section = INVESTOR_QUESTION_SECTIONS[currentSection];
   const totalSections = INVESTOR_QUESTION_SECTIONS.length;
