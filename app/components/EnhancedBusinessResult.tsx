@@ -5,6 +5,16 @@ import 'react-circular-progressbar/dist/styles.css';
 import ActionableInsights from './ActionableInsights';
 import EnhancedMobileResult from './EnhancedMobileResult';
 
+interface ActionableInsight {
+  title: string;
+  impact: 'high' | 'medium' | 'low';
+  timeframe: string;
+  description: string;
+  implementation: string[];
+  expectedResult: string;
+  investorPerspective: string;
+}
+
 interface CategoryScore {
   score: number;
   label: string;
@@ -27,6 +37,7 @@ interface ResultData {
     storytellingDeck: CategoryScore;
   };
   premiumAnalysis?: any;
+  actionableInsights?: ActionableInsight[];
 }
 
 const getScoreEmoji = (score: number) => {
@@ -224,6 +235,19 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
             </div>
           )}
         </div>
+
+        {/* Actionable Insights Section - Full Width */}
+        {data.actionableInsights && (
+          <div className="mt-12">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-white mb-4">🎯 Handlingsplan för högre värdering</h2>
+              <p className="text-lg text-white/70 max-w-2xl mx-auto">
+                Konkreta åtgärder baserade på din analys som ökar dina chanser att få finansiering
+              </p>
+            </div>
+            <ActionableInsights insights={data.actionableInsights} />
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="mt-8 flex justify-center gap-4">
