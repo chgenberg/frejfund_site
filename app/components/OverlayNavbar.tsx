@@ -115,34 +115,34 @@ export default function OverlayNavbar() {
       </div>
 
       {/* Knappar + logotyp uppe till höger */}
-      <div className="fixed top-6 right-6 z-[100] flex items-center gap-4">
+      <div className="fixed top-6 right-6 z-[100] flex items-center gap-2 md:gap-4">
         {/* Profile icon button - endast för inloggade */}
-        {isLoggedIn && (
+        {user && (
           <button
             className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all border border-white/20 flex items-center justify-center"
             onClick={() => setShowProfile(true)}
             aria-label="Profilinställningar"
           >
-            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" />
               <path d="M4 20c0-4 4-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="2" />
             </svg>
           </button>
         )}
         {/* Skapa konto och Logga in - endast för utloggade */}
-        {!isLoggedIn && (
+        {!user && (
           <button
             onClick={() => {
               setAuthMode('signup');
               setShowAuthModal(true);
             }}
-            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all font-semibold"
+            className="px-3 py-1.5 md:px-4 md:py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all font-semibold text-sm md:text-base"
           >
             Skapa konto
           </button>
         )}
         {/* Logotyp */}
-        <Link href="/" className="flex items-center justify-end" style={{height: '56px', width: '176px'}}>
+        <Link href="/" className="flex items-center justify-end h-10 w-28 md:h-14 md:w-44">
           {!logoError ? (
             <div className="relative w-full h-full">
               <Image
@@ -156,14 +156,19 @@ export default function OverlayNavbar() {
               />
             </div>
           ) : (
-            <span className="text-white text-xl font-bold bg-black/30 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20 cursor-pointer">Frejfund</span>
+            <span className="text-white text-base md:text-xl font-bold">FREJFUND</span>
           )}
         </Link>
       </div>
 
       {/* Profile Modal */}
-      {isLoggedIn && (
-        <ProfileSettingsModal open={showProfile} onClose={() => setShowProfile(false)} userEmail={userEmail} setUserEmail={setUserEmail} />
+      {user && (
+        <ProfileSettingsModal 
+          open={showProfile} 
+          onClose={() => setShowProfile(false)} 
+          userEmail={user.email || 'test@demo.se'} 
+          setUserEmail={setUserEmail} 
+        />
       )}
       {/* Auth Modal */}
       <AuthModal

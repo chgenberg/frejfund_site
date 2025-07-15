@@ -83,16 +83,23 @@ export default function EnhancedMobileResult({ data }: { data: any }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900">
       {/* Mobile Sticky Header */}
-      <div className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-lg border-b border-white/10">
-        <div className="px-4 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-bold text-white">Investeringsanalys</h1>
-            <div className="w-16 h-16">
+      <div className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-lg border-b border-white/10">
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-white">Investeringsanalys</h1>
+              <p className="text-xs text-white/60 mt-0.5">
+                {data.overallScore >= 75 ? 'Investor Ready' : 
+                 data.overallScore >= 50 ? 'Stark Potential' :
+                 data.overallScore >= 25 ? 'Lovande Start' : 'Tidigt Stadium'}
+              </p>
+            </div>
+            <div className="w-14 h-14 flex-shrink-0">
               <CircularProgressbar
                 value={data.overallScore}
                 text={`${data.overallScore}`}
                 styles={buildStyles({
-                  textSize: '28px',
+                  textSize: '32px',
                   pathColor: getScoreColor(data.overallScore),
                   textColor: '#fff',
                   trailColor: 'rgba(255, 255, 255, 0.1)',
@@ -102,7 +109,7 @@ export default function EnhancedMobileResult({ data }: { data: any }) {
           </div>
           
           {/* Tab Navigation */}
-          <div className="flex gap-2">
+          <div className="flex gap-1 mt-3">
             {[
               { id: 'overview', label: 'Översikt', icon: '📊' },
               { id: 'details', label: 'Detaljer', icon: '🔍' },
@@ -111,14 +118,14 @@ export default function EnhancedMobileResult({ data }: { data: any }) {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                className={`flex-1 py-2 px-2 rounded-lg text-xs font-medium transition-all ${
                   activeTab === tab.id
-                    ? 'bg-purple-500 text-white'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
                     : 'bg-white/10 text-white/60'
                 }`}
               >
-                <span className="mr-1">{tab.icon}</span>
-                {tab.label}
+                <span className="block text-lg mb-0.5">{tab.icon}</span>
+                <span className="block">{tab.label}</span>
               </button>
             ))}
           </div>

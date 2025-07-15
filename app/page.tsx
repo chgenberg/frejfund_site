@@ -11,25 +11,38 @@ export default function Home() {
 
   return (
     <>
-      <main className="min-h-screen flex flex-col items-center justify-center w-full">
-        {/* Brain med knapp centrerad ovanpå */}
-        <div className="relative flex items-center justify-center w-full h-full z-10" style={{ minHeight: 900 }}>
-          <Image
-            src="/brain.png"
-            alt="Brain"
-            width={2400}
-            height={1800}
-            className="opacity-95 drop-shadow-lg"
-            priority
-          />
-          <button
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#16475b] px-10 py-5 font-bold uppercase tracking-widest text-white shadow-lg transition-colors hover:bg-[#7edcff] hover:text-[#04121d] text-2xl sm:text-3xl"
-            onClick={() => setShowWizard(true)}
-            style={{ minWidth: 260 }}
-          >
-            Starta analys
-          </button>
+      <main className="min-h-screen flex flex-col items-center justify-center w-full bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900">
+        {/* Mobile optimized hero section */}
+        <div className="relative flex items-center justify-center w-full h-screen px-4">
+          {/* Brain image - responsive sizing */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-30 md:opacity-95">
+            <Image
+              src="/brain.png"
+              alt="Brain"
+              width={1200}
+              height={900}
+              className="w-full h-auto max-w-[800px] md:max-w-[1200px] lg:max-w-[2400px] object-contain"
+              priority
+            />
+          </div>
+          
+          {/* Content container */}
+          <div className="relative z-10 text-center px-4 max-w-2xl">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 md:mb-6">
+              FrejFund
+            </h1>
+            <p className="text-lg md:text-xl text-white/80 mb-8 md:mb-12">
+              AI-driven investeringsanalys för startups
+            </p>
+            <button
+              className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 md:px-10 py-4 md:py-5 font-bold uppercase tracking-widest text-white shadow-lg transition-all hover:shadow-xl hover:scale-105 text-lg md:text-2xl"
+              onClick={() => setShowWizard(true)}
+            >
+              Starta analys
+            </button>
+          </div>
         </div>
+        
         <EnhancedBusinessWizard open={showWizard} onClose={() => setShowWizard(false)} />
       </main>
     </>
