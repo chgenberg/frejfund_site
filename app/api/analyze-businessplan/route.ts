@@ -12,33 +12,109 @@ export async function POST(req: NextRequest) {
     // Strukturera svaren för OpenAI
     const structuredAnswers = JSON.stringify(answers, null, 2);
 
-    const prompt = `Du är en erfaren investerare och affärsrådgivare. Analysera följande affärsplan för ${company} i ${bransch}-branschen.
+    const prompt = `Analysera följande affärsplan för ${company} och generera en investeringsanalys.
 
-FÖRETAGSDATA:
-${structuredAnswers}
+Företagsinfo:
+${JSON.stringify(answers, null, 2)}
 
-Generera en omfattande analys i följande JSON-format:
-
+Generera ett JSON-objekt med följande struktur:
 {
-  "score": [0-100 baserat på affärsplanens kvalitet och investeringspotential],
-  "scoreBreakdown": {
-    "problemSolution": [0-20],
-    "marketAnalysis": [0-15],
-    "businessModel": [0-15],
-    "team": [0-15],
-    "traction": [0-10],
-    "financialPlan": [0-15],
-    "risks": [0-10]
-  },
-  "insights": [
-    {
-      "category": "problem-solution",
-      "strength": "high/medium/low",
-      "summary": "kort sammanfattning",
-      "details": "detaljerad analys"
+  "score": [0-100],
+  "categories": {
+    "problemSolution": {
+      "score": [0-100],
+      "label": "Problem–Lösning Fit",
+      "description": "Poäng för problemets akuthet & USP-styrka",
+      "metrics": {
+        "gapIndex": { "value": [0-10], "type": "number" },
+        "problemCriticality": { "value": [0-10], "type": "number" }
+      },
+      "insights": ["3-5 konkreta insikter"]
     },
-    // ... fler insikter för varje kategori
-  ],
+    "marketTiming": {
+      "score": [0-100],
+      "label": "Marknad & Timing",
+      "description": "TAM-validitet, trender, Why now",
+      "metrics": {
+        "tamConfidence": { "value": [0-100], "type": "percentage" },
+        "marketGrowth": { "value": [0-100], "type": "percentage" }
+      },
+      "insights": ["3-5 konkreta insikter"]
+    },
+    "moatCompetition": {
+      "score": [0-100],
+      "label": "Moat & Konkurrens",
+      "description": "Unikhet, skydd, hot",
+      "metrics": {
+        "defensibilityScore": { "value": [0-10], "type": "number" },
+        "competitiveThreat": { "value": [0-10], "type": "number" }
+      },
+      "insights": ["3-5 konkreta insikter"]
+    },
+    "tractionKpi": {
+      "score": [0-100],
+      "label": "Traction & KPI-progress",
+      "description": "MRR/DAU tillväxt & benchmarks",
+      "metrics": {
+        "growthQuality": { "value": [0-10], "type": "number" },
+        "mrr": { "value": ${answers.mrr_arr?.mrr || 0}, "type": "currency" },
+        "growthRate": { "value": ${answers.mrr_arr?.growth || 0}, "type": "percentage" }
+      },
+      "insights": ["3-5 konkreta insikter"]
+    },
+    "unitEconomics": {
+      "score": [0-100],
+      "label": "Unit Economics",
+      "description": "CAC vs LTV, break-even-prognos",
+      "metrics": {
+        "paybackMonths": { "value": ${answers.unit_economics?.payback || 0}, "type": "number" },
+        "ltvCacRatio": { "value": ${(answers.unit_economics?.ltv || 0) / (answers.unit_economics?.cac || 1)}, "type": "number" },
+        "grossMargin": { "value": ${answers.unit_economics?.gross_margin || 0}, "type": "percentage" }
+      },
+      "insights": ["3-5 konkreta insikter"]
+    },
+    "teamExecution": {
+      "score": [0-100],
+      "label": "Team & Execution",
+      "description": "Founder-market-fit, coachability",
+      "metrics": {
+        "teamStrength": { "value": [0-10], "type": "number" },
+        "executionSpeed": { "value": [0-10], "type": "number" }
+      },
+      "insights": ["3-5 konkreta insikter"]
+    },
+    "financialHealth": {
+      "score": [0-100],
+      "label": "Finansiell Hälsa",
+      "description": "Burn, runway, finansplan",
+      "metrics": {
+        "cashRisk": { "value": [0-10], "type": "number" },
+        "runwayMonths": { "value": ${answers.runway || 0}, "type": "number" },
+        "burnRate": { "value": ${answers.burn_rate || 0}, "type": "currency" }
+      },
+      "insights": ["3-5 konkreta insikter"]
+    },
+    "riskCompliance": {
+      "score": [0-100],
+      "label": "Risk & Compliance",
+      "description": "Röd-gul-grön-flags",
+      "metrics": {
+        "riskLevel": { "value": [0-10], "type": "number" },
+        "complianceStatus": { "value": [0-10], "type": "number" }
+      },
+      "insights": ["3-5 konkreta insikter"]
+    },
+    "storytellingDeck": {
+      "score": [0-100],
+      "label": "Storytelling & Deck-kvalitet",
+      "description": "Captivate-Validate-Motivate-poäng",
+      "metrics": {
+        "pitchClarity": { "value": [0-10], "type": "number" },
+        "narrativeStrength": { "value": [0-10], "type": "number" }
+      },
+      "insights": ["3-5 konkreta insikter"]
+    }
+  },
   "feedback": {
     "[field_name]": "specifik feedback för detta fält"
   },

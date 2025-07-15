@@ -49,16 +49,32 @@ export type MarketSizeQuestion = BaseQuestion & {
 };
 
 // Combined question type
-export type Question = 
-  | TextQuestion 
-  | NumberQuestion 
-  | MilestoneQuestion 
-  | FounderMarketFitQuestion 
-  | SelectQuestion 
-  | RadioQuestion 
-  | CapitalMatrixQuestion 
-  | EsgCheckboxQuestion 
-  | MarketSizeQuestion;
+export type Question = {
+  id: string;
+  label: string;
+  type: 'textarea' | 'text' | 'number' | 'select' | 'radio' | 'file' | 
+        'milestone_list' | 'capital_matrix' | 'founder_market_fit' | 
+        'esg_questions' | 'market_size' | 'multi_input' | 'scale' | 'percentage';
+  required: boolean;
+  help?: string;
+  options?: string[];
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  multiInputs?: {
+    id: string;
+    label: string;
+    type: 'text' | 'number' | 'percentage';
+    placeholder?: string;
+  }[];
+};
+
+export type QuestionSection = {
+  id: string;
+  title: string;
+  icon: string;
+  questions: Question[];
+};
 
 // Type guards
 export function isSelectQuestion(question: Question): question is SelectQuestion {
@@ -77,8 +93,8 @@ export function isCapitalQuestion(question: Question): question is CapitalMatrix
   return question.type === 'capital_matrix';
 }
 
-export function isESGQuestion(question: Question): question is EsgCheckboxQuestion {
-  return question.type === 'esg_checkbox';
+export function isESGQuestion(question: Question): question is Question {
+  return question.type === 'esg_questions';
 }
 
 export function isFounderMarketFitQuestion(question: Question): question is FounderMarketFitQuestion {

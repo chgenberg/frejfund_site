@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import Image from "next/image";
 import { useState } from "react";
-import BusinessPlanWizard from "./components/BusinessPlanWizard";
+import EnhancedBusinessWizard from "./components/EnhancedBusinessWizard";
 import Link from 'next/link'
 
 export default function Home() {
@@ -30,7 +30,7 @@ export default function Home() {
             Starta analys
           </button>
         </div>
-        <BusinessPlanWizard open={showWizard} onClose={() => setShowWizard(false)} />
+        <EnhancedBusinessWizard open={showWizard} onClose={() => setShowWizard(false)} />
       </main>
     </>
   );
