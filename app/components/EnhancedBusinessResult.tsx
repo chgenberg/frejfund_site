@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import ActionableInsights from './ActionableInsights';
+import EnhancedMobileResult from './EnhancedMobileResult';
 
 interface CategoryScore {
   score: number;
@@ -94,6 +96,7 @@ const MetricDisplay = ({ label, value, type = 'text' }: any) => {
 export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
   const [activeCategory, setActiveCategory] = useState('problemSolution');
   const [animatedScore, setAnimatedScore] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   
   const categories = Object.entries(data.categories);
   const activeData = data.categories[activeCategory as keyof typeof data.categories];
@@ -112,6 +115,21 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
     }, 30);
     return () => clearInterval(timer);
   }, [data.overallScore]);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  if (isMobile) {
+    return <EnhancedMobileResult data={data} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900">

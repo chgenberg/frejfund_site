@@ -145,19 +145,23 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
   return (
     <div className="fixed inset-0 z-50 overflow-auto bg-black/90 backdrop-blur-xl">
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 rounded-3xl p-8 max-w-4xl w-full shadow-2xl border border-purple-500/20">
+        <div className="bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 rounded-3xl p-4 md:p-8 max-w-4xl w-full shadow-2xl border border-purple-500/20 max-h-[90vh] overflow-y-auto">
           {!isSubmitting ? (
             <>
               {/* Progress Bar */}
-              <div className="mb-8">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold text-white">Investeringsanalys</h2>
-                  <button onClick={fillTestData} className="text-xs text-white/60 hover:text-white bg-white/10 px-3 py-1 rounded-lg mr-2">Testdata</button>
-                  <button onClick={onClose} className="text-white/60 hover:text-white">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+              <div className="mb-6 md:mb-8">
+                <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-2">
+                  <h2 className="text-xl md:text-2xl font-bold text-white">Investeringsanalys</h2>
+                  <div className="flex items-center gap-2">
+                    <button onClick={fillTestData} className="text-xs text-white/60 hover:text-white bg-white/10 px-3 py-1 rounded-lg">
+                      Testdata
+                    </button>
+                    <button onClick={onClose} className="text-white/60 hover:text-white p-1">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
                 <div className="w-full bg-white/10 rounded-full h-2">
                   <div 
@@ -171,13 +175,13 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
               </div>
 
               {/* Section Content */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-4xl">{section.icon}</span>
-                  <h3 className="text-xl font-semibold text-white">{section.title}</h3>
+              <div className="mb-6 md:mb-8">
+                <div className="flex items-center gap-3 mb-4 md:mb-6">
+                  <span className="text-3xl md:text-4xl">{section.icon}</span>
+                  <h3 className="text-lg md:text-xl font-semibold text-white">{section.title}</h3>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-4 md:space-y-6">
                   {section.questions.map((question) => (
                     <div key={question.id} className="space-y-2">
                       <label className="block text-white/90 font-medium">

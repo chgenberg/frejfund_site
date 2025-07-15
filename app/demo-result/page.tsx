@@ -165,7 +165,68 @@ const DEMO_DATA = {
         'Regulatoriska förändringar kan påverka affärsmodellen'
       ]
     }
-  }
+  },
+  actionableInsights: [
+    {
+      title: 'Kvantifiera kundens smärta i kronor',
+      impact: 'high' as const,
+      timeframe: '1-2 veckor',
+      description: 'Er lösning adresserar ett problem men saknar konkret data om vad det kostar kunden idag.',
+      implementation: [
+        'Intervjua 10 befintliga kunder om deras tidsåtgång med nuvarande lösning',
+        'Beräkna timkostnad × antal timmar = årlig kostnad per kund',
+        'Dokumentera 3-5 konkreta exempel med företagsnamn och belopp',
+        'Skapa en "ROI-kalkylator" som säljare kan använda i pitch'
+      ],
+      expectedResult: 'Öka konvertering med 30-40% genom att visa "Spara 420.000 kr/år" istället för "Spara tid"',
+      investorPerspective: 'Investerare vill se att ni förstår kundens ekonomi på djupet. Konkreta siffror > vaga löften.'
+    },
+    {
+      title: 'Optimera CAC genom produktledd tillväxt',
+      impact: 'high' as const,
+      timeframe: '3-6 månader',
+      description: 'Er CAC på €1000 kan halveras med rätt produktstrategi.',
+      implementation: [
+        'Bygg en gratis "light version" med smarta begränsningar',
+        'Skapa viral loop där varje användare bjuder in 2-3 kollegor',
+        'Automatisera onboarding med interaktiva produkttours',
+        'Implementera "aha moment" inom första 5 minuterna',
+        'Mät och optimera varje steg i aktiveringsflödet'
+      ],
+      expectedResult: 'Sänk CAC till €500, vilket ger LTV:CAC 8:1 och möjliggör aggressiv expansion',
+      investorPerspective: 'Företag med CAC < €500 får 3x högre värderingsmultiplar i Series A.'
+    },
+    {
+      title: 'Bygg "unfair advantage" genom data-moat',
+      impact: 'medium' as const,
+      timeframe: '6-12 månader',
+      description: 'Er tekniska fördel är temporär utan nätverkseffekter.',
+      implementation: [
+        'Samla unik data från varje kundinteraktion',
+        'Bygg ML-modeller som förbättras med fler användare',
+        'Skapa bransch-benchmarks som bara ni har',
+        'Publicera årlig rapport som positionerar er som thought leader',
+        'Gör data-insights till del av produktvärdet'
+      ],
+      expectedResult: 'Efter 1000 kunder blir er lösning 10x bättre än konkurrenternas',
+      investorPerspective: 'Data-moats är de enda hållbara konkurrensfördelarna i SaaS.'
+    },
+    {
+      title: 'Accelerera enterprise-sales genom champion-strategi',
+      impact: 'medium' as const,
+      timeframe: '2-3 månader',
+      description: 'Enterprise-deals tar för lång tid och kostar för mycket.',
+      implementation: [
+        'Identifiera "champions" inom målföretag via LinkedIn',
+        'Erbjud personlig demo + gratis pilot för deras team',
+        'Hjälp dem bygga business case internt',
+        'Ge dem färdiga slides för ledningspresentation',
+        'Implementera "land and expand" med små starter-deals'
+      ],
+      expectedResult: 'Korta säljcykeln från 6 till 3 månader, öka close rate till 40%',
+      investorPerspective: 'Enterprise-kunder ger 10x högre LTV och lägre churn.'
+    }
+  ]
 };
 
 export default function DemoResultPage() {
