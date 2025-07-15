@@ -5,7 +5,6 @@ const nextConfig = {
       // Handle Supabase dependencies
       config.resolve.alias = {
         ...config.resolve.alias,
-        '@supabase/realtime-js': false,
         'ws': false,
         'net': false,
         'tls': false,
