@@ -9,6 +9,7 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [statusMessage, setStatusMessage] = useState('');
   const router = useRouter();
 
   if (!open) return null;
@@ -42,16 +43,46 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    // Simulate progress
-    const interval = setInterval(() => {
+    
+    // Progress messages with timing
+    const messages = [
+      { text: 'Analyserar dina svar...', at: 0 },
+      { text: 'Utvärderar marknadsposition...', at: 15 },
+      { text: 'Granskar unit economics...', at: 25 },
+      { text: 'Jämför med branschstandard...', at: 35 },
+      { text: 'Genererar AI-insikter...', at: 45 },
+      { text: 'Bygger investeringsrekommendationer...', at: 55 },
+      { text: 'Skapar handlingsplan...', at: 65 },
+      { text: 'Beräknar investeringspotential...', at: 75 },
+      { text: 'Färdigställer rapporten...', at: 85 },
+      { text: 'Nästan klar...', at: 95 }
+    ];
+    
+    setStatusMessage(messages[0].text);
+    
+    // Start progress animation (90 seconds total)
+    let currentMessageIndex = 0;
+    const progressInterval = setInterval(() => {
       setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
+        const newProgress = Math.min(prev + 1.11, 100); // 1.11% per second = 90 seconds
+        
+        // Update message based on progress
+        const nextMessage = messages.find((msg, idx) => 
+          idx > currentMessageIndex && newProgress >= msg.at
+        );
+        
+        if (nextMessage) {
+          currentMessageIndex = messages.indexOf(nextMessage);
+          setStatusMessage(nextMessage.text);
         }
-        return prev + 2;
+        
+        if (newProgress >= 100) {
+          clearInterval(progressInterval);
+        }
+        
+        return newProgress;
       });
-    }, 100);
+    }, 1000);
 
     try {
       const response = await fetch('/api/analyze-businessplan', {
@@ -61,9 +92,21 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
       });
       
       const result = await response.json();
+      
+      // Wait for animation to complete
+      await new Promise(resolve => {
+        const checkComplete = setInterval(() => {
+          if (progress >= 100) {
+            clearInterval(checkComplete);
+            resolve(true);
+          }
+        }, 100);
+      });
+      
       router.push(`/enhanced-result?data=${encodeURIComponent(JSON.stringify(result))}`);
     } catch (error) {
       console.error('Error:', error);
+      clearInterval(progressInterval);
     }
   };
 
@@ -312,7 +355,7 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
                 </div>
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">Analyserar er affärsplan...</h3>
-              <p className="text-white/60">AI:n processar er data och genererar djupgående insikter</p>
+              <p className="text-white/60">{statusMessage}</p>
             </div>
           )}
         </div>
