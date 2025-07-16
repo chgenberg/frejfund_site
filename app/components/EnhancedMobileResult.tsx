@@ -23,50 +23,50 @@ const getActionableInsights = (category: any) => {
   const insightMaps: Record<string, any[]> = {
     problemSolution: [
       {
-        title: 'Kvantifiera kundens smärta i kronor',
+        title: 'Quantify customer pain in monetary terms',
         impact: 'high',
-        timeframe: '1-2 veckor',
-        description: 'Er lösning adresserar ett problem men saknar konkret data om vad det kostar kunden idag.',
+        timeframe: '1-2 weeks',
+        description: 'Your solution addresses a problem but lacks concrete data on what it costs the customer today.',
         implementation: [
-          'Intervjua 10 befintliga kunder om deras tidsåtgång',
-          'Beräkna timkostnad × antal timmar = årlig kostnad',
-          'Dokumentera 3-5 konkreta exempel med företagsnamn',
-          'Skapa en "ROI-kalkylator" för säljmaterial'
+          'Interview 10 existing customers about their time usage',
+          'Calculate hourly cost × number of hours = annual cost',
+          'Document 3-5 concrete examples with company names',
+          'Create an "ROI calculator" for sales materials'
         ],
-        expectedResult: 'Öka konvertering med 30-40% genom att visa "Spara 420.000 kr/år" istället för "Spara tid"',
-        investorPerspective: 'Investerare vill se att ni förstår kundens ekonomi på djupet. Siffror > känslor.'
+        expectedResult: 'Increase conversion by 30-40% by showing "Save $50,000/year" instead of "Save time"',
+        investorPerspective: 'Investors want to see that you understand customer economics in depth. Numbers > feelings.'
       }
     ],
     marketTiming: [
       {
-        title: 'Koppla er lösning till makrotrender',
+        title: 'Connect your solution to macro trends',
         impact: 'medium',
-        timeframe: '1 vecka',
-        description: 'Marknaden växer men er koppling till drivande trender är otydlig.',
+        timeframe: '1 week',
+        description: 'The market is growing but your connection to driving trends is unclear.',
         implementation: [
-          'Lista 3 makrotrender som driver er marknad (AI, reglering, etc)',
-          'Hitta 2-3 trovärdiga källor per trend (Gartner, McKinsey)',
-          'Skapa en "Why Now" slide med timeline',
-          'Koppla varje trend till er lösning specifikt'
+          'List 3 macro trends driving your market (AI, regulation, etc)',
+          'Find 2-3 credible sources per trend (Gartner, McKinsey)',
+          'Create a "Why Now" slide with timeline',
+          'Connect each trend to your solution specifically'
         ],
-        expectedResult: 'Investerare förstår varför detta är rätt timing och inte bara "nice to have"',
-        investorPerspective: 'Vi letar efter företag som surfar på vågor, inte de som försöker skapa dem.'
+        expectedResult: 'Investors understand why this is the right timing and not just "nice to have"',
+        investorPerspective: 'We look for companies riding waves, not trying to create them.'
       }
     ],
     unitEconomics: [
       {
-        title: 'Optimera CAC genom produktledd tillväxt',
+        title: 'Optimize CAC through product-led growth',
         impact: 'high',
-        timeframe: '3-6 månader',
-        description: 'Er CAC på €1000 kan halveras med rätt strategi.',
+        timeframe: '3-6 months',
+        description: 'Your CAC of €1000 can be halved with the right strategy.',
         implementation: [
-          'Bygg en gratis "light version" med begränsningar',
-          'Skapa viral loop: varje användare bjuder in 2 kollegor',
-          'Automatisera onboarding med produkttours',
-          'Mät och optimera varje steg i aktiveringsflödet'
+          'Build a free "light version" with limitations',
+          'Create viral loop: each user invites 2 colleagues',
+          'Automate onboarding with product tours',
+          'Measure and optimize each step in the activation flow'
         ],
-        expectedResult: 'Sänk CAC till €500, vilket ger LTV:CAC 8:1 och möjliggör aggressiv expansion',
-        investorPerspective: 'Företag med CAC < €500 får 3x högre värderingsmultiplar i Series A.'
+        expectedResult: 'Lower CAC to €500, giving LTV:CAC 8:1 and enabling aggressive expansion',
+        investorPerspective: 'Companies with CAC < €500 get 3x higher valuation multiples in Series A.'
       }
     ]
   };
@@ -241,9 +241,9 @@ export default function EnhancedMobileResult({ data }: { data: any }) {
         {activeTab === 'actions' && (
           <div className="space-y-6">
             <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl p-4 border border-purple-500/50">
-              <h2 className="text-lg font-bold text-white mb-2">🎯 Dina nästa steg</h2>
+              <h2 className="text-lg font-bold text-white mb-2">🎯 Your next steps</h2>
               <p className="text-sm text-white/80">
-                Konkreta åtgärder som ökar dina chanser att få finansiering
+                Concrete actions that increase your chances of getting funding
               </p>
             </div>
 
@@ -262,7 +262,7 @@ export default function EnhancedMobileResult({ data }: { data: any }) {
       {/* Mobile CTA */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-slate-900/95 backdrop-blur-lg border-t border-white/10">
         <button className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl">
-          Ladda ner fullständig rapport
+          Download complete report
         </button>
       </div>
     </div>

@@ -208,10 +208,10 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
   const actionItems = [
     {
       priority: 'high',
-      title: 'Säkra första 10 betalande kunderna',
-      description: 'Erbjud pilot-priser till early adopters. Fokusera på att få testimonials och case studies.',
-      timeframe: '1 månad',
-      impact: 'Validerar affärsmodellen och ökar investerarnas förtroende'
+      title: 'Secure first 10 paying customers',
+      description: 'Offer pilot pricing to early adopters. Focus on getting testimonials and case studies.',
+      timeframe: '1 month',
+      impact: 'Validates the business model and increases investor confidence'
     },
   ];
 
@@ -280,7 +280,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
                 onClick={() => setCurrentSection('actions')}
                 className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
               >
-                🎯 Nästa Steg
+                🎯 Next Steps
               </button>
             </div>
           </>

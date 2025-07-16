@@ -32,7 +32,7 @@ export default function Home() {
               FrejFund
             </h1>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/80 mb-8 md:mb-12 px-4">
-              AI-driven investeringsanalys för startups
+              AI-driven investment analysis for startups
             </p>
             
             {/* CTA buttons - mobile optimized */}
@@ -41,13 +41,13 @@ export default function Home() {
                 onClick={() => setShowWizard(true)}
                 className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full hover:shadow-2xl hover:scale-105 transition-all text-base sm:text-lg shadow-lg"
               >
-                Starta analys
+                Start analysis
               </button>
               <Link
                 href="/vara-paket"
                 className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full hover:bg-white/20 transition-all border border-white/20 text-base sm:text-lg text-center"
               >
-                Se våra paket
+                View our packages
               </Link>
             </div>
 
@@ -55,15 +55,15 @@ export default function Home() {
             <div className="mt-12 md:mt-16 grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-8 px-4 sm:px-0">
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-white">500+</div>
-                <div className="text-xs sm:text-sm text-white/60">Analyser gjorda</div>
+                <div className="text-xs sm:text-sm text-white/60">Analyses completed</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-white">4.8/5</div>
-                <div className="text-xs sm:text-sm text-white/60">Användarbetyg</div>
+                <div className="text-xs sm:text-sm text-white/60">User rating</div>
               </div>
               <div className="text-center col-span-2 sm:col-span-1">
                 <div className="text-2xl sm:text-3xl font-bold text-white">15 min</div>
-                <div className="text-xs sm:text-sm text-white/60">Till första resultat</div>
+                <div className="text-xs sm:text-sm text-white/60">To first results</div>
               </div>
             </div>
           </div>

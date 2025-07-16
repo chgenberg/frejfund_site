@@ -20,23 +20,23 @@ import {
 } from '../types/businessPlan';
 
 const INVESTOR_QUESTIONS: Question[] = [
-  { id: 'company_value', label: 'Vad gör företaget och vilket värde skapar det?', type: 'textarea', required: true, help: 'Beskriv affärsidén, produkten/tjänsten, kundpain och hur ni skapar värde.' },
-  { id: 'customer_problem', label: 'Vilket problem löser ni för era kunder?', type: 'textarea', required: true, help: 'Beskriv det specifika problem eller behov som er produkt/tjänst adresserar.' },
-  { id: 'problem_evidence', label: 'Hur vanligt är problemet – och hur bevisar ni det?', type: 'textarea', required: true, help: 'Ge gärna en datapunkt, referens eller länk.' },
-  { id: 'market_gap', label: 'Vilket "gap" på marknaden fyller ni?', type: 'textarea', required: true, help: 'Finns det en lucka där befintliga alternativ inte räcker till?' },
-  { id: 'solution', label: 'Hur löser ni problemet? (Er lösning)', type: 'textarea', required: true, help: 'Förklara er produkt/tjänst och hur den adresserar problemet.' },
-  { id: 'why_now', label: 'Varför är timingen rätt – tekniskt, marknadsmässigt eller reglerings-mässigt?', type: 'textarea', required: true, help: 'Motivera varför just nu är rätt tillfälle.' },
-  { id: 'target_customer', label: 'Vem är er målgrupp och kund?', type: 'textarea', required: true, help: 'Beskriv er idealkund. Är ni B2B eller B2C? SMB eller enterprise?' },
-  { id: 'market_size', label: 'Hur stort är marknadsutrymmet? (TAM/SAM/SOM)', type: 'market_size', required: true, help: 'Uppskatta er totala marknad: TAM, SAM, SOM.' },
-  { id: 'market_trends', label: 'Vilka viktiga marknadstrender gynnar er?', type: 'textarea', required: false, help: 'Beskriv trender (teknologiska, demografiska, regulatoriska) som ni surfar på.' },
-  { id: 'traction', label: 'Hur ser traction ut hittills?', type: 'textarea', required: true, help: 'Ange milstolpar och resultat: användare, kunder, piloter, intäkter, tillväxttal.' },
-  { id: 'revenue_block', label: 'Hur tjänar ni pengar och hur fördelas intäkterna (återkommande/engång)?', type: 'textarea', required: true, help: 'Beskriv intäktsströmmar, prissättning och fördelning mellan återkommande och engångsintäkter.' },
-  { id: 'runway', label: 'Hur lång runway (antal månader) har ni? (heltal)', type: 'number', required: true, help: 'Hur många månader räcker ert kapital?', min: 0 },
-  { id: 'growth_plan', label: 'Vad är er tillväxtplan för nästa 12-24 månader?', type: 'textarea', required: true, help: 'Beskriv framtidsplaner: försäljningstillväxt, produktlanseringar, kundmål.' },
-  { id: 'milestones', label: 'Vilka tre största milstolpar planerar ni att nå kommande 12 månader (med månad/kvartal)?', type: 'milestone_list', required: true, help: 'Exempel: "Lansering Q3", "Första betalande kund i september".' },
-  { id: 'team', label: 'Hur ser ert team ut?', type: 'textarea', required: true, help: 'Presentera grundarna och kärnteamet, roller och erfarenheter.' },
-  { id: 'founder_equity', label: 'Hur stor ägarandel (%) behåller grundarteamet efter denna runda?', type: 'number', required: true, help: 'Svara i procent, t.ex. 65.', min: 0, max: 100 },
-  { id: 'founder_market_fit', label: 'Hur väl matchar teamets bakgrund det problem ni löser? (1–5-skala + fritext)', type: 'founder_market_fit', required: true, help: '1 = ingen erfarenhet, 5 = djup domänexpertis. Motivera kort.' },
+  { id: 'company_value', label: 'What does the company do and what value does it create?', type: 'textarea', required: true, help: 'Describe the business idea, product/service, customer pain and how you create value.' },
+  { id: 'customer_problem', label: 'What problem do you solve for your customers?', type: 'textarea', required: true, help: 'Describe the specific problem or need that your product/service addresses.' },
+  { id: 'problem_evidence', label: 'How common is the problem – and how do you prove it?', type: 'textarea', required: true, help: 'Please provide a data point, reference or link.' },
+  { id: 'market_gap', label: 'What "gap" in the market do you fill?', type: 'textarea', required: true, help: 'Is there a gap where existing alternatives fall short?' },
+  { id: 'solution', label: 'How do you solve the problem? (Your solution)', type: 'textarea', required: true, help: 'Explain your product/service and how it addresses the problem.' },
+  { id: 'why_now', label: 'Why is the timing right – technically, market-wise or regulatory-wise?', type: 'textarea', required: true, help: 'Justify why right now is the right time.' },
+  { id: 'target_customer', label: 'Who is your target group and customer?', type: 'textarea', required: true, help: 'Describe your ideal customer. Are you B2B or B2C? SMB or enterprise?' },
+  { id: 'market_size', label: 'How large is the market opportunity? (TAM/SAM/SOM)', type: 'market_size', required: true, help: 'Estimate your total market: TAM, SAM, SOM.' },
+  { id: 'market_trends', label: 'What important market trends favor you?', type: 'textarea', required: false, help: 'Describe trends (technological, demographic, regulatory) that you are riding.' },
+  { id: 'traction', label: 'What does traction look like so far?', type: 'textarea', required: true, help: 'State milestones and results: users, customers, pilots, revenue, growth figures.' },
+  { id: 'revenue_block', label: 'How do you make money and how is revenue distributed (recurring/one-time)?', type: 'textarea', required: true, help: 'Describe revenue streams, pricing and distribution between recurring and one-time revenue.' },
+  { id: 'runway', label: 'How long runway (number of months) do you have? (whole number)', type: 'number', required: true, help: 'How many months will your capital last?', min: 0 },
+  { id: 'growth_plan', label: 'What is your growth plan for the next 12-24 months?', type: 'textarea', required: true, help: 'Describe future plans: sales growth, product launches, customer goals.' },
+  { id: 'milestones', label: 'What are the three biggest milestones you plan to reach in the coming 12 months (with month/quarter)?', type: 'milestone_list', required: true, help: 'Example: "Launch Q3", "First paying customer in September".' },
+  { id: 'team', label: 'What does your team look like?', type: 'textarea', required: true, help: 'Present the founders and core team, roles and experience.' },
+  { id: 'founder_equity', label: 'What ownership percentage (%) does the founding team retain after this round?', type: 'number', required: true, help: 'Answer in percent, e.g. 65.', min: 0, max: 100 },
+  { id: 'founder_market_fit', label: 'How well does the team\'s background match the problem you solve? (1–5 scale + free text)', type: 'founder_market_fit', required: true, help: '1 = no experience, 5 = deep domain expertise. Briefly justify.' },
 ];
 
 const inputBase = `w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-200`;
@@ -91,32 +91,32 @@ function MarketSizePopup({ open, onClose, onEstimate }: { open: boolean, onClose
 
     const handleEstimate = async () => {
         // Mock API call
-        onEstimate(`Uppskattad marknad för ${bransch} i ${omrade}: 5 miljarder SEK.`);
+        onEstimate(`Estimated market for ${bransch} in ${omrade}: 5 billion SEK.`);
         onClose();
     };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
             <div className="bg-gradient-to-br from-[#0a1628] to-[#04111d] text-white rounded-3xl p-8 max-w-lg w-full">
-                <h2 className="text-2xl font-bold mb-4">Uppskatta marknadsstorlek</h2>
+                <h2 className="text-2xl font-bold mb-4">Estimate market size</h2>
                 <div className="space-y-4">
                     <div>
-                        <label className="block font-semibold mb-2">Bransch</label>
-                        <input type="text" value={bransch} onChange={(e) => setBransch(e.target.value)} className={inputBase} placeholder="T.ex. SaaS för fastighetsmäklare" />
+                        <label className="block font-semibold mb-2">Industry</label>
+                        <input type="text" value={bransch} onChange={(e) => setBransch(e.target.value)} className={inputBase} placeholder="E.g. SaaS for real estate agents" />
                     </div>
                     <div>
-                        <label className="block font-semibold mb-2">Område</label>
+                        <label className="block font-semibold mb-2">Region</label>
                         <select value={omrade} onChange={(e) => setOmrade(e.target.value)} className={inputBase}>
-                            <option>Stad</option>
-                            <option>Land</option>
-                            <option>Kontinent</option>
-                            <option>Världsdel</option>
+                            <option>City</option>
+                            <option>Country</option>
+                            <option>Continent</option>
+                            <option>Global</option>
                         </select>
                     </div>
                 </div>
                 <div className="flex justify-end gap-4 mt-6">
-                    <button onClick={onClose} className="px-4 py-2 bg-white/10 rounded-full">Avbryt</button>
-                    <button onClick={handleEstimate} className="px-4 py-2 bg-purple-500 rounded-full">Beräkna</button>
+                    <button onClick={onClose} className="px-4 py-2 bg-white/10 rounded-full">Cancel</button>
+                    <button onClick={handleEstimate} className="px-4 py-2 bg-purple-500 rounded-full">Calculate</button>
                 </div>
             </div>
         </div>
@@ -272,9 +272,9 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
                       className="w-4 h-4 text-purple-500 bg-white/10 border-white/20 rounded focus:ring-purple-500"
                     />
                     <label htmlFor="privacyPolicy" className="ml-2 text-sm text-white/80">
-                      Jag godkänner{' '}
+                      I accept the{' '}
                       <Link href="/integritet" target="_blank" className="underline text-purple-400">
-                        integritetspolicyn
+                        privacy policy
                       </Link>
                     </label>
                   </div>
@@ -282,8 +282,8 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
             </div>
 
             <div className="flex justify-between mt-8">
-                <button onClick={handleBack} disabled={step === 0} className="px-6 py-2 bg-white/10 rounded-full">Tillbaka</button>
-                <button onClick={handleNext} disabled={!isCurrentStepValid()} className="px-6 py-2 bg-purple-500 rounded-full disabled:opacity-50">Nästa</button>
+                <button onClick={handleBack} disabled={step === 0} className="px-6 py-2 bg-white/10 rounded-full">Back</button>
+                <button onClick={handleNext} disabled={!isCurrentStepValid()} className="px-6 py-2 bg-purple-500 rounded-full disabled:opacity-50">Next</button>
             </div>
         </div>
         <MarketSizePopup 

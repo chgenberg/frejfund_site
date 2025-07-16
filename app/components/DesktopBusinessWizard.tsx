@@ -169,7 +169,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    setStatusMessage('Genererar investeringsanalys...');
+    setStatusMessage('Generating investment analysis...');
     setAnalysisProgress(0);
     
     // Animate progress from 0 to 100
@@ -180,13 +180,13 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
         
         // Update status messages based on progress
         if (newProgress > 20 && newProgress <= 40) {
-          setStatusMessage('Analyserar affärsmodell...');
+          setStatusMessage('Analyzing business model...');
         } else if (newProgress > 40 && newProgress <= 60) {
-          setStatusMessage('Beräknar marknadspotential...');
+          setStatusMessage('Calculating market potential...');
         } else if (newProgress > 60 && newProgress <= 80) {
-          setStatusMessage('Utvärderar finansiella prognoser...');
+          setStatusMessage('Evaluating financial forecasts...');
         } else if (newProgress > 80) {
-          setStatusMessage('Slutför analys...');
+          setStatusMessage('Finishing analysis...');
         }
         
         if (newProgress >= 90) {
@@ -260,7 +260,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
       }
     } catch (error) {
       console.error('Error submitting:', error);
-      setStatusMessage('Ett fel uppstod. Försök igen.');
+      setStatusMessage('An error occurred. Please try again.');
       clearInterval(progressInterval);
       setAnalysisProgress(0);
       setIsSubmitting(false);
@@ -293,8 +293,8 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
                   </div>
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Analyserar din hemsida</h3>
-              <p className="text-white/70 mb-4">Vi använder AI för att extrahera relevant information från din hemsida...</p>
+              <h3 className="text-xl font-bold text-white mb-2">Analyzing your website</h3>
+              <p className="text-white/70 mb-4">We use AI to extract relevant information from your website...</p>
             </div>
           </div>
         </div>
@@ -309,9 +309,9 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
               <div className="p-6 pb-0">
                 <div className="flex justify-between items-center mb-4">
                   <div>
-                    <h2 className="text-2xl font-bold text-white">Investeringsanalys</h2>
+                    <h2 className="text-2xl font-bold text-white">Investment Analysis</h2>
                     <p className="text-white/70 text-sm mt-1">
-                      {questionsOnCurrentPage[0]?.sectionTitle || 'Företagsinformation'}
+                      {questionsOnCurrentPage[0]?.sectionTitle || 'Company Information'}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -332,7 +332,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
                     </div>
                   </div>
                   <p className="text-white/70 text-sm mt-2 text-center">
-                    Sida {currentPage + 1} av {totalPages}
+                    Page {currentPage + 1} of {totalPages}
                   </p>
                 </div>
               </div>
@@ -371,7 +371,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
                       {showHelpFor === question.id && question.exampleAnswers && (
                         <div className="absolute top-12 right-4 z-50 bg-slate-700 text-white p-4 rounded-xl shadow-2xl max-w-sm w-80 border border-purple-500/30 animate-fadeIn">
                           <div className="flex items-start justify-between mb-2">
-                            <h4 className="font-semibold text-sm text-purple-300">Exempelsvar:</h4>
+                            <h4 className="font-semibold text-sm text-purple-300">Example answer:</h4>
                             <button onClick={() => setShowHelpFor(null)} className="text-white/60 hover:text-white">
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -446,7 +446,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
                           className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all appearance-none"
                           style={{ backgroundImage: 'url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3E%3Cpath stroke=\'%236b7280\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'m6 8 4 4 4-4\'/%3E%3C/svg%3E")', backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
                         >
-                          <option value="">Välj...</option>
+                          <option value="">Select...</option>
                           {question.options?.map((option: string) => (
                             <option key={option} value={option} className="bg-slate-800">
                               {option}
@@ -511,9 +511,9 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
                       className="w-4 h-4 text-purple-500 bg-white/10 border-white/20 rounded focus:ring-purple-500"
                     />
                     <label htmlFor="privacyPolicy" className="ml-2 text-sm text-white/80">
-                      Jag godkänner{' '}
+                      I accept the{' '}
                       <Link href="/integritet" target="_blank" className="underline text-purple-400 hover:text-purple-300">
-                        integritetspolicyn
+                        privacy policy
                       </Link>
                     </label>
                   </div>
@@ -530,7 +530,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
-                      Tillbaka
+                      Back
                     </span>
                   </button>
                   
@@ -546,10 +546,10 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
-                          Analyserar...
+                          Analyzing...
                         </span>
                       ) : (
-                        'Analysera'
+                        'Analyze'
                       )}
                     </button>
                   ) : (
@@ -559,7 +559,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
                       className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100"
                     >
                       <span className="flex items-center justify-center gap-2">
-                        Nästa
+                        Next
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -587,7 +587,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
                     </div>
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Analyserar er affärsplan...</h3>
+                <h3 className="text-2xl font-bold text-white mb-4">Analyzing your business plan...</h3>
                 <p className="text-white/60">{statusMessage}</p>
               </div>
             </div>

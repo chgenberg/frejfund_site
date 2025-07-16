@@ -264,9 +264,9 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
         {data.actionableInsights && (
           <div className="mt-12">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-white mb-4">🎯 Handlingsplan för högre värdering</h2>
+              <h2 className="text-3xl font-bold text-white mb-4">🎯 Action Plan for Higher Valuation</h2>
               <p className="text-lg text-white/70 max-w-2xl mx-auto">
-                Konkreta åtgärder baserade på din analys som ökar dina chanser att få finansiering
+                Concrete actions based on your analysis that increase your chances of getting funding
               </p>
             </div>
             <ActionableInsights insights={data.actionableInsights} />
@@ -276,7 +276,7 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
         {/* Action Buttons */}
         <div className="mt-8 flex justify-center gap-4">
           <button className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all">
-            Ladda ner rapport
+            Download report
           </button>
           <button className="px-8 py-3 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition-all">
             Dela resultat

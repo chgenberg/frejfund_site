@@ -542,9 +542,9 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
                   </div>
                 </div>
                 
-                <h3 className="text-xl font-bold text-white mb-2">Analyserar din hemsida</h3>
+                <h3 className="text-xl font-bold text-white mb-2">Analyzing your website</h3>
                 <p className="text-white/70 mb-4">
-                  Vi använder AI för att extrahera relevant information från din hemsida...
+                  We use AI to extract relevant information from your website...
                 </p>
                 
                 <div className="space-y-2 text-left">
@@ -552,19 +552,19 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-sm">Hämtar hemsidedata</span>
+                    <span className="text-sm">Fetching website data</span>
                   </div>
                   <div className={`flex items-center gap-2 ${scrapingProgress > 30 ? 'text-green-400' : 'text-white/40'}`}>
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-sm">Analyserar innehåll</span>
+                    <span className="text-sm">Analyzing content</span>
                   </div>
                   <div className={`flex items-center gap-2 ${scrapingProgress > 60 ? 'text-green-400' : 'text-white/40'}`}>
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-sm">Förifyllningsinformation</span>
+                    <span className="text-sm">Pre-filling information</span>
                   </div>
                 </div>
               </div>
@@ -646,10 +646,10 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Analyserar...
+                    Analyzing...
                   </span>
                 ) : (
-                  'Analysera'
+                  'Analyze'
                 )}
               </button>
             ) : (
@@ -659,7 +659,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
                 className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm transform hover:scale-105 disabled:hover:scale-100"
               >
                 <span className="flex items-center justify-center gap-2">
-                  Nästa
+                  Next
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
