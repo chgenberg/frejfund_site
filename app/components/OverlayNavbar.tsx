@@ -93,7 +93,7 @@ export default function OverlayNavbar() {
                 className="block px-6 py-3 hover:bg-white/10 transition-colors text-base tracking-wide text-center uppercase text-white"
                 onClick={() => setIsOpen(false)}
               >
-                PITCH-PINGVINEN
+                PITCH-PENGUIN
               </Link>
               <Link 
                 href="/qa" 

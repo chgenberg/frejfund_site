@@ -38,7 +38,7 @@ export default function Footer() {
             href="/pitch-pingvinen" 
             className="text-white hover:text-gray-300 transition-colors uppercase"
           >
-            PITCH-PINGVINEN
+            PITCH-PENGUIN
           </Link>
         </div>
         
