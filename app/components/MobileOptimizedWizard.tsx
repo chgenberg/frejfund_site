@@ -219,6 +219,8 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
     const nextPage = currentPage + 1;
     if (nextPage < totalPages) {
       setCurrentQuestionIndex(nextPage * questionsPerPage);
+      // Scroll to top when navigating to next page
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -226,6 +228,8 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
     const prevPage = currentPage - 1;
     if (prevPage >= 0) {
       setCurrentQuestionIndex(prevPage * questionsPerPage);
+      // Scroll to top when navigating to previous page
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 

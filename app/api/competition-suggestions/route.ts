@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
   // Compose a detailed OpenAI prompt
   const apiKey = process.env.OPENAI_API_KEY;
-  const prompt = `Du är en expert på marknadsanalys. Baserat på denna affärsidé, bransch, område och kundgrupp, lista 3–5 faktiska konkurrenter på svenska marknaden. Svara ENDAST med en JSON-array med företagsnamn, inga förklaringar eller text.\n\nAffärsidé: ${business_idea}\nBransch: ${bransch}\nOmråde: ${omrade}\nKundgrupp: ${customer_segments}\n`;
+  const prompt = `You are an expert in market analysis. Based on this business idea, industry, area and customer group, list 3–5 actual competitors in the Swedish market. Answer ONLY with a JSON array of company names, no explanations or text.\n\nBusiness idea: ${business_idea}\nIndustry: ${bransch}\nArea: ${omrade}\nCustomer group: ${customer_segments}\n`;
 
   let aiSuggestions: string[] = [];
   let webSuggestions: string[] = [];
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          { role: 'system', content: 'Du är en expert på marknadsanalys.' },
+          { role: 'system', content: 'You are an expert in market analysis.' },
           { role: 'user', content: prompt }
         ],
         max_tokens: 200,

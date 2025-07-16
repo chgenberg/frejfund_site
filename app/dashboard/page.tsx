@@ -22,6 +22,8 @@ export default function Dashboard() {
   useEffect(() => {
     checkUser()
     fetchAnalyses()
+    // Scroll to top when dashboard loads
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
   const checkUser = async () => {

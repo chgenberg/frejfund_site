@@ -160,7 +160,7 @@ export async function POST(request: Request) {
           Return ONLY a JSON object with the following structure:
           {
             "customer_pain": "description",
-            "solution": "description",
+            "solution": "description", 
             "elevator_pitch": "max 140 characters",
             "target_customer": "description",
             "unique_tech": "description",
@@ -170,7 +170,7 @@ export async function POST(request: Request) {
             "company_value": "description"
           }
           
-          If information is missing, use null for that field. Write all descriptions in English.`
+          If information is missing, use null for that field. Write all descriptions in English and keep them concise but informative.`
         },
         {
           role: "user",

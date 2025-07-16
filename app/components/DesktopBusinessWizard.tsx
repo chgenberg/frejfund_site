@@ -157,6 +157,8 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
     const nextPage = currentPage + 1;
     if (nextPage < totalPages) {
       setCurrentQuestionIndex(nextPage * questionsPerPage);
+      // Scroll to top when navigating to next page
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -164,6 +166,8 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
     const prevPage = currentPage - 1;
     if (prevPage >= 0) {
       setCurrentQuestionIndex(prevPage * questionsPerPage);
+      // Scroll to top when navigating to previous page
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -252,6 +256,9 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
         
         // Small delay to show 100% before navigating
         await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Scroll to top before navigation
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         
         // Navigate to result page
         router.push('/result');

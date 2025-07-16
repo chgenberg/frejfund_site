@@ -20,23 +20,23 @@ export async function POST(req: NextRequest) {
     
     // Anpassa förslag baserat på frågan
     const questionSpecificPrompts = {
-      'customer_problem': `Baserat på att ${context.company} verkar inom ${context.industry} och erbjuder: "${context.value}", generera ett specifikt svar på frågan "${questionText}". Fokusera på det exakta problemet deras målgrupp (${context.target}) har.`,
+      'customer_problem': `Based on ${context.company} operating in ${context.industry} and offering: "${context.value}", generate a specific answer to the question "${questionText}". Focus on the exact problem their target audience (${context.target}) has.`,
       
-      'problem_evidence': `För ${context.company} inom ${context.industry}, ge konkreta bevis eller datapunkter som visar att problemet de löser verkligen existerar. Inkludera statistik, studier eller trender som är relevanta för ${context.target}.`,
+      'problem_evidence': `For ${context.company} in ${context.industry}, provide concrete evidence or data points showing that the problem they solve really exists. Include statistics, studies or trends relevant to ${context.target}.`,
       
-      'market_gap': `Analysera marknadsluckan för ${context.company}. Med tanke på konkurrenter som ${context.competitors}, vad är det specifika gap som ${context.company} fyller på marknaden?`,
+      'market_gap': `Analyze the market gap for ${context.company}. Given competitors like ${context.competitors}, what is the specific gap that ${context.company} fills in the market?`,
       
-      'why_now': `Förklara varför timingen är rätt för ${context.company} inom ${context.industry}. Vilka tekniska, marknadsmässiga eller regulatoriska förändringar gör att nu är rätt tid?`,
+      'why_now': `Explain why the timing is right for ${context.company} in ${context.industry}. What technical, market or regulatory changes make now the right time?`,
       
-      'unique_solution': `Baserat på att ${context.company} konkurrerar med ${context.competitors}, vad gör deras lösning unik eller svår att kopiera? Fokusera på specifika konkurrensfördelar.`,
+      'unique_solution': `Based on ${context.company} competing with ${context.competitors}, what makes their solution unique or hard to copy? Focus on specific competitive advantages.`,
       
-      'main_risks': `För ett företag som ${context.company} inom ${context.industry}, identifiera de största riskerna och hur de kan hanteras.`
+      'main_risks': `For a company like ${context.company} in ${context.industry}, identify the biggest risks and how they can be managed.`
     };
     
     contextualPrompt = questionSpecificPrompts[questionId as keyof typeof questionSpecificPrompts] || 
-      `Baserat på informationen om ${context.company}, generera ett relevant svar på frågan: "${questionText}"`;
+      `Based on the information about ${context.company}, generate a relevant answer to the question: "${questionText}"`;
     
-    contextualPrompt += ` Svara på svenska med ett konkret, specifikt svar som är minst 100 ord långt.`;
+    contextualPrompt += ` Answer in English with a concrete, specific response that is at least 100 words long.`;
     
     try {
       const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           model: 'gpt-4o',
           messages: [
-            { role: 'system', content: 'Du är en expert på affärsplaner och företagsanalys. Ge ENDAST konkreta, specifika svar direkt utan förklaringar om hur du kom fram till svaret. Svara kort och koncist men informativt. Inga långa utläggningar eller pedagogiska förklaringar. Fokusera på värdeskapande insikter som är relevanta för investerare.' },
+            { role: 'system', content: 'You are an expert in business plans and company analysis. Provide ONLY concrete, specific answers directly without explanations about how you arrived at the answer. Answer briefly and concisely but informatively. No long explanations or pedagogical clarifications. Focus on value-creating insights relevant to investors.' },
             { role: 'user', content: contextualPrompt }
           ],
           max_tokens: 800,
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
   }
   
   // Fallback till original funktionalitet för följdfrågor
-  const prompt = `Baserat på frågan: '${questionText}', svaret: '${currentAnswer}', och företagets domän/beskrivning: '${businessDomain}', ge EXAKT 2 smarta följdfrågor eller förtydliganden som är relevanta för detta företag. Använd alltid hela svaret exakt som det är, utan att förkorta eller använda variabler. Om svaret är ett ord, använd det ordet exakt i dina följdfrågor. Svara på svenska och returnera endast en JSON-array med exakt 2 förslag.`;
+  const prompt = `Based on the question: '${questionText}', the answer: '${currentAnswer}', and the company's domain/description: '${businessDomain}', provide EXACTLY 2 smart follow-up questions or clarifications that are relevant to this company. Always use the complete answer exactly as it is, without shortening or using variables. If the answer is one word, use that word exactly in your follow-up questions. Answer in English and return only a JSON array with exactly 2 suggestions.`;
 
   let suggestions = [];
   try {
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          { role: 'system', content: 'Du är en expert på att coacha entreprenörer.' },
+          { role: 'system', content: 'You are an expert at coaching entrepreneurs.' },
           { role: 'user', content: prompt }
         ],
         max_tokens: 200,

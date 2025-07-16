@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   }
 
   const planText = JSON.stringify(answers, null, 2);
-  const prompt = `Här är hela affärsplanen (struktur i JSON):\n${planText}\nSkriv en summering på svenska som lyfter styrkor, svagheter och rekommenderar nästa steg. Max 5 meningar. Skriv pedagogiskt och konstruktivt.`;
+  const prompt = `Here is the complete business plan (structure in JSON):\n${planText}\nWrite a summary in English that highlights strengths, weaknesses and recommends next steps. Max 5 sentences. Write pedagogically and constructively.`;
 
   try {
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          { role: 'system', content: 'Du är en pedagogisk och konstruktiv affärscoach.' },
+          { role: 'system', content: 'You are a pedagogical and constructive business coach.' },
           { role: 'user', content: prompt }
         ],
         max_tokens: 300,

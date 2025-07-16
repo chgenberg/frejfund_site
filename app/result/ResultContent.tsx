@@ -14,6 +14,11 @@ export default function ResultContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+  
   // Funktion för att sätta test-data
   const setTestData = () => {
     if (typeof window !== 'undefined') {

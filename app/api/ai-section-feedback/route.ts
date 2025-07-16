@@ -14,11 +14,11 @@ export async function POST(req: NextRequest) {
     }, { status: 500 });
   }
 
-  const prompt = `Här är ${section}-beskrivningen för ett startup: "${text}". Ge en pedagogisk kommentar på svenska:
-1. Vad är bra?
-2. Vad kan förbättras?
-3. Tips till entreprenören.
-Svara utförligt men koncist, alltid i fullständiga meningar och avsluta aldrig mitt i en mening. Om svaret blir långt, avsluta med en sammanfattning. Svara i max 10 meningar.`;
+  const prompt = `Here is the ${section} description for a startup: "${text}". Provide pedagogical feedback in English:
+1. What is good?
+2. What can be improved?
+3. Tips for the entrepreneur.
+Answer thoroughly but concisely, always in complete sentences and never end in the middle of a sentence. If the answer becomes long, end with a summary. Answer in max 10 sentences.`;
 
   try {
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {

@@ -142,7 +142,12 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
       }
     };
     checkUser();
-  }, []);
+    
+    // Scroll to top when wizard opens
+    if (open) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [open]);
 
   const isCurrentStepValid = () => {
     if (step === 0 && !policyAccepted) return false;
@@ -166,11 +171,15 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
   const handleNext = () => {
       if (isCurrentStepValid()) {
           setStep(s => Math.min(s + 1, INVESTOR_QUESTIONS.length - 1));
+          // Scroll to top when moving to next step
+          window.scrollTo({ top: 0, behavior: 'smooth' });
       }
   };
 
   const handleBack = () => {
       setStep(s => Math.max(s - 1, 0));
+      // Scroll to top when moving to previous step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
   if (!open) return null;

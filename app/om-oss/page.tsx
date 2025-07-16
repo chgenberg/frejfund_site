@@ -4,74 +4,74 @@ import IdeaMashSlot from '../components/IdeaMashSlot';
 export default function About() {
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center px-2 py-12">
-      <h1 className="text-3xl md:text-4xl font-extrabold text-[#16475b] tracking-widest text-center mb-10 mt-2 uppercase">OM OSS</h1>
-      {/* Idé slot maskinen överst */}
+      <h1 className="text-3xl md:text-4xl font-extrabold text-[#16475b] tracking-widest text-center mb-10 mt-2 uppercase">ABOUT US</h1>
+      {/* Idea slot machine at the top */}
       <div className="mb-10 w-full flex justify-center">
         <IdeaMashSlot />
       </div>
-      {/* Bakgrundsbild */}
+      {/* Background image */}
       <Image
         src="/omoss.png"
-        alt="Om oss bakgrund"
+        alt="About us background"
         fill
         className="object-cover -z-10"
         priority
       />
       <div className="flex flex-col gap-20 w-full max-w-4xl items-center">
-        {/* Moln 1 - Moved up */}
+        {/* Cloud 1 - Moved up */}
         <div className="bg-white/90 rounded-[3rem] shadow-2xl border border-gray-200 px-8 py-8 max-w-2xl w-full text-center backdrop-blur-md mt-12">
           <p className="text-lg text-[#16475b]/80 max-w-2xl text-center">
-    Vi är ett team av entreprenörer, investerare och AI-experter.
-</p>
-        </div>
-        {/* Moln 2 */}
-        <div className="bg-white/80 rounded-[2.5rem] shadow-xl border border-gray-100 px-8 py-8 max-w-2xl w-full text-center backdrop-blur-sm mt-[-2rem] ml-auto">
-          <p className="text-lg text-gray-800 font-medium">
-            <span className="text-xl font-bold text-[#16475b] block mb-2">Så hur gör vi det?</span>
-            Vi möter dig där gnistan finns och låter tekniken göra grovjobbet. Vår AI-drivna analysplatta skannar din affärsidé som en röntgen, avslöjar luckor och visar exakt var rustningen behöver förstärkas innan du ställer dig på scen. Vi översätter visionen till investerarlogik, men behåller hjärtats språk intakt. Runt plattformen har vi byggt en stam: mentorer, seriegrundare och nykläckta innovatörer som delar insikter, misstag och segrar vid samma digitala lägereld. Du kliver aldrig ensam ut ur skogen – det finns alltid någon som går bredvid och håller kartan.
+            We are a team of entrepreneurs, investors and AI experts.
           </p>
         </div>
-        {/* Moln 3 */}
+        {/* Cloud 2 */}
+        <div className="bg-white/80 rounded-[2.5rem] shadow-xl border border-gray-100 px-8 py-8 max-w-2xl w-full text-center backdrop-blur-sm mt-[-2rem] ml-auto">
+          <p className="text-lg text-gray-800 font-medium">
+            <span className="text-xl font-bold text-[#16475b] block mb-2">So how do we do it?</span>
+            We meet you where the spark exists and let technology do the heavy lifting. Our AI-driven analysis platform scans your business idea like an X-ray, reveals gaps and shows exactly where the armor needs strengthening before you step on stage. We translate vision into investor logic while keeping the heart's language intact. Around the platform, we've built a tribe: mentors, serial founders and emerging innovators who share insights, mistakes and victories around the same digital campfire. You never step out of the forest alone – there's always someone walking alongside holding the map.
+          </p>
+        </div>
+        {/* Cloud 3 */}
         <div className="bg-white/95 rounded-[2.5rem] shadow-xl border border-gray-100 px-8 py-8 max-w-2xl w-full text-center backdrop-blur-sm mt-[-2rem] mr-auto">
           <p className="text-lg text-gray-800 font-medium">
-            <span className="text-xl font-bold text-[#16475b] block mb-2">Och vad är det du faktiskt får?</span>
-            En interaktiv genomlysning som mynnar ut i en personlig rapport, en handlingsplan och ett scoringsystem investerare förstår direkt. Du får verktygslådor fyllda med mallar, avtal och KPI-dashboards som sparar veckor av gissningar. Du får varma introduktioner till änglar, ALMI och riskkapital när planen sitter, och du får oss vid din sida hela vägen – från första brainstorm till sista finansieringsrunda. Kort sagt: vi ser till att din idé får den rustning, det sällskap och den fart den förtjänar, så att du kan fortsätta göra det entreprenörer gör bäst – skapa framtid.
+            <span className="text-xl font-bold text-[#16475b] block mb-2">And what do you actually get?</span>
+            An interactive analysis that culminates in a personal report, action plan and scoring system that investors understand immediately. You get toolboxes filled with templates, contracts and KPI dashboards that save weeks of guesswork. You get warm introductions to angels, government grants and venture capital when the plan is solid, and you get us by your side the whole way – from first brainstorm to final funding round. In short: we ensure your idea gets the armor, companionship and momentum it deserves, so you can continue doing what entrepreneurs do best – create the future.
           </p>
         </div>
         {/* Team Stories Section */}
         <div className="flex flex-col gap-8 w-full max-w-3xl">
           {/* Jakob's Story */}
           <div className="bg-white/95 rounded-[2.5rem] shadow-xl border border-gray-100 px-8 py-8 backdrop-blur-sm">
-            <h2 className="text-2xl font-extrabold text-[#16475b] mb-4">OM JAKOB – från river card till rader kod</h2>
+            <h2 className="text-2xl font-extrabold text-[#16475b] mb-4">ABOUT JAKOB – from river cards to lines of code</h2>
             <p className="text-gray-800 leading-relaxed">
-              Det började vid pokerborden i Macau och Vegas: Jakob läste odds snabbare än motspelarna hann blinka. Men efter tusentals händer och en bokstavlig miljon beräknade kombinationer blev han kär i själva algoritmen bakom spelet – inte i markerhögarna.
+              It started at poker tables in Macau and Vegas: Jakob read odds faster than opponents could blink. But after thousands of hands and a literal million calculated combinations, he fell in love with the algorithm behind the game – not the chip stacks.
             </p>
             <p className="text-gray-800 leading-relaxed mt-4">
-              I dag sitter han därför i sin "bod" på Mallorca (ett garage-meets-serverrum med AC och flamingotapet), hackar Python sent in på nätterna och bygger AI-motorer som höjer företagsvärden snabbare än en "all-in" på pocket Ess. När han inte kodar driver han ett kontorsshotell i Stockholm och jonglerar familjeliv med fru och två barn som hellre badar än debuggar.
+              Today he sits in his "shed" in Mallorca (a garage-meets-server room with AC and flamingo wallpaper), hacking Python late into the night and building AI engines that increase company valuations faster than an "all-in" with pocket Aces. When he's not coding, he runs a co-working space in Stockholm and juggles family life with wife and two kids who prefer swimming to debugging.
             </p>
             <p className="text-gray-800 leading-relaxed mt-4">
-              Jakob är vår risk-kalkylator och mjukvarusmed – han svarar snabbare på pull requests än på WhatsApp, men löser båda innan kaffet kallnat.
+              Jakob is our risk calculator and software smith – he responds to pull requests faster than WhatsApp messages, but solves both before the coffee gets cold.
             </p>
           </div>
 
           {/* Christopher's Story */}
           <div className="bg-white/95 rounded-[2.5rem] shadow-xl border border-gray-100 px-8 py-8 backdrop-blur-sm">
-            <h2 className="text-2xl font-extrabold text-[#16475b] mb-4">OM CHRISTOPHER – krämer, KPI:er & kod</h2>
+            <h2 className="text-2xl font-extrabold text-[#16475b] mb-4">ABOUT CHRISTOPHER – creams, KPIs & code</h2>
             <p className="text-gray-800 leading-relaxed">
-              Christopher började sin bana i ett laboratorium fullt av doftämnen och pH-stickor. På tretton år hann han grunda tre hudvårdsmärken, sälja till både salonger och livsstilsshoppare – och lära sig den hårda vägen hur kassaflöden kan svida mer än syrakemisk peeling.
+              Christopher began his journey in a laboratory full of fragrance compounds and pH strips. Over thirteen years, he founded three skincare brands, sold to both salons and lifestyle shoppers – and learned the hard way how cash flows can sting more than acid peeling.
             </p>
             <p className="text-gray-800 leading-relaxed mt-4">
-              Nu har han bytt pipetter mot prompt-ingenjörskap. Han älskar hur AI kan massera fram smartare beslut och jämna ut start-up-smärtan för fler grundare. Passionen? Göra komplicerad finans-jargong lika klar och återfuktande som en bra serumformula.
+              Now he's traded pipettes for prompt engineering. He loves how AI can massage out smarter decisions and smooth the startup pain for more founders. His passion? Making complicated finance jargon as clear and moisturizing as a good serum formula.
             </p>
             <p className="text-gray-800 leading-relaxed mt-4">
-              Han bor numera, liksom Jakob, på soliga Mallorca med fru, två barn och en osund mängd prototyp-slides i Google Drive. Hos oss är Christopher historiens berättare, marknadsstrategen och den som alltid frågar: &quot;Hur känns det för användaren?&quot; – oavsett om det gäller hudkräm eller AI-dashboard.
+              He now lives, like Jakob, in sunny Mallorca with wife, two children and an unhealthy amount of prototype slides in Google Drive. At our company, Christopher is the storyteller, market strategist and the one who always asks: &quot;How does it feel for the user?&quot; – whether it's about skincare or AI dashboards.
             </p>
           </div>
 
           {/* Team Conclusion */}
           <div className="bg-white/95 rounded-[2.5rem] shadow-xl border border-gray-100 px-8 py-8 backdrop-blur-sm text-center">
             <p className="text-gray-800 leading-relaxed">
-              Tillsammans driver de FrejFund som ett väloljat pokermaskineri med silkeslen finish – där odds, algoritmer och omtanke möts för att göra entreprenörskap lite enklare, mycket roligare och betydligt mer investerbart.
+              Together they drive FrejFund like a well-oiled poker machine with silky smooth finish – where odds, algorithms and care meet to make entrepreneurship a little easier, much more fun and significantly more investable.
             </p>
           </div>
         </div>

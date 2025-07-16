@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(req: NextRequest) {
   const { bransch, omrade } = await req.json();
 
-  // Improved OpenAI prompt for Swedish, number + source only
+  // Improved OpenAI prompt for English, number + source only
   const apiKey = process.env.OPENAI_API_KEY;
-  const prompt = `Svara på svenska. Uppskatta den totala marknadsstorleken (TAM) i SEK för branschen: "${bransch}" och målgruppen/området: "${omrade}". Svara ENBART med:
-Marknadsstorlek: [siffra] SEK\nKälla: [kort källa eller förklaring]\nInga metodbeskrivningar, bara siffra och källa.`;
+  const prompt = `Answer in English. Estimate the total addressable market (TAM) in SEK for the industry: "${bransch}" and target group/area: "${omrade}". Answer ONLY with:
+Market size: [number] SEK\nSource: [brief source or explanation]\nNo methodology descriptions, just number and source.`;
 
   let estimate = '';
   let source = '';
@@ -31,10 +31,10 @@ Marknadsstorlek: [siffra] SEK\nKälla: [kort källa eller förklaring]\nInga met
     const data = await openaiRes.json();
     const text = data.choices?.[0]?.message?.content || '';
     // Extract number and source
-    const match = text.match(/Marknadsstorlek:\s*([\d\s.,]+)\s*SEK[\s\n\r]*Källa:\s*(.+)/i);
+    const match = text.match(/Market size:\s*([\d\s.,]+)\s*SEK[\s\n\r]*Source:\s*(.+)/i);
     if (match) {
-      estimate = `Marknadsstorlek: ${match[1].trim()} SEK`;
-      source = `Källa: ${match[2].trim()}`;
+      estimate = `Market size: ${match[1].trim()} SEK`;
+      source = `Source: ${match[2].trim()}`;
     } else {
       estimate = text.trim();
       source = '';

@@ -6,30 +6,30 @@ export async function POST(request: Request) {
     
     // Simulera AI-feedback med realistiskt innehåll
     const feedbackData = {
-      'business_idea': `✅ Stark affärsidé med tydligt värde för kunden. Bra problemformulering och lösningsansats. 
+      'business_idea': `✅ Strong business idea with clear customer value. Good problem formulation and solution approach. 
       
-      💡 Förslag: Konkretisera er unika värdeproposition ytterligare och kvantifiera nyttan för kunden.`,
+      💡 Suggestion: Further concretize your unique value proposition and quantify the customer benefit.`,
       
-      'market_analysis': `📊 Bra marknadsförståelse med tydlig TAM/SAM/SOM-uppdelning. Marknadstrender väl identifierade.
+      'market_analysis': `📊 Good market understanding with clear TAM/SAM/SOM breakdown. Market trends well identified.
       
-      💡 Förslag: Lägg till konkreta källor för marknadsdata och inkludera regional analys.`,
+      💡 Suggestion: Add concrete sources for market data and include regional analysis.`,
       
-      'team': `👥 Starkt team med relevant branschexpertis och komplementära färdigheter. Bra balans mellan teknik och affär.
+      'team': `👥 Strong team with relevant industry expertise and complementary skills. Good balance between technical and business.
       
-      💡 Förslag: Överväg att förstärka med säljexpertis och internationell erfarenhet.`,
+      💡 Suggestion: Consider strengthening with sales expertise and international experience.`,
       
-      'competition': `⚔️ Välgenomtänkt konkurrentanalys med tydlig differentiering. Bra förståelse för direkta och indirekta konkurrenter.
+      'competition': `⚔️ Well-thought competitive analysis with clear differentiation. Good understanding of direct and indirect competitors.
       
-      💡 Förslag: Utveckla defensiva strategier och beskriv hur ni ska behålla konkurrensfördelen.`,
+      💡 Suggestion: Develop defensive strategies and describe how you will maintain competitive advantage.`,
       
-      'funding': `💰 Realistisk kapitalallokering och välmotiverat finansieringsbehov. Bra fördelning mellan olika investeringsområden.
+      'funding': `💰 Realistic capital allocation and well-motivated funding needs. Good distribution across different investment areas.
       
-      💡 Förslag: Inkludera scenario-analys och backup-plan för olika finansieringsalternativ.`
+      💡 Suggestion: Include scenario analysis and backup plan for different financing alternatives.`
     };
 
     // Välj feedback baserat på sektion
     const feedback = feedbackData[section as keyof typeof feedbackData] || 
-      `Analyserar ${section}... Bra innehåll som visar förståelse för området. Fortsätt utveckla denna del med mer specifika exempel och data.`;
+      `Analyzing ${section}... Good content that shows understanding of the area. Continue developing this part with more specific examples and data.`;
 
     const prompt = `Ge AI-feedback på varje del av affärsplanen. Gör varje feedback ca 30% kortare än tidigare, men se till att meningarna är kompletta och inte slutar mitt i. Svara på svenska. Format: {"budget_forecast": "...", ...}`;
 

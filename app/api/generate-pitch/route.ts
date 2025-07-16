@@ -14,31 +14,31 @@ export async function POST(request: NextRequest) {
 
     const { answers } = await request.json();
 
-    const prompt = `Du är världens bästa pitch-coach. Skapa en EPISK 30-sekunders pitch för följande produkt:
+    const prompt = `You are the world's best pitch coach. Create an EPIC 30-second pitch for the following product:
 
-Produkt: ${answers.product}
-Målgrupp: ${answers.targetAudience}
-Värdeerbjudande: ${answers.value}
+Product: ${answers.product}
+Target audience: ${answers.targetAudience}
+Value proposition: ${answers.value}
 ${answers.ask ? `Ask: ${answers.ask}` : ''}
 
-Regler:
-- Max 80 ord
-- Använd storytelling och emotionell anknytning
-- Inkludera en "hook" i början
-- Avsluta med ett tydligt call-to-action
-- Använd korta, kraftfulla meningar
-- Var specifik och konkret
-- Undvik floskler och buzzwords
-- Formatera texten med radbrytningar för bättre läsbarhet
+Rules:
+- Max 80 words
+- Use storytelling and emotional connection
+- Include a "hook" at the beginning
+- End with a clear call-to-action
+- Use short, powerful sentences
+- Be specific and concrete
+- Avoid clichés and buzzwords
+- Format the text with line breaks for better readability
 
-Skapa en pitch som får lyssnaren att vilja agera NU.`;
+Create a pitch that makes the listener want to act NOW.`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
         {
           role: "system",
-          content: "Du är världens bästa pitch-coach med flera decenniers erfarenhet av att hjälpa startups att lyckas. Du har en unik förmåga att förvandla komplexa idéer till fängslande berättelser som får investerare att vilja investera och kunder att vilja köpa."
+          content: "You are the world's best pitch coach with decades of experience helping startups succeed. You have a unique ability to transform complex ideas into captivating stories that make investors want to invest and customers want to buy."
         },
         {
           role: "user",

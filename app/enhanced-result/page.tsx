@@ -1,11 +1,16 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import EnhancedBusinessResult from '../components/EnhancedBusinessResult';
 
 function ResultContent() {
   const searchParams = useSearchParams();
   const dataParam = searchParams.get('data');
+  
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
   
   if (!dataParam) {
     return (
