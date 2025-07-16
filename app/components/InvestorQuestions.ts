@@ -2,6 +2,49 @@ import { QuestionSection } from '../types/businessPlan';
 
 export const INVESTOR_QUESTION_SECTIONS: QuestionSection[] = [
   {
+    id: 'company_info',
+    title: '1. Företagsinformation',
+    icon: '🏢',
+    questions: [
+      {
+        id: 'company_name',
+        label: 'Företagets namn',
+        type: 'text',
+        required: true,
+        placeholder: 'Ex: TechStartup AB'
+      },
+      {
+        id: 'contact_name',
+        label: 'Ditt namn',
+        type: 'text',
+        required: true,
+        placeholder: 'Ex: Anna Andersson'
+      },
+      {
+        id: 'contact_email',
+        label: 'Din e-postadress',
+        type: 'text',
+        required: true,
+        placeholder: 'Ex: anna@techstartup.se'
+      },
+      {
+        id: 'has_website',
+        label: 'Har du en hemsida idag?',
+        type: 'select',
+        required: true,
+        options: ['Ja', 'Nej']
+      },
+      {
+        id: 'website_url',
+        label: 'Företagets hemsida',
+        type: 'text',
+        required: false,
+        placeholder: 'Ex: https://www.techstartup.se',
+        help: 'Vi kan analysera din hemsida för att förifyllla information'
+      }
+    ]
+  },
+  {
     id: 'problem_market',
     title: '2.1 Problem & marknadsbehov',
     icon: '🎯',
@@ -92,6 +135,22 @@ export const INVESTOR_QUESTION_SECTIONS: QuestionSection[] = [
         type: 'textarea',
         required: true,
         placeholder: 'Ex: 1) Enterprise (ROI>3x), 2) SMB (enkel setup), 3) Startup (låg kostnad)'
+      },
+      {
+        id: 'competitor_growth',
+        label: 'Hur snabbt växer era huvudkonkurrenter? 📈',
+        type: 'textarea',
+        required: true,
+        placeholder: 'Ex: Competitor X: +200% ARR, Series B 50M EUR\nCompetitor Y: +150% kunder, expanderat till 5 länder',
+        help: 'Ange funding, kunder, revenue eller andra tillväxtindikatorer'
+      },
+      {
+        id: 'trigger_events',
+        label: 'Vilka trigger events driver kundernas köpbeslut just nu?',
+        type: 'textarea',
+        required: true,
+        placeholder: 'Ex: GDPR-böter, digital transformation post-COVID, brist på utvecklare',
+        help: 'Vad får kunder att agera NU istället för att vänta?'
       }
     ]
   },
@@ -122,6 +181,22 @@ export const INVESTOR_QUESTION_SECTIONS: QuestionSection[] = [
         type: 'text',
         required: false,
         placeholder: 'Ex: gartner.com/report/magic-quadrant-2024'
+      },
+      {
+        id: 'ip_rights',
+        label: 'Vilka patent, varumärken eller IP-rättigheter har ni? 📄',
+        type: 'textarea',
+        required: true,
+        placeholder: 'Ex: Patent #12345 för ML-algoritm (godkänt)\nVarumärke "TechAI" (registrerat EU)\n3 patentansökningar under behandling',
+        help: 'Lista alla immateriella rättigheter, status och geografisk täckning'
+      },
+      {
+        id: 'proprietary_data',
+        label: 'Vilken proprietär data samlar ni som konkurrenter inte har?',
+        type: 'textarea',
+        required: true,
+        placeholder: 'Ex: 5 års historisk transaktionsdata från 10k användare\nUnik branschinsikt från 500+ expertintervjuer\nRealtidsdata från IoT-sensorer',
+        help: 'Data som ger er konkurrensfördel'
       }
     ]
   },
@@ -343,6 +418,22 @@ export const INVESTOR_QUESTION_SECTIONS: QuestionSection[] = [
         type: 'textarea',
         required: true,
         placeholder: 'Ex:\n1. Teknisk: Single point of failure → Multi-region Q2\n2. Marknad: Ny konkurrent → Accelerera enterprise-features\n3. Team: Key person dependency → Kunskapsdelning-program'
+      },
+      {
+        id: 'technical_risks',
+        label: 'Största tekniska risker och mitigationsplan',
+        type: 'textarea',
+        required: true,
+        placeholder: 'Ex: Skalbarhet vid 10x användare → Microservices arkitektur pågår\nBeroende av 3rd party API → Bygger egen backup-lösning',
+        help: 'Fokusera på tekniska flaskhalsar och single points of failure'
+      },
+      {
+        id: 'key_dependency_risk',
+        label: 'Vad händer om nyckelkund/partner försvinner?',
+        type: 'textarea',
+        required: true,
+        placeholder: 'Ex: Största kund = 40% av ARR → Diversifierar aktivt, ingen kund >20% inom 6 mån\nHuvudpartner → Har backup-avtal med 2 alternativ',
+        help: 'Beskriv beroenden och backup-planer'
       }
     ]
   },
@@ -371,6 +462,37 @@ export const INVESTOR_QUESTION_SECTIONS: QuestionSection[] = [
         type: 'textarea',
         required: true,
         placeholder: 'Ex: Strategic acquisition 2027 (SAP, Salesforce), IPO 2029 vid 100M ARR'
+      }
+    ]
+  },
+  {
+    id: 'storytelling_pitch',
+    title: '2.13 Storytelling & Pitch',
+    icon: '🎭',
+    questions: [
+      {
+        id: 'pitch_deck_upload',
+        label: 'Ladda upp er pitch deck för AI-analys (valfritt)',
+        type: 'file',
+        required: false,
+        help: 'PDF, max 10MB. Vi analyserar struktur, design och innehåll'
+      },
+      {
+        id: 'presentation_ability',
+        label: 'Betygsätt er förmåga att presentera/pitcha',
+        type: 'scale',
+        required: true,
+        help: '1 = Behöver mycket träning, 5 = Naturlig talare som fängslar',
+        min: 1,
+        max: 5
+      },
+      {
+        id: 'unique_story',
+        label: 'Vad är er unika "founder story" som skapar emotionell koppling?',
+        type: 'textarea',
+        required: true,
+        placeholder: 'Ex: Efter att min mamma kämpade med X i 10 år insåg jag att... / Som tidigare anställd på Y såg jag dagligen hur...',
+        help: 'Den personliga anledningen till varför just DU bygger detta'
       }
     ]
   }

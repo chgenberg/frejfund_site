@@ -17,6 +17,8 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   const [isMobile, setIsMobile] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+  const [isScrapingWebsite, setIsScrapingWebsite] = useState(false);
+  const [scrapingProgress, setScrapingProgress] = useState(0);
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -61,9 +63,19 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
 
   // Group questions into pages (2 per page for mobile, 3 for desktop)
   const questionsPerPage = isMobile ? 2 : 3;
-  const totalPages = Math.ceil(allQuestions.length / questionsPerPage);
+  
+  // Filter questions based on conditions
+  const filteredQuestions = allQuestions.filter(q => {
+    // Show website_url only if has_website is "Ja"
+    if (q.id === 'website_url' && answers.has_website !== 'Ja') {
+      return false;
+    }
+    return true;
+  });
+  
+  const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
   const currentPage = Math.floor(currentQuestionIndex / questionsPerPage);
-  const questionsOnCurrentPage = allQuestions.slice(
+  const questionsOnCurrentPage = filteredQuestions.slice(
     currentPage * questionsPerPage,
     (currentPage + 1) * questionsPerPage
   );
@@ -81,6 +93,60 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
 
   const handleAnswer = (questionId: string, value: any) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
+    
+    // Check if user selected "Ja" for has_website and we have a URL
+    if (questionId === 'has_website' && value === 'Ja') {
+      // We'll wait for the URL to be entered
+    } else if (questionId === 'website_url' && value && answers.has_website === 'Ja') {
+      // Start website scraping
+      scrapeWebsite(value);
+    }
+  };
+
+  const scrapeWebsite = async (url: string) => {
+    setIsScrapingWebsite(true);
+    setScrapingProgress(0);
+    
+    // Simulate progress
+    const progressInterval = setInterval(() => {
+      setScrapingProgress(prev => Math.min(prev + 10, 90));
+    }, 500);
+    
+    try {
+      const response = await fetch('/api/scrape-website', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        // Pre-fill the answers with scraped data
+        setAnswers(prev => ({
+          ...prev,
+          customer_pain: data.data.customer_pain || prev.customer_pain || '',
+          solution: data.data.solution || prev.solution || '',
+          elevator_pitch: data.data.elevator_pitch || prev.elevator_pitch || '',
+          target_customer: data.data.target_customer || prev.target_customer || '',
+          unique_tech: data.data.unique_tech || prev.unique_tech || '',
+          company_value: data.data.company_value || prev.company_value || '',
+          traction: data.data.traction || prev.traction || ''
+        }));
+        
+        setScrapingProgress(100);
+        setTimeout(() => {
+          setIsScrapingWebsite(false);
+          setScrapingProgress(0);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Error scraping website:', error);
+      setIsScrapingWebsite(false);
+      setScrapingProgress(0);
+    } finally {
+      clearInterval(progressInterval);
+    }
   };
 
   const isPageValid = () => {
@@ -92,7 +158,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   };
 
   const handleNext = () => {
-    if (currentQuestionIndex + questionsPerPage < allQuestions.length) {
+    if (currentQuestionIndex + questionsPerPage < filteredQuestions.length) {
       setCurrentQuestionIndex(prev => prev + questionsPerPage);
     }
   };
@@ -105,41 +171,54 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    setStatusMessage('Förbereder analys...');
+    setStatusMessage('Genererar investeringsanalys...');
     
     try {
-      // Calculate initial score
-      let score = 0;
-      const totalQuestions = allQuestions.filter(q => q.required).length;
-      const answeredQuestions = allQuestions.filter(q => q.required && answers[q.id]).length;
-      score = Math.round((answeredQuestions / totalQuestions) * 100);
-
-      // Save to localStorage for result page
-      localStorage.setItem('businessPlanAnswers', JSON.stringify(answers));
-      localStorage.setItem('businessPlanScore', score.toString());
+      // Generate analysis
+      const analysisResponse = await fetch('/api/generate-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers })
+      });
       
-      // Check if user is logged in
-      const supabase = getSupabaseClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const analysisData = await analysisResponse.json();
       
-      if (user) {
-        // Save to database if logged in
-        const { error } = await supabase
-          .from('analyses')
-          .insert({
-            user_id: user.id,
-            score: score,
-            answers: answers,
-            created_at: new Date().toISOString()
-          });
-          
-        if (error) {
-          console.error('Error saving analysis:', error);
+      if (analysisData.success && analysisData.analysis) {
+        // Save complete analysis to localStorage
+        const resultData = {
+          ...analysisData.analysis,
+          answers: answers,
+          timestamp: new Date().toISOString()
+        };
+        
+        localStorage.setItem('latestAnalysisResult', JSON.stringify(resultData));
+        
+        // Check if user is logged in and save to database
+        const supabase = getSupabaseClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { error } = await supabase
+            .from('analyses')
+            .insert({
+              user_id: user.id,
+              company_name: answers.company_name,
+              score: analysisData.analysis.overallScore,
+              analysis_data: resultData,
+              answers: answers,
+              created_at: new Date().toISOString()
+            });
+            
+          if (error) {
+            console.error('Error saving analysis:', error);
+          }
         }
+        
+        // Navigate to enhanced result page
+        router.push('/result');
+      } else {
+        throw new Error('Failed to generate analysis');
       }
-      
-      // Navigate to result page
-      router.push(`/result?score=${score}`);
     } catch (error) {
       console.error('Error submitting:', error);
       setStatusMessage('Ett fel uppstod. Försök igen.');
@@ -295,6 +374,72 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   return (
     <div className="fixed inset-0 z-[200] bg-slate-900">
       <div className="h-full flex flex-col bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900">
+        {/* Loading overlay for website scraping */}
+        {isScrapingWebsite && (
+          <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center">
+            <div className="bg-slate-800 rounded-3xl p-8 max-w-md w-full mx-4 border border-purple-500/50 shadow-2xl">
+              <div className="text-center">
+                <div className="mb-6">
+                  <div className="w-24 h-24 mx-auto relative">
+                    <svg className="w-24 h-24 transform -rotate-90">
+                      <circle
+                        cx="48"
+                        cy="48"
+                        r="44"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        fill="none"
+                        className="text-white/10"
+                      />
+                      <circle
+                        cx="48"
+                        cy="48"
+                        r="44"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        fill="none"
+                        className="text-purple-500"
+                        strokeDasharray={`${2 * Math.PI * 44}`}
+                        strokeDashoffset={`${2 * Math.PI * 44 * (1 - scrapingProgress / 100)}`}
+                        style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-2xl font-bold text-white">{scrapingProgress}%</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <h3 className="text-xl font-bold text-white mb-2">Analyserar din hemsida</h3>
+                <p className="text-white/70 mb-4">
+                  Vi använder AI för att extrahera relevant information från din hemsida...
+                </p>
+                
+                <div className="space-y-2 text-left">
+                  <div className={`flex items-center gap-2 ${scrapingProgress > 0 ? 'text-green-400' : 'text-white/40'}`}>
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Hämtar hemsidedata</span>
+                  </div>
+                  <div className={`flex items-center gap-2 ${scrapingProgress > 30 ? 'text-green-400' : 'text-white/40'}`}>
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Analyserar innehåll</span>
+                  </div>
+                  <div className={`flex items-center gap-2 ${scrapingProgress > 60 ? 'text-green-400' : 'text-white/40'}`}>
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Förifyllningsinformation</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header with progress */}
         <div className="bg-slate-900/90 backdrop-blur-md border-b border-white/20 px-4 py-3">
           <div className="flex justify-between items-center mb-2">
