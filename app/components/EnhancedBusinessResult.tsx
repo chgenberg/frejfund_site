@@ -138,6 +138,30 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Hide navbar on result pages
+  useEffect(() => {
+    const navbar = document.querySelector('[data-navbar]') as HTMLElement;
+    const main = document.querySelector('main') as HTMLElement;
+    
+    if (navbar) {
+      navbar.style.display = 'none';
+    }
+    
+    if (main) {
+      main.style.paddingTop = '0';
+    }
+    
+    // Cleanup - show navbar and restore padding when component unmounts
+    return () => {
+      if (navbar) {
+        navbar.style.display = '';
+      }
+      if (main) {
+        main.style.paddingTop = '';
+      }
+    };
+  }, []);
+
   if (isMobile) {
     return <EnhancedMobileResult data={data} />;
   }

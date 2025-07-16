@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import ActionableInsights from './ActionableInsights';
@@ -80,59 +80,83 @@ export default function EnhancedMobileResult({ data }: { data: any }) {
 
   const categories = Object.entries(data.categories);
 
+  // Hide navbar on this page
+  useEffect(() => {
+    const navbar = document.querySelector('[data-navbar]') as HTMLElement;
+    const main = document.querySelector('main') as HTMLElement;
+    
+    if (navbar) {
+      navbar.style.display = 'none';
+    }
+    
+    if (main) {
+      main.style.paddingTop = '0';
+    }
+    
+    // Cleanup - show navbar and restore padding when component unmounts
+    return () => {
+      if (navbar) {
+        navbar.style.display = '';
+      }
+      if (main) {
+        main.style.paddingTop = '';
+      }
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900">
-      {/* Mobile Sticky Header */}
-      <div className="sticky top-20 z-40 bg-slate-900/95 backdrop-blur-lg border-b border-white/10">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-white">Investeringsanalys</h1>
-              <p className="text-xs text-white/60 mt-0.5">
-                {data.overallScore >= 75 ? 'Investor Ready' : 
-                 data.overallScore >= 50 ? 'Stark Potential' :
-                 data.overallScore >= 25 ? 'Lovande Start' : 'Tidigt Stadium'}
-              </p>
-            </div>
-            <div className="w-14 h-14 flex-shrink-0">
-              <CircularProgressbar
-                value={data.overallScore}
-                text={`${data.overallScore}`}
-                styles={buildStyles({
-                  textSize: '32px',
-                  pathColor: getScoreColor(data.overallScore),
-                  textColor: '#fff',
-                  trailColor: 'rgba(255, 255, 255, 0.1)',
-                })}
-              />
-            </div>
+      {/* Top Header with Score and Navigation */}
+      <div className="bg-slate-900/95 backdrop-blur-lg border-b border-white/10 px-4 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex-1">
+            <h1 className="text-xl font-bold text-white">Investeringsanalys</h1>
+            <p className="text-sm text-white/70 mt-1">
+              {data.overallScore >= 75 ? 'Investor Ready' : 
+               data.overallScore >= 50 ? 'Stark Potential' :
+               data.overallScore >= 25 ? 'Lovande Start' : 'Tidigt Stadium'}
+            </p>
           </div>
-          
-          {/* Tab Navigation */}
-          <div className="flex gap-1 mt-3">
-            {[
-              { id: 'overview', label: 'Översikt', icon: '📊' },
-              { id: 'details', label: 'Detaljer', icon: '🔍' },
-              { id: 'actions', label: 'Åtgärder', icon: '🎯' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 py-2 px-2 rounded-lg text-xs font-medium transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                    : 'bg-white/10 text-white/60'
-                }`}
-              >
-                <span className="block text-lg mb-0.5">{tab.icon}</span>
-                <span className="block">{tab.label}</span>
-              </button>
-            ))}
+          <div className="w-16 h-16 flex-shrink-0">
+            <CircularProgressbar
+              value={data.overallScore}
+              text={`${data.overallScore}`}
+              styles={buildStyles({
+                textSize: '28px',
+                pathColor: getScoreColor(data.overallScore),
+                textColor: '#fff',
+                trailColor: 'rgba(255, 255, 255, 0.1)',
+              })}
+            />
           </div>
+        </div>
+        
+        {/* Tab Navigation */}
+        <div className="flex gap-1">
+          {[
+            { id: 'overview', label: 'Översikt', icon: '📊' },
+            { id: 'details', label: 'Detaljer', icon: '🔍' },
+            { id: 'actions', label: 'Åtgärder', icon: '🎯' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`flex-1 py-3 px-2 rounded-xl text-xs font-medium transition-all ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                  : 'bg-white/10 text-white/70 hover:bg-white/20'
+              }`}
+            >
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-lg">{tab.icon}</span>
+                <span>{tab.label}</span>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Content */}
+      {/* Content Area */}
       <div className="px-4 py-6">
         {activeTab === 'overview' && (
           <div className="space-y-4">

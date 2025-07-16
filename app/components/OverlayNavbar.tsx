@@ -59,7 +59,7 @@ export default function OverlayNavbar() {
   };
 
   return (
-    <>
+    <div data-navbar>
       {/* Hamburgarmeny */}
       <div className="fixed top-6 left-6 z-[100]">
         <button
@@ -176,6 +176,6 @@ export default function OverlayNavbar() {
         onClose={() => setShowAuthModal(false)}
         defaultMode={authMode}
       />
-    </>
+    </div>
   );
 } 
