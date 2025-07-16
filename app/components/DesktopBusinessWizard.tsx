@@ -267,41 +267,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
     }
   };
 
-  const fillTestData = () => {
-    const testAnswers: Record<string, any> = {};
-    allQuestions.forEach(q => {
-      switch (q.type) {
-        case 'text':
-          testAnswers[q.id] = q.id === 'website_url' ? 'https://example.com' : 'Test ' + q.label.slice(0, 20);
-          break;
-        case 'textarea':
-          testAnswers[q.id] = 'Detta är ett testsvar för ' + q.label;
-          break;
-        case 'number':
-          testAnswers[q.id] = Math.floor(Math.random() * 100);
-          break;
-        case 'percentage':
-          testAnswers[q.id] = Math.floor(Math.random() * 100);
-          break;
-        case 'scale':
-          testAnswers[q.id] = 3;
-          break;
-        case 'select':
-          testAnswers[q.id] = q.options?.[0] || '';
-          break;
-        case 'multi_input':
-          const multiValues: Record<string, any> = {};
-          q.multiInputs?.forEach(input => {
-            multiValues[input.id] = input.type === 'percentage' ? 50 : 'Test';
-          });
-          testAnswers[q.id] = multiValues;
-          break;
-      }
-    });
-    testAnswers.has_website = 'Ja';
-    setPolicyAccepted(true);
-    setAnswers(testAnswers);
-  };
+
 
   const progress = ((currentPage + 1) / totalPages) * 100;
 
@@ -349,9 +315,6 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={fillTestData} className="text-xs text-white/60 hover:text-white bg-white/10 px-3 py-1 rounded-lg transition-colors">
-                      Testdata
-                    </button>
                     <button onClick={onClose} className="text-white/60 hover:text-white p-1 transition-colors">
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
