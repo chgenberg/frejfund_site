@@ -2,12 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 export async function POST(req: NextRequest) {
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-
   try {
-    const { answers, company, email, bransch, omrade, hasWebsite, isPremium = false } = await req.json();
+    // Check for API key before instantiating OpenAI client
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
+    }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    const body = await req.json();
+
+    const { answers, company, email, bransch, omrade, hasWebsite, isPremium = false } = body;
 
     // Strukturera svaren för OpenAI
     const structuredAnswers = JSON.stringify(answers, null, 2);

@@ -1,20 +1,25 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-export async function POST(request: Request) {
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-
+export async function POST(request: NextRequest) {
   try {
-    const { product, targetAudience, value, ask } = await request.json();
+    // Check for API key before instantiating OpenAI client
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
+    }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    const { answers } = await request.json();
 
     const prompt = `Du är världens bästa pitch-coach. Skapa en EPISK 30-sekunders pitch för följande produkt:
 
-Produkt: ${product}
-Målgrupp: ${targetAudience}
-Värdeerbjudande: ${value}
-${ask ? `Ask: ${ask}` : ''}
+Produkt: ${answers.product}
+Målgrupp: ${answers.targetAudience}
+Värdeerbjudande: ${answers.value}
+${answers.ask ? `Ask: ${answers.ask}` : ''}
 
 Regler:
 - Max 80 ord

@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-
 async function getCompetitorList(answers: Record<string, unknown>) {
+  // Check for API key
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OpenAI API key not configured');
+  }
+
   // GPT-prompt för att hitta konkurrenter
   const prompt = `Du är en marknadsanalytiker. Här är en affärsplan: ${JSON.stringify(answers, null, 2)}\n\nLista de tre största konkurrenterna (namn och webbadress) till detta bolag. Returnera som JSON-array: [{\"name\":..., \"url\":...}]`;
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
       model: 'gpt-4o',
@@ -49,7 +52,7 @@ export async function POST(req: NextRequest) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
           model: 'gpt-4o',

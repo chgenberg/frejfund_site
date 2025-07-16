@@ -1,15 +1,24 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function GET() {
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-  
   try {
+    // Check for API key before instantiating OpenAI client
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ 
+        error: 'OpenAI API key not configured',
+        hasKey: false 
+      }, { status: 500 });
+    }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    // Test simple completion
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: "Say hello!" }],
       model: "gpt-3.5-turbo",

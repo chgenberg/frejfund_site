@@ -48,9 +48,14 @@ function parseTextWithBold(text: string) {
 }
 
 export async function POST(request: Request) {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
   try {
+    // Check for API key before instantiating OpenAI client
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
+    }
+
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
     const formData = await request.formData();
     const answersStr = formData.get('answers') as string;
     const additionalAnswersStr = formData.get('additionalAnswers') as string;
