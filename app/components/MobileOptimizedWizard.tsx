@@ -20,6 +20,35 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Hide navbar when wizard opens
+  useEffect(() => {
+    if (open) {
+      const navbar = document.querySelector('[data-navbar]') as HTMLElement;
+      const main = document.querySelector('main') as HTMLElement;
+      
+      if (navbar) {
+        navbar.style.display = 'none';
+      }
+      
+      if (main) {
+        main.style.paddingTop = '0';
+      }
+    }
+    
+    // Cleanup when wizard closes
+    return () => {
+      const navbar = document.querySelector('[data-navbar]') as HTMLElement;
+      const main = document.querySelector('main') as HTMLElement;
+      
+      if (navbar) {
+        navbar.style.display = '';
+      }
+      if (main) {
+        main.style.paddingTop = '';
+      }
+    };
+  }, [open]);
+
   // Flatten all questions into a single array with section info
   const allQuestions = INVESTOR_QUESTION_SECTIONS.flatMap(section => 
     section.questions.map(q => ({
@@ -264,7 +293,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   };
 
   return (
-    <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md">
+    <div className="fixed inset-0 z-[200] bg-slate-900">
       <div className="h-full flex flex-col bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900">
         {/* Header with progress */}
         <div className="bg-slate-900/90 backdrop-blur-md border-b border-white/20 px-4 py-3">

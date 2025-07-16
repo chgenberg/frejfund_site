@@ -23,6 +23,35 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Hide navbar when wizard opens
+  useEffect(() => {
+    if (open) {
+      const navbar = document.querySelector('[data-navbar]') as HTMLElement;
+      const main = document.querySelector('main') as HTMLElement;
+      
+      if (navbar) {
+        navbar.style.display = 'none';
+      }
+      
+      if (main) {
+        main.style.paddingTop = '0';
+      }
+    }
+    
+    // Cleanup when wizard closes
+    return () => {
+      const navbar = document.querySelector('[data-navbar]') as HTMLElement;
+      const main = document.querySelector('main') as HTMLElement;
+      
+      if (navbar) {
+        navbar.style.display = '';
+      }
+      if (main) {
+        main.style.paddingTop = '';
+      }
+    };
+  }, [open]);
+
   if (!open) return null;
 
   // Use mobile-optimized wizard for mobile devices
@@ -159,7 +188,7 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
   };
 
   return (
-    <div className="fixed inset-0 z-[200] overflow-auto bg-black/85 backdrop-blur-md">
+    <div className="fixed inset-0 z-[200] overflow-auto bg-slate-900">
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 rounded-3xl p-4 md:p-8 max-w-4xl w-full shadow-2xl border border-purple-500/20 max-h-[90vh] overflow-y-auto">
           {!isSubmitting ? (
