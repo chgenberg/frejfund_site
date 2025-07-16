@@ -126,8 +126,8 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
     
     // Simulate progress
     const progressInterval = setInterval(() => {
-      setScrapingProgress(prev => Math.min(prev + 10, 90));
-    }, 500);
+      setScrapingProgress(prev => Math.min(prev + 5, 90));
+    }, 1000);
     
     try {
       const response = await fetch('/api/scrape-website', {
@@ -157,7 +157,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
         setTimeout(() => {
           setIsScrapingWebsite(false);
           setScrapingProgress(0);
-        }, 1000);
+        }, 2000);
       }
     } catch (error) {
       console.error('Error scraping website:', error);
