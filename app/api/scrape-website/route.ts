@@ -143,7 +143,7 @@ export async function POST(request: Request) {
 
     // Use OpenAI to extract business information
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
