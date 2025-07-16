@@ -1,0 +1,626 @@
+'use client';
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { INVESTOR_QUESTION_SECTIONS } from './InvestorQuestions';
+import { getSupabaseClient } from '../../lib/supabase';
+import Link from 'next/link';
+
+const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
+  const [policyAccepted, setPolicyAccepted] = useState(false);
+  const [isScrapingWebsite, setIsScrapingWebsite] = useState(false);
+  const [scrapingProgress, setScrapingProgress] = useState(0);
+  const [showHelpFor, setShowHelpFor] = useState<string | null>(null);
+  const router = useRouter();
+
+  // Get all questions flattened with section info
+  const allQuestions = INVESTOR_QUESTION_SECTIONS.flatMap(section => 
+    section.questions.map(q => ({ 
+      ...q, 
+      sectionTitle: section.title, 
+      sectionIcon: section.icon 
+    }))
+  );
+
+  // Desktop shows 3 questions per page
+  const questionsPerPage = 3;
+  const totalPages = Math.ceil(allQuestions.length / questionsPerPage);
+  const currentPage = Math.floor(currentQuestionIndex / questionsPerPage);
+  const questionsOnCurrentPage = allQuestions.slice(
+    currentPage * questionsPerPage,
+    Math.min((currentPage + 1) * questionsPerPage, allQuestions.length)
+  );
+
+  // Hide navbar when wizard opens
+  useEffect(() => {
+    if (open) {
+      const navbar = document.querySelector('[data-navbar]') as HTMLElement;
+      const main = document.querySelector('main') as HTMLElement;
+      
+      if (navbar) {
+        navbar.style.display = 'none';
+      }
+      
+      if (main) {
+        main.style.paddingTop = '0';
+      }
+    }
+    
+    return () => {
+      const navbar = document.querySelector('[data-navbar]') as HTMLElement;
+      const main = document.querySelector('main') as HTMLElement;
+      
+      if (navbar) {
+        navbar.style.display = '';
+      }
+      if (main) {
+        main.style.paddingTop = '';
+      }
+    };
+  }, [open]);
+
+  if (!open) return null;
+
+  const handleAnswer = (questionId: string, value: any) => {
+    setAnswers(prev => ({ ...prev, [questionId]: value }));
+  };
+
+  const isPageValid = () => {
+    const pageValid = questionsOnCurrentPage.every(q => {
+      if (q.id === 'website_url') {
+        if (answers.has_website === 'Ja') {
+          return answers.website_url && answers.website_url.trim() !== '';
+        }
+        return true;
+      }
+      
+      if (!q.required) return true;
+      const answer = answers[q.id];
+      return answer && (typeof answer === 'object' ? Object.values(answer).every(v => v) : true);
+    });
+
+    // Check privacy policy on first page
+    const firstQuestionIndex = currentPage * questionsPerPage;
+    if (firstQuestionIndex === 0 && !policyAccepted) return false;
+    
+    return pageValid;
+  };
+
+  const scrapeWebsite = async (url: string) => {
+    console.log('🔍 Starting website scraping for URL:', url);
+    setIsScrapingWebsite(true);
+    setScrapingProgress(0);
+    
+    const progressInterval = setInterval(() => {
+      setScrapingProgress(prev => Math.min(prev + 10, 90));
+    }, 500);
+    
+    try {
+      const response = await fetch('/api/scrape-website', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        setAnswers(prev => ({
+          ...prev,
+          customer_pain_points: data.data.customer_pain || prev.customer_pain_points || '',
+          solution_description: data.data.solution || prev.solution_description || '',
+          elevator_pitch: data.data.elevator_pitch || prev.elevator_pitch || '',
+          target_customer: data.data.target_customer || prev.target_customer || '',
+          unique_tech: data.data.unique_tech || prev.unique_tech || '',
+          team_overview: data.data.team || prev.team_overview || '',
+          revenue_model: data.data.revenue_model || prev.revenue_model || '',
+          traction_overview: data.data.traction || prev.traction_overview || '',
+          company_value: data.data.company_value || prev.company_value || ''
+        }));
+        
+        setScrapingProgress(100);
+        setTimeout(() => {
+          setIsScrapingWebsite(false);
+          setScrapingProgress(0);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Error scraping website:', error);
+      setIsScrapingWebsite(false);
+      setScrapingProgress(0);
+    } finally {
+      clearInterval(progressInterval);
+    }
+  };
+
+  const handleNext = () => {
+    // Check if we should scrape website
+    const currentPageQuestionIds = questionsOnCurrentPage.map(q => q.id);
+    if (currentPageQuestionIds.includes('website_url') && answers.has_website === 'Ja' && answers.website_url) {
+      try {
+        const url = answers.website_url;
+        const urlToScrape = url.startsWith('http') ? url : `https://${url}`;
+        new URL(urlToScrape);
+        
+        if (url.includes('.') && url.length > 4) {
+          scrapeWebsite(url);
+        }
+      } catch (error) {
+        console.log('URL validation failed:', error);
+      }
+    }
+    
+    const nextPage = currentPage + 1;
+    if (nextPage < totalPages) {
+      setCurrentQuestionIndex(nextPage * questionsPerPage);
+    }
+  };
+
+  const handleBack = () => {
+    const prevPage = currentPage - 1;
+    if (prevPage >= 0) {
+      setCurrentQuestionIndex(prevPage * questionsPerPage);
+    }
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setStatusMessage('Genererar investeringsanalys...');
+    
+    try {
+      // Save raw data as txt file
+      await fetch('/api/save-customer-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: answers.contact_email || null,
+          company: answers.company_name || null,
+          url: answers.website_url || null,
+          answers
+        })
+      }).catch(err => console.error('save-customer-data error', err));
+
+      // Generate analysis
+      const response = await fetch('/api/generate-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers })
+      });
+      
+      const analysisData = await response.json();
+      
+      if (analysisData.success && analysisData.analysis) {
+        // Save complete analysis to localStorage
+        const resultData = {
+          ...analysisData.analysis,
+          answers: answers,
+          timestamp: new Date().toISOString()
+        };
+        
+        localStorage.setItem('latestAnalysisResult', JSON.stringify(resultData));
+        
+        // Check if user is logged in and save to database
+        const supabase = getSupabaseClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          await supabase
+            .from('analyses')
+            .insert({
+              user_id: user.id,
+              company_name: answers.company_name,
+              score: analysisData.analysis.overallScore,
+              analysis_data: resultData,
+              answers: answers,
+              created_at: new Date().toISOString()
+            });
+        }
+        
+        // Navigate to result page
+        router.push('/result');
+      } else {
+        throw new Error('Failed to generate analysis');
+      }
+    } catch (error) {
+      console.error('Error submitting:', error);
+      setStatusMessage('Ett fel uppstod. Försök igen.');
+      setIsSubmitting(false);
+    }
+  };
+
+  const fillTestData = () => {
+    const testAnswers: Record<string, any> = {};
+    allQuestions.forEach(q => {
+      switch (q.type) {
+        case 'text':
+          testAnswers[q.id] = q.id === 'website_url' ? 'https://example.com' : 'Test ' + q.label.slice(0, 20);
+          break;
+        case 'textarea':
+          testAnswers[q.id] = 'Detta är ett testsvar för ' + q.label;
+          break;
+        case 'number':
+          testAnswers[q.id] = Math.floor(Math.random() * 100);
+          break;
+        case 'percentage':
+          testAnswers[q.id] = Math.floor(Math.random() * 100);
+          break;
+        case 'scale':
+          testAnswers[q.id] = 3;
+          break;
+        case 'select':
+          testAnswers[q.id] = q.options?.[0] || '';
+          break;
+        case 'multi_input':
+          const multiValues: Record<string, any> = {};
+          q.multiInputs?.forEach(input => {
+            multiValues[input.id] = input.type === 'percentage' ? 50 : 'Test';
+          });
+          testAnswers[q.id] = multiValues;
+          break;
+      }
+    });
+    testAnswers.has_website = 'Ja';
+    setPolicyAccepted(true);
+    setAnswers(testAnswers);
+  };
+
+  const progress = ((currentPage + 1) / totalPages) * 100;
+
+  return (
+    <div className="fixed inset-0 z-[200] bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900" data-wizard-open="true">
+      {/* Website scraping overlay - same as mobile */}
+      {isScrapingWebsite && (
+        <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-slate-800 rounded-3xl p-8 max-w-md w-full mx-4 border border-purple-500/50 shadow-2xl">
+            <div className="text-center">
+              <div className="mb-6">
+                <div className="w-24 h-24 mx-auto relative">
+                  <svg className="w-24 h-24 transform -rotate-90">
+                    <circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="8" fill="none" className="text-white/10" />
+                    <circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="8" fill="none" 
+                      className="text-purple-500" strokeDasharray={`${2 * Math.PI * 44}`}
+                      strokeDashoffset={`${2 * Math.PI * 44 * (1 - scrapingProgress / 100)}`}
+                      style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-white">{scrapingProgress}%</span>
+                  </div>
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Analyserar din hemsida</h3>
+              <p className="text-white/70 mb-4">Vi använder AI för att extrahera relevant information från din hemsida...</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main content */}
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="bg-gradient-to-br from-slate-900/90 via-purple-900/20 to-slate-900/90 backdrop-blur-md rounded-3xl p-8 max-w-5xl w-full shadow-2xl border border-purple-500/20">
+          {!isSubmitting ? (
+            <>
+              {/* Header */}
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <h2 className="text-3xl font-bold text-white">Investeringsanalys</h2>
+                    <p className="text-white/70 text-sm mt-1">
+                      {questionsOnCurrentPage[0]?.sectionTitle || 'Företagsinformation'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={fillTestData} className="text-xs text-white/60 hover:text-white bg-white/10 px-3 py-1 rounded-lg transition-colors">
+                      Testdata
+                    </button>
+                    <button onClick={onClose} className="text-white/60 hover:text-white p-1 transition-colors">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Progress bar */}
+                <div className="relative">
+                  <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
+                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500 ease-out relative"
+                      style={{ width: `${progress}%` }}>
+                      <div className="absolute inset-0 bg-white/20 animate-shimmer"></div>
+                    </div>
+                  </div>
+                  <p className="text-white/70 text-sm mt-2 text-center">
+                    Sida {currentPage + 1} av {totalPages}
+                  </p>
+                </div>
+              </div>
+
+              {/* Questions */}
+              <div className="grid gap-6 mb-8">
+                {questionsOnCurrentPage.map((question, index) => (
+                  <div key={question.id} className="bg-slate-800/60 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-purple-500/30 transition-all duration-300 shadow-lg relative">
+                    {index === 0 && currentPage === 0 && (
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-2xl">{question.sectionIcon}</span>
+                        <h3 className="text-lg font-semibold text-white/80">{question.sectionTitle}</h3>
+                      </div>
+                    )}
+                    
+                    <div className="flex items-start justify-between mb-3">
+                      <label className="block text-white font-medium flex-1">
+                        {question.label}
+                        {question.required && <span className="text-pink-400 ml-1">*</span>}
+                      </label>
+                      {question.exampleAnswers && question.exampleAnswers.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowHelpFor(showHelpFor === question.id ? null : question.id)}
+                          className="ml-2 p-1 rounded-full hover:bg-white/10 transition-colors"
+                        >
+                          <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Help popup */}
+                    {showHelpFor === question.id && question.exampleAnswers && (
+                      <div className="absolute top-12 right-4 z-50 bg-slate-700 text-white p-4 rounded-xl shadow-2xl max-w-sm w-80 border border-purple-500/30 animate-fadeIn">
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-semibold text-sm text-purple-300">Exempelsvar:</h4>
+                          <button onClick={() => setShowHelpFor(null)} className="text-white/60 hover:text-white">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div className="space-y-2">
+                          {question.exampleAnswers.map((example: string, idx: number) => (
+                            <p key={idx} className="text-sm text-white/90 italic">"{example}"</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Input fields */}
+                    {question.type === 'text' && (
+                      <input
+                        type="text"
+                        value={answers[question.id] || ''}
+                        onChange={(e) => handleAnswer(question.id, e.target.value)}
+                        placeholder={question.placeholder}
+                        maxLength={question.max}
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      />
+                    )}
+
+                    {question.type === 'textarea' && (
+                      <textarea
+                        value={answers[question.id] || ''}
+                        onChange={(e) => handleAnswer(question.id, e.target.value)}
+                        placeholder={question.placeholder}
+                        rows={4}
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                      />
+                    )}
+
+                    {question.type === 'scale' && (
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((value) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => handleAnswer(question.id, value)}
+                            className={`flex-1 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 ${
+                              answers[question.id] === value
+                                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                                : 'bg-white/10 text-white/60 hover:bg-white/20'
+                            }`}
+                          >
+                            {value}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {question.type === 'number' && (
+                      <input
+                        type="number"
+                        value={answers[question.id] || ''}
+                        onChange={(e) => handleAnswer(question.id, e.target.value)}
+                        placeholder={question.placeholder}
+                        min={question.min}
+                        max={question.max}
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      />
+                    )}
+
+                    {question.type === 'select' && (
+                      <select
+                        value={answers[question.id] || ''}
+                        onChange={(e) => handleAnswer(question.id, e.target.value)}
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all appearance-none"
+                        style={{ backgroundImage: 'url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3E%3Cpath stroke=\'%236b7280\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'m6 8 4 4 4-4\'/%3E%3C/svg%3E")', backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
+                      >
+                        <option value="">Välj...</option>
+                        {question.options?.map((option: string) => (
+                          <option key={option} value={option} className="bg-slate-800">
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+
+                    {question.type === 'percentage' && (
+                      <div className="relative">
+                        <input
+                          type="number"
+                          value={answers[question.id] || ''}
+                          onChange={(e) => handleAnswer(question.id, e.target.value)}
+                          placeholder={question.placeholder}
+                          min={0}
+                          max={100}
+                          className="w-full px-4 py-3 pr-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        />
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none">%</span>
+                      </div>
+                    )}
+
+                    {question.type === 'multi_input' && (
+                      <div className="grid grid-cols-2 gap-4">
+                        {question.multiInputs?.map((input: any) => (
+                          <div key={input.id}>
+                            <label className="text-sm text-white/60 mb-1 block">{input.label}</label>
+                            <input
+                              type={input.type === 'percentage' ? 'number' : input.type}
+                              value={answers[question.id]?.[input.id] || ''}
+                              onChange={(e) => handleAnswer(question.id, {
+                                ...answers[question.id],
+                                [input.id]: e.target.value
+                              })}
+                              placeholder={input.placeholder}
+                              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-all"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {question.help && (
+                      <p className="text-sm text-white/60 mt-2 italic">{question.help}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Privacy policy checkbox */}
+              {currentPage === 0 && (
+                <div className="flex items-center mb-6">
+                  <input
+                    type="checkbox"
+                    id="privacyPolicy"
+                    checked={policyAccepted}
+                    onChange={(e) => setPolicyAccepted(e.target.checked)}
+                    className="w-4 h-4 text-purple-500 bg-white/10 border-white/20 rounded focus:ring-purple-500"
+                  />
+                  <label htmlFor="privacyPolicy" className="ml-2 text-sm text-white/80">
+                    Jag godkänner{' '}
+                    <Link href="/integritet" target="_blank" className="underline text-purple-400">
+                      integritetspolicyn
+                    </Link>
+                  </label>
+                </div>
+              )}
+
+              {/* Navigation buttons */}
+              <div className="flex justify-between gap-4">
+                <button
+                  onClick={handleBack}
+                  disabled={currentPage === 0}
+                  className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium transform hover:scale-105 disabled:hover:scale-100"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Tillbaka
+                  </span>
+                </button>
+                
+                {currentPage === totalPages - 1 ? (
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!isPageValid() || isSubmitting}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100"
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Analyserar...
+                      </span>
+                    ) : (
+                      'Analysera'
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleNext}
+                    disabled={!isPageValid()}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      Nästa
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                  </button>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-16">
+              <div className="mb-8">
+                <div className="w-32 h-32 mx-auto relative">
+                  <svg className="w-32 h-32 transform -rotate-90">
+                    <circle cx="64" cy="64" r="60" stroke="currentColor" strokeWidth="8" fill="none" className="text-white/10" />
+                    <circle cx="64" cy="64" r="60" stroke="currentColor" strokeWidth="8" fill="none"
+                      strokeDasharray={`${2 * Math.PI * 60}`}
+                      strokeDashoffset={`${2 * Math.PI * 60 * (1 - progress / 100)}`}
+                      className="text-purple-500 transition-all duration-300"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-3xl font-bold text-white">{Math.round(progress)}%</span>
+                  </div>
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">Analyserar er affärsplan...</h3>
+              <p className="text-white/60">{statusMessage}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+
+        .animate-shimmer {
+          animation: shimmer 2s infinite;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default DesktopBusinessWizard;

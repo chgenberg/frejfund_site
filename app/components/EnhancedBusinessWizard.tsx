@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { INVESTOR_QUESTION_SECTIONS } from './InvestorQuestions';
 import { getSupabaseClient } from '../../lib/supabase';
 import MobileOptimizedWizard from './MobileOptimizedWizard';
+import DesktopBusinessWizard from './DesktopBusinessWizard';
 
 const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const [currentSection, setCurrentSection] = useState(0);
@@ -59,8 +60,8 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
     return <MobileOptimizedWizard open={open} onClose={onClose} />;
   }
 
-  const section = INVESTOR_QUESTION_SECTIONS[currentSection];
-  const totalSections = INVESTOR_QUESTION_SECTIONS.length;
+  // Use desktop-optimized wizard for desktop devices  
+  return <DesktopBusinessWizard open={open} onClose={onClose} />;
 
   const handleAnswer = (questionId: string, value: any) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));

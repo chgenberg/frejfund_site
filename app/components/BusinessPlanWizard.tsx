@@ -2,6 +2,7 @@
 import { getSupabaseClient } from '../../lib/supabase';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   Question,
   BusinessPlanAnswers,
@@ -128,6 +129,7 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [showMarketPopup, setShowMarketPopup] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [policyAccepted, setPolicyAccepted] = useState(false);
   
   const current: Question = INVESTOR_QUESTIONS[step];
 
@@ -143,6 +145,7 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
   }, []);
 
   const isCurrentStepValid = () => {
+    if (step === 0 && !policyAccepted) return false;
     if (!current.required) return true;
     
     const answer = answers[current.id];
@@ -211,6 +214,18 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
         status: 'pending', // Or 'completed', 'failed'
       });
 
+      // Spara txt-fil med alla svar
+      fetch('/api/save-customer-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: answers.contact_email || null,
+          company: answers.company_name || null,
+          url: answers.website_url || null,
+          answers
+        })
+      }).catch(err => console.error('save-customer-data error', err));
+
       if (error) {
         console.error('Error saving analysis:', error);
         alert('Fel vid sparande av affärsplan.');
@@ -245,6 +260,24 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
                         <textarea value={answers[current.id] || ''} onChange={(e) => setAnswers({...answers, [current.id]: e.target.value})} className={inputBase} rows={3} />
                         <button onClick={() => setShowMarketPopup(true)} className="mt-2 text-sm text-purple-400 hover:underline">Hjälp mig uppskatta</button>
                     </div>
+                )}
+
+                {step === 0 && (
+                  <div className="flex items-center mt-4">
+                    <input
+                      type="checkbox"
+                      id="privacyPolicy"
+                      checked={policyAccepted}
+                      onChange={(e) => setPolicyAccepted(e.target.checked)}
+                      className="w-4 h-4 text-purple-500 bg-white/10 border-white/20 rounded focus:ring-purple-500"
+                    />
+                    <label htmlFor="privacyPolicy" className="ml-2 text-sm text-white/80">
+                      Jag godkänner{' '}
+                      <Link href="/integritet" target="_blank" className="underline text-purple-400">
+                        integritetspolicyn
+                      </Link>
+                    </label>
+                  </div>
                 )}
             </div>
 
