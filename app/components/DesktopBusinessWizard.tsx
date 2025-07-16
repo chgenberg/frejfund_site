@@ -270,7 +270,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
   const progress = ((currentPage + 1) / totalPages) * 100;
 
   return (
-    <div className="fixed inset-0 z-[200] bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900" data-wizard-open="true">
+    <div className="fixed inset-0 z-[200] bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900 overflow-y-auto" data-wizard-open="true">
       {/* Website scraping overlay - same as mobile */}
       {isScrapingWebsite && (
         <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center">
@@ -299,12 +299,12 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
       )}
 
       {/* Main content */}
-      <div className="min-h-screen flex items-start justify-center p-4 pt-8 overflow-y-auto">
-        <div className="bg-gradient-to-br from-slate-900/90 via-purple-900/20 to-slate-900/90 backdrop-blur-md rounded-3xl p-6 max-w-4xl w-full shadow-2xl border border-purple-500/20 my-4">
+      <div className="h-screen flex items-center justify-center p-4">
+        <div className="bg-gradient-to-br from-slate-900/95 via-purple-900/30 to-slate-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-purple-500/30 max-w-3xl w-full h-[90vh] flex flex-col">
           {!isSubmitting ? (
             <>
-              {/* Header */}
-              <div className="mb-6">
+              {/* Fixed Header */}
+              <div className="p-6 pb-0">
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <h2 className="text-2xl font-bold text-white">Investeringsanalys</h2>
@@ -338,252 +338,259 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
                 </div>
               </div>
 
-              {/* Questions */}
-              <div className="grid gap-4 mb-6">
-                {questionsOnCurrentPage.map((question, index) => (
-                  <div key={question.id} className="bg-slate-800/60 backdrop-blur-md rounded-2xl p-4 border border-white/10 hover:border-purple-500/30 transition-all duration-300 shadow-lg relative">
-                    {index === 0 && currentPage === 0 && (
-                      <div className="flex items-center gap-3 mb-4">
-                        <span className="text-2xl">{question.sectionIcon}</span>
-                        <h3 className="text-lg font-semibold text-white/80">{question.sectionTitle}</h3>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-start justify-between mb-3">
-                      <label className="block text-white font-medium flex-1">
-                        {question.label}
-                        {question.required && <span className="text-pink-400 ml-1">*</span>}
-                      </label>
-                      {question.exampleAnswers && question.exampleAnswers.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setShowHelpFor(showHelpFor === question.id ? null : question.id)}
-                          className="ml-2 p-1 rounded-full hover:bg-white/10 transition-colors"
-                        >
-                          <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </button>
+              {/* Scrollable content area */}
+              <div className="flex-1 overflow-y-auto px-6 pb-0">
+                <div className="grid gap-4 py-4">
+                  {questionsOnCurrentPage.map((question, index) => (
+                    <div key={question.id} className="bg-slate-800/60 backdrop-blur-md rounded-2xl p-4 border border-white/10 hover:border-purple-500/30 transition-all duration-300 shadow-lg relative">
+                      {index === 0 && currentPage === 0 && (
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className="text-2xl">{question.sectionIcon}</span>
+                          <h3 className="text-lg font-semibold text-white/80">{question.sectionTitle}</h3>
+                        </div>
                       )}
-                    </div>
-
-                    {/* Help popup */}
-                    {showHelpFor === question.id && question.exampleAnswers && (
-                      <div className="absolute top-12 right-4 z-50 bg-slate-700 text-white p-4 rounded-xl shadow-2xl max-w-sm w-80 border border-purple-500/30 animate-fadeIn">
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-semibold text-sm text-purple-300">Exempelsvar:</h4>
-                          <button onClick={() => setShowHelpFor(null)} className="text-white/60 hover:text-white">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      
+                      <div className="flex items-start justify-between mb-3">
+                        <label className="block text-white font-medium flex-1">
+                          {question.label}
+                          {question.required && <span className="text-pink-400 ml-1">*</span>}
+                        </label>
+                        {question.exampleAnswers && question.exampleAnswers.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setShowHelpFor(showHelpFor === question.id ? null : question.id)}
+                            className="ml-2 p-1 rounded-full hover:bg-white/10 transition-colors"
+                          >
+                            <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </button>
+                        )}
+                      </div>
+
+                      {/* Help popup */}
+                      {showHelpFor === question.id && question.exampleAnswers && (
+                        <div className="absolute top-12 right-4 z-50 bg-slate-700 text-white p-4 rounded-xl shadow-2xl max-w-sm w-80 border border-purple-500/30 animate-fadeIn">
+                          <div className="flex items-start justify-between mb-2">
+                            <h4 className="font-semibold text-sm text-purple-300">Exempelsvar:</h4>
+                            <button onClick={() => setShowHelpFor(null)} className="text-white/60 hover:text-white">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                          <div className="space-y-2">
+                            {question.exampleAnswers.map((example: string, idx: number) => (
+                              <p key={idx} className="text-sm text-white/90 italic">"{example}"</p>
+                            ))}
+                          </div>
                         </div>
-                        <div className="space-y-2">
-                          {question.exampleAnswers.map((example: string, idx: number) => (
-                            <p key={idx} className="text-sm text-white/90 italic">"{example}"</p>
+                      )}
+
+                      {/* Input fields */}
+                      {question.type === 'text' && (
+                        <input
+                          type="text"
+                          value={answers[question.id] || ''}
+                          onChange={(e) => handleAnswer(question.id, e.target.value)}
+                          placeholder={question.placeholder}
+                          maxLength={question.max}
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        />
+                      )}
+
+                      {question.type === 'textarea' && (
+                        <textarea
+                          value={answers[question.id] || ''}
+                          onChange={(e) => handleAnswer(question.id, e.target.value)}
+                          placeholder={question.placeholder}
+                          rows={4}
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                        />
+                      )}
+
+                      {question.type === 'scale' && (
+                        <div className="flex gap-2">
+                          {[1, 2, 3, 4, 5].map((value) => (
+                            <button
+                              key={value}
+                              type="button"
+                              onClick={() => handleAnswer(question.id, value)}
+                              className={`flex-1 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 ${
+                                answers[question.id] === value
+                                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                                  : 'bg-white/10 text-white/60 hover:bg-white/20'
+                              }`}
+                            >
+                              {value}
+                            </button>
                           ))}
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* Input fields */}
-                    {question.type === 'text' && (
-                      <input
-                        type="text"
-                        value={answers[question.id] || ''}
-                        onChange={(e) => handleAnswer(question.id, e.target.value)}
-                        placeholder={question.placeholder}
-                        maxLength={question.max}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                      />
-                    )}
-
-                    {question.type === 'textarea' && (
-                      <textarea
-                        value={answers[question.id] || ''}
-                        onChange={(e) => handleAnswer(question.id, e.target.value)}
-                        placeholder={question.placeholder}
-                        rows={4}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
-                      />
-                    )}
-
-                    {question.type === 'scale' && (
-                      <div className="flex gap-2">
-                        {[1, 2, 3, 4, 5].map((value) => (
-                          <button
-                            key={value}
-                            type="button"
-                            onClick={() => handleAnswer(question.id, value)}
-                            className={`flex-1 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 ${
-                              answers[question.id] === value
-                                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                                : 'bg-white/10 text-white/60 hover:bg-white/20'
-                            }`}
-                          >
-                            {value}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {question.type === 'number' && (
-                      <input
-                        type="number"
-                        value={answers[question.id] || ''}
-                        onChange={(e) => handleAnswer(question.id, e.target.value)}
-                        placeholder={question.placeholder}
-                        min={question.min}
-                        max={question.max}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                      />
-                    )}
-
-                    {question.type === 'select' && (
-                      <select
-                        value={answers[question.id] || ''}
-                        onChange={(e) => handleAnswer(question.id, e.target.value)}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all appearance-none"
-                        style={{ backgroundImage: 'url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3E%3Cpath stroke=\'%236b7280\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'m6 8 4 4 4-4\'/%3E%3C/svg%3E")', backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
-                      >
-                        <option value="">Välj...</option>
-                        {question.options?.map((option: string) => (
-                          <option key={option} value={option} className="bg-slate-800">
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-
-                    {question.type === 'percentage' && (
-                      <div className="relative">
+                      {question.type === 'number' && (
                         <input
                           type="number"
                           value={answers[question.id] || ''}
                           onChange={(e) => handleAnswer(question.id, e.target.value)}
                           placeholder={question.placeholder}
-                          min={0}
-                          max={100}
-                          className="w-full px-4 py-3 pr-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                          min={question.min}
+                          max={question.max}
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                         />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none">%</span>
-                      </div>
-                    )}
+                      )}
 
-                    {question.type === 'multi_input' && (
-                      <div className="grid grid-cols-2 gap-4">
-                        {question.multiInputs?.map((input: any) => (
-                          <div key={input.id}>
-                            <label className="text-sm text-white/60 mb-1 block">{input.label}</label>
-                            <input
-                              type={input.type === 'percentage' ? 'number' : input.type}
-                              value={answers[question.id]?.[input.id] || ''}
-                              onChange={(e) => handleAnswer(question.id, {
-                                ...answers[question.id],
-                                [input.id]: e.target.value
-                              })}
-                              placeholder={input.placeholder}
-                              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-all"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                      {question.type === 'select' && (
+                        <select
+                          value={answers[question.id] || ''}
+                          onChange={(e) => handleAnswer(question.id, e.target.value)}
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all appearance-none"
+                          style={{ backgroundImage: 'url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3E%3Cpath stroke=\'%236b7280\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'m6 8 4 4 4-4\'/%3E%3C/svg%3E")', backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
+                        >
+                          <option value="">Välj...</option>
+                          {question.options?.map((option: string) => (
+                            <option key={option} value={option} className="bg-slate-800">
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      )}
 
-                    {question.help && (
-                      <p className="text-sm text-white/60 mt-2 italic">{question.help}</p>
-                    )}
-                  </div>
-                ))}
+                      {question.type === 'percentage' && (
+                        <div className="relative">
+                          <input
+                            type="number"
+                            value={answers[question.id] || ''}
+                            onChange={(e) => handleAnswer(question.id, e.target.value)}
+                            placeholder={question.placeholder}
+                            min={0}
+                            max={100}
+                            className="w-full px-4 py-3 pr-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                          />
+                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none">%</span>
+                        </div>
+                      )}
+
+                      {question.type === 'multi_input' && (
+                        <div className="grid grid-cols-2 gap-4">
+                          {question.multiInputs?.map((input: any) => (
+                            <div key={input.id}>
+                              <label className="text-sm text-white/60 mb-1 block">{input.label}</label>
+                              <input
+                                type={input.type === 'percentage' ? 'number' : input.type}
+                                value={answers[question.id]?.[input.id] || ''}
+                                onChange={(e) => handleAnswer(question.id, {
+                                  ...answers[question.id],
+                                  [input.id]: e.target.value
+                                })}
+                                placeholder={input.placeholder}
+                                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-all"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {question.help && (
+                        <p className="text-sm text-white/60 mt-2 italic">{question.help}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* Privacy policy checkbox */}
-              {currentPage === 0 && (
-                <div className="flex items-center mb-6">
-                  <input
-                    type="checkbox"
-                    id="privacyPolicy"
-                    checked={policyAccepted}
-                    onChange={(e) => setPolicyAccepted(e.target.checked)}
-                    className="w-4 h-4 text-purple-500 bg-white/10 border-white/20 rounded focus:ring-purple-500"
-                  />
-                  <label htmlFor="privacyPolicy" className="ml-2 text-sm text-white/80">
-                    Jag godkänner{' '}
-                    <Link href="/integritet" target="_blank" className="underline text-purple-400">
-                      integritetspolicyn
-                    </Link>
-                  </label>
-                </div>
-              )}
+              {/* Fixed bottom section with policy and navigation */}
+              <div className="p-6 pt-2 bg-gradient-to-t from-slate-900 to-transparent">
+                {/* Privacy policy checkbox */}
+                {currentPage === 0 && (
+                  <div className="flex items-center mb-4">
+                    <input
+                      type="checkbox"
+                      id="privacyPolicy"
+                      checked={policyAccepted}
+                      onChange={(e) => setPolicyAccepted(e.target.checked)}
+                      className="w-4 h-4 text-purple-500 bg-white/10 border-white/20 rounded focus:ring-purple-500"
+                    />
+                    <label htmlFor="privacyPolicy" className="ml-2 text-sm text-white/80">
+                      Jag godkänner{' '}
+                      <Link href="/integritet" target="_blank" className="underline text-purple-400 hover:text-purple-300">
+                        integritetspolicyn
+                      </Link>
+                    </label>
+                  </div>
+                )}
 
-              {/* Navigation buttons */}
-              <div className="flex justify-between gap-4">
-                <button
-                  onClick={handleBack}
-                  disabled={currentPage === 0}
-                  className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium transform hover:scale-105 disabled:hover:scale-100"
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    Tillbaka
-                  </span>
-                </button>
-                
-                {currentPage === totalPages - 1 ? (
+                {/* Navigation buttons */}
+                <div className="flex justify-between gap-4">
                   <button
-                    onClick={handleSubmit}
-                    disabled={!isPageValid() || isSubmitting}
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100"
-                  >
-                    {isSubmitting ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Analyserar...
-                      </span>
-                    ) : (
-                      'Analysera'
-                    )}
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleNext}
-                    disabled={!isPageValid()}
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100"
+                    onClick={handleBack}
+                    disabled={currentPage === 0}
+                    className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium transform hover:scale-105 disabled:hover:scale-100"
                   >
                     <span className="flex items-center justify-center gap-2">
-                      Nästa
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
+                      Tillbaka
                     </span>
                   </button>
-                )}
+                  
+                  {currentPage === totalPages - 1 ? (
+                    <button
+                      onClick={handleSubmit}
+                      disabled={!isPageValid() || isSubmitting}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100"
+                    >
+                      {isSubmitting ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Analyserar...
+                        </span>
+                      ) : (
+                        'Analysera'
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleNext}
+                      disabled={!isPageValid()}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        Nästa
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </span>
+                    </button>
+                  )}
+                </div>
               </div>
             </>
           ) : (
-            <div className="text-center py-16">
-              <div className="mb-8">
-                <div className="w-32 h-32 mx-auto relative">
-                  <svg className="w-32 h-32 transform -rotate-90">
-                    <circle cx="64" cy="64" r="60" stroke="currentColor" strokeWidth="8" fill="none" className="text-white/10" />
-                    <circle cx="64" cy="64" r="60" stroke="currentColor" strokeWidth="8" fill="none"
-                      strokeDasharray={`${2 * Math.PI * 60}`}
-                      strokeDashoffset={`${2 * Math.PI * 60 * (1 - progress / 100)}`}
-                      className="text-purple-500 transition-all duration-300"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-3xl font-bold text-white">{Math.round(progress)}%</span>
+            <div className="flex items-center justify-center h-full p-6">
+              <div className="text-center">
+                <div className="mb-8">
+                  <div className="w-32 h-32 mx-auto relative">
+                    <svg className="w-32 h-32 transform -rotate-90">
+                      <circle cx="64" cy="64" r="60" stroke="currentColor" strokeWidth="8" fill="none" className="text-white/10" />
+                      <circle cx="64" cy="64" r="60" stroke="currentColor" strokeWidth="8" fill="none"
+                        strokeDasharray={`${2 * Math.PI * 60}`}
+                        strokeDashoffset={`${2 * Math.PI * 60 * (1 - progress / 100)}`}
+                        className="text-purple-500 transition-all duration-300"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-3xl font-bold text-white">{Math.round(progress)}%</span>
+                    </div>
                   </div>
                 </div>
+                <h3 className="text-2xl font-bold text-white mb-4">Analyserar er affärsplan...</h3>
+                <p className="text-white/60">{statusMessage}</p>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Analyserar er affärsplan...</h3>
-              <p className="text-white/60">{statusMessage}</p>
             </div>
           )}
         </div>
