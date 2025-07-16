@@ -299,15 +299,15 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
       )}
 
       {/* Main content */}
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="bg-gradient-to-br from-slate-900/90 via-purple-900/20 to-slate-900/90 backdrop-blur-md rounded-3xl p-8 max-w-5xl w-full shadow-2xl border border-purple-500/20">
+      <div className="min-h-screen flex items-start justify-center p-4 pt-8 overflow-y-auto">
+        <div className="bg-gradient-to-br from-slate-900/90 via-purple-900/20 to-slate-900/90 backdrop-blur-md rounded-3xl p-6 max-w-4xl w-full shadow-2xl border border-purple-500/20 my-4">
           {!isSubmitting ? (
             <>
               {/* Header */}
-              <div className="mb-8">
-                <div className="flex justify-between items-center mb-6">
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-4">
                   <div>
-                    <h2 className="text-3xl font-bold text-white">Investeringsanalys</h2>
+                    <h2 className="text-2xl font-bold text-white">Investeringsanalys</h2>
                     <p className="text-white/70 text-sm mt-1">
                       {questionsOnCurrentPage[0]?.sectionTitle || 'Företagsinformation'}
                     </p>
@@ -339,9 +339,9 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
               </div>
 
               {/* Questions */}
-              <div className="grid gap-6 mb-8">
+              <div className="grid gap-4 mb-6">
                 {questionsOnCurrentPage.map((question, index) => (
-                  <div key={question.id} className="bg-slate-800/60 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-purple-500/30 transition-all duration-300 shadow-lg relative">
+                  <div key={question.id} className="bg-slate-800/60 backdrop-blur-md rounded-2xl p-4 border border-white/10 hover:border-purple-500/30 transition-all duration-300 shadow-lg relative">
                     {index === 0 && currentPage === 0 && (
                       <div className="flex items-center gap-3 mb-4">
                         <span className="text-2xl">{question.sectionIcon}</span>
