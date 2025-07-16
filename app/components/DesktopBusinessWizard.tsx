@@ -14,6 +14,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
   const [isScrapingWebsite, setIsScrapingWebsite] = useState(false);
   const [scrapingProgress, setScrapingProgress] = useState(0);
   const [showHelpFor, setShowHelpFor] = useState<string | null>(null);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
   const router = useRouter();
 
   // Get all questions flattened with section info
@@ -169,6 +170,32 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setStatusMessage('Genererar investeringsanalys...');
+    setAnalysisProgress(0);
+    
+    // Animate progress from 0 to 100
+    let progressInterval: NodeJS.Timeout;
+    progressInterval = setInterval(() => {
+      setAnalysisProgress(prev => {
+        const newProgress = prev + Math.random() * 15 + 5;
+        
+        // Update status messages based on progress
+        if (newProgress > 20 && newProgress <= 40) {
+          setStatusMessage('Analyserar affärsmodell...');
+        } else if (newProgress > 40 && newProgress <= 60) {
+          setStatusMessage('Beräknar marknadspotential...');
+        } else if (newProgress > 60 && newProgress <= 80) {
+          setStatusMessage('Utvärderar finansiella prognoser...');
+        } else if (newProgress > 80) {
+          setStatusMessage('Slutför analys...');
+        }
+        
+        if (newProgress >= 90) {
+          clearInterval(progressInterval);
+          return 90;
+        }
+        return newProgress;
+      });
+    }, 700);
     
     try {
       // Save raw data as txt file
@@ -219,6 +246,13 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
             });
         }
         
+        // Complete progress animation
+        clearInterval(progressInterval);
+        setAnalysisProgress(100);
+        
+        // Small delay to show 100% before navigating
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         // Navigate to result page
         router.push('/result');
       } else {
@@ -227,6 +261,8 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
     } catch (error) {
       console.error('Error submitting:', error);
       setStatusMessage('Ett fel uppstod. Försök igen.');
+      clearInterval(progressInterval);
+      setAnalysisProgress(0);
       setIsSubmitting(false);
     }
   };
@@ -579,12 +615,12 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
                       <circle cx="64" cy="64" r="60" stroke="currentColor" strokeWidth="8" fill="none" className="text-white/10" />
                       <circle cx="64" cy="64" r="60" stroke="currentColor" strokeWidth="8" fill="none"
                         strokeDasharray={`${2 * Math.PI * 60}`}
-                        strokeDashoffset={`${2 * Math.PI * 60 * (1 - progress / 100)}`}
-                        className="text-purple-500 transition-all duration-300"
+                        strokeDashoffset={`${2 * Math.PI * 60 * (1 - analysisProgress / 100)}`}
+                        className="text-purple-500 transition-all duration-500"
                       />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-3xl font-bold text-white">{Math.round(progress)}%</span>
+                      <span className="text-3xl font-bold text-white">{Math.round(analysisProgress)}%</span>
                     </div>
                   </div>
                 </div>
