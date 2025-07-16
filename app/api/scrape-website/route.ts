@@ -41,16 +41,25 @@ export async function POST(request: Request) {
         maxRedirects: 5
       });
 
-      // Pre-process HTML to remove problematic style elements
+      // Pre-process HTML to remove problematic elements and resources
       let cleanedHtml = response.data
         .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // Remove all style tags
         .replace(/<link[^>]*rel=["']stylesheet["'][^>]*>/gi, '') // Remove stylesheet links
-        .replace(/style\s*=\s*["'][^"']*["']/gi, ''); // Remove inline styles
+        .replace(/<link[^>]*>/gi, '') // Remove all link tags
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') // Remove all script tags
+        .replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, '') // Remove iframes
+        .replace(/<video[^>]*>[\s\S]*?<\/video>/gi, '') // Remove videos
+        .replace(/<audio[^>]*>[\s\S]*?<\/audio>/gi, '') // Remove audio
+        .replace(/<img[^>]*>/gi, '') // Remove images
+        .replace(/<object[^>]*>[\s\S]*?<\/object>/gi, '') // Remove objects
+        .replace(/<embed[^>]*>/gi, '') // Remove embed tags
+        .replace(/style\s*=\s*["'][^"']*["']/gi, '') // Remove inline styles
+        .replace(/src\s*=\s*["'][^"']*["']/gi, '') // Remove src attributes
+        .replace(/href\s*=\s*["'][^"']*["']/gi, ''); // Remove href attributes
 
-      // Parse HTML with JSDOM
+      // Parse HTML with JSDOM - simple configuration
       const dom = new JSDOM(cleanedHtml, {
-        resources: "usable",
-        runScripts: "outside-only"
+        resources: "usable"
       });
       
       const document = dom.window.document;
