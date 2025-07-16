@@ -72,7 +72,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
   const isPageValid = () => {
     const pageValid = questionsOnCurrentPage.every(q => {
       if (q.id === 'website_url') {
-        if (answers.has_website === 'Ja') {
+        if (answers.has_website === 'Yes') {
           return answers.website_url && answers.website_url.trim() !== '';
         }
         return true;
@@ -140,7 +140,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
   const handleNext = () => {
     // Check if we should scrape website
     const currentPageQuestionIds = questionsOnCurrentPage.map(q => q.id);
-    if (currentPageQuestionIds.includes('website_url') && answers.has_website === 'Ja' && answers.website_url) {
+    if (currentPageQuestionIds.includes('website_url') && answers.has_website === 'Yes' && answers.website_url) {
       try {
         const url = answers.website_url;
         const urlToScrape = url.startsWith('http') ? url : `https://${url}`;

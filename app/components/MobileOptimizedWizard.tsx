@@ -170,9 +170,9 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
 
   const isPageValid = () => {
     return questionsOnCurrentPage.every(q => {
-      // Special handling for website_url - only required if has_website is "Ja"
+      // Special handling for website_url - only required if has_website is "Yes"
       if (q.id === 'website_url') {
-        if (answers.has_website === 'Ja') {
+        if (answers.has_website === 'Yes') {
           return answers.website_url && answers.website_url.trim() !== '';
         }
         return true; // Not required if no website
@@ -193,7 +193,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
     
     // If this page contains website questions and user has website with URL
     if ((hasWebsiteQuestionOnPage || hasUrlQuestionOnPage) && 
-        answers.has_website === 'Ja' && 
+        answers.has_website === 'Yes' && 
         answers.website_url && 
         answers.website_url.trim() !== '') {
       
