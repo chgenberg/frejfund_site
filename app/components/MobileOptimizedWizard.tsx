@@ -119,8 +119,8 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   };
 
   const renderQuestion = (question: any) => (
-    <div key={question.id} className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 animate-fadeIn shadow-lg">
-      <label className="block text-white/90 font-medium mb-3 text-sm md:text-base">
+    <div key={question.id} className="bg-slate-800/60 backdrop-blur-md rounded-2xl p-4 border border-white/30 animate-fadeIn shadow-xl">
+      <label className="block text-white font-medium mb-3 text-sm md:text-base">
         {question.label}
         {question.required && <span className="text-pink-400 ml-1">*</span>}
       </label>
@@ -264,20 +264,20 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   };
 
   return (
-    <div className="fixed inset-0 z-[110] bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
-      <div className="h-full flex flex-col">
+    <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-md">
+      <div className="h-full flex flex-col bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900">
         {/* Header with progress */}
-        <div className="bg-slate-900/80 backdrop-blur-md border-b border-white/10 px-4 py-3">
+        <div className="bg-slate-900/90 backdrop-blur-md border-b border-white/20 px-4 py-3">
           <div className="flex justify-between items-center mb-2">
             <div>
               <h2 className="text-lg font-bold text-white">Investeringsanalys</h2>
-              <p className="text-white/60 text-xs mt-0.5">
+              <p className="text-white/70 text-xs mt-0.5">
                 {questionsOnCurrentPage[0]?.sectionTitle || 'Frågor'}
               </p>
             </div>
             <button 
               onClick={onClose} 
-              className="text-white/60 hover:text-white p-1 transition-colors"
+              className="text-white/70 hover:text-white p-1 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -285,7 +285,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
             </button>
           </div>
           <div className="relative">
-            <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
               <div 
                 className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500 ease-out relative"
                 style={{ width: `${progress}%` }}
@@ -293,14 +293,14 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
                 <div className="absolute inset-0 bg-white/20 animate-shimmer"></div>
               </div>
             </div>
-            <p className="text-white/60 text-xs mt-1 text-center">
+            <p className="text-white/70 text-xs mt-1 text-center">
               Sida {currentPage + 1} av {totalPages}
             </p>
           </div>
         </div>
 
         {/* Questions container - no scroll */}
-        <div className="flex-1 px-4 py-4 flex flex-col justify-center overflow-hidden bg-slate-900/60"
+        <div className="flex-1 px-4 py-4 flex flex-col justify-center overflow-hidden bg-slate-900/40"
              onTouchStart={handleTouchStart}
              onTouchMove={handleTouchMove}
              onTouchEnd={handleTouchEnd}
@@ -312,7 +312,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
         </div>
 
         {/* Navigation buttons - sticky at bottom */}
-        <div className="bg-slate-900/80 backdrop-blur-md border-t border-white/10 px-4 py-4 safe-area-inset-bottom">
+        <div className="bg-slate-900/90 backdrop-blur-md border-t border-white/20 px-4 py-4 safe-area-inset-bottom">
           <div className="flex justify-between gap-4 max-w-lg mx-auto">
             <button
               onClick={handleBack}

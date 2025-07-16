@@ -159,7 +159,7 @@ const EnhancedBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () 
   };
 
   return (
-    <div className="fixed inset-0 z-[110] overflow-auto bg-black/90 backdrop-blur-xl">
+    <div className="fixed inset-0 z-[200] overflow-auto bg-black/85 backdrop-blur-md">
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 rounded-3xl p-4 md:p-8 max-w-4xl w-full shadow-2xl border border-purple-500/20 max-h-[90vh] overflow-y-auto">
           {!isSubmitting ? (
