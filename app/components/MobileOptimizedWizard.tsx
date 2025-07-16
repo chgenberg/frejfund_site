@@ -502,7 +502,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   };
 
   return (
-    <div className="fixed inset-0 z-[200] bg-slate-900">
+    <div className="fixed inset-0 z-[200] bg-slate-900" data-wizard-open="true">
       <div className="h-full flex flex-col bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900">
         {/* Loading overlay for website scraping */}
         {isScrapingWebsite && (

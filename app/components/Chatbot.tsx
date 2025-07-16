@@ -11,6 +11,7 @@ const EXAMPLES = [
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [messages, setMessages] = useState([
     { role: "assistant", content: "Hej! Jag är FrejFunds AI-medarbetare. Hur kan jag hjälpa dig idag?" },
   ]);
@@ -20,11 +21,45 @@ export default function Chatbot() {
   const [feedback, setFeedback] = useState<{ [key: number]: 'up' | 'down' | null }>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Check if wizard is open by monitoring DOM
+  useEffect(() => {
+    const checkWizardState = () => {
+      // Look for wizard container with data-wizard-open attribute
+      const wizardElement = document.querySelector('[data-wizard-open="true"]');
+      setIsWizardOpen(!!wizardElement);
+    };
+
+    // Check immediately
+    checkWizardState();
+
+    // Check periodically while component is mounted
+    const interval = setInterval(checkWizardState, 300);
+
+    // Also listen for DOM mutations for immediate updates
+    const observer = new MutationObserver(checkWizardState);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['data-wizard-open']
+    });
+
+    return () => {
+      clearInterval(interval);
+      observer.disconnect();
+    };
+  }, []);
+
   useEffect(() => {
     if (open && !minimized) {
       setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
     }
   }, [messages, open, minimized]);
+
+  // Hide chatbot completely when wizard is open
+  if (isWizardOpen) {
+    return null;
+  }
 
   const sendMessage = async (msg: string) => {
     if (!msg.trim()) return;
