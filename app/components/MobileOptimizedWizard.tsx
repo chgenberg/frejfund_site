@@ -142,13 +142,15 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
         // Pre-fill the answers with scraped data
         setAnswers(prev => ({
           ...prev,
-          customer_pain: data.data.customer_pain || prev.customer_pain || '',
-          solution: data.data.solution || prev.solution || '',
+          customer_pain_points: data.data.customer_pain || prev.customer_pain_points || '',
+          solution_description: data.data.solution || prev.solution_description || '',
           elevator_pitch: data.data.elevator_pitch || prev.elevator_pitch || '',
           target_customer: data.data.target_customer || prev.target_customer || '',
           unique_tech: data.data.unique_tech || prev.unique_tech || '',
-          company_value: data.data.company_value || prev.company_value || '',
-          traction: data.data.traction || prev.traction || ''
+          team_overview: data.data.team || prev.team_overview || '',
+          revenue_model: data.data.revenue_model || prev.revenue_model || '',
+          traction_overview: data.data.traction || prev.traction_overview || '',
+          company_value: data.data.company_value || prev.company_value || ''
         }));
         
         setScrapingProgress(100);
