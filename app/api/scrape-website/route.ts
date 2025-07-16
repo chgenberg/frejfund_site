@@ -41,8 +41,18 @@ export async function POST(request: Request) {
         maxRedirects: 5
       });
 
+      // Pre-process HTML to remove problematic style elements
+      let cleanedHtml = response.data
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // Remove all style tags
+        .replace(/<link[^>]*rel=["']stylesheet["'][^>]*>/gi, '') // Remove stylesheet links
+        .replace(/style\s*=\s*["'][^"']*["']/gi, ''); // Remove inline styles
+
       // Parse HTML with JSDOM
-      const dom = new JSDOM(response.data);
+      const dom = new JSDOM(cleanedHtml, {
+        resources: "usable",
+        runScripts: "outside-only"
+      });
+      
       const document = dom.window.document;
 
       // Remove unnecessary elements
