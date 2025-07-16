@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import axios from 'axios';
-import * as cheerio from 'cheerio';
+import { JSDOM } from 'jsdom';
 
 export async function POST(request: Request) {
   try {
@@ -20,14 +20,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
-    console.log('🔍 Scraping website with Cheerio:', url);
+    console.log('🔍 Scraping website with JSDOM:', url);
 
     // Prepare URL
     const targetUrl = url.startsWith('http') ? url : `https://${url}`;
 
     let scrapedContent;
     try {
-      // Scrape website content using axios and cheerio
+      // Scrape website content using axios and JSDOM
       const response = await axios.get(targetUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -41,21 +41,27 @@ export async function POST(request: Request) {
         maxRedirects: 5
       });
 
-      const $ = cheerio.load(response.data);
+      // Parse HTML with JSDOM
+      const dom = new JSDOM(response.data);
+      const document = dom.window.document;
 
       // Remove unnecessary elements
-      $('script, style, nav, footer, header, .nav, .footer, .header').remove();
+      const elementsToRemove = document.querySelectorAll('script, style, nav, footer, header, .nav, .footer, .header');
+      elementsToRemove.forEach(el => el.remove());
 
       // Extract title
-      const title = $('title').text().trim();
+      const titleElement = document.querySelector('title');
+      const title = titleElement ? titleElement.textContent?.trim() || '' : '';
 
       // Extract meta description
-      const metaDescription = $('meta[name="description"]').attr('content') || '';
+      const metaElement = document.querySelector('meta[name="description"]');
+      const metaDescription = metaElement ? metaElement.getAttribute('content') || '' : '';
 
       // Extract headings
       const headings: string[] = [];
-      $('h1, h2, h3').each((_, element) => {
-        const text = $(element).text().trim();
+      const headingElements = document.querySelectorAll('h1, h2, h3');
+      headingElements.forEach(el => {
+        const text = el.textContent?.trim();
         if (text && text.length > 5) {
           headings.push(text);
         }
@@ -63,8 +69,9 @@ export async function POST(request: Request) {
 
       // Extract paragraphs
       const paragraphs: string[] = [];
-      $('p').each((_, element) => {
-        const text = $(element).text().trim();
+      const paragraphElements = document.querySelectorAll('p');
+      paragraphElements.forEach(el => {
+        const text = el.textContent?.trim();
         if (text && text.length > 20) {
           paragraphs.push(text);
         }
@@ -81,8 +88,9 @@ export async function POST(request: Request) {
 
       const additionalContent: string[] = [];
       contentSelectors.forEach(selector => {
-        $(selector).each((_, element) => {
-          const text = $(element).text().trim();
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+          const text = el.textContent?.trim();
           if (text && text.length > 50) {
             // Limit to 500 characters per section
             additionalContent.push(text.substring(0, 500));
