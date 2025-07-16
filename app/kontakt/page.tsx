@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function Kontakt() {
+export default function Contact() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -11,7 +11,7 @@ export default function Kontakt() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Här kan du lägga till logik för att hantera formuläret
+    // Here you can add logic to handle the form
     console.log('Form submitted:', formData);
   };
 
@@ -25,17 +25,17 @@ export default function Kontakt() {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center px-2 py-12">
-      <h1 className="text-3xl md:text-4xl font-extrabold text-[#16475b] tracking-widest text-center mb-10 mt-2 uppercase">KONTAKT</h1>
+      <h1 className="text-3xl md:text-4xl font-extrabold text-[#16475b] tracking-widest text-center mb-10 mt-2 uppercase">CONTACT</h1>
       {/* Background Image */}
       <div className="w-full max-w-sm">
         <div className="mb-4 text-center">
-          <h2 className="text-xl font-bold text-[#16475b] tracking-wide">Har du frågor?</h2>
-          <p className="text-[#16475b]/80 mt-1">Fyll i formuläret så återkommer vi inom kort.</p>
+          <h2 className="text-xl font-bold text-[#16475b] tracking-wide">Have questions?</h2>
+          <p className="text-[#16475b]/80 mt-1">Fill out the form and we'll get back to you shortly.</p>
         </div>
-        {/* Kontaktformulär */}
+        {/* Contact form */}
         <div className="w-full mt-6">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white/90 rounded-2xl shadow-md border border-gray-100 p-6">
-            <label className="font-semibold text-[#16475b]" htmlFor="name">Namn</label>
+            <label className="font-semibold text-[#16475b]" htmlFor="name">Name</label>
             <input
               id="name"
               name="name"
@@ -44,9 +44,9 @@ export default function Kontakt() {
               value={formData.name}
               onChange={handleChange}
               className="rounded-xl border border-gray-200 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#16475b]/40 text-gray-800 bg-white"
-              placeholder="Ditt namn"
+              placeholder="Your name"
             />
-            <label className="font-semibold text-[#16475b]" htmlFor="email">E-post</label>
+            <label className="font-semibold text-[#16475b]" htmlFor="email">Email</label>
             <input
               id="email"
               name="email"
@@ -55,23 +55,24 @@ export default function Kontakt() {
               value={formData.email}
               onChange={handleChange}
               className="rounded-xl border border-gray-200 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#16475b]/40 text-gray-800 bg-white"
-              placeholder="din@email.se"
+              placeholder="your@email.com"
             />
-            <label className="font-semibold text-[#16475b]" htmlFor="message">Meddelande</label>
+            <label className="font-semibold text-[#16475b]" htmlFor="message">Message</label>
             <textarea
               id="message"
               name="message"
               required
               value={formData.message}
               onChange={handleChange}
-              className="rounded-xl border border-gray-200 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#16475b]/40 text-gray-800 bg-white min-h-[100px]"
-              placeholder="Skriv ditt meddelande här..."
+              rows={4}
+              className="rounded-xl border border-gray-200 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#16475b]/40 text-gray-800 bg-white resize-none"
+              placeholder="Your message..."
             />
             <button
               type="submit"
-              className="mt-2 bg-[#16475b] text-white font-bold rounded-full px-8 py-3 shadow-lg hover:bg-[#133a4a] transition-colors focus:outline-none focus:ring-2 focus:ring-[#16475b]/40"
+              className="bg-[#16475b] text-white rounded-xl px-6 py-3 font-bold hover:bg-[#16475b]/90 transition-colors focus:outline-none focus:ring-2 focus:ring-[#16475b]/40"
             >
-              Skicka
+              Send message
             </button>
           </form>
         </div>

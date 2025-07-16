@@ -8,30 +8,30 @@ interface QAItem {
 }
 
 const qaData: QAItem[] = [
-  { q: '1. Vad är FrejFund i ett nötskal?', a: 'FrejFund är en end-to-end plattform för AI-analys, investeringspitch och investerar-matchning.' },
-  { q: '2. Hur gör man en affärsanalys – och hur lång tid tar det?', a: 'Du fyller i ett interaktivt frågeformulär, laddar upp din pitch/PDF. Få AI-pitch & Analys – som kan laddas ner som PDF.' },
-  { q: '3. Är det öppet för bolag utanför EU – betyder det att investerare kan koppla in internationellt på samma villkor?', a: 'Ja, men du ansvarar för att följa lokala regler. Plattformen är byggd för export, men investerarna är främst EU-baserade.' },
-  { q: '4. Hur görs dataskydd? (GDPR)', a: 'All data lagras i EU och delas aldrig utan godkännande. Vi följer Schrems II och har DPA med OpenAI.' },
-  { q: '5. Kan man ladda upp Excel och PDF?', a: 'Ja, du kan ladda upp Excel och PDF till analysen.' },
-  { q: '6. Hur funkar investerar-matchningen?', a: 'AI:n matchar dig med relevanta investerare baserat på din analys och preferenser.' },
-  { q: '7. Hur lång tid tar det att få svar?', a: 'Oftast inom 24 timmar, ibland snabbare.' },
-  { q: '8. Hur många investerare finns på plattformen?', a: 'Över 70 aktiva investerare och nätverk.' },
-  { q: '9. Vad kostar det?', a: 'Grundanalys är gratis. Premium-analys och investerar-matchning har en avgift.' },
-  { q: '10. Vilka investerare får se min pitch?', a: 'Endast de du själv väljer att dela med.' },
-  { q: '11. Kan jag bjuda in teamet att fylla i?', a: 'Ja, du kan bjuda in co-founders och team.' },
-  { q: '12. Hur skyddas min pitch och data?', a: 'All data krypteras och delas aldrig utan ditt godkännande.' },
-  { q: '13. Hur hanteras personuppgifter?', a: 'Vi följer GDPR och Schrems II. All data lagras i EU.' },
-  { q: '14. Kan man få hjälp att förbättra sin pitch?', a: 'Ja, AI:n ger konkreta förbättringsförslag och mallar.' },
-  { q: '15. Kan investerare kontakta mig direkt?', a: 'Ja, om du godkänner det.' },
-  { q: '16. Kan investerare se vilka andra som pitchat?', a: 'Nej, endast de du delar med.' },
-  { q: '17. Hur funkar Premium-analysen?', a: 'Du får en djupare AI-analys, fler datapunkter och en professionell PDF-rapport.' },
-  { q: '18. Kan man använda FrejFund för grant-ansökningar?', a: 'Ja, analysen kan användas som underlag för t.ex. Vinnova, Almi, EU SME, EIC Accelerator.' },
-  { q: '19. Kan man använda FrejFund för due diligence?', a: 'Ja, rapporten kan användas som underlag för due diligence.' },
-  { q: '20. Vem står bakom FrejFund?', a: 'Team och investerare med bakgrund från AI, startups, riskkapital och juridik.' },
-  { q: '21. Hur kontaktar jag support eller ger feedback?', a: 'Maila support@frejfund.com.' },
-  { q: '22. Vilka språk stöds?', a: 'Svenska och engelska.' },
-  { q: '23. Hur rapporterar jag buggar eller fel?', a: 'Maila support@frejfund.com.' },
-  { q: '24. Vad händer om jag inte är nöjd?', a: 'Formulär, support och Pitch-Fix-guiden finns för att hjälpa dig – med förtydligande och väg till produktutveckling.' },
+  { q: '1. What is FrejFund in a nutshell?', a: 'FrejFund is an end-to-end platform for AI analysis, investment pitching and investor matching.' },
+  { q: '2. How do you create a business analysis – and how long does it take?', a: 'You fill out an interactive questionnaire, upload your pitch/PDF. Get AI pitch & Analysis – which can be downloaded as PDF.' },
+  { q: '3. Is it open to companies outside the EU – does this mean investors can connect internationally on the same terms?', a: 'Yes, but you are responsible for following local regulations. The platform is built for export, but investors are primarily EU-based.' },
+  { q: '4. How is data protection handled? (GDPR)', a: 'All data is stored in the EU and never shared without approval. We follow Schrems II and have DPA with OpenAI.' },
+  { q: '5. Can you upload Excel and PDF?', a: 'Yes, you can upload Excel and PDF to the analysis.' },
+  { q: '6. How does investor matching work?', a: 'The AI matches you with relevant investors based on your analysis and preferences.' },
+  { q: '7. How long does it take to get a response?', a: 'Usually within 24 hours, sometimes faster.' },
+  { q: '8. How many investors are on the platform?', a: 'Over 70 active investors and networks.' },
+  { q: '9. What does it cost?', a: 'Basic analysis is free. Premium analysis and investor matching have a fee.' },
+  { q: '10. Which investors get to see my pitch?', a: 'Only those you choose to share with.' },
+  { q: '11. Can I invite the team to fill it out?', a: 'Yes, you can invite co-founders and team members.' },
+  { q: '12. How is my pitch and data protected?', a: 'All data is encrypted and never shared without your approval.' },
+  { q: '13. How is personal data handled?', a: 'We follow GDPR and Schrems II. All data is stored in the EU.' },
+  { q: '14. Can I get help improving my pitch?', a: 'Yes, the AI provides concrete improvement suggestions and templates.' },
+  { q: '15. Can investors contact me directly?', a: 'Yes, if you approve it.' },
+  { q: '16. Can investors see who else has pitched?', a: 'No, only those you share with.' },
+  { q: '17. How does the Premium analysis work?', a: 'You get a deeper AI analysis, more data points and a professional PDF report.' },
+  { q: '18. Can you use FrejFund for grant applications?', a: 'Yes, the analysis can be used as a basis for e.g. Vinnova, Almi, EU SME, EIC Accelerator.' },
+  { q: '19. Can you use FrejFund for due diligence?', a: 'Yes, the report can be used as a basis for due diligence.' },
+  { q: '20. Who is behind FrejFund?', a: 'Team and investors with backgrounds from AI, startups, venture capital and law.' },
+  { q: '21. How do I contact support or give feedback?', a: 'Email support@frejfund.com.' },
+  { q: '22. Which languages are supported?', a: 'Swedish and English.' },
+  { q: '23. How do I report bugs or errors?', a: 'Email support@frejfund.com.' },
+  { q: '24. What happens if I\'m not satisfied?', a: 'Forms, support and the Pitch-Fix guide are available to help you – with clarification and path to product development.' },
 ];
 
 export default function QA() {
@@ -39,10 +39,10 @@ export default function QA() {
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center px-2 py-12">
       <h1 className="text-3xl md:text-4xl font-extrabold text-[#16475b] tracking-widest text-center mb-10 mt-2 uppercase">Q&amp;A</h1>
-      {/* Bakgrundsbild */}
+      {/* Background image */}
       <Image
         src="/bakgrund.png"
-        alt="Q&A bakgrund"
+        alt="Q&A background"
         fill
         className="object-cover -z-10"
         priority

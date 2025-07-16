@@ -52,7 +52,7 @@ export default function PitchPingvinen() {
         })
         .catch(() => {
           setScore(Math.floor(Math.random() * 41) + 60);
-          setFeedback('Kunde inte analysera pitchen. Försök igen!');
+          setFeedback('Could not analyze the pitch. Try again!');
           setListening(false);
           setShowPopup(true);
         });
@@ -98,27 +98,27 @@ export default function PitchPingvinen() {
       <div className="w-full max-w-6xl flex flex-col gap-12">
         {/* Huvudfunktion: Pitch-Pingvinen */}
         <div className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto mb-2 bg-white/90 rounded-3xl shadow-xl p-10 border border-gray-200">
-          <h2 className="text-2xl font-bold text-[#16475b] mb-4 text-center">Spela in din pitch</h2>
+          <h2 className="text-2xl font-bold text-[#16475b] mb-4 text-center">Record your pitch</h2>
           <p className="text-[#16475b] text-center mb-4 text-lg font-medium">
-            Tryck på mikrofonen och berätta din idé på max 20 sekunder.<br />
-            <span className="font-semibold">Tips:</span> Fokusera på <span className="underline">vad du löser för kunden</span> (värdeerbjudande), varför just du/ni är rätt team och vad som gör idén unik.
+            Press the microphone and tell your idea in max 20 seconds.<br />
+            <span className="font-semibold">Tip:</span> Focus on <span className="underline">what you solve for the customer</span> (value proposition), why you/your team are the right people and what makes the idea unique.
           </p>
           <ul className="text-[#16475b] text-sm mb-4 bg-[#eaf6fa] rounded-xl p-4 border border-[#7edcff]/30 w-full max-w-md mx-auto">
-            <li><b>Värdeerbjudande:</b> Vad får kunden ut? (Ex: "Vi hjälper småföretag att spara tid på bokföring.")</li>
-            <li><b>Unikhet:</b> Vad gör er annorlunda än konkurrenterna?</li>
-            <li><b>Team:</b> Varför är ni rätt personer att lyckas?</li>
+            <li><b>Value proposition:</b> What does the customer get? (Ex: "We help small businesses save time on accounting.")</li>
+            <li><b>Uniqueness:</b> What makes you different from competitors?</li>
+            <li><b>Team:</b> Why are you the right people to succeed?</li>
           </ul>
           <Image src="/pingvin.png" alt="Pitch-Pingvinen" width={120} height={120} className={listening ? "animate-pulse" : ""} />
           <button
             className={`w-24 h-24 rounded-full flex items-center justify-center bg-[#16475b] text-white text-4xl shadow-lg border-4 border-white transition-all ${recording ? 'animate-pulse' : ''}`}
             onClick={recording ? stopRecording : startRecording}
-            aria-label={recording ? "Stoppa inspelning" : "Starta inspelning"}
+            aria-label={recording ? "Stop recording" : "Start recording"}
             disabled={listening}
           >
             {recording ? (
               <span className="material-icons" style={{ fontSize: 28 }}>stop</span>
             ) : (
-              <Image src="/mic.png" alt="Mikrofon" width={44} height={44} style={{ filter: 'invert(1)' }} />
+              <Image src="/mic.png" alt="Microphone" width={44} height={44} style={{ filter: 'invert(1)' }} />
             )}
           </button>
           {/* Progress bar */}
@@ -133,7 +133,7 @@ export default function PitchPingvinen() {
           {audioUrl && (
             <audio controls src={audioUrl} className="mt-2" />
           )}
-          {listening && <div className="text-[#16475b] font-bold animate-pulse mt-2">Pingvinen lyssnar...</div>}
+          {listening && <div className="text-[#16475b] font-bold animate-pulse mt-2">The penguin is listening...</div>}
           {/* Popup overlay for score/feedback */}
           {showPopup && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -141,7 +141,7 @@ export default function PitchPingvinen() {
                 <button
                   className="absolute top-4 right-4 text-[#16475b] text-2xl font-bold hover:text-[#0d2a36] focus:outline-none"
                   onClick={() => setShowPopup(false)}
-                  aria-label="Stäng"
+                  aria-label="Close"
                 >
                   ×
                 </button>
@@ -168,8 +168,8 @@ export default function PitchPingvinen() {
         </div>
         {/* Inspiration/AI pitch-generator */}
         <div className="bg-gradient-to-br from-[#7edcff]/90 to-[#16475b]/90 text-white rounded-2xl shadow-xl border border-[#7edcff]/40 p-8 max-w-2xl mx-auto mt-2 flex flex-col items-center">
-          <h3 className="text-2xl font-extrabold mb-2 text-center">Behöver du inspiration?</h3>
-          <p className="text-white/90 text-center mb-4 text-lg">Låt AI skapa ett pitch-manus åt dig!<br />Fyll i tre snabba fält och få ett färdigt manus på 30 sekunder.<br /><span className='text-[#ffe066] font-semibold'>Tips: Testa olika värdeerbjudanden för att se vad som låter bäst!</span></p>
+          <h3 className="text-2xl font-extrabold mb-2 text-center">Need inspiration?</h3>
+          <p className="text-white/90 text-center mb-4 text-lg">Let AI create a pitch script for you!<br />Fill in three quick fields and get a ready script in 30 seconds.<br /><span className='text-[#ffe066] font-semibold'>Tip: Try different value propositions to see what sounds best!</span></p>
           <PitchGenerator />
         </div>
       </div>

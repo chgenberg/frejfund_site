@@ -51,7 +51,7 @@ export default function PitchGenerator() {
         <div className="col-span-1">
           <input
             type="text"
-            placeholder="Vad säljer du?"
+            placeholder="What are you selling?"
             value={formData.product}
             onChange={(e) => setFormData({ ...formData, product: e.target.value })}
             className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-[#7edcff]"
@@ -61,7 +61,7 @@ export default function PitchGenerator() {
         <div className="col-span-1">
           <input
             type="text"
-            placeholder="Vem är din målgrupp?"
+            placeholder="Who is your target audience?"
             value={formData.targetAudience}
             onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
             className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-[#7edcff]"
@@ -71,7 +71,7 @@ export default function PitchGenerator() {
         <div className="col-span-1">
           <input
             type="text"
-            placeholder="Vad är ditt värdeerbjudande?"
+            placeholder="What is your value proposition?"
             value={formData.value}
             onChange={(e) => setFormData({ ...formData, value: e.target.value })}
             className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-[#7edcff]"
@@ -81,7 +81,7 @@ export default function PitchGenerator() {
         <div className="col-span-1">
           <input
             type="text"
-            placeholder="Vad vill du ha? (valfritt)"
+            placeholder="What do you want? (optional)"
             value={formData.ask}
             onChange={(e) => setFormData({ ...formData, ask: e.target.value })}
             className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-[#7edcff]"
@@ -93,7 +93,7 @@ export default function PitchGenerator() {
             disabled={isLoading}
             className="w-full bg-[#7edcff] text-[#16475b] font-bold py-3 rounded-lg hover:bg-[#16475b] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Genererar pitch...' : 'Skapa EPISK pitch'}
+            {isLoading ? 'Generating pitch...' : 'Create EPIC pitch'}
           </button>
         </div>
       </form>
@@ -103,7 +103,7 @@ export default function PitchGenerator() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
             <div className="text-center">
-              <h3 className="text-xl font-bold text-[#16475b] mb-4">Förbereder en EPISK pitch...</h3>
+              <h3 className="text-xl font-bold text-[#16475b] mb-4">Preparing an EPIC pitch...</h3>
               <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div className="h-full bg-[#7edcff] rounded-full animate-pulse" style={{ width: '100%' }} />
               </div>
@@ -123,7 +123,7 @@ export default function PitchGenerator() {
               ×
             </button>
             <div className="prose prose-lg max-w-none prose-invert">
-              <h3 className="text-xl font-bold mb-4">Din EPISKA pitch</h3>
+              <h3 className="text-xl font-bold mb-4">Your EPIC pitch</h3>
               <p className="whitespace-pre-line">{pitch}</p>
             </div>
           </div>
