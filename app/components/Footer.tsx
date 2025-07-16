@@ -44,7 +44,7 @@ export default function Footer() {
         
         {/* Copyright */}
         <div className="text-center text-white/80 text-sm">
-          © 2025 FrejFund AB – en del av Padami
+          © 2025 FrejFund AB – part of Padami
         </div>
       </div>
     </footer>

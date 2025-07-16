@@ -35,20 +35,14 @@ export default function Home() {
               AI-driven investment analysis for startups
             </p>
             
-            {/* CTA buttons - mobile optimized */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center px-4 sm:px-0">
+            {/* CTA button - centered */}
+            <div className="flex justify-center items-center px-4 sm:px-0">
               <button
                 onClick={() => setShowWizard(true)}
                 className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full hover:shadow-2xl hover:scale-105 transition-all text-base sm:text-lg shadow-lg"
               >
                 Start analysis
               </button>
-              <Link
-                href="/our-packages"
-                className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full hover:bg-white/20 transition-all border border-white/20 text-base sm:text-lg text-center"
-              >
-                View our packages
-              </Link>
             </div>
 
             {/* Trust indicators - mobile friendly */}
