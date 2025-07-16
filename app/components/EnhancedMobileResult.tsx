@@ -83,7 +83,7 @@ export default function EnhancedMobileResult({ data }: { data: any }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900">
       {/* Mobile Sticky Header */}
-      <div className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-lg border-b border-white/10">
+      <div className="sticky top-20 z-40 bg-slate-900/95 backdrop-blur-lg border-b border-white/10">
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex-1">

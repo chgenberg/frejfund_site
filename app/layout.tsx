@@ -61,7 +61,7 @@ export default function RootLayout({
           />
           <LoginModal />
           <OverlayNavbar />
-          <main className="flex-grow relative z-10">
+          <main className="flex-grow relative z-10 pt-20">
             {children}
           </main>
           <Footer />

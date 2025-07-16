@@ -119,7 +119,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   };
 
   const renderQuestion = (question: any) => (
-    <div key={question.id} className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10 animate-fadeIn">
+    <div key={question.id} className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 animate-fadeIn shadow-lg">
       <label className="block text-white/90 font-medium mb-3 text-sm md:text-base">
         {question.label}
         {question.required && <span className="text-pink-400 ml-1">*</span>}
@@ -264,10 +264,10 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
+    <div className="fixed inset-0 z-[110] bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
       <div className="h-full flex flex-col">
         {/* Header with progress */}
-        <div className="bg-slate-900/50 backdrop-blur-md border-b border-white/10 px-4 py-3">
+        <div className="bg-slate-900/80 backdrop-blur-md border-b border-white/10 px-4 py-3">
           <div className="flex justify-between items-center mb-2">
             <div>
               <h2 className="text-lg font-bold text-white">Investeringsanalys</h2>
@@ -300,7 +300,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
         </div>
 
         {/* Questions container - no scroll */}
-        <div className="flex-1 px-4 py-4 flex flex-col justify-center overflow-hidden"
+        <div className="flex-1 px-4 py-4 flex flex-col justify-center overflow-hidden bg-slate-900/60"
              onTouchStart={handleTouchStart}
              onTouchMove={handleTouchMove}
              onTouchEnd={handleTouchEnd}
@@ -312,7 +312,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
         </div>
 
         {/* Navigation buttons - sticky at bottom */}
-        <div className="bg-slate-900/50 backdrop-blur-md border-t border-white/10 px-4 py-4 safe-area-inset-bottom">
+        <div className="bg-slate-900/80 backdrop-blur-md border-t border-white/10 px-4 py-4 safe-area-inset-bottom">
           <div className="flex justify-between gap-4 max-w-lg mx-auto">
             <button
               onClick={handleBack}
