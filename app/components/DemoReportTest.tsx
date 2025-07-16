@@ -25,9 +25,9 @@ export default function DemoReportTest() {
               logoUrl: "https://placehold.co/200x80?text=LOGO",
               date: new Date().toLocaleDateString('sv-SE'),
               sections: [
-                { title: "Sammanfattning", content: "Detta är en fiktiv sammanfattning av affärsplanen." },
-                { title: "Marknad", content: "Marknaden är stor och växande." },
-                { title: "Team", content: "Teamet består av erfarna entreprenörer." }
+                { title: "Summary", content: "This is a fictional summary of the business plan." },
+                { title: "Market", content: "The market is large and growing." },
+                { title: "Team", content: "The team consists of experienced entrepreneurs." }
               ],
               design,
             };
@@ -41,13 +41,13 @@ export default function DemoReportTest() {
               const url = window.URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
-              a.download = 'demo-affarsanalys.pdf';
+              a.download = 'demo-business-analysis.pdf';
               document.body.appendChild(a);
               a.click();
               window.URL.revokeObjectURL(url);
               document.body.removeChild(a);
             } else {
-              alert('Kunde inte generera demo-PDF.');
+              alert('Could not generate demo PDF.');
             }
           }}
         />

@@ -14,7 +14,7 @@ export default function Footer() {
             href="/integritet" 
             className="text-white hover:text-gray-300 transition-colors uppercase"
           >
-            INTEGRITET
+            PRIVACY
           </Link>
           <Link 
             href="/cookies" 
@@ -26,7 +26,7 @@ export default function Footer() {
             href="/villkor" 
             className="text-white hover:text-gray-300 transition-colors uppercase"
           >
-            VILLKOR
+            TERMS
           </Link>
           <Link 
             href="/dpa" 

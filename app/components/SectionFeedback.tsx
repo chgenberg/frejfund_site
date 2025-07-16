@@ -24,10 +24,10 @@ export default function SectionFeedback({ section, text }: SectionFeedbackProps)
       if (res.ok) {
         setFeedback(data.feedback);
       } else {
-        setError(data.error || 'Kunde inte hämta feedback.');
+        setError(data.error || 'Could not fetch feedback.');
       }
     } catch {
-      setError('Något gick fel. Försök igen.');
+      setError('Something went wrong. Please try again.');
     }
     setLoading(false);
   };

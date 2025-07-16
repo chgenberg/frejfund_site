@@ -3,39 +3,39 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 
 const TARGETS = [
-  "Studenter",
-  "Seniorer",
-  "Småföretag",
-  "Miljöaktivister",
-  "Digitala nomader",
-  "Föräldrar",
-  "Musiker",
-  "E-handlare",
-  "Idrottare",
-  "Lantbrukare",
+  "Students",
+  "Seniors",
+  "Small businesses",
+  "Environmental activists",
+  "Digital nomads",
+  "Parents",
+  "Musicians",
+  "E-commerce sellers",
+  "Athletes",
+  "Farmers",
 ];
 const TECHS = [
   "AI",
   "Blockchain",
   "IoT",
   "App",
-  "Webbplattform",
-  "3D-printing",
+  "Web platform",
+  "3D printing",
   "AR/VR",
-  "Chattbot",
+  "Chatbot",
   "Wearables",
-  "Automatisering",
+  "Automation",
 ];
 const MODELS = [
-  "Abonnemang",
+  "Subscription",
   "Freemium",
-  "Marknadsplats",
+  "Marketplace",
   "Pay-per-use",
-  "Licens",
-  "Reklamfinansierad",
+  "License",
+  "Ad-supported",
   "Crowdfunding",
-  "Konsulttjänst",
-  "Plattform",
+  "Consulting",
+  "Platform",
   "SaaS",
 ];
 
@@ -89,12 +89,12 @@ export default function IdeaMashSlot() {
             if (data.pitch && data.name) {
               setResult({ pitch: data.pitch, name: data.name });
             } else {
-              setError("Kunde inte generera en idé just nu.");
+              setError("Could not generate an idea right now.");
             }
             setSpinning(false);
           })
           .catch(() => {
-            setError("Kunde inte generera en idé just nu.");
+            setError("Could not generate an idea right now.");
             setSpinning(false);
           });
       }

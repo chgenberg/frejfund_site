@@ -44,7 +44,7 @@ export default function Home() {
                 Start analysis
               </button>
               <Link
-                href="/vara-paket"
+                href="/our-packages"
                 className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full hover:bg-white/20 transition-all border border-white/20 text-base sm:text-lg text-center"
               >
                 View our packages
