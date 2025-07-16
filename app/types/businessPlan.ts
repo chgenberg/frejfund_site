@@ -67,6 +67,7 @@ export type Question = {
     type: 'text' | 'number' | 'percentage';
     placeholder?: string;
   }[];
+  exampleAnswers?: string[];
 };
 
 export type QuestionSection = {

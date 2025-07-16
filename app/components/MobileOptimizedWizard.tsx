@@ -19,6 +19,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   const [touchEnd, setTouchEnd] = useState(0);
   const [isScrapingWebsite, setIsScrapingWebsite] = useState(false);
   const [scrapingProgress, setScrapingProgress] = useState(0);
+  const [showHelpFor, setShowHelpFor] = useState<string | null>(null);
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -227,11 +228,50 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   };
 
   const renderQuestion = (question: any) => (
-    <div key={question.id} className="bg-slate-800/60 backdrop-blur-md rounded-2xl p-4 border border-white/30 animate-fadeIn shadow-xl">
-      <label className="block text-white font-medium mb-3 text-sm md:text-base">
-        {question.label}
-        {question.required && <span className="text-pink-400 ml-1">*</span>}
-      </label>
+    <div key={question.id} className="bg-slate-800/60 backdrop-blur-md rounded-2xl p-4 border border-white/30 animate-fadeIn shadow-xl relative">
+      <div className="flex items-start justify-between mb-3">
+        <label className="block text-white font-medium text-sm md:text-base flex-1">
+          {question.label}
+          {question.required && <span className="text-pink-400 ml-1">*</span>}
+        </label>
+        {question.exampleAnswers && question.exampleAnswers.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowHelpFor(showHelpFor === question.id ? null : question.id)}
+            className="ml-2 p-1 rounded-full hover:bg-white/10 transition-colors"
+          >
+            <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
+        )}
+      </div>
+      
+      {/* Help popup */}
+      {showHelpFor === question.id && question.exampleAnswers && (
+        <div className="absolute top-12 right-4 z-50 bg-slate-700 text-white p-4 rounded-xl shadow-2xl max-w-sm w-80 border border-purple-500/30 animate-fadeIn">
+          <div className="flex items-start justify-between mb-2">
+            <h4 className="font-semibold text-sm text-purple-300">Exempelsvar:</h4>
+            <button
+              type="button"
+              onClick={() => setShowHelpFor(null)}
+              className="text-white/60 hover:text-white"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="space-y-2">
+            {question.exampleAnswers.map((example: string, index: number) => (
+              <p key={index} className="text-sm text-white/90 italic">"{example}"</p>
+            ))}
+          </div>
+          <div className="mt-3 pt-3 border-t border-white/10">
+            <p className="text-xs text-white/60">Klicka för att stänga</p>
+          </div>
+        </div>
+      )}
       
       {question.type === 'text' && (
         <input
