@@ -117,18 +117,51 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
     // Prevent unnecessary updates if value hasn't changed
     if (answers[questionId] === value) return;
     
-    setAnswers(prev => ({ ...prev, [questionId]: value }));
+    console.log('📝 Answer updated:', questionId, '=', value);
     
-    // Check if user selected "Ja" for has_website and we have a URL
-    if (questionId === 'has_website' && value === 'Ja') {
-      // We'll wait for the URL to be entered
-    } else if (questionId === 'website_url' && value && answers.has_website === 'Ja') {
-      // Start website scraping
-      scrapeWebsite(value);
+    const newAnswers = { ...answers, [questionId]: value };
+    setAnswers(newAnswers);
+    
+    // Only trigger scraping when website_url is entered AND has_website is "Ja"
+    if (questionId === 'website_url' && 
+        value && 
+        value.trim() !== '' && 
+        value.length > 4 && // At least "a.co" length
+        newAnswers.has_website === 'Ja') {
+      
+      console.log('✅ Conditions met for scraping:', {
+        questionId,
+        value,
+        hasWebsite: newAnswers.has_website,
+        valueLength: value.length
+      });
+      
+      // Validate URL format
+      try {
+        const urlToScrape = value.startsWith('http') ? value : `https://${value}`;
+        new URL(urlToScrape); // This will throw if invalid
+        
+        // Additional check: URL should contain a dot (domain)
+        if (value.includes('.')) {
+          scrapeWebsite(value);
+        } else {
+          console.log('❌ URL missing domain, skipping scraping');
+        }
+      } catch (error) {
+        console.log('❌ Invalid URL format, skipping scraping:', error);
+      }
+    } else {
+      console.log('⏭️ Scraping conditions not met:', {
+        questionId,
+        value: value ? `"${value}" (${value.length} chars)` : 'no value',
+        hasWebsite: newAnswers.has_website,
+        isWebsiteUrl: questionId === 'website_url'
+      });
     }
   };
 
   const scrapeWebsite = async (url: string) => {
+    console.log('🔍 Starting website scraping for URL:', url);
     setIsScrapingWebsite(true);
     setScrapingProgress(0);
     
