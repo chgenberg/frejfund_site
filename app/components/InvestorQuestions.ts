@@ -44,11 +44,11 @@ export const INVESTOR_QUESTION_SECTIONS: QuestionSection[] = [
       },
       {
         id: 'website_url',
-        label: 'Företagets hemsida',
+        label: 'Företagets hemsida (om ja ovan)',
         type: 'text',
         required: false,
         placeholder: 'Ex: https://www.techstartup.se',
-        help: 'Vi kan analysera din hemsida för att förifyllla information',
+        help: 'Krävs endast om du har hemsida. Vi analyserar den automatiskt när du klickar "Nästa"',
         exampleAnswers: ['https://www.nordictech.se']
       }
     ]

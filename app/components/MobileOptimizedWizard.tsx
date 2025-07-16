@@ -86,14 +86,8 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   // Group questions into pages (2 per page for mobile, 3 for desktop)
   const questionsPerPage = isMobile ? 2 : 3;
   
-  // Filter questions based on conditions
-  const filteredQuestions = allQuestions.filter(q => {
-    // Show website_url only if has_website is "Ja"
-    if (q.id === 'website_url' && answers.has_website !== 'Ja') {
-      return false;
-    }
-    return true;
-  });
+  // No filtering - show all questions
+  const filteredQuestions = allQuestions;
   
   const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
   const currentPage = Math.floor(currentQuestionIndex / questionsPerPage);
@@ -122,42 +116,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
     
-    // Only trigger scraping when website_url is entered AND has_website is "Ja"
-    if (questionId === 'website_url' && 
-        value && 
-        value.trim() !== '' && 
-        value.length > 4 && // At least "a.co" length
-        newAnswers.has_website === 'Ja') {
-      
-      console.log('✅ Conditions met for scraping:', {
-        questionId,
-        value,
-        hasWebsite: newAnswers.has_website,
-        valueLength: value.length
-      });
-      
-      // Validate URL format
-      try {
-        const urlToScrape = value.startsWith('http') ? value : `https://${value}`;
-        new URL(urlToScrape); // This will throw if invalid
-        
-        // Additional check: URL should contain a dot (domain)
-        if (value.includes('.')) {
-          scrapeWebsite(value);
-        } else {
-          console.log('❌ URL missing domain, skipping scraping');
-        }
-      } catch (error) {
-        console.log('❌ Invalid URL format, skipping scraping:', error);
-      }
-    } else {
-      console.log('⏭️ Scraping conditions not met:', {
-        questionId,
-        value: value ? `"${value}" (${value.length} chars)` : 'no value',
-        hasWebsite: newAnswers.has_website,
-        isWebsiteUrl: questionId === 'website_url'
-      });
-    }
+    // No automatic scraping - will be triggered on Next button
   };
 
   const scrapeWebsite = async (url: string) => {
@@ -209,6 +168,15 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
 
   const isPageValid = () => {
     return questionsOnCurrentPage.every(q => {
+      // Special handling for website_url - only required if has_website is "Ja"
+      if (q.id === 'website_url') {
+        if (answers.has_website === 'Ja') {
+          return answers.website_url && answers.website_url.trim() !== '';
+        }
+        return true; // Not required if no website
+      }
+      
+      // Regular validation for other questions
       if (!q.required) return true;
       const answer = answers[q.id];
       return answer && (typeof answer === 'object' ? Object.values(answer).every(v => v) : true);
@@ -216,6 +184,36 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   };
 
   const handleNext = () => {
+    // Check if we should start website scraping before moving to next page
+    const currentPageQuestions = questionsOnCurrentPage.map(q => q.id);
+    const hasWebsiteQuestionOnPage = currentPageQuestions.includes('has_website');
+    const hasUrlQuestionOnPage = currentPageQuestions.includes('website_url');
+    
+    // If this page contains website questions and user has website with URL
+    if ((hasWebsiteQuestionOnPage || hasUrlQuestionOnPage) && 
+        answers.has_website === 'Ja' && 
+        answers.website_url && 
+        answers.website_url.trim() !== '') {
+      
+      console.log('🚀 Starting website scraping on Next button click');
+      
+      // Validate URL format before scraping
+      try {
+        const url = answers.website_url;
+        const urlToScrape = url.startsWith('http') ? url : `https://${url}`;
+        new URL(urlToScrape); // This will throw if invalid
+        
+        if (url.includes('.') && url.length > 4) {
+          scrapeWebsite(url);
+        } else {
+          console.log('❌ Invalid URL format, skipping scraping');
+        }
+      } catch (error) {
+        console.log('❌ URL validation failed, skipping scraping:', error);
+      }
+    }
+    
+    // Proceed to next page
     const nextPage = currentPage + 1;
     if (nextPage < totalPages) {
       setCurrentQuestionIndex(nextPage * questionsPerPage);
