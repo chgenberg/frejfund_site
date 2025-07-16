@@ -36,6 +36,17 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
       if (main) {
         main.style.paddingTop = '0';
       }
+
+      // Prevent mobile zoom on input focus
+      const viewport = document.querySelector('meta[name="viewport"]');
+      if (viewport) {
+        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+      }
+
+      // Prevent body scroll when wizard is open
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
     }
     
     // Cleanup when wizard closes
@@ -49,6 +60,16 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
       if (main) {
         main.style.paddingTop = '';
       }
+
+      // Restore viewport and body styles
+      const viewport = document.querySelector('meta[name="viewport"]');
+      if (viewport) {
+        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0');
+      }
+      
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
     };
   }, [open]);
 
@@ -93,6 +114,9 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   if (!open) return null;
 
   const handleAnswer = (questionId: string, value: any) => {
+    // Prevent unnecessary updates if value hasn't changed
+    if (answers[questionId] === value) return;
+    
     setAnswers(prev => ({ ...prev, [questionId]: value }));
     
     // Check if user selected "Ja" for has_website and we have a URL
@@ -159,14 +183,16 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   };
 
   const handleNext = () => {
-    if (currentQuestionIndex + questionsPerPage < filteredQuestions.length) {
-      setCurrentQuestionIndex(prev => prev + questionsPerPage);
+    const nextPage = currentPage + 1;
+    if (nextPage < totalPages) {
+      setCurrentQuestionIndex(nextPage * questionsPerPage);
     }
   };
 
   const handleBack = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => Math.max(0, prev - questionsPerPage));
+    const prevPage = currentPage - 1;
+    if (prevPage >= 0) {
+      setCurrentQuestionIndex(prevPage * questionsPerPage);
     }
   };
 
@@ -228,7 +254,8 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
   };
 
   const renderQuestion = (question: any) => (
-    <div key={question.id} className="bg-slate-800/60 backdrop-blur-md rounded-2xl p-4 border border-white/30 animate-fadeIn shadow-xl relative">
+    <div key={question.id} className="bg-slate-800/60 backdrop-blur-md rounded-2xl p-4 border border-white/30 animate-fadeIn shadow-xl relative"
+         onClick={(e) => e.stopPropagation()}>
       <div className="flex items-start justify-between mb-3">
         <label className="block text-white font-medium text-sm md:text-base flex-1">
           {question.label}
@@ -237,7 +264,10 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
         {question.exampleAnswers && question.exampleAnswers.length > 0 && (
           <button
             type="button"
-            onClick={() => setShowHelpFor(showHelpFor === question.id ? null : question.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowHelpFor(showHelpFor === question.id ? null : question.id);
+            }}
             className="ml-2 p-1 rounded-full hover:bg-white/10 transition-colors"
           >
             <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,7 +284,10 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
             <h4 className="font-semibold text-sm text-purple-300">Exempelsvar:</h4>
             <button
               type="button"
-              onClick={() => setShowHelpFor(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowHelpFor(null);
+              }}
               className="text-white/60 hover:text-white"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -280,6 +313,12 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
           onChange={(e) => handleAnswer(question.id, e.target.value)}
           placeholder={question.placeholder}
           maxLength={question.max}
+          onFocus={(e) => {
+            // Ensure input is visible when focused
+            setTimeout(() => {
+              e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+          }}
           className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-all"
         />
       )}
@@ -290,6 +329,12 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
           onChange={(e) => handleAnswer(question.id, e.target.value)}
           placeholder={question.placeholder}
           rows={isMobile ? 3 : 4}
+          onFocus={(e) => {
+            // Ensure textarea is visible when focused
+            setTimeout(() => {
+              e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+          }}
           className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm transition-all"
         />
       )}
@@ -387,12 +432,22 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
 
   const progress = ((currentPage + 1) / totalPages) * 100;
 
-  // Handle swipe gestures
+  // Handle swipe gestures - but not when user is interacting with form elements
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Don't handle swipes if user is touching an input, button, or interactive element
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('button') || target.closest('input') || target.closest('textarea')) {
+      return;
+    }
     setTouchStart(e.targetTouches[0].clientX);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    // Don't handle swipes if user is touching an input or interactive element
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('button') || target.closest('input') || target.closest('textarea')) {
+      return;
+    }
     setTouchEnd(e.targetTouches[0].clientX);
   };
 
@@ -409,6 +464,10 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
     if (isRightSwipe && currentPage > 0) {
       handleBack();
     }
+    
+    // Reset touch state
+    setTouchStart(0);
+    setTouchEnd(0);
   };
 
   return (
@@ -520,7 +579,8 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
              onTouchEnd={handleTouchEnd}
              ref={containerRef}
         >
-          <div className="space-y-3 max-w-lg mx-auto w-full">
+          <div className="space-y-3 max-w-lg mx-auto w-full" 
+               style={{ touchAction: 'pan-y' }}>
             {questionsOnCurrentPage.map(renderQuestion)}
           </div>
         </div>
