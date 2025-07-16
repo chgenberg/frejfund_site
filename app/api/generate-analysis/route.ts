@@ -24,9 +24,9 @@ export async function POST(request: Request) {
       messages: [
         {
           role: "system",
-          content: `Du är en erfaren investerare och affärsanalytiker. Analysera följande affärsplansinformation och generera en detaljerad investeringsanalys.
+          content: `You are an experienced investor and business analyst. Analyze the following business plan information and generate a detailed investment analysis.
           
-          Returnera ett JSON-objekt med följande struktur:
+          Return a JSON object with the following structure:
           {
             "overallScore": number (0-100),
             "categories": {
@@ -53,22 +53,22 @@ export async function POST(request: Request) {
             ]
           }
           
-          Basera scores på:
-          - Problem/Solution fit (hur väl löser de ett verkligt problem)
-          - Market timing (är det rätt tid för denna lösning)
-          - Moat/Competition (hur försvarbar är positionen)
-          - Traction & KPIs (bevis på framgång)
-          - Unit Economics (är affärsmodellen hållbar)
-          - Team (har teamet rätt kompetens)
+          Base scores on:
+          - Problem/Solution fit (how well do they solve a real problem)
+          - Market timing (is it the right time for this solution)
+          - Moat/Competition (how defensible is the position)
+          - Traction & KPIs (proof of success)
+          - Unit Economics (is the business model sustainable)
+          - Team (does the team have the right competence)
           - Financial Health (runway, burn rate)
-          - Risk & Compliance (hur väl hanteras risker)
-          - Storytelling (kan de sälja sin vision)
+          - Risk & Compliance (how well are risks managed)
+          - Storytelling (can they sell their vision)
           
-          Ge konkreta, actionable insights baserat på svaren.`
+          Provide concrete, actionable insights based on the answers. Write all content in English.`
         },
         {
           role: "user",
-          content: `Analysera denna affärsplan:\n\n${JSON.stringify(answers, null, 2)}`
+          content: `Analyze this business plan:\n\n${JSON.stringify(answers, null, 2)}`
         }
       ],
       temperature: 0.7,

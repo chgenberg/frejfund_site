@@ -10,7 +10,7 @@ const ResultContent = dynamic(() => import('./ResultContent'), {
     <div className="min-h-screen bg-[#04111d] flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-        <p className="text-white/60">Laddar analysresultat...</p>
+        <p className="text-white/60">Loading analysis results...</p>
       </div>
     </div>
   )
@@ -22,7 +22,7 @@ export default function ResultPage() {
       <div className="min-h-screen bg-[#04111d] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-white/60">Laddar sida...</p>
+          <p className="text-white/60">Loading page...</p>
         </div>
       </div>
     }>

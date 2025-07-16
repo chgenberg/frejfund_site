@@ -42,7 +42,7 @@ export default function ResultContent() {
               "Beräkna timkostnad × antal timmar = årlig kostnad",
               "Dokumentera 3-5 konkreta exempel med företagsnamn"
             ],
-            expectedResult: "Öka konvertering med 30-40% genom att visa 'Spara 420.000 kr/år' istället för 'Spara tid'",
+            expectedResult: "Increase conversion by 30-40% by showing 'Save $50,000/year' instead of 'Save time'",
             investorPerspective: "Investerare vill se att ni förstår kundens ekonomi på djupet. Siffror > känslor."
           }
         ],
@@ -101,7 +101,7 @@ export default function ResultContent() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-white/60">Laddar analysresultat...</p>
+          <p className="text-white/60">Loading analysis results...</p>
         </div>
       </div>
     );
@@ -141,7 +141,7 @@ export default function ResultContent() {
                 onClick={setTestData}
                 className="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all"
               >
-                Ladda test-data
+                Load test data
               </button>
             </div>
           </div>

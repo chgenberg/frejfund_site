@@ -147,34 +147,34 @@ export async function POST(request: Request) {
       messages: [
         {
           role: "system",
-          content: `Du är en expert på att analysera företagshemsidor och extrahera affärsinformation. 
-          Analysera texten och extrahera följande information om den finns:
-          - Kundens problem/pain som löses
-          - Lösningen/produkten
-          - Målgrupp och kundsegment
-          - Unika fördelar/USP
-          - Team och grundare
-          - Affärsmodell och prissättning
-          - Traction och proof points
+          content: `You are an expert at analyzing company websites and extracting business information. 
+          Analyze the text and extract the following information if available:
+          - Customer problems/pain being solved
+          - The solution/product
+          - Target audience and customer segments
+          - Unique advantages/USP
+          - Team and founders
+          - Business model and pricing
+          - Traction and proof points
           
-          Returnera ENDAST ett JSON-objekt med följande struktur:
+          Return ONLY a JSON object with the following structure:
           {
-            "customer_pain": "beskrivning",
-            "solution": "beskrivning",
-            "elevator_pitch": "max 140 tecken",
-            "target_customer": "beskrivning",
-            "unique_tech": "beskrivning",
-            "team": "beskrivning",
-            "revenue_model": "beskrivning",
-            "traction": "beskrivning",
-            "company_value": "beskrivning"
+            "customer_pain": "description",
+            "solution": "description",
+            "elevator_pitch": "max 140 characters",
+            "target_customer": "description",
+            "unique_tech": "description",
+            "team": "description",
+            "revenue_model": "description",
+            "traction": "description",
+            "company_value": "description"
           }
           
-          Om information saknas, använd null för det fältet.`
+          If information is missing, use null for that field. Write all descriptions in English.`
         },
         {
           role: "user",
-          content: `Analysera denna hemsida och extrahera affärsinformation:\n\n${scrapedContent}`
+          content: `Analyze this website and extract business information:\n\n${scrapedContent}`
         }
       ],
       temperature: 0.3,
