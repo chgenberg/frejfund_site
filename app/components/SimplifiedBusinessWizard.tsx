@@ -123,10 +123,10 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
 
   const renderStep1 = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Welcome! Let's get started</h2>
+      <h2 className="text-2xl font-bold text-gray-900">Welcome! Let's get started</h2>
       
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           What's your name?
         </label>
         <input
@@ -139,7 +139,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           What's your email?
         </label>
         <input
@@ -159,9 +159,9 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           onChange={(e) => setFormData(prev => ({ ...prev, privacyAccepted: e.target.checked }))}
           className="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
         />
-        <label htmlFor="privacy" className="text-sm text-gray-600">
+        <label htmlFor="privacy" className="text-sm text-gray-900">
           I agree to the{' '}
-          <a href="/integritet" target="_blank" className="text-purple-600 hover:underline">
+          <a href="/integritet" target="_blank" className="text-purple-600 hover:underline font-medium">
             Privacy Policy
           </a>
         </label>
@@ -179,10 +179,10 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
 
   const renderStep2 = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Tell us about your business</h2>
+      <h2 className="text-2xl font-bold text-gray-900">Tell us about your business</h2>
       
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           <FaGlobe className="inline-block w-4 h-4 mr-1" />
           What's your website? (optional)
         </label>
@@ -196,11 +196,11 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           <FaUpload className="inline-block w-4 h-4 mr-1" />
           Upload your materials (pitch deck, ideas, etc.)
         </label>
-        <p className="text-xs text-gray-500 mb-3">PDF, Word, or .txt documents</p>
+        <p className="text-xs text-gray-700 mb-3">PDF, Word, or .txt documents</p>
         
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-500 transition-colors">
           <input
@@ -282,20 +282,20 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         </div>
       </div>
       
-      <h3 className="text-xl font-semibold text-gray-800 mb-2">Analyzing your business...</h3>
-      <p className="text-gray-600">This deep analysis may take a minute</p>
+      <h3 className="text-xl font-semibold text-gray-900 mb-2">Analyzing your business...</h3>
+      <p className="text-gray-800">This deep analysis may take a minute</p>
     </div>
   );
 
   const renderFollowUp = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">A few more questions</h2>
-      <p className="text-gray-600">Based on your materials, we need some clarification:</p>
+      <h2 className="text-2xl font-bold text-gray-900">A few more questions</h2>
+      <p className="text-gray-800">Based on your materials, we need some clarification:</p>
       
       <div className="space-y-4 max-h-96 overflow-y-auto">
         {followUpQuestions.map((question, index) => (
           <div key={index}>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-900 mb-2">
               {question}
             </label>
             <textarea
@@ -326,8 +326,8 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
       
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-hidden">
-        <div className="p-6 overflow-y-auto max-h-[85vh]">
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-hidden border border-gray-200">
+        <div className="p-6 overflow-y-auto max-h-[85vh] bg-white">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
