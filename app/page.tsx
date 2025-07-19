@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import Image from "next/image";
 import { useState } from "react";
-import EnhancedBusinessWizard from "./components/EnhancedBusinessWizard";
+import SimplifiedBusinessWizard from "./components/SimplifiedBusinessWizard";
 import Link from 'next/link'
 
 export default function Home() {
@@ -72,7 +72,7 @@ export default function Home() {
       </main>
 
       {/* Wizard modal */}
-      <EnhancedBusinessWizard 
+      <SimplifiedBusinessWizard 
         open={showWizard} 
         onClose={() => setShowWizard(false)} 
       />
