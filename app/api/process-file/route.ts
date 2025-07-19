@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pdfParse from 'pdf-parse';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +14,8 @@ export async function POST(request: NextRequest) {
     
     // Handle different file types
     if (file.type === 'application/pdf') {
+      // Dynamic import to avoid build issues
+      const pdfParse = (await import('pdf-parse')).default;
       const pdfData = await pdfParse(buffer);
       content = pdfData.text;
     } else if (file.type === 'text/plain') {
