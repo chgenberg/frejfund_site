@@ -133,7 +133,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           type="text"
           value={formData.name}
           onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
           placeholder="John Doe"
         />
       </div>
@@ -146,7 +146,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           type="email"
           value={formData.email}
           onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
           placeholder="john@example.com"
         />
       </div>
@@ -190,7 +190,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           type="url"
           value={formData.website}
           onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
           placeholder="https://example.com"
         />
       </div>
@@ -213,14 +213,14 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           />
           <label htmlFor="file-upload" className="cursor-pointer">
             <FaUpload className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-            <p className="text-sm text-gray-600">Click to upload or drag and drop</p>
+            <p className="text-sm text-gray-800">Click to upload or drag and drop</p>
           </label>
         </div>
         
         {formData.uploadedFiles.length > 0 && (
           <div className="mt-3 space-y-2">
             {formData.uploadedFiles.map((file, index) => (
-              <div key={index} className="flex items-center space-x-2 text-sm text-gray-600">
+              <div key={index} className="flex items-center space-x-2 text-sm text-gray-900">
                 <FaCheck className="w-4 h-4 text-green-500" />
                 <span>{file.name}</span>
               </div>
@@ -278,7 +278,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           </defs>
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xl font-bold text-gray-800">{Math.round(analysisProgress)}%</span>
+          <span className="text-2xl font-bold text-gray-900">{Math.round(analysisProgress)}%</span>
         </div>
       </div>
       
@@ -301,7 +301,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
             <textarea
               value={followUpAnswers[`q${index}`] || ''}
               onChange={(e) => setFollowUpAnswers(prev => ({ ...prev, [`q${index}`]: e.target.value }))}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
               rows={3}
             />
           </div>
