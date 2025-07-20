@@ -19,6 +19,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
     email: '',
     privacyAccepted: false,
     website: '',
+    linkedinProfiles: '',
     uploadedFiles: [] as File[]
   });
   
@@ -69,13 +70,25 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         fileContents.push(fileData);
       }
 
-      // 3. Deep analysis with AI
+      // 3. Scrape LinkedIn profiles if provided
+      let linkedinData = null;
+      if (formData.linkedinProfiles) {
+        const linkedinResponse = await fetch('/api/scrape-linkedin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profiles: formData.linkedinProfiles })
+        });
+        linkedinData = await linkedinResponse.json();
+      }
+
+      // 4. Deep analysis with AI
       const analysisResponse = await fetch('/api/deep-investment-analysis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           websiteData,
           fileContents,
+          linkedinData,
           userInfo: {
             name: formData.name,
             email: formData.email
@@ -197,6 +210,20 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
 
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-2">
+          LinkedIn profiles of founders (optional)
+        </label>
+        <input
+          type="text"
+          value={formData.linkedinProfiles}
+          onChange={(e) => setFormData(prev => ({ ...prev, linkedinProfiles: e.target.value }))}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+          placeholder="LinkedIn URLs separated by commas"
+        />
+        <p className="text-xs text-gray-700 mt-1">Example: linkedin.com/in/founder1, linkedin.com/in/founder2</p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-900 mb-2">
           <FaUpload className="inline-block w-4 h-4 mr-1" />
           Upload your materials (pitch deck, ideas, etc.)
         </label>
@@ -238,7 +265,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         </button>
         <button
           onClick={handleInitialAnalysis}
-          disabled={!formData.website && formData.uploadedFiles.length === 0}
+          disabled={!formData.website && formData.uploadedFiles.length === 0 && !formData.linkedinProfiles}
           className="flex-1 py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Analyze

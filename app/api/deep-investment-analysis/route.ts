@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const { websiteData, fileContents, userInfo } = await request.json();
+    const { websiteData, fileContents, linkedinData, userInfo } = await request.json();
     
     // Combine all content for analysis
     let combinedContent = `Business Analysis for ${userInfo.name} (${userInfo.email})\n\n`;
@@ -33,6 +33,27 @@ export async function POST(request: Request) {
         combinedContent += `Content: ${file.content}\n`;
       });
     }
+    
+    if (linkedinData?.data?.length > 0) {
+      combinedContent += `\nFounder LinkedIn Profiles:\n`;
+      linkedinData.data.forEach((profile: any) => {
+        combinedContent += `\nFounder: ${profile.name || 'Unknown'}\n`;
+        combinedContent += `Current Role: ${profile.currentTitle || 'N/A'} at ${profile.currentCompany || 'N/A'}\n`;
+        if (profile.experience) {
+          combinedContent += `Experience: ${Array.isArray(profile.experience) ? profile.experience.join(', ') : profile.experience}\n`;
+        }
+        if (profile.education) {
+          combinedContent += `Education: ${Array.isArray(profile.education) ? profile.education.join(', ') : profile.education}\n`;
+        }
+        if (profile.skills) {
+          combinedContent += `Skills: ${Array.isArray(profile.skills) ? profile.skills.join(', ') : profile.skills}\n`;
+        }
+        if (profile.entrepreneurialBackground) {
+          combinedContent += `Entrepreneurial Background: ${profile.entrepreneurialBackground}\n`;
+        }
+        combinedContent += `Profile URL: ${profile.profileUrl}\n`;
+      });
+    }
 
     // First pass: Deep analysis
     const analysisResponse = await openai.chat.completions.create({
@@ -46,12 +67,14 @@ export async function POST(request: Request) {
 2. Problem/solution fit and market validation
 3. Business model and revenue potential
 4. Competitive landscape and moat
-5. Team assessment and execution capability
+5. Team assessment and execution capability (including LinkedIn profile analysis)
 6. Traction and growth metrics
 7. Risk factors and mitigation strategies
 8. Financial projections and unit economics
 9. Go-to-market strategy
 10. Funding requirements and use of funds
+
+Pay special attention to team analysis if LinkedIn profiles are provided - assess founder backgrounds, relevant experience, industry expertise, previous entrepreneurial success, education, and overall team complementarity.
 
 After analysis, determine if you need additional information to provide a complete investment assessment. If yes, generate 3-10 specific, targeted questions that would help complete the analysis.
 
