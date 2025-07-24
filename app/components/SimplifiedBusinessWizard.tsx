@@ -11,6 +11,9 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [isCompletingAnalysis, setIsCompletingAnalysis] = useState(false);
+  const [completionProgress, setCompletionProgress] = useState(0);
+  const [completionStage, setCompletionStage] = useState('');
   const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
   
   // Form data
@@ -216,20 +219,70 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
   };
 
   const handleFinalAnalysis = async (initialAnalysis?: any) => {
-    // Navigate to results page with all data
-    const analysisData = initialAnalysis || await fetch('/api/complete-analysis', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        followUpAnswers,
-        userEmail: formData.email
-      })
-    }).then(res => res.json());
+    if (initialAnalysis) {
+      // Direct result from initial analysis
+      const transformedData = transformAnalysisToResultFormat(initialAnalysis);
+      localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
+      window.location.href = '/result';
+      return;
+    }
 
-    // Transform and store in localStorage with correct key
-    const transformedData = transformAnalysisToResultFormat(analysisData);
-    localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
-    window.location.href = '/result';
+    // Show completion progress
+    setIsCompletingAnalysis(true);
+    setCompletionProgress(0);
+    setCompletionStage('Processing your answers...');
+
+    // Simulate progress stages
+    const progressStages = [
+      { progress: 20, stage: 'Processing your answers...', delay: 800 },
+      { progress: 40, stage: 'Analyzing business model...', delay: 1200 },
+      { progress: 60, stage: 'Evaluating market potential...', delay: 1000 },
+      { progress: 80, stage: 'Generating investment recommendations...', delay: 1500 },
+      { progress: 95, stage: 'Finalizing analysis report...', delay: 800 }
+    ];
+
+    // Start progress simulation
+    let currentStageIndex = 0;
+    const progressInterval = setInterval(() => {
+      if (currentStageIndex < progressStages.length) {
+        const stage = progressStages[currentStageIndex];
+        setCompletionProgress(stage.progress);
+        setCompletionStage(stage.stage);
+        currentStageIndex++;
+      }
+    }, 1000);
+
+    try {
+      // Make the actual API call
+      const analysisData = await fetch('/api/complete-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          followUpAnswers,
+          userEmail: formData.email
+        })
+      }).then(res => res.json());
+
+      // Complete progress
+      clearInterval(progressInterval);
+      setCompletionProgress(100);
+      setCompletionStage('Analysis complete! Redirecting...');
+
+      // Wait a moment to show completion
+      setTimeout(() => {
+        // Transform and store in localStorage with correct key
+        const transformedData = transformAnalysisToResultFormat(analysisData);
+        localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
+        window.location.href = '/result';
+      }, 1000);
+
+    } catch (error) {
+      clearInterval(progressInterval);
+      console.error('Error completing analysis:', error);
+      setIsCompletingAnalysis(false);
+      setCompletionProgress(0);
+      alert('An error occurred while completing the analysis. Please try again.');
+    }
   };
 
   const renderStep1 = () => (
@@ -412,6 +465,63 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
     </div>
   );
 
+  const renderCompletingAnalysis = () => (
+    <div className="text-center py-12">
+      <div className="relative w-32 h-32 mx-auto mb-8">
+        <svg className="w-32 h-32 transform -rotate-90">
+          <circle
+            cx="64"
+            cy="64"
+            r="60"
+            stroke="#e5e7eb"
+            strokeWidth="8"
+            fill="none"
+          />
+          <circle
+            cx="64"
+            cy="64"
+            r="60"
+            stroke="url(#completionGradient)"
+            strokeWidth="8"
+            fill="none"
+            strokeDasharray={`${2 * Math.PI * 60}`}
+            strokeDashoffset={`${2 * Math.PI * 60 * (1 - completionProgress / 100)}`}
+            className="transition-all duration-500"
+          />
+          <defs>
+            <linearGradient id="completionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#059669" />
+              <stop offset="100%" stopColor="#10b981" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-2xl font-bold text-gray-900">{Math.round(completionProgress)}%</span>
+        </div>
+      </div>
+      
+      <h3 className="text-xl font-semibold text-gray-900 mb-2">Completing your analysis...</h3>
+      <p className="text-gray-800 mb-4">{completionStage}</p>
+      
+      {/* Progress stages visualization */}
+      <div className="max-w-md mx-auto">
+        <div className="flex justify-between text-xs text-gray-600 mb-2">
+          <span className={completionProgress >= 20 ? "text-green-600 font-semibold" : ""}>Processing</span>
+          <span className={completionProgress >= 40 ? "text-green-600 font-semibold" : ""}>Analyzing</span>
+          <span className={completionProgress >= 60 ? "text-green-600 font-semibold" : ""}>Evaluating</span>
+          <span className={completionProgress >= 80 ? "text-green-600 font-semibold" : ""}>Generating</span>
+          <span className={completionProgress >= 100 ? "text-green-600 font-semibold" : ""}>Complete</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className="bg-gradient-to-r from-green-500 to-emerald-600 h-2 rounded-full transition-all duration-500"
+            style={{ width: `${completionProgress}%` }}
+          ></div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderFollowUp = () => (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-900">A few more questions</h2>
@@ -460,7 +570,8 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
             <FaTimes className="w-6 h-6" />
           </button>
 
-          {isAnalyzing ? renderAnalyzing() : (
+          {isAnalyzing ? renderAnalyzing() : 
+           isCompletingAnalysis ? renderCompletingAnalysis() : (
             currentStep === 1 ? renderStep1() :
             currentStep === 2 ? renderStep2() :
             renderFollowUp()
