@@ -259,6 +259,22 @@ export default function EnhancedMobileResult({ data }: { data: any }) {
         )}
       </div>
 
+      {/* Deep Analysis CTA - Mobile */}
+      <div className="p-4 mb-20">
+        <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl p-6 border border-blue-500/50">
+          <h3 className="text-lg font-bold text-white mb-3">🧠 Want Even More Specific Advice?</h3>
+          <p className="text-white/80 mb-4 text-sm">
+            Get ultra-specific, hands-on recommendations. Answer 8 focused questions for personalized insights.
+          </p>
+          <button 
+            onClick={() => window.location.href = '/deep-analysis-wizard'}
+            className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
+          >
+            🎯 Get Deep Analysis
+          </button>
+        </div>
+      </div>
+
       {/* Mobile CTA */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-slate-900/95 backdrop-blur-lg border-t border-white/10">
         <button className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl">
