@@ -76,6 +76,8 @@ export async function POST(request: Request) {
 
 Pay special attention to team analysis if LinkedIn profiles are provided - assess founder backgrounds, relevant experience, industry expertise, previous entrepreneurial success, education, and overall team complementarity.
 
+CRITICAL: You MUST generate 3-5 actionable insights that will help increase the company's valuation and investment attractiveness. These should be specific, implementable actions with clear timelines and expected outcomes. Focus on areas that investors care most about: market validation, competitive advantages, growth metrics, team strength, and financial performance.
+
 After analysis, determine if you need additional information to provide a complete investment assessment. If yes, generate 3-10 specific, targeted questions that would help complete the analysis.
 
 Return a JSON object with:
@@ -113,14 +115,23 @@ Return a JSON object with:
     "healthInsights": ["insight1", "insight2"],
     "riskInsights": ["insight1", "insight2"],
     "pitchInsights": ["insight1", "insight2"],
-    // Actionable insights
+    // Actionable insights (MUST generate 3-5 insights)
     "actionableInsights": [
       {
         "title": "Action title",
         "impact": "high/medium/low", 
         "timeframe": "1-2 weeks",
         "description": "What to do",
-        "implementation": ["step1", "step2"],
+        "implementation": ["step1", "step2", "step3"],
+        "expectedResult": "Expected outcome",
+        "investorPerspective": "Why investors care"
+      },
+      {
+        "title": "Second action",
+        "impact": "high/medium/low",
+        "timeframe": "timeframe", 
+        "description": "description",
+        "implementation": ["step1", "step2", "step3"],
         "expectedResult": "Expected outcome",
         "investorPerspective": "Why investors care"
       }

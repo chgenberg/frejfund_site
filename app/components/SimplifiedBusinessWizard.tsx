@@ -198,6 +198,48 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           ],
           expectedResult: "Increase conversion by 30-40% by showing 'Save $50,000/year' instead of 'Save time'",
           investorPerspective: "Investors want to see deep understanding of customer economics. Numbers > feelings."
+        },
+        {
+          title: "Build strategic partnerships early",
+          impact: "medium" as const,
+          timeframe: "4-6 weeks",
+          description: "Strategic partnerships can accelerate growth and provide market validation.",
+          implementation: [
+            "Identify 5-10 potential strategic partners in your industry",
+            "Develop partnership value propositions for each",
+            "Reach out with concrete collaboration proposals",
+            "Start with pilot partnerships to prove concept"
+          ],
+          expectedResult: "Gain market credibility and potentially 20-30% faster customer acquisition",
+          investorPerspective: "Strategic partnerships demonstrate market validation and reduce go-to-market risks."
+        },
+        {
+          title: "Strengthen your competitive moat",
+          impact: "high" as const,
+          timeframe: "3-4 weeks",
+          description: "Building defensible advantages will increase long-term value and investor appeal.",
+          implementation: [
+            "Document your unique processes and methodologies",
+            "File provisional patents for key innovations",
+            "Build network effects into your product",
+            "Create high switching costs for customers"
+          ],
+          expectedResult: "Improved competitive positioning and higher valuation multiples",
+          investorPerspective: "Investors pay premium valuations for defensible businesses with clear moats."
+        },
+        {
+          title: "Implement data-driven growth tracking",
+          impact: "medium" as const,
+          timeframe: "2-3 weeks",
+          description: "Investors need clear visibility into your growth metrics and unit economics.",
+          implementation: [
+            "Set up comprehensive analytics tracking",
+            "Define and measure key KPIs weekly",
+            "Create investor-ready dashboards",
+            "Establish cohort analysis for customer retention"
+          ],
+          expectedResult: "Demonstrate growth predictability and operational excellence",
+          investorPerspective: "Data-driven companies receive higher valuations due to reduced execution risk."
         }
       ],
       answers: {

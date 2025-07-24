@@ -38,6 +38,8 @@ export async function POST(request: Request) {
           role: "system",
           content: `You are an expert investment analyst. You have already performed an initial analysis and asked follow-up questions. Now complete your comprehensive investment assessment using all available information.
 
+CRITICAL REQUIREMENT: You MUST generate 3-5 specific, actionable insights that will help increase the company's valuation and investment attractiveness. These should be concrete actions with clear implementation steps, timelines, and expected results.
+
 Generate a detailed investment report with this exact JSON structure:
 
 {
@@ -74,18 +76,36 @@ Generate a detailed investment report with this exact JSON structure:
     "healthInsights": ["insight1", "insight2"],
     "riskInsights": ["insight1", "insight2"],
     "pitchInsights": ["insight1", "insight2"],
-    // 3-5 actionable insights
-    "actionableInsights": [
-      {
-        "title": "Action title",
-        "impact": "high/medium/low",
-        "timeframe": "1-2 weeks", 
-        "description": "What to do",
-        "implementation": ["step1", "step2", "step3"],
-        "expectedResult": "Expected outcome",
-        "investorPerspective": "Why investors care"
-      }
-    ]
+         // 3-5 actionable insights (MUST generate multiple)
+     "actionableInsights": [
+       {
+         "title": "Action title",
+         "impact": "high/medium/low",
+         "timeframe": "1-2 weeks", 
+         "description": "What to do",
+         "implementation": ["step1", "step2", "step3"],
+         "expectedResult": "Expected outcome",
+         "investorPerspective": "Why investors care"
+       },
+       {
+         "title": "Second action",
+         "impact": "high/medium/low",
+         "timeframe": "timeframe",
+         "description": "description", 
+         "implementation": ["step1", "step2", "step3"],
+         "expectedResult": "Expected outcome",
+         "investorPerspective": "Why investors care"
+       },
+       {
+         "title": "Third action",
+         "impact": "high/medium/low",
+         "timeframe": "timeframe",
+         "description": "description",
+         "implementation": ["step1", "step2", "step3"], 
+         "expectedResult": "Expected outcome",
+         "investorPerspective": "Why investors care"
+       }
+     ]
   }
 }`
         },
