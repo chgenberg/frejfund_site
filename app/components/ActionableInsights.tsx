@@ -9,6 +9,7 @@ interface ActionableInsight {
   implementation: string[];
   expectedResult: string;
   investorPerspective: string;
+  _source?: string;
 }
 
 const impactColors = {
@@ -34,7 +35,19 @@ export default function ActionableInsights({ insights }: { insights: ActionableI
           {/* Header */}
           <div className="p-4 md:p-6 bg-gradient-to-r from-purple-600/10 to-pink-600/10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-              <h3 className="text-lg md:text-xl font-bold text-white">{insight.title}</h3>
+              <div className="flex items-center gap-3">
+                <h3 className="text-lg md:text-xl font-bold text-white">{insight.title}</h3>
+                {insight._source === 'fallback' && (
+                  <span className="px-2 py-1 text-xs bg-yellow-500/20 text-yellow-300 rounded-full border border-yellow-500/30">
+                    General advice
+                  </span>
+                )}
+                {insight._source === 'ai-generated' && (
+                  <span className="px-2 py-1 text-xs bg-green-500/20 text-green-300 rounded-full border border-green-500/30">
+                    AI-personalized
+                  </span>
+                )}
+              </div>
               <div className="flex items-center gap-3">
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${impactColors[insight.impact]} text-white`}>
                   {impactLabels[insight.impact]}

@@ -127,6 +127,15 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
     // Transform AI analysis to expected result format
     const analysis = analysisData.analysis || analysisData.initialAnalysis || {};
     
+    // Debug logging to show if insights are AI-generated or fallback
+    const hasAIInsights = analysis.actionableInsights && analysis.actionableInsights.length > 0;
+    console.log('🔍 Analysis Debug:', {
+      hasAIInsights,
+      insightCount: hasAIInsights ? analysis.actionableInsights.length : 0,
+      source: hasAIInsights ? 'AI-generated' : 'Fallback',
+      firstInsightTitle: hasAIInsights ? analysis.actionableInsights[0]?.title : 'Using fallbacks'
+    });
+    
     return {
       overallScore: analysis.overallScore || Math.floor(Math.random() * 20 + 70), // 70-90
       categories: {
@@ -185,9 +194,13 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           insights: analysis.pitchInsights || ["Engaging story", "Professional presentation"]
         }
       },
-      actionableInsights: analysis.actionableInsights || [
+      actionableInsights: analysis.actionableInsights?.map((insight: any) => ({
+        ...insight,
+        _source: 'ai-generated'
+      })) || [
         {
           title: "Quantify customer pain in monetary terms",
+          _source: "fallback",
           impact: "high" as const,
           timeframe: "1-2 weeks",
           description: "Your solution addresses a problem but lacks concrete data about customer costs.",
@@ -201,6 +214,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         },
         {
           title: "Build strategic partnerships early",
+          _source: "fallback",
           impact: "medium" as const,
           timeframe: "4-6 weeks",
           description: "Strategic partnerships can accelerate growth and provide market validation.",
@@ -215,6 +229,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         },
         {
           title: "Strengthen your competitive moat",
+          _source: "fallback",
           impact: "high" as const,
           timeframe: "3-4 weeks",
           description: "Building defensible advantages will increase long-term value and investor appeal.",
@@ -229,6 +244,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         },
         {
           title: "Implement data-driven growth tracking",
+          _source: "fallback",
           impact: "medium" as const,
           timeframe: "2-3 weeks",
           description: "Investors need clear visibility into your growth metrics and unit economics.",
