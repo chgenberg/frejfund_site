@@ -24,7 +24,9 @@ export async function POST(request: Request) {
     // Prepare follow-up content
     let followUpContent = `Additional information provided:\n\n`;
     Object.entries(followUpAnswers).forEach(([key, answer]) => {
-      followUpContent += `Q: ${context.followUpQuestions[parseInt(key.slice(1))]}\n`;
+      const questionIndex = parseInt(key.slice(1));
+      const question = context.followUpQuestions?.[questionIndex] || `Question ${questionIndex + 1}`;
+      followUpContent += `Q: ${question}\n`;
       followUpContent += `A: ${answer}\n\n`;
     });
 
@@ -36,18 +38,56 @@ export async function POST(request: Request) {
           role: "system",
           content: `You are an expert investment analyst. You have already performed an initial analysis and asked follow-up questions. Now complete your comprehensive investment assessment using all available information.
 
-Generate a detailed investment report including:
+Generate a detailed investment report with this exact JSON structure:
 
-1. Investment Recommendation (Strong Buy, Buy, Hold, Pass) with clear rationale
-2. Overall Investment Score (0-100)
-3. Key Strengths and Opportunities
-4. Major Risks and Concerns
-5. Detailed Analysis by Category
-6. Specific Action Items and Next Steps
-7. Comparison to similar successful companies
-8. Funding recommendation and valuation estimate
-
-Format as a structured JSON for the results page.`
+{
+  "analysis": {
+    "overallScore": 75, // Overall investment score 0-100
+    "executiveSummary": "string",
+    "investmentThesis": "string", 
+    "marketOpportunity": "string",
+    "customerPain": "string",
+    "solution": "string",
+    "competitivePosition": "string",
+    "teamAssessment": "string",
+    "financialAnalysis": "string",
+    "riskAssessment": "string",
+    "growthStrategy": "string",
+    "fundingAnalysis": "string",
+    // Category scores 0-100
+    "problemSolutionScore": 80,
+    "marketScore": 75,
+    "competitiveScore": 70,
+    "tractionScore": 85,
+    "financialScore": 78,
+    "teamScore": 88,
+    "financialHealthScore": 75,
+    "riskScore": 70,
+    "pitchScore": 80,
+    // Insights arrays (2-3 bullet points each)
+    "problemInsights": ["insight1", "insight2"],
+    "marketInsights": ["insight1", "insight2"],
+    "moatInsights": ["insight1", "insight2"],
+    "tractionInsights": ["insight1", "insight2"],
+    "financialInsights": ["insight1", "insight2"],
+    "teamInsights": ["insight1", "insight2"],
+    "healthInsights": ["insight1", "insight2"],
+    "riskInsights": ["insight1", "insight2"],
+    "pitchInsights": ["insight1", "insight2"],
+    // 3-5 actionable insights
+    "actionableInsights": [
+      {
+        "title": "Action title",
+        "impact": "high/medium/low",
+        "timeframe": "1-2 weeks", 
+        "description": "What to do",
+        "implementation": ["step1", "step2", "step3"],
+        "expectedResult": "Expected outcome",
+        "investorPerspective": "Why investors care"
+      }
+    ]
+  }
+}`
         },
         {
           role: "user",

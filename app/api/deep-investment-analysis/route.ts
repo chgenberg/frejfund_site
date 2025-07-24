@@ -81,16 +81,50 @@ After analysis, determine if you need additional information to provide a comple
 Return a JSON object with:
 {
   "initialAnalysis": {
+    "overallScore": 75, // Overall investment score 0-100
     "executiveSummary": "string",
     "investmentThesis": "string",
     "marketOpportunity": "string",
-    "productAnalysis": "string",
+    "customerPain": "string",
+    "solution": "string",
     "competitivePosition": "string",
     "teamAssessment": "string",
     "financialAnalysis": "string",
     "riskAssessment": "string",
     "growthStrategy": "string",
-    "fundingAnalysis": "string"
+    "fundingAnalysis": "string",
+    // Category scores 0-100
+    "problemSolutionScore": 80,
+    "marketScore": 75,
+    "competitiveScore": 70,
+    "tractionScore": 85,
+    "financialScore": 78,
+    "teamScore": 88,
+    "financialHealthScore": 75,
+    "riskScore": 70,
+    "pitchScore": 80,
+    // Insights arrays
+    "problemInsights": ["insight1", "insight2"],
+    "marketInsights": ["insight1", "insight2"],
+    "moatInsights": ["insight1", "insight2"],
+    "tractionInsights": ["insight1", "insight2"],
+    "financialInsights": ["insight1", "insight2"],
+    "teamInsights": ["insight1", "insight2"],
+    "healthInsights": ["insight1", "insight2"],
+    "riskInsights": ["insight1", "insight2"],
+    "pitchInsights": ["insight1", "insight2"],
+    // Actionable insights
+    "actionableInsights": [
+      {
+        "title": "Action title",
+        "impact": "high/medium/low", 
+        "timeframe": "1-2 weeks",
+        "description": "What to do",
+        "implementation": ["step1", "step2"],
+        "expectedResult": "Expected outcome",
+        "investorPerspective": "Why investors care"
+      }
+    ]
   },
   "followUpQuestions": ["question1", "question2", ...] // Empty array if no questions needed
 }`
@@ -113,6 +147,7 @@ Return a JSON object with:
       await storeAnalysisContext({
         userInfo,
         initialAnalysis: analysisData.initialAnalysis,
+        followUpQuestions: analysisData.followUpQuestions,
         combinedContent
       });
     }
