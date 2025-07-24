@@ -78,20 +78,53 @@ export default function DeepAnalysisWizard() {
   const [answers, setAnswers] = useState<DeepAnalysisAnswers>({} as DeepAnalysisAnswers);
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [personalizedQuestions, setPersonalizedQuestions] = useState<any[]>(DEEP_QUESTIONS);
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
 
   useEffect(() => {
-    setProgress(((currentQuestion + 1) / DEEP_QUESTIONS.length) * 100);
-  }, [currentQuestion]);
+    setProgress(((currentQuestion + 1) / personalizedQuestions.length) * 100);
+  }, [currentQuestion, personalizedQuestions]);
+
+  // Load previous analysis and generate personalized questions
+  useEffect(() => {
+    const generatePersonalizedQuestions = async () => {
+      try {
+        const previousAnalysis = localStorage.getItem('latestAnalysisResult');
+        
+        if (previousAnalysis) {
+          const response = await fetch('/api/generate-deep-questions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ previousAnalysis: JSON.parse(previousAnalysis) })
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            if (result.questions && result.questions.length > 0) {
+              setPersonalizedQuestions(result.questions);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error generating personalized questions:', error);
+        // Fallback to default questions
+      } finally {
+        setLoadingQuestions(false);
+      }
+    };
+
+    generatePersonalizedQuestions();
+  }, []);
 
   const handleAnswerChange = (value: string) => {
     setAnswers(prev => ({
       ...prev,
-      [DEEP_QUESTIONS[currentQuestion].id]: value
+      [personalizedQuestions[currentQuestion].id]: value
     }));
   };
 
   const handleNext = () => {
-    if (currentQuestion < DEEP_QUESTIONS.length - 1) {
+    if (currentQuestion < personalizedQuestions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
     } else {
       handleSubmit();
@@ -142,9 +175,29 @@ export default function DeepAnalysisWizard() {
     }
   };
 
-  const currentQuestionData = DEEP_QUESTIONS[currentQuestion];
-  const currentAnswer = answers[currentQuestionData.id as keyof DeepAnalysisAnswers] || '';
-  const isLastQuestion = currentQuestion === DEEP_QUESTIONS.length - 1;
+  const currentQuestionData = personalizedQuestions[currentQuestion];
+  const currentAnswer = answers[currentQuestionData?.id as keyof DeepAnalysisAnswers] || '';
+  const isLastQuestion = currentQuestion === personalizedQuestions.length - 1;
+
+  if (loadingQuestions) {
+    return (
+      <div className="min-h-screen relative flex items-center justify-center">
+        <Image
+          src="/bakgrund.png"
+          alt="Background"
+          fill
+          className="object-cover -z-10"
+          priority
+        />
+        
+        <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-12 border border-white/20 text-center max-w-lg">
+          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+          <h2 className="text-2xl font-bold text-white mb-4">Preparing Your Personalized Questions...</h2>
+          <p className="text-white/70">Analyzing your previous responses to create targeted follow-up questions...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -181,7 +234,7 @@ export default function DeepAnalysisWizard() {
           {/* Progress Bar */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-white/60 text-sm">Question {currentQuestion + 1} of {DEEP_QUESTIONS.length}</span>
+              <span className="text-white/60 text-sm">Question {currentQuestion + 1} of {personalizedQuestions.length}</span>
               <span className="text-white/60 text-sm">{Math.round(progress)}% Complete</span>
             </div>
             <div className="w-full bg-white/10 rounded-full h-2">
@@ -193,26 +246,27 @@ export default function DeepAnalysisWizard() {
           </div>
 
           {/* Question Card */}
-          <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20">
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold text-white mb-3">
-                {currentQuestionData.title}
-              </h1>
-              <p className="text-xl text-white/70">
-                {currentQuestionData.subtitle}
-              </p>
-            </div>
+          {currentQuestionData && (
+            <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20">
+              <div className="mb-6">
+                <h1 className="text-3xl font-bold text-white mb-3">
+                  {currentQuestionData.title}
+                </h1>
+                <p className="text-xl text-white/70">
+                  {currentQuestionData.subtitle}
+                </p>
+              </div>
 
-            {/* Answer Input */}
-            <div className="mb-8">
-              <textarea
-                value={currentAnswer}
-                onChange={(e) => handleAnswerChange(e.target.value)}
-                placeholder={currentQuestionData.placeholder}
-                className="w-full h-32 bg-white/5 border border-white/20 rounded-xl p-4 text-white placeholder-white/50 resize-none focus:outline-none focus:border-blue-500 transition-colors"
-                autoFocus
-              />
-            </div>
+              {/* Answer Input */}
+              <div className="mb-8">
+                <textarea
+                  value={currentAnswer}
+                  onChange={(e) => handleAnswerChange(e.target.value)}
+                  placeholder={currentQuestionData.placeholder}
+                  className="w-full h-32 bg-white/5 border border-white/20 rounded-xl p-4 text-white placeholder-white/50 resize-none focus:outline-none focus:border-blue-500 transition-colors"
+                  autoFocus
+                />
+              </div>
 
             {/* Navigation Buttons */}
             <div className="flex justify-between items-center">
@@ -239,6 +293,7 @@ export default function DeepAnalysisWizard() {
               </button>
             </div>
           </div>
+          )}
 
           {/* Tips */}
           <div className="mt-6 bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4 text-center">
