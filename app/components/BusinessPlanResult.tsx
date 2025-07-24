@@ -246,7 +246,7 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
         {currentSection === 'score' ? (
           <>
             <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold mb-4">Din Affärsplan</h1>
+              <h1 className="text-4xl font-bold mb-4">Your Business Plan</h1>
               <div className="inline-block">
                 <div className="w-48 h-48 mx-auto">
                   <CircularProgressbar
@@ -268,13 +268,13 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
                 onClick={() => setCurrentSection('score')}
                 className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
               >
-                📊 Poäng & Analys
+                📊 Score & Analysis
               </button>
               <button
                 onClick={() => setCurrentSection('insights')}
                 className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
               >
-                💡 Insikter & Rekommendationer
+                💡 Insights & Recommendations
               </button>
               <button
                 onClick={() => setCurrentSection('actions')}

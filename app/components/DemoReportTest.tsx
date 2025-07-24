@@ -21,7 +21,7 @@ export default function DemoReportTest() {
             const dummyData = {
               companyName: "Fiktivt AB",
               score: 88,
-              scoreExplanation: "Din affärsplan är mycket lovande och redo för investerare.",
+              scoreExplanation: "Your business plan is very promising and ready for investors.",
               logoUrl: "https://placehold.co/200x80?text=LOGO",
               date: new Date().toLocaleDateString('sv-SE'),
               sections: [

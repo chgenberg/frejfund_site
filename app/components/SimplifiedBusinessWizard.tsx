@@ -194,68 +194,24 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           insights: analysis.pitchInsights || ["Engaging story", "Professional presentation"]
         }
       },
-      actionableInsights: analysis.actionableInsights?.map((insight: any) => ({
+      actionableInsights: analysis.actionableInsights?.length > 0 ? analysis.actionableInsights.map((insight: any) => ({
         ...insight,
         _source: 'ai-generated'
-      })) || [
+      })) : [
         {
-          title: "Quantify customer pain in monetary terms",
-          _source: "fallback",
+          title: "Complete detailed business analysis",
+          _source: "needs-more-info",
           impact: "high" as const,
-          timeframe: "1-2 weeks",
-          description: "Your solution addresses a problem but lacks concrete data about customer costs.",
+          timeframe: "15 minutes",
+          description: "We need more specific information about your business to provide personalized recommendations.",
           implementation: [
-            "Interview 10 existing customers about their time investment",
-            "Calculate hourly cost × hours = annual cost",
-            "Document 3-5 concrete examples with company names"
+            "Answer follow-up questions about your target market",
+            "Provide details about your current customers and their specific pain points",
+            "Share information about your business model and pricing",
+            "Describe your competitive landscape and unique advantages"
           ],
-          expectedResult: "Increase conversion by 30-40% by showing 'Save $50,000/year' instead of 'Save time'",
-          investorPerspective: "Investors want to see deep understanding of customer economics. Numbers > feelings."
-        },
-        {
-          title: "Build strategic partnerships early",
-          _source: "fallback",
-          impact: "medium" as const,
-          timeframe: "4-6 weeks",
-          description: "Strategic partnerships can accelerate growth and provide market validation.",
-          implementation: [
-            "Identify 5-10 potential strategic partners in your industry",
-            "Develop partnership value propositions for each",
-            "Reach out with concrete collaboration proposals",
-            "Start with pilot partnerships to prove concept"
-          ],
-          expectedResult: "Gain market credibility and potentially 20-30% faster customer acquisition",
-          investorPerspective: "Strategic partnerships demonstrate market validation and reduce go-to-market risks."
-        },
-        {
-          title: "Strengthen your competitive moat",
-          _source: "fallback",
-          impact: "high" as const,
-          timeframe: "3-4 weeks",
-          description: "Building defensible advantages will increase long-term value and investor appeal.",
-          implementation: [
-            "Document your unique processes and methodologies",
-            "File provisional patents for key innovations",
-            "Build network effects into your product",
-            "Create high switching costs for customers"
-          ],
-          expectedResult: "Improved competitive positioning and higher valuation multiples",
-          investorPerspective: "Investors pay premium valuations for defensible businesses with clear moats."
-        },
-        {
-          title: "Implement data-driven growth tracking",
-          _source: "fallback",
-          impact: "medium" as const,
-          timeframe: "2-3 weeks",
-          description: "Investors need clear visibility into your growth metrics and unit economics.",
-          implementation: [
-            "Set up comprehensive analytics tracking",
-            "Define and measure key KPIs weekly",
-            "Create investor-ready dashboards",
-            "Establish cohort analysis for customer retention"
-          ],
-          expectedResult: "Demonstrate growth predictability and operational excellence",
-          investorPerspective: "Data-driven companies receive higher valuations due to reduced execution risk."
+          expectedResult: "Receive 3-5 personalized, actionable insights tailored to your specific business situation",
+          investorPerspective: "Investors value entrepreneurs who can articulate their business model and market position clearly."
         }
       ],
       answers: {
@@ -288,27 +244,51 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
     // Show completion progress
     setIsCompletingAnalysis(true);
     setCompletionProgress(0);
-    setCompletionStage('Processing your answers...');
+    setCompletionStage('Initializing AI analysis...');
 
-    // Simulate progress stages
+    // Smooth progress animation over 45 seconds
+    const totalDuration = 45000; // 45 seconds
+    const updateInterval = 100; // Update every 100ms for smooth animation
+    const totalSteps = totalDuration / updateInterval;
+    let currentStep = 0;
+    
+    // Progress stages with better distribution
     const progressStages = [
-      { progress: 20, stage: 'Processing your answers...', delay: 800 },
-      { progress: 40, stage: 'Analyzing business model...', delay: 1200 },
-      { progress: 60, stage: 'Evaluating market potential...', delay: 1000 },
-      { progress: 80, stage: 'Generating investment recommendations...', delay: 1500 },
-      { progress: 95, stage: 'Finalizing analysis report...', delay: 800 }
+      { threshold: 15, stage: 'Processing your answers...' },
+      { threshold: 30, stage: 'Analyzing business model...' },
+      { threshold: 45, stage: 'Evaluating market potential...' },
+      { threshold: 60, stage: 'Comparing with industry benchmarks...' },
+      { threshold: 75, stage: 'Generating investment recommendations...' },
+      { threshold: 88, stage: 'Creating detailed insights...' },
+      { threshold: 96, stage: 'Finalizing analysis report...' }
     ];
 
-    // Start progress simulation
-    let currentStageIndex = 0;
+    // Smooth progress animation
     const progressInterval = setInterval(() => {
-      if (currentStageIndex < progressStages.length) {
-        const stage = progressStages[currentStageIndex];
-        setCompletionProgress(stage.progress);
-        setCompletionStage(stage.stage);
-        currentStageIndex++;
+      currentStep++;
+      
+      // Calculate progress using easing function for natural feel
+      const linearProgress = currentStep / totalSteps;
+      const easedProgress = 1 - Math.pow(1 - linearProgress, 3); // Cubic ease-in-out
+      const currentProgress = Math.min(easedProgress * 98, 98); // Cap at 98% until API completes
+      
+      setCompletionProgress(currentProgress);
+      
+      // Update stage based on progress
+      const currentStage = progressStages.find((stage, index) => {
+        const nextStage = progressStages[index + 1];
+        return currentProgress >= stage.threshold && (!nextStage || currentProgress < nextStage.threshold);
+      });
+      
+      if (currentStage) {
+        setCompletionStage(currentStage.stage);
       }
-    }, 1000);
+      
+      // Stop at 98% until API completes
+      if (currentProgress >= 98) {
+        clearInterval(progressInterval);
+      }
+    }, updateInterval);
 
     try {
       // Make the actual API call
@@ -321,18 +301,38 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         })
       }).then(res => res.json());
 
-      // Complete progress
+      // Complete progress smoothly to 100%
       clearInterval(progressInterval);
-      setCompletionProgress(100);
-      setCompletionStage('Analysis complete! Redirecting...');
-
-      // Wait a moment to show completion
-      setTimeout(() => {
-        // Transform and store in localStorage with correct key
-        const transformedData = transformAnalysisToResultFormat(analysisData);
-        localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
-        window.location.href = '/result';
-      }, 1000);
+      
+      // Get current progress value before animating to 100%
+      setCompletionProgress(prev => {
+        const finalProgress = prev;
+        
+        // Animate from current progress to 100%
+        const finalSteps = 10;
+        let finalStep = 0;
+        
+        const finalInterval = setInterval(() => {
+          finalStep++;
+          const progress = finalProgress + ((100 - finalProgress) * finalStep / finalSteps);
+          setCompletionProgress(progress);
+          
+          if (finalStep >= finalSteps) {
+            clearInterval(finalInterval);
+            setCompletionStage('Analysis complete! Redirecting...');
+            
+            // Wait a moment to show completion
+            setTimeout(() => {
+              // Transform and store in localStorage with correct key
+              const transformedData = transformAnalysisToResultFormat(analysisData);
+              localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
+              window.location.href = '/result';
+            }, 1000);
+          }
+        }, 50);
+        
+        return prev;
+      });
 
     } catch (error) {
       clearInterval(progressInterval);
@@ -525,56 +525,103 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
 
   const renderCompletingAnalysis = () => (
     <div className="text-center py-12">
-      <div className="relative w-32 h-32 mx-auto mb-8">
-        <svg className="w-32 h-32 transform -rotate-90">
+      {/* Modern circular progress */}
+      <div className="relative w-48 h-48 mx-auto mb-8">
+        {/* Outer glow effect */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-purple-600/20 blur-xl animate-pulse"></div>
+        
+        {/* Background circle */}
+        <svg className="w-48 h-48 transform -rotate-90">
           <circle
-            cx="64"
-            cy="64"
-            r="60"
-            stroke="#e5e7eb"
-            strokeWidth="8"
+            cx="96"
+            cy="96"
+            r="88"
+            stroke="rgba(229, 231, 235, 0.3)"
+            strokeWidth="12"
             fill="none"
           />
+          {/* Progress circle */}
           <circle
-            cx="64"
-            cy="64"
-            r="60"
-            stroke="url(#completionGradient)"
-            strokeWidth="8"
+            cx="96"
+            cy="96"
+            r="88"
+            stroke="url(#progressGradient)"
+            strokeWidth="12"
             fill="none"
-            strokeDasharray={`${2 * Math.PI * 60}`}
-            strokeDashoffset={`${2 * Math.PI * 60 * (1 - completionProgress / 100)}`}
-            className="transition-all duration-500"
+            strokeDasharray={`${2 * Math.PI * 88}`}
+            strokeDashoffset={`${2 * Math.PI * 88 * (1 - completionProgress / 100)}`}
+            strokeLinecap="round"
+            className="transition-all duration-300 filter drop-shadow-lg"
           />
           <defs>
-            <linearGradient id="completionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#059669" />
-              <stop offset="100%" stopColor="#10b981" />
+            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#9333ea" />
+              <stop offset="50%" stopColor="#ec4899" />
+              <stop offset="100%" stopColor="#9333ea" />
             </linearGradient>
           </defs>
         </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xl font-bold text-gray-900">{Math.round(completionProgress)}%</span>
+        
+        {/* Center content */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            {Math.round(completionProgress)}
+          </span>
+          <span className="text-sm text-gray-600 font-medium">percent</span>
         </div>
       </div>
       
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">Completing your analysis...</h3>
-      <p className="text-gray-800 mb-4">{completionStage}</p>
+      <h3 className="text-2xl font-bold text-gray-900 mb-3">Completing your analysis</h3>
+      <p className="text-gray-600 mb-8 font-medium animate-pulse">{completionStage}</p>
       
-      {/* Progress stages visualization */}
-      <div className="max-w-md mx-auto">
-        <div className="flex justify-between text-xs text-gray-600 mb-2">
-          <span className={completionProgress >= 20 ? "text-green-600 font-semibold" : ""}>Processing</span>
-          <span className={completionProgress >= 40 ? "text-green-600 font-semibold" : ""}>Analyzing</span>
-          <span className={completionProgress >= 60 ? "text-green-600 font-semibold" : ""}>Evaluating</span>
-          <span className={completionProgress >= 80 ? "text-green-600 font-semibold" : ""}>Generating</span>
-          <span className={completionProgress >= 100 ? "text-green-600 font-semibold" : ""}>Complete</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+      {/* Modern progress stages */}
+      <div className="max-w-lg mx-auto">
+        <div className="relative">
+          {/* Progress line background */}
+          <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 rounded-full -translate-y-1/2"></div>
+          
+          {/* Active progress line */}
           <div 
-            className="bg-gradient-to-r from-green-500 to-emerald-600 h-2 rounded-full transition-all duration-500"
+            className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full -translate-y-1/2 transition-all duration-500"
             style={{ width: `${completionProgress}%` }}
           ></div>
+          
+          {/* Stage dots */}
+          <div className="relative flex justify-between">
+            {[
+              { name: 'Start', threshold: 0 },
+              { name: 'Process', threshold: 25 },
+              { name: 'Analyze', threshold: 50 },
+              { name: 'Generate', threshold: 75 },
+              { name: 'Complete', threshold: 100 }
+            ].map((stage, index) => (
+              <div key={index} className="flex flex-col items-center">
+                <div className={`
+                  w-4 h-4 rounded-full border-3 transition-all duration-500
+                  ${completionProgress >= stage.threshold 
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 border-purple-600 scale-125' 
+                    : 'bg-white border-gray-300'
+                  }
+                `}></div>
+                <span className={`
+                  text-xs mt-2 transition-all duration-500
+                  ${completionProgress >= stage.threshold 
+                    ? 'text-purple-600 font-semibold' 
+                    : 'text-gray-400'
+                  }
+                `}>
+                  {stage.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* Estimated time */}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500">
+            Estimated time remaining: {Math.max(1, Math.ceil((100 - completionProgress) * 0.45))} seconds
+          </p>
         </div>
       </div>
     </div>

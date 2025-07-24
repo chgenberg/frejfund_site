@@ -171,7 +171,7 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
       <div className="container mx-auto px-4 py-8">
         {/* Header with Overall Score */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-8">Investeringsanalys!</h1>
+          <h1 className="text-4xl font-bold text-white mb-8">Investment Analysis!</h1>
           
           <div className="inline-block">
             <div className="w-48 h-48 relative">
@@ -189,8 +189,8 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
               <div className="absolute -bottom-8 left-0 right-0 text-center">
                 <p className="text-xl font-semibold text-white">
                   {data.overallScore >= 75 ? 'Investor Ready' :
-                   data.overallScore >= 50 ? 'Stark Potential' :
-                   data.overallScore >= 25 ? 'Lovande Start' : 'Tidigt Stadium'}
+                   data.overallScore >= 50 ? 'Strong Potential' :
+                   data.overallScore >= 25 ? 'Promising Start' : 'Early Stage'}
                 </p>
               </div>
             </div>
@@ -245,15 +245,15 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
           {/* Premium Analysis Section */}
           {data.premiumAnalysis && activeCategory === 'problemSolution' && (
             <div className="mt-8 p-6 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl border border-purple-500/50">
-              <h3 className="text-xl font-semibold text-white mb-4">🎯 Premium Analys</h3>
+              <h3 className="text-xl font-semibold text-white mb-4">🎯 Premium Analysis</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white/10 rounded-lg p-4">
-                  <h4 className="font-semibold text-white mb-2">SWOT-analys</h4>
-                  <p className="text-sm text-white/70">Detaljerad analys tillgänglig</p>
+                  <h4 className="font-semibold text-white mb-2">SWOT Analysis</h4>
+                  <p className="text-sm text-white/70">Detailed analysis available</p>
                 </div>
                 <div className="bg-white/10 rounded-lg p-4">
-                  <h4 className="font-semibold text-white mb-2">Benchmark</h4>
-                  <p className="text-sm text-white/70">Branschjämförelser inkluderade</p>
+                  <h4 className="font-semibold text-white mb-2">Benchmarks</h4>
+                  <p className="text-sm text-white/70">Industry comparisons included</p>
                 </div>
               </div>
             </div>
@@ -279,7 +279,7 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
             Download report
           </button>
           <button className="px-8 py-3 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition-all">
-            Dela resultat
+            Share results
           </button>
         </div>
       </div>

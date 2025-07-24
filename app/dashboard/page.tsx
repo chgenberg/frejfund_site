@@ -182,11 +182,11 @@ export default function Dashboard() {
                     
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-white/60 text-sm">Poäng</span>
+                        <span className="text-white/60 text-sm">Score</span>
                         <span className="text-white font-semibold">{analysis.score}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-white/60 text-sm">Datum</span>
+                        <span className="text-white/60 text-sm">Date</span>
                         <span className="text-white/80 text-sm">
                           {new Date(analysis.created_at).toLocaleDateString('sv-SE')}
                         </span>
@@ -198,7 +198,7 @@ export default function Dashboard() {
                         href={`/dashboard/analysis/${analysis.id}`}
                         className="block w-full px-4 py-2 bg-white/10 text-white text-center rounded-lg hover:bg-white/20 transition-colors"
                       >
-                        Visa Analys
+                        View Analysis
                       </Link>
                     </div>
                   </div>

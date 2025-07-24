@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 import Image from "next/image";
-import PitchGenerator from '../components/PitchGenerator';
+
 
 export default function PitchPingvinen() {
   const [recording, setRecording] = useState(false);
@@ -165,12 +165,6 @@ export default function PitchPingvinen() {
               </div>
             </div>
           )}
-        </div>
-        {/* Inspiration/AI pitch-generator */}
-        <div className="bg-gradient-to-br from-[#7edcff]/90 to-[#16475b]/90 text-white rounded-2xl shadow-xl border border-[#7edcff]/40 p-8 max-w-2xl mx-auto mt-2 flex flex-col items-center">
-          <h3 className="text-2xl font-extrabold mb-2 text-center">Need inspiration?</h3>
-          <p className="text-white/90 text-center mb-4 text-lg">Let AI create a pitch script for you!<br />Fill in three quick fields and get a ready script in 30 seconds.<br /><span className='text-[#ffe066] font-semibold'>Tip: Try different value propositions to see what sounds best!</span></p>
-          <PitchGenerator />
         </div>
       </div>
     </div>

@@ -100,7 +100,7 @@ export default function AnalysisDetailPage() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                Tillbaka till dashboard
+                Back to dashboard
               </Link>
               
               {!analysis.is_premium && (
@@ -108,7 +108,7 @@ export default function AnalysisDetailPage() {
                   onClick={handleUpgradeToPremium}
                   className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all"
                 >
-                  Uppgradera till Premium
+                  Upgrade to Premium
                 </button>
               )}
             </div>

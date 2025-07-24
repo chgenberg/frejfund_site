@@ -15,7 +15,7 @@ function ResultContent() {
   if (!dataParam) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900">
-        <p className="text-white text-xl">Ingen data tillgänglig</p>
+        <p className="text-white text-xl">No data available</p>
       </div>
     );
   }
@@ -26,7 +26,7 @@ function ResultContent() {
   } catch (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900">
-        <p className="text-white text-xl">Fel vid laddning av data</p>
+        <p className="text-white text-xl">Error loading data</p>
       </div>
     );
   }

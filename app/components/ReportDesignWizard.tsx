@@ -67,9 +67,9 @@ export default function ReportDesignWizard({ onConfirm }: { onConfirm: (design: 
             <div style={{ fontFamily: font.fontFamily }}>
               <div className="flex flex-col items-center mb-4">
                 <div className="w-24 h-24 rounded-full border-8 flex items-center justify-center text-4xl font-bold mb-2" style={{ borderColor: secondary, background: accent, color: primary }}>78</div>
-                <div className="text-lg font-medium text-center mt-2" style={{ color: primary }}>Bra! Er affärsplan är lovande men behöver vissa förbättringar.</div>
+                <div className="text-lg font-medium text-center mt-2" style={{ color: primary }}>Good! Your business plan is promising but needs certain improvements.</div>
               </div>
-              <h1 className="text-3xl font-extrabold mb-2" style={{ color: primary }}>Affärsanalys</h1>
+                              <h1 className="text-3xl font-extrabold mb-2" style={{ color: primary }}>Business Analysis</h1>
               <h2 className="text-xl font-semibold mb-1">Företagsnamn AB</h2>
               <div className="text-gray-500 mb-2">2025-06-01</div>
               <hr className="my-4" style={{ borderColor: secondary }} />

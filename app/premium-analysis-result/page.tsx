@@ -59,15 +59,15 @@ export default function PremiumAnalysisResultPage() {
 
   const sections = [
     { id: 'executive-summary', title: 'Executive Summary', icon: '📋' },
-    { id: 'market-deep-dive', title: 'Marknadsanalys Deep Dive', icon: '📊' },
-    { id: 'competitive-landscape', title: 'Konkurrenslandskap', icon: '🏆' },
-    { id: 'business-model-analysis', title: 'Affärsmodellanalys', icon: '💰' },
-    { id: 'financial-projections', title: 'Finansiella Projektioner', icon: '📈' },
-    { id: 'risk-assessment', title: 'Riskbedömning', icon: '⚠️' },
-    { id: 'growth-strategy', title: 'Tillväxtstrategi', icon: '🚀' },
-    { id: 'investor-readiness', title: 'Investerarberedskap', icon: '💼' },
-    { id: 'action-plan', title: 'Handlingsplan', icon: '✅' },
-    { id: 'benchmarks', title: 'Branschjämförelser', icon: '📏' }
+    { id: 'market-deep-dive', title: 'Market Analysis Deep Dive', icon: '📊' },
+    { id: 'competitive-landscape', title: 'Competitive Landscape', icon: '🏆' },
+    { id: 'business-model-analysis', title: 'Business Model Analysis', icon: '💰' },
+    { id: 'financial-projections', title: 'Financial Projections', icon: '📈' },
+    { id: 'risk-assessment', title: 'Risk Assessment', icon: '⚠️' },
+    { id: 'growth-strategy', title: 'Growth Strategy', icon: '🚀' },
+    { id: 'investor-readiness', title: 'Investor Readiness', icon: '💼' },
+    { id: 'action-plan', title: 'Action Plan', icon: '✅' },
+    { id: 'benchmarks', title: 'Industry Benchmarks', icon: '📏' }
   ];
 
   if (isGenerating) {
@@ -80,13 +80,13 @@ export default function PremiumAnalysisResultPage() {
             <div className="absolute inset-2 border-4 border-transparent border-t-pink-500 rounded-full animate-spin" style={{ animationDuration: '1.5s' }}></div>
             <div className="absolute inset-4 border-4 border-transparent border-t-blue-500 rounded-full animate-spin" style={{ animationDuration: '2s' }}></div>
           </div>
-          <h2 className="text-3xl font-bold text-white mb-4">AI genererar din premium-analys...</h2>
-          <p className="text-white/60">Detta tar cirka 30 sekunder</p>
-          <div className="mt-8 space-y-2">
-            <p className="text-white/40 text-sm animate-pulse">Analyserar marknadspotential...</p>
-            <p className="text-white/40 text-sm animate-pulse" style={{ animationDelay: '0.5s' }}>Jämför med 100+ framgångsrika startups...</p>
-            <p className="text-white/40 text-sm animate-pulse" style={{ animationDelay: '1s' }}>Genererar finansiella projektioner...</p>
-          </div>
+          <h2 className="text-3xl font-bold text-white mb-4">AI is generating your premium analysis...</h2>
+          <p className="text-white/60">This takes approximately 30 seconds</p>
+                      <div className="mt-8 space-y-2">
+              <p className="text-white/40 text-sm animate-pulse">Analyzing market potential...</p>
+              <p className="text-white/40 text-sm animate-pulse" style={{ animationDelay: '0.5s' }}>Comparing with 100+ successful startups...</p>
+              <p className="text-white/40 text-sm animate-pulse" style={{ animationDelay: '1s' }}>Generating financial projections...</p>
+            </div>
         </div>
       </div>
     );
@@ -160,7 +160,7 @@ export default function PremiumAnalysisResultPage() {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-              <span className="text-3xl">👑</span> Premium AI-Analys - {answers.company_name || 'Ditt Företag'}
+              <span className="text-3xl">👑</span> Premium AI Analysis - {answers.company_name || 'Your Company'}
             </h1>
           </div>
         </div>
@@ -195,7 +195,7 @@ export default function PremiumAnalysisResultPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              Ladda ner Premium PDF
+              Download Premium PDF
             </button>
           </div>
 
@@ -244,22 +244,22 @@ export default function PremiumAnalysisResultPage() {
                 </h2>
                 
                 <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 backdrop-blur-xl rounded-3xl p-8 border border-purple-500/20 mb-8">
-                  <h3 className="text-xl font-semibold text-white mb-4">Huvudsakliga Styrkor</h3>
+                  <h3 className="text-xl font-semibold text-white mb-4">Key Strengths</h3>
                   <div className="grid gap-4">
                     {[
                       {
-                        title: answers.market_size ? 'Stark Marknadspotential' : 'Marknadsmöjlighet',
-                        desc: answers.market_size || 'Er marknad visar potential för tillväxt.',
+                        title: answers.market_size ? 'Strong Market Potential' : 'Market Opportunity',
+                        desc: answers.market_size || 'Your market shows potential for growth.',
                         score: marketPotential
                       },
                       {
-                        title: answers.team ? 'Erfaret Team' : 'Teamkompetens',
-                        desc: answers.team || 'Teamet har relevant bakgrund för att driva bolaget framåt.',
+                        title: answers.team ? 'Experienced Team' : 'Team Competence',
+                        desc: answers.team || 'The team has relevant background to drive the company forward.',
                         score: 88
                       },
                       {
-                        title: answers.revenue_model ? 'Validerad Affärsmodell' : 'Affärsmodell',
-                        desc: answers.revenue_model || 'Er affärsmodell har potential att generera hållbara intäkter.',
+                        title: answers.revenue_model ? 'Validated Business Model' : 'Business Model',
+                        desc: answers.revenue_model || 'Your business model has potential to generate sustainable revenue.',
                         score: scalability
                       }
                     ].map((strength, index) => (
@@ -275,26 +275,26 @@ export default function PremiumAnalysisResultPage() {
                 </div>
 
                 <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 mb-8">
-                  <h3 className="text-xl font-semibold text-white mb-4">Kritiska Framgångsfaktorer</h3>
+                  <h3 className="text-xl font-semibold text-white mb-4">Critical Success Factors</h3>
                   <div className="space-y-6">
                     {[
                       {
-                        factor: 'Kundvalidering',
-                        current: answers.traction ? `Ni har ${answers.traction}` : 'Begränsad traction hittills',
-                        needed: 'Behöver 10+ betalande kunder för proof of concept',
-                        action: 'Fokusera på pilotprojekt med early adopters'
+                        factor: 'Customer Validation',
+                        current: answers.traction ? `You have ${answers.traction}` : 'Limited traction so far',
+                        needed: 'Need 10+ paying customers for proof of concept',
+                        action: 'Focus on pilot projects with early adopters'
                       },
                       {
-                        factor: 'Finansiering',
-                        current: answers.capital_block ? 'Kapitalbehov identifierat' : 'Finansieringsstrategi behövs',
-                        needed: 'Säkra 6-12 månaders runway',
-                        action: 'Förbered pitch deck och börja investerardialog'
+                        factor: 'Financing',
+                        current: answers.capital_block ? 'Capital needs identified' : 'Financing strategy needed',
+                        needed: 'Secure 6-12 months runway',
+                        action: 'Prepare pitch deck and start investor dialogue'
                       },
                       {
-                        factor: 'Marknadsposition',
-                        current: answers.competitors ? 'Konkurrenter identifierade' : 'Konkurrenssituation oklar',
-                        needed: 'Tydlig differentiering och USP',
-                        action: 'Genomför djupare konkurrentanalys'
+                        factor: 'Market Position',
+                        current: answers.competitors ? 'Competitors identified' : 'Competitive situation unclear',
+                        needed: 'Clear differentiation and USP',
+                        action: 'Conduct deeper competitor analysis'
                       }
                     ].map((factor, index) => (
                       <div key={index} className="border-l-4 border-purple-500/50 pl-6">
@@ -385,14 +385,14 @@ export default function PremiumAnalysisResultPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Ladda ner Premium-rapport</h2>
-                  <p className="text-white/60 mb-6">Din kompletta 50+ sidor analys är redo att laddas ner.</p>
+                  <h2 className="text-2xl font-bold text-white mb-2">Download Premium Report</h2>
+                                      <p className="text-white/60 mb-6">Your complete 50+ page analysis is ready to download.</p>
                   
                   <button
                     onClick={handleDownloadPDF}
                     className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-full hover:shadow-lg hover:scale-105 transition-all"
                   >
-                    Ladda ner PDF
+                    Download PDF
                   </button>
                 </div>
               </>

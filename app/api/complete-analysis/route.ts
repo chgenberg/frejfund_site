@@ -35,10 +35,33 @@ export async function POST(request: Request) {
       model: "gpt-4-turbo-preview",
       messages: [
         {
-          role: "system",
+          role: "system", 
           content: `You are an expert investment analyst. You have already performed an initial analysis and asked follow-up questions. Now complete your comprehensive investment assessment using all available information.
 
-CRITICAL REQUIREMENT: You MUST generate 3-5 specific, actionable insights that will help increase the company's valuation and investment attractiveness. These should be concrete actions with clear implementation steps, timelines, and expected results.
+CRITICAL REQUIREMENT FOR PERSONALIZED ACTIONABLE INSIGHTS:
+You MUST generate 3-5 SPECIFIC, TAILORED actionable insights based on THIS EXACT COMPANY'S situation. 
+
+FORBIDDEN - DO NOT use generic advice like:
+- "Quantify customer pain in monetary terms"
+- "Build strategic partnerships early" 
+- "Strengthen your competitive moat"
+- "Implement data-driven growth tracking"
+
+REQUIRED - Generate insights that are:
+1. SPECIFIC to their industry/business model mentioned
+2. REFERENCE their actual target customers described
+3. USE their specific challenges/opportunities identified  
+4. MENTION their actual product/service details
+5. TAILORED to their current stage and context
+6. INCLUDE specific numbers/metrics relevant to their situation
+
+Example of GOOD personalized insight:
+"Based on your SaaS platform for [specific industry mentioned], interview your existing customers at [specific customer types they mentioned] to calculate the exact time savings from [specific process they automate]. If customers save 3 hours/week at €75/hour = €11,700/year value per customer, use this in sales conversations to justify your €2,000 annual fee."
+
+Example of BAD generic insight:
+"Quantify customer pain in monetary terms by interviewing customers"
+
+Each insight MUST reference specific details from their answers and be immediately actionable for their exact situation.
 
 Generate a detailed investment report with this exact JSON structure:
 

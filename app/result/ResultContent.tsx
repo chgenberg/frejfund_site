@@ -84,7 +84,7 @@ export default function ResultContent() {
               return;
             } catch (e) {
               console.error('Error parsing stored result:', e);
-              setError('Kunde inte läsa in analysresultatet');
+              setError('Could not load analysis result');
             }
           }
         }
@@ -93,7 +93,7 @@ export default function ResultContent() {
         setLoading(false);
       } catch (error) {
         console.error('Error loading result data:', error);
-        setError('Ett fel uppstod vid laddning av analysresultatet');
+        setError('An error occurred while loading the analysis result');
         setLoading(false);
       }
     };
@@ -121,7 +121,7 @@ export default function ResultContent() {
             onClick={() => router.push('/')}
             className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all"
           >
-            Gör en ny analys
+            Create new analysis
           </button>
         </div>
       </div>
@@ -132,16 +132,16 @@ export default function ResultContent() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-white/60 mb-4">Ingen analys hittades</p>
+          <p className="text-white/60 mb-4">No analysis found</p>
           <div className="space-y-4">
             <button
               onClick={() => router.push('/')}
               className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all"
             >
-              Gör en ny analys
+              Create new analysis
             </button>
             <div className="mt-4">
-              <p className="text-white/40 mb-2">För utveckling:</p>
+              <p className="text-white/40 mb-2">For development:</p>
               <button
                 onClick={setTestData}
                 className="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all"

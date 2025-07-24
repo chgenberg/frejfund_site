@@ -21,13 +21,13 @@ export default function HtmlReportTemplate({ companyName, score, scoreExplanatio
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
-        <title>Affärsanalysrapport</title>
+        <title>Business Analysis Report</title>
       </head>
       <body className="bg-gray-50 text-[#16475b] font-sans">
         <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl p-10 mt-10 mb-10">
           <div className="flex flex-col items-center mb-8">
             {logoUrl && <img src={logoUrl} alt="Logo" className="h-20 mb-4" />}
-            <h1 className="text-4xl font-extrabold tracking-tight mb-2">Affärsanalys</h1>
+            <h1 className="text-4xl font-extrabold tracking-tight mb-2">Business Analysis</h1>
             <div className="text-2xl font-semibold mb-1">{companyName}</div>
             <div className="text-gray-500 mb-2">{date}</div>
             <div className="flex flex-col items-center my-4">
