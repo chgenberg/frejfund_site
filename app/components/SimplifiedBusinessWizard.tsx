@@ -20,10 +20,17 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    privacyAccepted: false,
     website: '',
     linkedinProfiles: '',
-    uploadedFiles: [] as File[]
+    uploadedFiles: [] as File[],
+    privacyAccepted: false,
+    // Essential business information for personalized insights
+    businessStage: '', // e.g., "idea", "mvp", "early-revenue", "scaling"
+    industry: '', // e.g., "SaaS", "E-commerce", "Fintech"
+    targetMarket: '', // e.g., "SMBs", "Enterprises", "Consumers"
+    businessModel: '', // e.g., "B2B subscription", "Marketplace", "E-commerce"
+    monthlyRevenue: '', // e.g., "0", "1-10k", "10-50k", "50k+"
+    teamSize: '' // e.g., "1", "2-5", "6-10", "10+"
   });
   
   // Follow-up answers
@@ -95,6 +102,14 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           userInfo: {
             name: formData.name,
             email: formData.email
+          },
+          businessInfo: {
+            stage: formData.businessStage,
+            industry: formData.industry,
+            targetMarket: formData.targetMarket,
+            businessModel: formData.businessModel,
+            monthlyRevenue: formData.monthlyRevenue,
+            teamSize: formData.teamSize
           }
         })
       });
@@ -403,6 +418,125 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         />
       </div>
 
+      {/* Essential Business Information */}
+      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Tell us about your business</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-2">
+              Business Stage <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.businessStage}
+              onChange={(e) => setFormData(prev => ({ ...prev, businessStage: e.target.value }))}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+            >
+              <option value="">Select stage...</option>
+              <option value="idea">💡 Idea stage</option>
+              <option value="mvp">🛠️ Building MVP</option>
+              <option value="early-revenue">💰 Early revenue</option>
+              <option value="scaling">🚀 Scaling up</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-2">
+              Industry <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.industry}
+              onChange={(e) => setFormData(prev => ({ ...prev, industry: e.target.value }))}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+            >
+              <option value="">Select industry...</option>
+              <option value="saas">💻 SaaS / Software</option>
+              <option value="ecommerce">🛒 E-commerce</option>
+              <option value="fintech">💳 Fintech</option>
+              <option value="healthtech">🏥 Healthtech</option>
+              <option value="edtech">📚 Edtech</option>
+              <option value="marketplace">🏪 Marketplace</option>
+              <option value="hardware">⚙️ Hardware / IoT</option>
+              <option value="consulting">🎯 Consulting / Services</option>
+              <option value="other">📦 Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-2">
+              Target Market <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.targetMarket}
+              onChange={(e) => setFormData(prev => ({ ...prev, targetMarket: e.target.value }))}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+            >
+              <option value="">Select target market...</option>
+              <option value="smb">🏢 Small-Medium Business</option>
+              <option value="enterprise">🏛️ Enterprise</option>
+              <option value="consumers">👥 Consumers (B2C)</option>
+              <option value="government">🏛️ Government</option>
+              <option value="nonprofits">❤️ Non-profits</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-2">
+              Business Model <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.businessModel}
+              onChange={(e) => setFormData(prev => ({ ...prev, businessModel: e.target.value }))}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+            >
+              <option value="">Select business model...</option>
+              <option value="subscription">💰 Subscription / SaaS</option>
+              <option value="marketplace">🏪 Marketplace / Platform</option>
+              <option value="ecommerce">🛒 Product Sales</option>
+              <option value="advertising">📢 Advertising</option>
+              <option value="freemium">🎁 Freemium</option>
+              <option value="consulting">🎯 Service / Consulting</option>
+              <option value="licensing">📜 Licensing</option>
+              <option value="other">📦 Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-2">
+              Monthly Revenue
+            </label>
+            <select
+              value={formData.monthlyRevenue}
+              onChange={(e) => setFormData(prev => ({ ...prev, monthlyRevenue: e.target.value }))}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+            >
+              <option value="">Select revenue range...</option>
+              <option value="0">💡 No revenue yet</option>
+              <option value="1-1k">🌱 €1 - €1k</option>
+              <option value="1k-10k">📈 €1k - €10k</option>
+              <option value="10k-50k">🚀 €10k - €50k</option>
+              <option value="50k+">💰 €50k+</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-2">
+              Team Size
+            </label>
+            <select
+              value={formData.teamSize}
+              onChange={(e) => setFormData(prev => ({ ...prev, teamSize: e.target.value }))}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+            >
+              <option value="">Select team size...</option>
+              <option value="1">👤 Just me</option>
+              <option value="2-3">👥 2-3 people</option>
+              <option value="4-10">👥 4-10 people</option>
+              <option value="10+">👥 10+ people</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div className="flex items-start space-x-3">
         <input
           type="checkbox"
@@ -421,35 +555,66 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
 
       <button
         onClick={() => setCurrentStep(2)}
-        disabled={!formData.name || !formData.email || !formData.privacyAccepted}
-        className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!formData.name || !formData.email || !formData.privacyAccepted || !formData.businessStage || !formData.industry || !formData.targetMarket || !formData.businessModel}
+        className="w-full bg-purple-600 text-white py-4 px-6 rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium text-lg transition-colors"
       >
-        Continue
+        Continue to Data Collection →
       </button>
     </div>
   );
 
   const renderStep2 = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900">Tell us about your business</h2>
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Gather Additional Information</h2>
+        <p className="text-gray-600">
+          Help us provide even more personalized insights by sharing additional data about your business.
+          <br />
+          <span className="text-sm">💡 The more information you provide, the more specific our recommendations will be!</span>
+        </p>
+      </div>
+
+      {/* Information Quality Indicator */}
+      <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 border border-green-200">
+        <h3 className="font-semibold text-gray-900 mb-2">📊 Current Data Quality</h3>
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <FaCheck className="w-4 h-4 text-green-500" />
+            <span className="text-sm text-gray-700">Basic business information ✓</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            {formData.website ? <FaCheck className="w-4 h-4 text-green-500" /> : <span className="w-4 h-4 rounded-full border-2 border-gray-300"></span>}
+            <span className="text-sm text-gray-700">Website analysis {formData.website ? '✓' : '(optional but recommended)'}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            {formData.uploadedFiles.length > 0 ? <FaCheck className="w-4 h-4 text-green-500" /> : <span className="w-4 h-4 rounded-full border-2 border-gray-300"></span>}
+            <span className="text-sm text-gray-700">Business documents {formData.uploadedFiles.length > 0 ? '✓' : '(optional but recommended)'}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            {formData.linkedinProfiles ? <FaCheck className="w-4 h-4 text-green-500" /> : <span className="w-4 h-4 rounded-full border-2 border-gray-300"></span>}
+            <span className="text-sm text-gray-700">Team analysis {formData.linkedinProfiles ? '✓' : '(optional)'}</span>
+          </div>
+        </div>
+      </div>
       
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-2">
           <FaGlobe className="inline-block w-4 h-4 mr-1" />
-          What's your website? (optional)
+          Website URL
         </label>
         <input
           type="url"
           value={formData.website}
           onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
           className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
-          placeholder="https://example.com"
+          placeholder="https://yourcompany.com"
         />
+        <p className="text-xs text-gray-600 mt-1">📈 <strong>Recommended:</strong> We'll analyze your value proposition, target market, and competitors</p>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-2">
-          LinkedIn profiles of founders (optional)
+          LinkedIn profiles of founders/team
         </label>
         <input
           type="text"
@@ -458,15 +623,24 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
           placeholder="LinkedIn URLs separated by commas"
         />
-        <p className="text-xs text-gray-700 mt-1">Example: linkedin.com/in/founder1, linkedin.com/in/founder2</p>
+        <p className="text-xs text-gray-600 mt-1">👥 <strong>Team insights:</strong> We'll assess founder-market fit and team strengths</p>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-2">
           <FaUpload className="inline-block w-4 h-4 mr-1" />
-          Upload your materials (pitch deck, ideas, etc.)
+          Upload business materials
         </label>
-        <p className="text-xs text-gray-700 mb-3">PDF, Word, or .txt documents</p>
+        <div className="bg-blue-50 rounded-lg p-3 mb-3 border border-blue-200">
+          <p className="text-sm text-gray-700 font-medium mb-2">📋 Most valuable documents to upload:</p>
+          <ul className="text-xs text-gray-600 space-y-1">
+            <li>• <strong>Pitch deck</strong> - for complete business model analysis</li>
+            <li>• <strong>Financial projections</strong> - for unit economics review</li>
+            <li>• <strong>Customer interviews/surveys</strong> - for market validation insights</li>
+            <li>• <strong>Business plan</strong> - for comprehensive strategy review</li>
+            <li>• <strong>Competitive analysis</strong> - for positioning recommendations</li>
+          </ul>
+        </div>
         
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-500 transition-colors">
           <input
@@ -480,6 +654,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           <label htmlFor="file-upload" className="cursor-pointer">
             <FaUpload className="mx-auto h-12 w-12 text-gray-400 mb-3" />
             <p className="text-sm text-gray-800">Click to upload or drag and drop</p>
+            <p className="text-xs text-gray-500 mt-1">PDF, Word, or .txt documents</p>
           </label>
         </div>
         
@@ -500,14 +675,13 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           onClick={() => setCurrentStep(1)}
           className="flex-1 py-3 px-4 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-all"
         >
-          Back
+          ← Back
         </button>
         <button
           onClick={handleInitialAnalysis}
-          disabled={!formData.website && formData.uploadedFiles.length === 0 && !formData.linkedinProfiles}
-          className="flex-1 py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all"
         >
-          Analyze
+          🚀 Start Analysis
         </button>
       </div>
     </div>
@@ -715,4 +889,4 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       </div>
     </div>
   );
-} 
+}

@@ -11,10 +11,21 @@ export async function POST(request: Request) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const { websiteData, fileContents, linkedinData, userInfo } = await request.json();
+    const { websiteData, fileContents, linkedinData, userInfo, businessInfo } = await request.json();
     
     // Combine all content for analysis
     let combinedContent = `Business Analysis for ${userInfo.name} (${userInfo.email})\n\n`;
+    
+    // Add essential business information first for better context
+    if (businessInfo) {
+      combinedContent += `BUSINESS OVERVIEW:\n`;
+      combinedContent += `Business Stage: ${businessInfo.stage || 'Not specified'}\n`;
+      combinedContent += `Industry: ${businessInfo.industry || 'Not specified'}\n`;
+      combinedContent += `Target Market: ${businessInfo.targetMarket || 'Not specified'}\n`;
+      combinedContent += `Business Model: ${businessInfo.businessModel || 'Not specified'}\n`;
+      combinedContent += `Monthly Revenue: ${businessInfo.monthlyRevenue || 'Not specified'}\n`;
+      combinedContent += `Team Size: ${businessInfo.teamSize || 'Not specified'}\n\n`;
+    }
     
     if (websiteData?.data) {
       combinedContent += `Website Analysis:\n`;
@@ -79,27 +90,50 @@ CRITICAL REQUIREMENT - ALWAYS GENERATE INSIGHTS:
 You MUST ALWAYS generate AT LEAST 3 actionable insights, even if you also need follow-up questions.
 
 PERSONALIZATION REQUIREMENTS:
+- REFERENCE their specific business stage, industry, target market, and business model
+- USE their revenue level and team size to tailor recommendations appropriately
+- MENTION their actual business model or industry specifics
+- INCLUDE stage-appropriate recommendations (different advice for idea vs scaling)
 - REFERENCE specific details from their website content
-- MENTION their actual business model or industry if identified
 - USE any team/founder information provided
-- INCLUDE specific recommendations based on their current situation
 - AVOID generic advice like "Quantify customer pain" or "Build partnerships"
+
+INDUSTRY & STAGE-SPECIFIC GUIDANCE:
+- For SaaS businesses: Focus on MRR, churn, CAC/LTV ratios
+- For E-commerce: Focus on conversion rates, AOV, inventory management
+- For Marketplaces: Focus on network effects, supply/demand balance
+- For Idea stage: Focus on validation, MVP, customer interviews
+- For MVP stage: Focus on product-market fit, user feedback, iterations
+- For Early revenue: Focus on growth, scalability, unit economics
+- For Scaling: Focus on operational efficiency, team building, fundraising
 
 QUALITY STANDARDS FOR INSIGHTS:
 Each insight must be:
-- Tailored to their specific context (website, industry, team background)
+- Tailored to their specific context (stage + industry + business model)
 - Include concrete next steps with timeframes
-- Reference specific tools, strategies, or approaches
-- Show clear business impact/ROI
-- Be immediately actionable
+- Reference specific tools, strategies, or approaches relevant to their industry
+- Show clear business impact/ROI appropriate for their stage
+- Be immediately actionable for their current situation
 
-EXAMPLES OF GOOD PERSONALIZED INSIGHTS:
-- "Based on your SaaS platform mentioned on your website, implement a freemium model with 2-3 core features free and advanced analytics behind paywall - similar successful companies in your space see 15-25% conversion rates"
-- "Your LinkedIn profile shows strong technical background but consider partnering with a sales-focused co-founder within 60 days - technical founders in B2B SaaS typically see 40% higher close rates with dedicated sales leadership"
-- "Your website mentions SMB focus - create case studies from your first 5 customers showing specific ROI metrics (time saved, cost reduced) to support premium pricing of €2,000+ annually"
+EXAMPLES OF IMPROVED PERSONALIZED INSIGHTS:
+- "As a SaaS business in early revenue stage targeting SMBs, implement a customer success program within 30 days - SaaS companies with dedicated CS see 25% lower churn and 15% higher expansion revenue"
+- "Your marketplace model with €1k-10k monthly revenue suggests strong early traction - focus on supply-side growth by recruiting 50+ new sellers in the next 60 days to improve selection and reduce customer acquisition costs"
+- "As an idea-stage fintech targeting enterprises, partner with an established financial services company for pilot testing - 70% of successful fintech startups validate with enterprise partners before building full product"
 
 FOLLOW-UP QUESTIONS (Optional):
 Generate follow-up questions only if you need specific metrics or detailed business model information for more advanced insights.
+
+DATA QUALITY CHECK - When to ask follow-up questions:
+- If website data is minimal or missing key business information
+- If no uploaded documents provide detailed business metrics
+- If current revenue is unspecified and business model lacks pricing details
+- If target customer details are too generic for specific recommendations
+- If competitive landscape is unclear from provided materials
+
+ALWAYS ask 3-5 follow-up questions if:
+- You cannot provide specific, actionable recommendations with concrete metrics
+- You lack information about customer pain points, pricing, or business metrics
+- The business model or go-to-market strategy needs clarification
 
 FOCUS FOLLOW-UP QUESTIONS ON:
 1. Specific customer pain points and current solutions they use
