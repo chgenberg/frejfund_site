@@ -199,19 +199,49 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         _source: 'ai-generated'
       })) : [
         {
-          title: "Complete detailed business analysis",
-          _source: "needs-more-info",
+          title: "Validate your value proposition with target customers",
+          _source: "contextual-fallback",
           impact: "high" as const,
-          timeframe: "15 minutes",
-          description: "We need more specific information about your business to provide personalized recommendations.",
+          timeframe: "2-3 weeks",
+          description: "Interview 10-15 potential customers to validate your business concept and refine your value proposition.",
           implementation: [
-            "Answer follow-up questions about your target market",
-            "Provide details about your current customers and their specific pain points",
-            "Share information about your business model and pricing",
-            "Describe your competitive landscape and unique advantages"
+            "Create a list of 20+ potential customers in your target market",
+            "Schedule 30-minute interviews asking about their current pain points",
+            "Test 2-3 different value propositions and measure responses",
+            "Document specific language customers use to describe their problems"
           ],
-          expectedResult: "Receive 3-5 personalized, actionable insights tailored to your specific business situation",
-          investorPerspective: "Investors value entrepreneurs who can articulate their business model and market position clearly."
+          expectedResult: "Clear understanding of customer language, pain points, and willingness to pay for your solution",
+          investorPerspective: "Investors want to see evidence of customer validation and product-market fit before investing."
+        },
+        {
+          title: "Build a simple MVP to test core assumptions",
+          _source: "contextual-fallback",
+          impact: "high" as const,
+          timeframe: "4-6 weeks",
+          description: "Create a minimal viable product focusing on your core value proposition to test with real users.",
+          implementation: [
+            "Define the single most important problem your product solves",
+            "Build the simplest version that demonstrates this value",
+            "Get 20+ users to test your MVP and provide feedback",
+            "Track key metrics: user engagement, retention, and feedback scores"
+          ],
+          expectedResult: "Validated product concept with real user data and testimonials",
+          investorPerspective: "Early traction and user validation significantly increase investment attractiveness and valuation."
+        },
+        {
+          title: "Develop a clear go-to-market strategy",
+          _source: "contextual-fallback",
+          impact: "medium" as const,
+          timeframe: "2-4 weeks",
+          description: "Create a detailed plan for how you'll acquire your first 100 customers.",
+          implementation: [
+            "Identify 3-5 specific customer acquisition channels to test",
+            "Calculate customer acquisition costs for each channel",
+            "Create content and messaging for your top 2 channels",
+            "Set up tracking and analytics to measure channel performance"
+          ],
+          expectedResult: "Clear roadmap to profitability with validated customer acquisition strategies",
+          investorPerspective: "Investors need to see a scalable path to customer acquisition and revenue growth."
         }
       ],
       answers: {

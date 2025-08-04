@@ -19,9 +19,9 @@ const impactColors = {
 };
 
 const impactLabels = {
-  high: 'Hög påverkan',
-  medium: 'Medel påverkan',
-  low: 'Låg påverkan'
+  high: 'High impact',
+  medium: 'Medium impact',
+  low: 'Low impact'
 };
 
 export default function ActionableInsights({ insights }: { insights: ActionableInsight[] }) {
@@ -61,13 +61,13 @@ export default function ActionableInsights({ insights }: { insights: ActionableI
           <div className="p-4 md:p-6 space-y-4">
             {/* Description */}
             <div>
-              <h4 className="text-sm font-semibold text-white/60 mb-2">Utmaning</h4>
+              <h4 className="text-sm font-semibold text-white/60 mb-2">Challenge</h4>
               <p className="text-white/90">{insight.description}</p>
             </div>
 
             {/* Implementation Steps */}
             <div>
-              <h4 className="text-sm font-semibold text-white/60 mb-2">Så här gör du</h4>
+              <h4 className="text-sm font-semibold text-white/60 mb-2">How to do it</h4>
               <ol className="space-y-2">
                 {insight.implementation.map((step, idx) => (
                   <li key={idx} className="flex gap-3">
@@ -82,13 +82,13 @@ export default function ActionableInsights({ insights }: { insights: ActionableI
 
             {/* Expected Result */}
             <div className="bg-green-500/10 rounded-xl p-4">
-              <h4 className="text-sm font-semibold text-green-400 mb-1">Förväntat resultat</h4>
+              <h4 className="text-sm font-semibold text-green-400 mb-1">Expected result</h4>
               <p className="text-white/80 text-sm">{insight.expectedResult}</p>
             </div>
 
             {/* Investor Perspective */}
             <div className="bg-purple-500/10 rounded-xl p-4">
-              <h4 className="text-sm font-semibold text-purple-400 mb-1">💡 Investerarperspektiv</h4>
+              <h4 className="text-sm font-semibold text-purple-400 mb-1">💡 Investor perspective</h4>
               <p className="text-white/80 text-sm italic">"{insight.investorPerspective}"</p>
             </div>
           </div>
