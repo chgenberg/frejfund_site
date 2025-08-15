@@ -100,9 +100,6 @@ export async function POST(request: Request) {
         ],
         temperature: strict ? aiConfig.temperature.strict : aiConfig.temperature.default,
       };
-      if (aiConfig.maxTokens && Number.isFinite(aiConfig.maxTokens)) {
-        opts.max_tokens = aiConfig.maxTokens;
-      }
       const res = await openai.chat.completions.create(opts);
       const txt = res.choices?.[0]?.message?.content || '{}';
       const parsed = safeParseJson(txt);

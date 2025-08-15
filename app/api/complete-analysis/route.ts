@@ -45,9 +45,6 @@ export async function POST(request: Request) {
         ],
         temperature: strict ? aiConfig.temperature.strict : aiConfig.temperature.final,
       };
-      if (aiConfig.maxTokens && Number.isFinite(aiConfig.maxTokens)) {
-        opts.max_tokens = aiConfig.maxTokens;
-      }
       const res = await openai.chat.completions.create(opts);
       const content = res.choices[0].message.content || '{}';
       return JSON.parse(content);
