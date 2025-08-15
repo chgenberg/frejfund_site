@@ -2,9 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { ultraDeepSchema } from '../_utils/aiSchemas';
 import { aiConfig } from '../_utils/aiConfig';
+import { rateLimit, getIp } from '../_utils/rateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 10 requests per minute per IP
+    const ip = getIp(request)
+    if (!rateLimit(`ultra:${ip}`, 10, 60_000)) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
+    }
+
     const { deepAnswers, previousAnalysis } = await request.json();
 
     if (!deepAnswers) {

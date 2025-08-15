@@ -119,6 +119,31 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       clearInterval(progressInterval);
       setAnalysisProgress(100);
       
+      // Persist initial analysis to DB and store id for later updates
+      try {
+        const saveRes = await fetch('/api/analyses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            companyName: formData.name || 'Unknown',
+            industry: formData.industry,
+            score: analysisData?.initialAnalysis?.overallScore || 0,
+            answers: {
+              ...formData,
+              websiteData,
+              linkedinData,
+            },
+            insights: analysisData?.initialAnalysis || null,
+          })
+        })
+        if (saveRes.ok) {
+          const { analysis } = await saveRes.json()
+          if (analysis?.id) localStorage.setItem('analysisId', analysis.id)
+        }
+      } catch (e) {
+        console.warn('Could not persist initial analysis:', e)
+      }
+      
       // If AI needs follow-up questions
       if (analysisData.followUpQuestions && analysisData.followUpQuestions.length > 0) {
         setFollowUpQuestions(analysisData.followUpQuestions);

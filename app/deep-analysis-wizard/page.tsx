@@ -167,7 +167,8 @@ export default function DeepAnalysisWizard() {
       // Attempt to persist to DB by updating existing analysis
       try {
         const prev = previousAnalysis ? JSON.parse(previousAnalysis) : null
-        const analysisId = prev?.id
+        const localId = typeof window !== 'undefined' ? localStorage.getItem('analysisId') : null
+        const analysisId = prev?.id || localId
         if (analysisId) {
           await fetch(`/api/analyses/${analysisId}`, {
             method: 'PUT',
@@ -178,7 +179,7 @@ export default function DeepAnalysisWizard() {
             })
           })
         } else {
-          console.warn('No analysisId found in previousAnalysis; skipping DB update')
+          console.warn('No analysisId found; skipping DB update')
         }
       } catch (e) {
         console.warn('Could not persist ultra-deep analysis (user may be anonymous):', e);
