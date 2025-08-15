@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { finalAnalysisSchema, hasMinInsights } from '../_utils/aiSchemas';
+import { aiConfig } from '../_utils/aiConfig';
 
 export async function POST(request: Request) {
   try {
@@ -8,9 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
     }
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const { followUpAnswers, userEmail } = await request.json();
     
@@ -31,15 +30,15 @@ export async function POST(request: Request) {
       followUpContent += `A: ${answer}\n\n`;
     });
 
-    async function generate(prompt: string) {
+    async function generate(prompt: string, strict = false) {
       const res = await openai.chat.completions.create({
-        model: 'gpt-4-turbo-preview',
+        model: aiConfig.models.final,
         messages: [
           { role: 'system', content: prompt },
           { role: 'user', content: `Initial Analysis Context:\n${context.combinedContent}\n\nInitial Analysis Results:\n${JSON.stringify(context.initialAnalysis, null, 2)}\n\n${followUpContent}` }
         ],
-        temperature: 0.6,
-        max_tokens: 4000,
+        temperature: strict ? aiConfig.temperature.strict : aiConfig.temperature.final,
+        max_tokens: aiConfig.maxTokens,
         response_format: { type: 'json_object' }
       });
       return JSON.parse(res.choices[0].message.content || '{}');
@@ -74,7 +73,7 @@ REQUIRED - Generate insights that are:
 
     if (!valid) {
       const strict = basePrompt + `\n\nSTRICT MODE: If some details are missing, make reasonable assumptions and STILL provide 3-5 concrete, immediately actionable recommendations with steps, tools, metrics and expected outcomes.`;
-      finalAnalysis = await generate(strict);
+      finalAnalysis = await generate(strict, true);
       try {
         finalAnalysisSchema.parse(finalAnalysis);
         valid = hasMinInsights(finalAnalysis, 'analysis', 3);

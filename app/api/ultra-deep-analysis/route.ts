@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { ultraDeepSchema } from '../_utils/aiSchemas';
+import { aiConfig } from '../_utils/aiConfig';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,17 +15,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
     }
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     async function generate() {
       const chatCompletion = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: aiConfig.models.ultra,
         messages: [
-          {
-            role: "system",
-            content: `You are a world-class business strategy consultant with 20+ years experience helping startups scale to $100M+ valuations. You specialize in creating ultra-specific, actionable recommendations that directly address each company's unique situation.
+          { role: 'system', content: `You are a world-class business strategy consultant with 20+ years experience helping startups scale to $100M+ valuations. You specialize in creating ultra-specific, actionable recommendations that directly address each company's unique situation.
 
 CRITICAL REQUIREMENTS FOR ULTRA-DEEP ANALYSIS:
 
@@ -54,14 +51,8 @@ Your response must include:
 - Address their specific team gaps and goals
 
 FORMAT: Return a JSON object with this structure:
-{
-  "insights": [ ... ],
-  "summary": { ... }
-}`
-          },
-          {
-            role: "user",
-            content: `Based on this company's detailed responses, create ultra-specific recommendations:
+{ "insights": [ ... ], "summary": { ... } }` },
+          { role: 'user', content: `Based on this company's detailed responses, create ultra-specific recommendations:
 
 COMPANY'S DEEP ANSWERS:
 ${Object.entries(deepAnswers).map(([key, value]) => `${key.replace(/_/g, ' ').toUpperCase()}: ${value}`).join('\n\n')}
@@ -75,53 +66,32 @@ Problem: ${previousAnalysis.answers?.customer_problem || 'Not specified'}
 Solution: ${previousAnalysis.answers?.solution || 'Not specified'}
 ` : ''}
 
-Generate 5-7 ultra-specific, hands-on recommendations that directly address their exact situation, challenges, and goals. Each recommendation should be immediately actionable with concrete implementation steps.`
-          }
+Generate 5-7 ultra-specific, hands-on recommendations that directly address their exact situation, challenges, and goals. Each recommendation should be immediately actionable with concrete implementation steps.` }
         ],
-        temperature: 0.3,
-        max_tokens: 4000,
+        temperature: aiConfig.temperature.strict,
+        max_tokens: aiConfig.maxTokens,
       });
 
       const response = chatCompletion.choices[0]?.message?.content;
       if (!response) throw new Error('No response from OpenAI');
 
       let analysisResult;
-      try {
-        analysisResult = JSON.parse(response);
-      } catch (parseError) {
-        analysisResult = { insights: [], summary: {}, rawResponse: response };
-      }
+      try { analysisResult = JSON.parse(response); } 
+      catch { analysisResult = { insights: [], summary: {}, rawResponse: response }; }
       return analysisResult;
     }
 
     let result = await generate();
-    try {
-      ultraDeepSchema.parse(result);
-    } catch {
-      // attempt one more generation
-      result = await generate();
-      try { ultraDeepSchema.parse(result); } catch {}
-    }
+    try { ultraDeepSchema.parse(result); } catch { result = await generate(); try { ultraDeepSchema.parse(result); } catch {} }
 
     if (!Array.isArray(result.insights)) result.insights = [];
-    while (result.insights.length < 5) {
+    while (result.insights.length < 5) { /* push default synthesized insight */ 
       result.insights.push({
         title: 'Establish a focused 90-day growth plan',
-        priority: 'high',
-        impact: 'high',
-        timeframe: '90 days',
+        priority: 'high', impact: 'high', timeframe: '90 days',
         expectedResult: 'Measurable revenue and pipeline growth',
-        implementation: {
-          overview: 'Define targets, channels, and weekly execution cadence',
-          steps: ['Set 90-day KPIs', 'Pick 2 acquisition channels', 'Create weekly operating rhythm'],
-          tools: ['HubSpot/CRM', 'Analytics'],
-          metrics: ['Leads/week', 'Conversion rates', 'Revenue'],
-          timeline: 'Weeks 1-2 setup; weeks 3-12 execute',
-          budget: 'Variable',
-          commonPitfalls: ['Too many priorities', 'No weekly review']
-        },
-        whyThis: 'Creates execution focus and investor confidence',
-        investorImpact: 'Demonstrates growth discipline'
+        implementation: { overview: 'Define targets, channels, and weekly execution cadence', steps: ['Set 90-day KPIs', 'Pick 2 acquisition channels', 'Create weekly operating rhythm'], tools: ['HubSpot/CRM', 'Analytics'], metrics: ['Leads/week', 'Conversion rates', 'Revenue'], timeline: 'Weeks 1-2 setup; weeks 3-12 execute', budget: 'Variable', commonPitfalls: ['Too many priorities', 'No weekly review'] },
+        whyThis: 'Creates execution focus and investor confidence', investorImpact: 'Demonstrates growth discipline'
       });
     }
 
@@ -129,9 +99,6 @@ Generate 5-7 ultra-specific, hands-on recommendations that directly address thei
 
   } catch (error) {
     console.error('Ultra-deep analysis error:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate ultra-deep analysis' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to generate ultra-deep analysis' }, { status: 500 });
   }
 } 

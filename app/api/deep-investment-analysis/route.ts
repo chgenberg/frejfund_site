@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { initialAnalysisSchema, hasMinInsights } from '../_utils/aiSchemas';
+import { aiConfig } from '../_utils/aiConfig';
 
 export async function POST(request: Request) {
   try {
@@ -8,9 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
     }
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const { websiteData, fileContents, linkedinData, userInfo, businessInfo } = await request.json();
     
@@ -67,15 +66,15 @@ export async function POST(request: Request) {
       });
     }
 
-    async function generate(promptContent: string) {
+    async function generate(promptContent: string, strict = false) {
       const res = await openai.chat.completions.create({
-        model: 'gpt-4-turbo-preview',
+        model: aiConfig.models.deep,
         messages: [
           { role: 'system', content: promptContent },
           { role: 'user', content: combinedContent }
         ],
-        temperature: 0.7,
-        max_tokens: 4000,
+        temperature: strict ? aiConfig.temperature.strict : aiConfig.temperature.default,
+        max_tokens: aiConfig.maxTokens,
         response_format: { type: 'json_object' }
       });
       const txt = res.choices[0].message.content || '{}';
@@ -159,7 +158,7 @@ Return a JSON object with the specified structure including "initialAnalysis" an
     if (!valid) {
       // Retry once with stricter instruction and lower temperature for determinism
       const strictPrompt = basePrompt + `\n\nSTRICT MODE: If you do not have enough detailed data, make reasonable assumptions based on provided business stage, industry, and model, and STILL generate 3 actionable insights with concrete steps and metrics.`;
-      analysisData = await generate(strictPrompt);
+      analysisData = await generate(strictPrompt, true);
       try {
         initialAnalysisSchema.parse(analysisData);
         valid = hasMinInsights(analysisData, 'initialAnalysis', 3);
