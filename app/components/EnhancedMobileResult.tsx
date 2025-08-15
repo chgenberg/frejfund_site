@@ -111,11 +111,11 @@ export default function EnhancedMobileResult({ data }: { data: any }) {
         <div className="flex items-center justify-between mb-4">
           <div className="flex-1">
             <h1 className="text-xl font-bold text-white">Investment Analysis</h1>
-                          <p className="text-sm text-white/70 mt-1">
-                {data.overallScore >= 75 ? 'Investor Ready' : 
+            <p className="text-sm text-white/70 mt-1">
+              {data.overallScore >= 75 ? 'Investor Ready' : 
                  data.overallScore >= 50 ? 'Strong Potential' :
                  data.overallScore >= 25 ? 'Promising Start' : 'Early Stage'}
-              </p>
+            </p>
           </div>
           <div className="w-16 h-16 flex-shrink-0">
             <CircularProgressbar

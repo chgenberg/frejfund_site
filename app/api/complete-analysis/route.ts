@@ -53,6 +53,8 @@ export async function POST(request: Request) {
 
     const basePrompt = `You are an expert investment analyst. You have already performed an initial analysis and asked follow-up questions. Now complete your comprehensive investment assessment using all available information.
 
+Before analysis, briefly restate a 5-bullet "Company context" using stage, industry, target market, business model, revenue, team. Keep it concise.
+
 CRITICAL REQUIREMENT FOR PERSONALIZED ACTIONABLE INSIGHTS:
 You MUST generate 3-5 SPECIFIC, TAILORED actionable insights based on THIS EXACT COMPANY'S situation. 
 
@@ -61,6 +63,7 @@ FORBIDDEN - DO NOT use generic advice like:
 - "Build strategic partnerships early" 
 - "Strengthen your competitive moat"
 - "Implement data-driven growth tracking"
+- Any advice that could apply to any company without referencing this company's specifics
 
 REQUIRED - Generate insights that are:
 1. SPECIFIC to their industry/business model mentioned
@@ -68,7 +71,10 @@ REQUIRED - Generate insights that are:
 3. USE their specific challenges/opportunities identified  
 4. MENTION their actual product/service details
 5. TAILORED to their current stage and context
-6. INCLUDE specific numbers/metrics relevant to their situation`;
+6. INCLUDE specific numbers/metrics relevant to their situation
+7. CITE brief snippets from website/docs when used (e.g., "from website: ...")
+
+IF SaaS with revenue > 0 → include churn, CAC, LTV, payback, expansion. If e‑commerce → CRO metrics and concrete tests. If marketplace → supply/demand tactics and loop design. If idea/MVP → validation plan with timelines and success thresholds.`
 
     let finalAnalysis = await generate(basePrompt);
 

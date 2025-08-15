@@ -10,5 +10,5 @@ export const aiConfig = {
     strict: 0.3,
     final: 0.6
   },
-  maxTokens: Number(process.env.AI_MAX_TOKENS || 6000)
+  maxTokens: Number(process.env.AI_MAX_TOKENS || 8000)
 }; 

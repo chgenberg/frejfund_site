@@ -82,11 +82,11 @@ export default function PremiumAnalysisResultPage() {
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">AI is generating your premium analysis...</h2>
           <p className="text-white/60">This takes approximately 30 seconds</p>
-                      <div className="mt-8 space-y-2">
+          <div className="mt-8 space-y-2">
               <p className="text-white/40 text-sm animate-pulse">Analyzing market potential...</p>
               <p className="text-white/40 text-sm animate-pulse" style={{ animationDelay: '0.5s' }}>Comparing with 100+ successful startups...</p>
               <p className="text-white/40 text-sm animate-pulse" style={{ animationDelay: '1s' }}>Generating financial projections...</p>
-            </div>
+          </div>
         </div>
       </div>
     );
