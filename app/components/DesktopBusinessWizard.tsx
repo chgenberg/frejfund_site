@@ -5,6 +5,32 @@ import { INVESTOR_QUESTION_SECTIONS } from './InvestorQuestions';
 import { getSupabaseClient } from '../../lib/supabase';
 import Link from 'next/link';
 
+// Normalize URL to handle various input formats
+const normalizeUrl = (url: string): string => {
+  if (!url) return '';
+  
+  // Remove whitespace
+  url = url.trim();
+  
+  // If it already has protocol, use as is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // If it starts with www., add https://
+  if (url.startsWith('www.')) {
+    return `https://${url}`;
+  }
+  
+  // For bare domains (like "example.com" or "example.se"), add https://
+  if (url.includes('.') && !url.includes('://')) {
+    return `https://${url}`;
+  }
+  
+  // Fallback: add https://
+  return `https://${url}`;
+};
+
 const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
@@ -143,7 +169,7 @@ const DesktopBusinessWizard = ({ open, onClose }: { open: boolean; onClose: () =
     if (currentPageQuestionIds.includes('website_url') && answers.has_website === 'Yes' && answers.website_url) {
       try {
         const url = answers.website_url;
-        const urlToScrape = url.startsWith('http') ? url : `https://${url}`;
+        const urlToScrape = normalizeUrl(url);
         new URL(urlToScrape);
         
         if (url.includes('.') && url.length > 4) {

@@ -3,6 +3,32 @@ import OpenAI from 'openai';
 import axios from 'axios';
 import { JSDOM } from 'jsdom';
 
+// Normalize URL to handle various input formats
+function normalizeUrl(url: string): string {
+  if (!url) return '';
+  
+  // Remove whitespace
+  url = url.trim();
+  
+  // If it already has protocol, use as is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // If it starts with www., add https://
+  if (url.startsWith('www.')) {
+    return `https://${url}`;
+  }
+  
+  // For bare domains (like "example.com" or "example.se"), add https://
+  if (url.includes('.') && !url.includes('://')) {
+    return `https://${url}`;
+  }
+  
+  // Fallback: add https://
+  return `https://${url}`;
+}
+
 export async function POST(request: Request) {
   try {
     // Check for API key before instantiating OpenAI client
@@ -22,8 +48,9 @@ export async function POST(request: Request) {
 
     console.log('🔍 Scraping website with JSDOM:', url);
 
-    // Prepare URL
-    const targetUrl = url.startsWith('http') ? url : `https://${url}`;
+    // Normalize URL to handle various formats
+    const targetUrl = normalizeUrl(url);
+    console.log('📝 Normalized URL:', targetUrl);
 
     let scrapedContent;
     try {

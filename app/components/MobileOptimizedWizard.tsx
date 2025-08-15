@@ -4,6 +4,32 @@ import { useRouter } from 'next/navigation';
 import { INVESTOR_QUESTION_SECTIONS } from './InvestorQuestions';
 import { getSupabaseClient } from '../../lib/supabase';
 
+// Normalize URL to handle various input formats
+const normalizeUrl = (url: string): string => {
+  if (!url) return '';
+  
+  // Remove whitespace
+  url = url.trim();
+  
+  // If it already has protocol, use as is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // If it starts with www., add https://
+  if (url.startsWith('www.')) {
+    return `https://${url}`;
+  }
+  
+  // For bare domains (like "example.com" or "example.se"), add https://
+  if (url.includes('.') && !url.includes('://')) {
+    return `https://${url}`;
+  }
+  
+  // Fallback: add https://
+  return `https://${url}`;
+};
+
 interface MobileOptimizedWizardProps {
   open: boolean;
   onClose: () => void;
@@ -202,7 +228,7 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
       // Validate URL format before scraping
       try {
         const url = answers.website_url;
-        const urlToScrape = url.startsWith('http') ? url : `https://${url}`;
+        const urlToScrape = normalizeUrl(url);
         new URL(urlToScrape); // This will throw if invalid
         
         if (url.includes('.') && url.length > 4) {

@@ -14,6 +14,32 @@ type FollowUpQuestion = {
   placeholder?: string;
 };
 
+// Normalize URL to handle various input formats
+const normalizeUrl = (url: string): string => {
+  if (!url) return '';
+  
+  // Remove whitespace
+  url = url.trim();
+  
+  // If it already has protocol, use as is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // If it starts with www., add https://
+  if (url.startsWith('www.')) {
+    return `https://${url}`;
+  }
+  
+  // For bare domains (like "example.com" or "example.se"), add https://
+  if (url.includes('.') && !url.includes('://')) {
+    return `https://${url}`;
+  }
+  
+  // Fallback: add https://
+  return `https://${url}`;
+};
+
 export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBusinessWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -65,10 +91,11 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       // 1. Scrape website if provided
       let websiteData = null;
       if (formData.website) {
+        const normalizedUrl = normalizeUrl(formData.website);
         const websiteResponse = await fetch('/api/scrape-website', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: formData.website })
+          body: JSON.stringify({ url: normalizedUrl })
         });
         websiteData = await websiteResponse.json();
       }
