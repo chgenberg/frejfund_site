@@ -92,16 +92,18 @@ export async function POST(request: Request) {
     };
 
     async function generateOnce(promptContent: string, strict = false) {
-      const res = await openai.chat.completions.create({
+      const opts: any = {
         model: aiConfig.models.deep,
         messages: [
           { role: 'system', content: promptContent + (strict ? '\nReturn ONLY valid minified JSON without markdown or extra text.' : '') },
           { role: 'user', content: combinedContent }
         ],
         temperature: strict ? aiConfig.temperature.strict : aiConfig.temperature.default,
-        max_tokens: aiConfig.maxTokens,
-        response_format: { type: 'json_object' }
-      });
+      };
+      if (aiConfig.maxTokens && Number.isFinite(aiConfig.maxTokens)) {
+        opts.max_tokens = aiConfig.maxTokens;
+      }
+      const res = await openai.chat.completions.create(opts);
       const txt = res.choices?.[0]?.message?.content || '{}';
       const parsed = safeParseJson(txt);
       if (!parsed) throw new Error('Failed to parse JSON from OpenAI');

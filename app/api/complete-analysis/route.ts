@@ -31,24 +31,26 @@ export async function POST(request: Request) {
     // Prepare follow-up content
     let followUpContent = `Additional information provided:\n\n`;
     Object.entries(followUpAnswers).forEach(([key, answer]) => {
-      const questionIndex = parseInt(key.slice(1));
-      const question = context.followUpQuestions?.[questionIndex] || `Question ${questionIndex + 1}`;
+      const question = (context.followUpQuestions || []).find((q: any) => q?.id === key)?.title || key;
       followUpContent += `Q: ${question}\n`;
       followUpContent += `A: ${answer}\n\n`;
     });
 
     async function generate(prompt: string, strict = false) {
-      const res = await openai.chat.completions.create({
+      const opts: any = {
         model: aiConfig.models.final,
         messages: [
-          { role: 'system', content: prompt },
+          { role: 'system', content: prompt + (strict ? '\nReturn ONLY valid minified JSON without markdown or extra text.' : '') },
           { role: 'user', content: `Initial Analysis Context:\n${context.combinedContent}\n\nInitial Analysis Results:\n${JSON.stringify(context.initialAnalysis, null, 2)}\n\n${followUpContent}` }
         ],
         temperature: strict ? aiConfig.temperature.strict : aiConfig.temperature.final,
-        max_tokens: aiConfig.maxTokens,
-        response_format: { type: 'json_object' }
-      });
-      return JSON.parse(res.choices[0].message.content || '{}');
+      };
+      if (aiConfig.maxTokens && Number.isFinite(aiConfig.maxTokens)) {
+        opts.max_tokens = aiConfig.maxTokens;
+      }
+      const res = await openai.chat.completions.create(opts);
+      const content = res.choices[0].message.content || '{}';
+      return JSON.parse(content);
     }
 
     const basePrompt = `You are an expert investment analyst. You have already performed an initial analysis and asked follow-up questions. Now complete your comprehensive investment assessment using all available information.
