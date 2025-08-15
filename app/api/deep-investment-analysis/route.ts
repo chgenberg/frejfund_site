@@ -197,15 +197,13 @@ Return a JSON object with the specified structure including "initialAnalysis" an
       }
     }
 
-    // Store initial analysis in session for later use
-    if (analysisData.followUpQuestions?.length > 0) {
-      await storeAnalysisContext({
-        userInfo,
-        initialAnalysis: analysisData.initialAnalysis,
-        followUpQuestions: analysisData.followUpQuestions,
-        combinedContent
-      });
-    }
+    // Store initial analysis in session for later use (always, questions may be generated client-side)
+    await storeAnalysisContext({
+      userInfo,
+      initialAnalysis: analysisData.initialAnalysis,
+      followUpQuestions: analysisData.followUpQuestions || [],
+      combinedContent
+    });
     
     return NextResponse.json({ success: true, ...analysisData });
 
@@ -220,7 +218,7 @@ Return a JSON object with the specified structure including "initialAnalysis" an
 
 // Helper function to store analysis context (implement based on your storage solution)
 async function storeAnalysisContext(data: any) {
-  const globalAny = global as any;
+  const globalAny = (global as any);
   globalAny.analysisContext = globalAny.analysisContext || {};
   globalAny.analysisContext[data.userInfo.email] = data;
 } 
