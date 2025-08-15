@@ -144,16 +144,49 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         console.warn('Could not persist initial analysis:', e)
       }
       
-      // If AI needs follow-up questions
-      if (analysisData.followUpQuestions && analysisData.followUpQuestions.length > 0) {
-        setFollowUpQuestions(analysisData.followUpQuestions);
-        setCurrentStep(3);
-        setIsAnalyzing(false);
-      } else {
-        // Go directly to results - transform and save
-        const transformedData = transformAnalysisToResultFormat(analysisData);
-        localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
-        window.location.href = '/result';
+      // If AI needs follow-up questions, or generate them if missing
+      try {
+        const initialQuestions = Array.isArray(analysisData.followUpQuestions) ? analysisData.followUpQuestions : [];
+        let questionsToAsk = initialQuestions;
+        if (questionsToAsk.length === 0) {
+          const genRes = await fetch('/api/generate-deep-questions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ previousAnalysis: analysisData })
+          });
+          if (genRes.ok) {
+            const genJson = await genRes.json();
+            if (Array.isArray(genJson.questions) && genJson.questions.length > 0) {
+              questionsToAsk = genJson.questions;
+            }
+          }
+        }
+        if (questionsToAsk.length > 0) {
+          setFollowUpQuestions(questionsToAsk);
+          setCurrentStep(3);
+          setIsAnalyzing(false);
+        } else {
+          // No questions at all; redirect to result page for the created analysis id (avoid mock localStorage)
+          const analysisId = localStorage.getItem('analysisId');
+          if (analysisId) {
+            window.location.href = `/result/${analysisId}`;
+          } else {
+            // Fallback only if no id is available
+            const transformedData = transformAnalysisToResultFormat(analysisData);
+            localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
+            window.location.href = '/result';
+          }
+        }
+      } catch (e) {
+        console.warn('Could not prepare follow-up questions:', e);
+        const analysisId = localStorage.getItem('analysisId');
+        if (analysisId) {
+          window.location.href = `/result/${analysisId}`;
+        } else {
+          const transformedData = transformAnalysisToResultFormat(analysisData);
+          localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
+          window.location.href = '/result';
+        }
       }
       
     } catch (error) {
@@ -305,9 +338,14 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
   const handleFinalAnalysis = async (initialAnalysis?: any) => {
     if (initialAnalysis) {
       // Direct result from initial analysis
-      const transformedData = transformAnalysisToResultFormat(initialAnalysis);
-      localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
-      window.location.href = '/result';
+      const analysisId = localStorage.getItem('analysisId');
+      if (analysisId) {
+        window.location.href = `/result/${analysisId}`;
+      } else {
+        const transformedData = transformAnalysisToResultFormat(initialAnalysis);
+        localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
+        window.location.href = '/result';
+      }
       return;
     }
 
@@ -392,8 +430,26 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
             setCompletionStage('Analysis complete! Redirecting...');
             
             // Wait a moment to show completion
-            setTimeout(() => {
-              // Transform and store in localStorage with correct key
+            setTimeout(async () => {
+              try {
+                // Update the existing analysis record with ultra deep results if available
+                const analysisId = localStorage.getItem('analysisId');
+                if (analysisId) {
+                  await fetch(`/api/analyses/${analysisId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      ultraDeepAnalysis: analysisData?.analysis || analysisData?.finalAnalysis || null,
+                      insightCount: (analysisData?.analysis?.actionableInsights || analysisData?.finalAnalysis?.actionableInsights || []).length || undefined
+                    })
+                  });
+                  window.location.href = `/result/${analysisId}`;
+                  return;
+                }
+              } catch (e) {
+                console.warn('Could not update analysis with final results:', e);
+              }
+              // Fallback: Transform and store in localStorage
               const transformedData = transformAnalysisToResultFormat(analysisData);
               localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
               window.location.href = '/result';
