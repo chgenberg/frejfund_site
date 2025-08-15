@@ -40,6 +40,30 @@ const normalizeUrl = (url: string): string => {
   return `https://${url}`;
 };
 
+// Compute data quality score based on available information
+const computeDataQualityScore = (formData: any, websiteData: any, linkedinData: any, fileContents: any[]): number => {
+  let score = 0;
+  
+  // Basic info (30 points)
+  if (formData.companyName) score += 5;
+  if (formData.industry) score += 5;
+  if (formData.businessStage) score += 5;
+  if (formData.targetMarket) score += 5;
+  if (formData.businessModel) score += 5;
+  if (formData.monthlyRevenue) score += 5;
+  
+  // Website data (25 points)
+  if (websiteData?.success) score += 25;
+  
+  // LinkedIn data (20 points)
+  if (linkedinData?.success) score += 20;
+  
+  // File uploads (25 points)
+  if (fileContents.length > 0) score += Math.min(25, fileContents.length * 8);
+  
+  return Math.min(100, score);
+};
+
 export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBusinessWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -167,31 +191,37 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       clearInterval(progressInterval);
       setAnalysisProgress(100);
       
-      // Persist initial analysis to DB and store id for later updates
+      // 5. Save initial analysis to database
+      let analysisId = null;
       try {
         const saveRes = await fetch('/api/analyses', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            companyName: formData.name || 'Unknown',
-            industry: formData.industry,
-            score: analysisData?.initialAnalysis?.overallScore || 0,
+            companyName: formData.name || 'Unknown Company',
+            industry: formData.industry || 'Unknown',
+            score: analysisData.overallScore || 50,
             answers: {
               ...formData,
-              websiteData,
-              linkedinData,
+              websiteData: websiteData?.success ? websiteData.data : null,
+              linkedinData: linkedinData?.success ? linkedinData.data : null,
+              fileContents
             },
-            insights: analysisData?.initialAnalysis || null,
+            insights: analysisData.actionableInsights || [],
+            dataQualityScore: computeDataQualityScore(formData, websiteData, linkedinData, fileContents)
           })
-        })
+        });
+
         if (saveRes.ok) {
-          const { analysis } = await saveRes.json()
-          if (analysis?.id) localStorage.setItem('analysisId', analysis.id)
-        } else if (saveRes.status !== 401) {
-          console.warn('Save analysis failed with status', saveRes.status)
+          const analysis = await saveRes.json();
+          analysisId = analysis.id;
+          localStorage.setItem('currentAnalysisId', analysisId);
+          console.log('✅ Analysis saved to database with ID:', analysisId);
+        } else {
+          console.warn('⚠️ Failed to save analysis to database, continuing with localStorage only');
         }
-      } catch (e) {
-        console.warn('Could not persist initial analysis:', e)
+      } catch (error) {
+        console.warn('⚠️ Database save failed, continuing with localStorage only:', error);
       }
       
       // Normalize questions utility
@@ -224,9 +254,9 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           setIsAnalyzing(false);
         } else {
           // No questions at all; redirect to result page for the created analysis id (avoid mock localStorage)
-          const analysisId = localStorage.getItem('analysisId');
-          if (analysisId) {
-            window.location.href = `/result/${analysisId}`;
+          const storedAnalysisId = localStorage.getItem('currentAnalysisId') || analysisId;
+          if (storedAnalysisId) {
+            window.location.href = `/result/${storedAnalysisId}`;
           } else {
             // Fallback only if no id is available
             const transformedData = transformAnalysisToResultFormat(analysisData);
@@ -236,9 +266,9 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         }
       } catch (e) {
         console.warn('Could not prepare follow-up questions:', e);
-        const analysisId = localStorage.getItem('analysisId');
-        if (analysisId) {
-          window.location.href = `/result/${analysisId}`;
+        const storedAnalysisId = localStorage.getItem('currentAnalysisId') || analysisId;
+        if (storedAnalysisId) {
+          window.location.href = `/result/${storedAnalysisId}`;
         } else {
           const transformedData = transformAnalysisToResultFormat(analysisData);
           localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
@@ -395,7 +425,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
   const handleFinalAnalysis = async (initialAnalysis?: any) => {
     if (initialAnalysis) {
       // Direct result from initial analysis
-      const analysisId = localStorage.getItem('analysisId');
+      const analysisId = localStorage.getItem('currentAnalysisId');
       if (analysisId) {
         window.location.href = `/result/${analysisId}`;
       } else {
@@ -490,9 +520,9 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
             setTimeout(async () => {
               try {
                 // Update the existing analysis record with ultra deep results if available
-                const analysisId = localStorage.getItem('analysisId');
+                const analysisId = localStorage.getItem('currentAnalysisId');
                 if (analysisId) {
-                  await fetch(`/api/analyses/${analysisId}`, {
+                  const updateRes = await fetch(`/api/analyses/${analysisId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -500,8 +530,13 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
                       insightCount: (analysisData?.analysis?.actionableInsights || analysisData?.finalAnalysis?.actionableInsights || []).length || undefined
                     })
                   });
-                  window.location.href = `/result/${analysisId}`;
-                  return;
+                  
+                  if (updateRes.ok) {
+                    window.location.href = `/result/${analysisId}`;
+                    return;
+                  } else {
+                    console.warn('Failed to update analysis, continuing with localStorage fallback');
+                  }
                 }
               } catch (e) {
                 console.warn('Could not update analysis with final results:', e);
