@@ -18,6 +18,7 @@ export default function Dashboard() {
   const [userEmail, setUserEmail] = useState('')
   const [showWizard, setShowWizard] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchAnalyses()
@@ -44,6 +45,24 @@ export default function Dashboard() {
   const handleSignOut = async () => {
     // If Supabase auth remains, redirect to logout page
     router.push('/auth/login')
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this analysis? This cannot be undone.')) return
+    setDeletingId(id)
+    const prev = analyses
+    setAnalyses(prev.filter(a => a.id !== id))
+    try {
+      const res = await fetch(`/api/analyses/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed to delete')
+    } catch (e) {
+      console.error('Delete failed', e)
+      // rollback
+      setAnalyses(prev)
+      alert('Failed to delete. Please try again.')
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   const totalAnalyses = analyses.length
@@ -176,13 +195,26 @@ export default function Dashboard() {
                       </div>
                     </div>
                     
-                    <div className="mt-6">
+                    <div className="mt-6 grid grid-cols-1 gap-2">
                       <Link
                         href={`/dashboard/analysis/${analysis.id}`}
                         className="block w-full px-4 py-2 bg-white/10 text-white text-center rounded-lg hover:bg-white/20 transition-colors"
                       >
                         View Analysis
                       </Link>
+                      <Link
+                        href={`/result/${analysis.id}`}
+                        className="block w-full px-4 py-2 bg-white/10 text-white text-center rounded-lg hover:bg-white/20 transition-colors"
+                      >
+                        Open public result
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(analysis.id as any)}
+                        disabled={deletingId === analysis.id}
+                        className="w-full px-4 py-2 bg-red-500/20 text-red-300 text-center rounded-lg hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                      >
+                        {deletingId === analysis.id ? 'Deleting…' : 'Delete'}
+                      </button>
                     </div>
                   </div>
                 </div>

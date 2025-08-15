@@ -15,6 +15,7 @@ export default function AnalysisDetailPage() {
   const id = params.id as string
   const [analysis, setAnalysis] = useState<any | null>(null)
   const [loading, setLoading] = useState(true)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -41,6 +42,14 @@ export default function AnalysisDetailPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/result/${id}`)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {}
   }
 
   const handleUpgradeToPremium = () => {
@@ -89,14 +98,28 @@ export default function AnalysisDetailPage() {
                 Back to dashboard
               </Link>
               
-              {!analysis.is_premium && (
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={handleUpgradeToPremium}
-                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+                  onClick={handleCopy}
+                  className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20 hover:bg-white/20 transition"
                 >
-                  Upgrade to Premium
+                  {copied ? 'Copied!' : 'Share / Copy link'}
                 </button>
-              )}
+                <Link
+                  href={`/result/${id}`}
+                  className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20 hover:bg-white/20 transition"
+                >
+                  Open public result
+                </Link>
+                {!analysis.is_premium && (
+                  <button
+                    onClick={handleUpgradeToPremium}
+                    className="px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+                  >
+                    Upgrade to Premium
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </header>
