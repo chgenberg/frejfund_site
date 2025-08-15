@@ -98,7 +98,6 @@ export async function POST(request: Request) {
           { role: 'system', content: promptContent + (strict ? '\nReturn ONLY valid minified JSON without markdown or extra text.' : '') },
           { role: 'user', content: combinedContent }
         ],
-        temperature: strict ? aiConfig.temperature.strict : aiConfig.temperature.default,
       };
       const res = await openai.chat.completions.create(opts);
       const txt = res.choices?.[0]?.message?.content || '{}';

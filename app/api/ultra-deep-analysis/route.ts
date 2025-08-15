@@ -75,7 +75,6 @@ Solution: ${previousAnalysis.answers?.solution || 'Not specified'}
 
 Generate 5-7 ultra-specific, hands-on recommendations that directly address their exact situation, challenges, and goals. Each recommendation should be immediately actionable with concrete implementation steps.` }
         ],
-        temperature: aiConfig.temperature.strict,
         max_tokens: aiConfig.maxTokens,
       });
 

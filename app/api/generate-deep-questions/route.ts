@@ -24,12 +24,7 @@ export async function POST(request: NextRequest) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const chatCompletion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: `You are an expert business analyst who specializes in conducting deep-dive interviews to gather critical business intelligence. Your job is to analyze existing business information and generate 6-8 highly targeted follow-up questions.
+    const systemPrompt = `You are an expert business analyst who specializes in conducting deep-dive interviews to gather critical business intelligence. Your job is to analyze existing business information and generate 6-8 highly targeted follow-up questions.
 
 CRITICAL REQUIREMENTS:
 
@@ -74,11 +69,9 @@ EXAMPLES OF GOOD QUESTIONS (tailored to their context):
 - "Since you're competing with [specific competitor], what's your process for demonstrating ROI to prospects who are currently using [competitor's solution]?"
 - "You mentioned [specific revenue/growth metric]. What's the biggest bottleneck preventing you from doubling that in the next 6 months?"
 
-Generate 6-8 questions that will unlock the most valuable insights for creating ultra-specific business recommendations.`
-        },
-        {
-          role: "user",
-          content: `Based on this company's existing analysis, generate personalized follow-up questions:
+Generate 6-8 questions that will unlock the most valuable insights for creating ultra-specific business recommendations.`;
+
+    const userPrompt = `Based on this company's existing analysis, generate personalized follow-up questions:
 
 EXISTING COMPANY INFORMATION:
 Company: ${previousAnalysis.answers?.company_name || 'Not specified'}
@@ -101,14 +94,17 @@ ${previousAnalysis.actionableInsights ?
 WEBSITE/DOCUMENT ANALYSIS:
 ${previousAnalysis.websiteData ? JSON.stringify(previousAnalysis.websiteData) : 'No website data available'}
 
-Generate 6-8 highly specific questions that will help create ultra-personalized recommendations for THIS EXACT company. Focus on areas where you need more detail to provide concrete, hands-on advice.`
-        }
+Generate 6-8 highly specific questions that will help create ultra-personalized recommendations for THIS EXACT company. Focus on areas where you need more detail to provide concrete, hands-on advice.`;
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
       ],
-      temperature: 0.4,
-      max_tokens: 2000,
     });
 
-    const response = chatCompletion.choices[0]?.message?.content;
+    const response = completion.choices[0]?.message?.content;
     
     if (!response) {
       throw new Error('No response from OpenAI');
