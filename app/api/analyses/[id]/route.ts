@@ -31,12 +31,13 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
 	try {
 		const supabase = createRouteHandlerClient({ cookies })
 		const { data: { user } } = await supabase.auth.getUser()
-		if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-		const item = await prisma.analysis.findFirst({
-			where: { id: params.id, userId: user.id },
-		})
+		// Allow public access if the analysis is anonymous (no userId)
+		const item = await prisma.analysis.findFirst({ where: { id: params.id } })
 		if (!item) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+		if (item.userId && (!user || user.id !== item.userId)) {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+		}
 		return NextResponse.json({ analysis: mapAnalysis(item) })
 	} catch (err) {
 		console.error('GET /api/analyses/[id] failed', err)
@@ -48,10 +49,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 	try {
 		const supabase = createRouteHandlerClient({ cookies })
 		const { data: { user } } = await supabase.auth.getUser()
-		if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-		const existing = await prisma.analysis.findFirst({ where: { id: params.id, userId: user.id } })
+		const existing = await prisma.analysis.findFirst({ where: { id: params.id } })
 		if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+		// Allow owner or anonymous record (no userId) to be updated
+		if (existing.userId && (!user || user.id !== existing.userId)) {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+		}
 
 		const bodyRaw = await request.json()
 		const parsed = analysisUpdateSchema.safeParse(bodyRaw)

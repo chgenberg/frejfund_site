@@ -66,7 +66,6 @@ export async function POST(request: NextRequest) {
 	try {
 		const supabase = createRouteHandlerClient({ cookies })
 		const { data: { user } } = await supabase.auth.getUser()
-		if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
 		const bodyRaw = await request.json()
 		const parsed = analysisCreateSchema.safeParse(bodyRaw)
@@ -78,7 +77,7 @@ export async function POST(request: NextRequest) {
 
 		const created = await prisma.analysis.create({
 			data: {
-				userId: user.id,
+				userId: user ? user.id : null,
 				companyName: body.companyName,
 				industry: body.industry ?? null,
 				score: body.score,

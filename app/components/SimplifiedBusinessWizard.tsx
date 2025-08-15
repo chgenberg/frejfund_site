@@ -7,6 +7,13 @@ interface SimplifiedBusinessWizardProps {
   onClose: () => void;
 }
 
+type FollowUpQuestion = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  placeholder?: string;
+};
+
 export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBusinessWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -14,7 +21,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
   const [isCompletingAnalysis, setIsCompletingAnalysis] = useState(false);
   const [completionProgress, setCompletionProgress] = useState(0);
   const [completionStage, setCompletionStage] = useState('');
-  const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
+  const [followUpQuestions, setFollowUpQuestions] = useState<FollowUpQuestion[]>([]);
   
   // Form data
   const [formData, setFormData] = useState({
@@ -113,6 +120,20 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           }
         })
       });
+
+      if (!analysisResponse.ok) {
+        // Backend failed (e.g., 500). Proceed with fallback deep questions so user can continue.
+        clearInterval(progressInterval);
+        setIsAnalyzing(false);
+        const fallbackQs: FollowUpQuestion[] = [
+          { id: 'main_challenge', title: 'What is your biggest business challenge right now?', subtitle: 'The specific obstacle preventing your next level of growth', placeholder: 'e.g., We close only 15% of qualified leads because our demo-to-decision takes 3 months' },
+          { id: 'customer_segments', title: 'Describe your most profitable customer types', subtitle: 'Include company size, industry, and what they pay you', placeholder: 'e.g., Mid-size law firms (50-200 emp) pay €2,400/month for compliance automation' },
+          { id: 'six_month_goal', title: 'What specific goal do you want to achieve in 6 months?', subtitle: 'Something measurable that would significantly impact your business', placeholder: 'e.g., Increase MRR from €45K to €120K by closing 3 enterprise deals' },
+        ];
+        setFollowUpQuestions(fallbackQs);
+        setCurrentStep(3);
+        return;
+      }
       
       const analysisData = await analysisResponse.json();
       
@@ -139,15 +160,25 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         if (saveRes.ok) {
           const { analysis } = await saveRes.json()
           if (analysis?.id) localStorage.setItem('analysisId', analysis.id)
+        } else if (saveRes.status !== 401) {
+          console.warn('Save analysis failed with status', saveRes.status)
         }
       } catch (e) {
         console.warn('Could not persist initial analysis:', e)
       }
       
+      // Normalize questions utility
+      const normalizeQuestions = (items: any[]): FollowUpQuestion[] => {
+        return (items || []).map((q: any, idx: number) => {
+          if (q && typeof q === 'object' && ('title' in q)) return q as FollowUpQuestion;
+          return { id: `q_${idx + 1}`, title: String(q) } as FollowUpQuestion;
+        });
+      };
+
       // If AI needs follow-up questions, or generate them if missing
       try {
-        const initialQuestions = Array.isArray(analysisData.followUpQuestions) ? analysisData.followUpQuestions : [];
-        let questionsToAsk = initialQuestions;
+        const initialQuestionsRaw = Array.isArray(analysisData.followUpQuestions) ? analysisData.followUpQuestions : [];
+        let questionsToAsk: FollowUpQuestion[] = normalizeQuestions(initialQuestionsRaw);
         if (questionsToAsk.length === 0) {
           const genRes = await fetch('/api/generate-deep-questions', {
             method: 'POST',
@@ -156,9 +187,8 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           });
           if (genRes.ok) {
             const genJson = await genRes.json();
-            if (Array.isArray(genJson.questions) && genJson.questions.length > 0) {
-              questionsToAsk = genJson.questions;
-            }
+            const apiQs = Array.isArray(genJson.questions) ? genJson.questions : [];
+            questionsToAsk = normalizeQuestions(apiQs);
           }
         }
         if (questionsToAsk.length > 0) {
@@ -985,17 +1015,20 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       </div>
       
       <div className="space-y-4 max-h-96 overflow-y-auto">
-        {followUpQuestions.map((question, index) => (
-          <div key={index} className="group">
-            <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
-              {question}
+        {followUpQuestions.map((question) => (
+          <div key={question.id} className="group">
+            <label className="block text-sm font-medium text-gray-300 mb-1 group-hover:text-white transition-colors">
+              {question.title}
             </label>
+            {question.subtitle && (
+              <p className="text-xs text-gray-500 mb-2">{question.subtitle}</p>
+            )}
             <textarea
-              value={followUpAnswers[`q${index}`] || ''}
-              onChange={(e) => setFollowUpAnswers(prev => ({ ...prev, [`q${index}`]: e.target.value }))}
+              value={followUpAnswers[question.id] || ''}
+              onChange={(e) => setFollowUpAnswers(prev => ({ ...prev, [question.id]: e.target.value }))}
               className="modern-input w-full px-4 py-3 rounded-2xl text-white placeholder-gray-500 outline-none resize-none"
               rows={3}
-              placeholder="Share your insights..."
+              placeholder={question.placeholder || 'Share your insights...'}
             />
           </div>
         ))}
@@ -1003,7 +1036,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
 
       <button
         onClick={() => handleFinalAnalysis()}
-        disabled={Object.keys(followUpAnswers).length < followUpQuestions.length}
+        disabled={followUpQuestions.length === 0 || followUpQuestions.some(q => !followUpAnswers[q.id]?.trim())}
         className="gradient-button w-full py-4 px-6 text-white font-semibold rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
       >
         <FaStar className="text-lg" />
