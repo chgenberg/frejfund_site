@@ -163,6 +163,25 @@ export default function DeepAnalysisWizard() {
       
       // Store the ultra-deep analysis result
       localStorage.setItem('ultraDeepAnalysisResult', JSON.stringify(result));
+
+      // Attempt to persist to DB if possible (user must be logged in)
+      try {
+        await fetch('/api/save-analysis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            companyName: previousAnalysis ? JSON.parse(previousAnalysis).answers?.company_name : undefined,
+            industry: previousAnalysis ? JSON.parse(previousAnalysis).answers?.industry : undefined,
+            score: previousAnalysis ? JSON.parse(previousAnalysis).overallScore : undefined,
+            answers: previousAnalysis ? JSON.parse(previousAnalysis).answers : undefined,
+            ultraDeepAnalysis: result,
+            insightCount: Array.isArray(result?.insights) ? result.insights.length : undefined,
+            dataQualityScore: 100 // placeholder; could be computed based on provided fields
+          })
+        });
+      } catch (e) {
+        console.warn('Could not persist ultra-deep analysis (user may be anonymous):', e);
+      }
       
       // Redirect to ultra-deep results page
       window.location.href = '/ultra-deep-result';
