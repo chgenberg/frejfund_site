@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { initialAnalysisSchema, hasMinInsights } from '../_utils/aiSchemas';
 
 export async function POST(request: Request) {
   try {
@@ -66,13 +67,22 @@ export async function POST(request: Request) {
       });
     }
 
-    // First pass: Deep analysis
-    const analysisResponse = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
-      messages: [
-        {
-          role: "system",
-          content: `You are an expert investment analyst with deep experience in early-stage startups. Analyze the provided business information comprehensively and generate PERSONALIZED, SPECIFIC actionable insights.
+    async function generate(promptContent: string) {
+      const res = await openai.chat.completions.create({
+        model: 'gpt-4-turbo-preview',
+        messages: [
+          { role: 'system', content: promptContent },
+          { role: 'user', content: combinedContent }
+        ],
+        temperature: 0.7,
+        max_tokens: 4000,
+        response_format: { type: 'json_object' }
+      });
+      const txt = res.choices[0].message.content || '{}';
+      return JSON.parse(txt);
+    }
+
+    const basePrompt = `You are an expert investment analyst with deep experience in early-stage startups. Analyze the provided business information comprehensively and generate PERSONALIZED, SPECIFIC actionable insights.
 
 ANALYSIS FRAMEWORK:
 1. Investment thesis and opportunity size
@@ -135,91 +145,46 @@ ALWAYS ask 3-5 follow-up questions if:
 - You lack information about customer pain points, pricing, or business metrics
 - The business model or go-to-market strategy needs clarification
 
-FOCUS FOLLOW-UP QUESTIONS ON:
-1. Specific customer pain points and current solutions they use
-2. Exact target market segments and customer characteristics  
-3. Current business metrics (revenue, customers, growth rate)
-4. Specific competitive challenges and differentiators
-5. Current business model and pricing strategy
-6. Specific goals and challenges in next 6-12 months
-7. Existing partnerships or distribution channels
-8. Team expertise and resource constraints
+Return a JSON object with the specified structure including "initialAnalysis" and "followUpQuestions" and ALWAYS include at least 3 items in initialAnalysis.actionableInsights.`;
 
-Return a JSON object with:
-{
-  "initialAnalysis": {
-    "overallScore": 75, // Overall investment score 0-100
-    "executiveSummary": "string",
-    "investmentThesis": "string",
-    "marketOpportunity": "string",
-    "customerPain": "string",
-    "solution": "string",
-    "competitivePosition": "string",
-    "teamAssessment": "string",
-    "financialAnalysis": "string",
-    "riskAssessment": "string",
-    "growthStrategy": "string",
-    "fundingAnalysis": "string",
-    // Category scores 0-100
-    "problemSolutionScore": 80,
-    "marketScore": 75,
-    "competitiveScore": 70,
-    "tractionScore": 85,
-    "financialScore": 78,
-    "teamScore": 88,
-    "financialHealthScore": 75,
-    "riskScore": 70,
-    "pitchScore": 80,
-    // Insights arrays
-    "problemInsights": ["insight1", "insight2"],
-    "marketInsights": ["insight1", "insight2"],
-    "moatInsights": ["insight1", "insight2"],
-    "tractionInsights": ["insight1", "insight2"],
-    "financialInsights": ["insight1", "insight2"],
-    "teamInsights": ["insight1", "insight2"],
-    "healthInsights": ["insight1", "insight2"],
-    "riskInsights": ["insight1", "insight2"],
-    "pitchInsights": ["insight1", "insight2"],
-    // ALWAYS GENERATE 3-5 ACTIONABLE INSIGHTS (REQUIRED)
-    "actionableInsights": [
-      {
-        "title": "Action title",
-        "impact": "high/medium/low", 
-        "timeframe": "1-2 weeks",
-        "description": "What to do",
-        "implementation": ["step1", "step2", "step3"],
-        "expectedResult": "Expected outcome",
-        "investorPerspective": "Why investors care"
-      },
-      {
-        "title": "Second action",
-        "impact": "high/medium/low",
-        "timeframe": "timeframe", 
-        "description": "description",
-        "implementation": ["step1", "step2", "step3"],
-        "expectedResult": "Expected outcome",
-        "investorPerspective": "Why investors care"
-      }
-    ]
-  },
-  "followUpQuestions": ["question1", "question2", ...] // Can be empty array, but actionableInsights must ALWAYS be populated
-}`
-        },
-        {
-          role: "user",
-          content: combinedContent
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 4000,
-      response_format: { type: "json_object" }
-    });
-
-    const analysisData = JSON.parse(analysisResponse.choices[0].message.content || '{}');
+    let analysisData = await generate(basePrompt);
     
+    // Validate with Zod and check min insights
+    let valid = false;
+    try {
+      initialAnalysisSchema.parse(analysisData);
+      valid = hasMinInsights(analysisData, 'initialAnalysis', 3);
+    } catch {}
+
+    if (!valid) {
+      // Retry once with stricter instruction and lower temperature for determinism
+      const strictPrompt = basePrompt + `\n\nSTRICT MODE: If you do not have enough detailed data, make reasonable assumptions based on provided business stage, industry, and model, and STILL generate 3 actionable insights with concrete steps and metrics.`;
+      analysisData = await generate(strictPrompt);
+      try {
+        initialAnalysisSchema.parse(analysisData);
+        valid = hasMinInsights(analysisData, 'initialAnalysis', 3);
+      } catch {}
+    }
+
+    if (!valid) {
+      // Last resort: inject a minimal actionableInsights array
+      analysisData.initialAnalysis = analysisData.initialAnalysis || {};
+      analysisData.initialAnalysis.actionableInsights = analysisData.initialAnalysis.actionableInsights || [];
+      while (analysisData.initialAnalysis.actionableInsights.length < 3) {
+        analysisData.initialAnalysis.actionableInsights.push({
+          title: 'Establish quantitative customer validation',
+          impact: 'high',
+          timeframe: '2-3 weeks',
+          description: 'Interview customers, quantify ROI, and document case examples.',
+          implementation: ['Recruit 10 customers', 'Conduct 30-min interviews', 'Compute ROI and write 3 case briefs'],
+          expectedResult: 'Clear proof of value and pricing power',
+          investorPerspective: 'Shows real customer economics and purchase intent'
+        });
+      }
+    }
+
     // Store initial analysis in session for later use
     if (analysisData.followUpQuestions?.length > 0) {
-      // Store context for follow-up
       await storeAnalysisContext({
         userInfo,
         initialAnalysis: analysisData.initialAnalysis,
@@ -228,10 +193,7 @@ Return a JSON object with:
       });
     }
     
-    return NextResponse.json({
-      success: true,
-      ...analysisData
-    });
+    return NextResponse.json({ success: true, ...analysisData });
 
   } catch (error) {
     console.error('Deep analysis error:', error);
@@ -244,8 +206,6 @@ Return a JSON object with:
 
 // Helper function to store analysis context (implement based on your storage solution)
 async function storeAnalysisContext(data: any) {
-  // Store in database, Redis, or session storage
-  // For now, we'll use a simple in-memory store
   const globalAny = global as any;
   globalAny.analysisContext = globalAny.analysisContext || {};
   globalAny.analysisContext[data.userInfo.email] = data;

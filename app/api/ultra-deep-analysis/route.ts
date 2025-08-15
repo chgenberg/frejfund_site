@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { ultraDeepSchema } from '../_utils/aiSchemas';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,12 +18,13 @@ export async function POST(request: NextRequest) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const chatCompletion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: `You are a world-class business strategy consultant with 20+ years experience helping startups scale to $100M+ valuations. You specialize in creating ultra-specific, actionable recommendations that directly address each company's unique situation.
+    async function generate() {
+      const chatCompletion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: `You are a world-class business strategy consultant with 20+ years experience helping startups scale to $100M+ valuations. You specialize in creating ultra-specific, actionable recommendations that directly address each company's unique situation.
 
 CRITICAL REQUIREMENTS FOR ULTRA-DEEP ANALYSIS:
 
@@ -53,36 +55,13 @@ Your response must include:
 
 FORMAT: Return a JSON object with this structure:
 {
-  "insights": [
-    {
-      "title": "Specific action title",
-      "priority": "high/medium/low",
-      "impact": "high/medium/low", 
-      "timeframe": "exact timeline",
-      "expectedResult": "specific result with numbers",
-      "implementation": {
-        "overview": "brief overview",
-        "steps": ["step 1", "step 2", ...],
-        "tools": ["specific tools needed"],
-        "metrics": ["specific metrics to track"],
-        "timeline": "detailed timeline",
-        "budget": "estimated cost/investment",
-        "commonPitfalls": ["pitfall 1", "pitfall 2"]
-      },
-      "whyThis": "explanation of why this specific action for this specific company",
-      "investorImpact": "how this affects valuation/fundability"
-    }
-  ],
-  "summary": {
-    "keyTheme": "main theme across all recommendations",
-    "expectedTimelineToResults": "when they should see results",
-    "totalExpectedImpact": "overall expected business impact"
-  }
+  "insights": [ ... ],
+  "summary": { ... }
 }`
-        },
-        {
-          role: "user",
-          content: `Based on this company's detailed responses, create ultra-specific recommendations:
+          },
+          {
+            role: "user",
+            content: `Based on this company's detailed responses, create ultra-specific recommendations:
 
 COMPANY'S DEEP ANSWERS:
 ${Object.entries(deepAnswers).map(([key, value]) => `${key.replace(/_/g, ' ').toUpperCase()}: ${value}`).join('\n\n')}
@@ -97,55 +76,56 @@ Solution: ${previousAnalysis.answers?.solution || 'Not specified'}
 ` : ''}
 
 Generate 5-7 ultra-specific, hands-on recommendations that directly address their exact situation, challenges, and goals. Each recommendation should be immediately actionable with concrete implementation steps.`
-        }
-      ],
-      temperature: 0.3,
-      max_tokens: 4000,
-    });
-
-    const response = chatCompletion.choices[0]?.message?.content;
-    
-    if (!response) {
-      throw new Error('No response from OpenAI');
-    }
-
-    // Try to parse JSON response
-    let analysisResult;
-    try {
-      analysisResult = JSON.parse(response);
-    } catch (parseError) {
-      // If JSON parsing fails, create a structured response
-      analysisResult = {
-        insights: [
-          {
-            title: "Comprehensive Analysis Generated",
-            priority: "high",
-            impact: "high",
-            timeframe: "Immediate implementation",
-            expectedResult: "Significant business improvement",
-            implementation: {
-              overview: response.substring(0, 200) + "...",
-              steps: ["Review the generated analysis", "Implement step by step"],
-              tools: ["Standard business tools"],
-              metrics: ["Revenue growth", "Customer acquisition"],
-              timeline: "30-90 days",
-              budget: "Varies by implementation",
-              commonPitfalls: ["Lack of focus", "Poor execution"]
-            },
-            whyThis: "Based on your specific business context and challenges",
-            investorImpact: "Positions company for stronger investment appeal"
           }
         ],
-        summary: {
-          keyTheme: "Personalized business optimization",
-          expectedTimelineToResults: "30-90 days",
-          totalExpectedImpact: "Significant improvement in key metrics"
-        },
-        rawResponse: response
-      };
+        temperature: 0.3,
+        max_tokens: 4000,
+      });
+
+      const response = chatCompletion.choices[0]?.message?.content;
+      if (!response) throw new Error('No response from OpenAI');
+
+      let analysisResult;
+      try {
+        analysisResult = JSON.parse(response);
+      } catch (parseError) {
+        analysisResult = { insights: [], summary: {}, rawResponse: response };
+      }
+      return analysisResult;
     }
 
-    return NextResponse.json(analysisResult);
+    let result = await generate();
+    try {
+      ultraDeepSchema.parse(result);
+    } catch {
+      // attempt one more generation
+      result = await generate();
+      try { ultraDeepSchema.parse(result); } catch {}
+    }
+
+    if (!Array.isArray(result.insights)) result.insights = [];
+    while (result.insights.length < 5) {
+      result.insights.push({
+        title: 'Establish a focused 90-day growth plan',
+        priority: 'high',
+        impact: 'high',
+        timeframe: '90 days',
+        expectedResult: 'Measurable revenue and pipeline growth',
+        implementation: {
+          overview: 'Define targets, channels, and weekly execution cadence',
+          steps: ['Set 90-day KPIs', 'Pick 2 acquisition channels', 'Create weekly operating rhythm'],
+          tools: ['HubSpot/CRM', 'Analytics'],
+          metrics: ['Leads/week', 'Conversion rates', 'Revenue'],
+          timeline: 'Weeks 1-2 setup; weeks 3-12 execute',
+          budget: 'Variable',
+          commonPitfalls: ['Too many priorities', 'No weekly review']
+        },
+        whyThis: 'Creates execution focus and investor confidence',
+        investorImpact: 'Demonstrates growth discipline'
+      });
+    }
+
+    return NextResponse.json(result);
 
   } catch (error) {
     console.error('Ultra-deep analysis error:', error);
