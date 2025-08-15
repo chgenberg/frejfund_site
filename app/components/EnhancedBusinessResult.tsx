@@ -61,29 +61,37 @@ const CategoryCard = ({ category, isActive, onClick }: any) => {
   return (
     <button
       onClick={onClick}
-      className={`p-6 rounded-2xl transition-all duration-300 ${
+      className={`category-badge p-6 rounded-3xl transition-all duration-300 relative overflow-hidden group ${
         isActive 
-          ? 'bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-2 border-purple-500' 
-          : 'bg-white/5 border border-white/10 hover:bg-white/10'
+          ? 'scale-105 border-white/30' 
+          : 'hover:scale-[1.02]'
       }`}
     >
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-3xl">{emoji}</span>
-        <div className="w-16 h-16">
-          <CircularProgressbar
-            value={category.score}
-            text={`${category.score}`}
-            styles={buildStyles({
-              textSize: '28px',
-              pathColor: color,
-              textColor: '#fff',
-              trailColor: 'rgba(255, 255, 255, 0.1)',
-            })}
-          />
+      {isActive && (
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 animate-pulse"></div>
+      )}
+      
+      <div className="relative z-10">
+        <div className="flex items-center justify-between mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+            <span className="text-2xl">{emoji}</span>
+          </div>
+          <div className="w-16 h-16">
+            <CircularProgressbar
+              value={category.score}
+              text={`${category.score}`}
+              styles={buildStyles({
+                textSize: '28px',
+                pathColor: color,
+                textColor: '#fff',
+                trailColor: 'rgba(255, 255, 255, 0.1)',
+              })}
+            />
+          </div>
         </div>
+        <h3 className="text-lg font-semibold text-white mb-1 text-left">{category.label}</h3>
+        <p className="text-sm text-gray-400 text-left line-clamp-2">{category.description}</p>
       </div>
-      <h3 className="text-lg font-semibold text-white mb-1">{category.label}</h3>
-      <p className="text-sm text-white/60">{category.description}</p>
     </button>
   );
 };
@@ -97,9 +105,11 @@ const MetricDisplay = ({ label, value, type = 'text' }: any) => {
   };
 
   return (
-    <div className="bg-white/5 rounded-xl p-4">
-      <p className="text-sm text-white/60 mb-1">{label}</p>
-      <p className="text-xl font-semibold text-white">{formatValue()}</p>
+    <div className="score-card rounded-2xl p-5 group hover:scale-[1.02] transition-all">
+      <p className="text-sm text-gray-400 mb-2 group-hover:text-gray-300">{label}</p>
+      <p className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+        {formatValue()}
+      </p>
     </div>
   );
 };
@@ -167,30 +177,38 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       <div className="container mx-auto px-4 py-8">
         {/* Header with Overall Score */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-8">Investment Analysis!</h1>
+        <div className="text-center mb-12 animate-fadeInUp">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-8">
+            Investment Analysis! ✨
+          </h1>
           
           <div className="inline-block">
             <div className="w-48 h-48 relative">
+              {/* Glow effect */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600/30 to-pink-600/30 blur-2xl animate-pulse-soft"></div>
+              
               <CircularProgressbar
                 value={animatedScore}
                 text={`${animatedScore}`}
                 styles={buildStyles({
-                  textSize: '24px',
+                  textSize: '28px',
                   pathColor: getScoreColor(data.overallScore),
                   textColor: '#fff',
                   trailColor: 'rgba(255, 255, 255, 0.1)',
                   pathTransitionDuration: 2,
                 })}
               />
-              <div className="absolute -bottom-8 left-0 right-0 text-center">
-                <p className="text-xl font-semibold text-white">
-                  {data.overallScore >= 75 ? 'Investor Ready' :
-                   data.overallScore >= 50 ? 'Strong Potential' :
-                   data.overallScore >= 25 ? 'Promising Start' : 'Early Stage'}
+              <div className="absolute -bottom-12 left-0 right-0 text-center">
+                <p className="text-2xl font-bold text-white mb-1">
+                  {data.overallScore >= 75 ? '🚀 Investor Ready' :
+                   data.overallScore >= 50 ? '⭐ Strong Potential' :
+                   data.overallScore >= 25 ? '💡 Promising Start' : '🔨 Early Stage'}
+                </p>
+                <p className="text-sm text-gray-400">
+                  Overall Investment Score
                 </p>
               </div>
             </div>
@@ -198,22 +216,28 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
         </div>
 
         {/* Category Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {categories.map(([key, category]) => (
-            <CategoryCard
-              key={key}
-              category={category}
-              isActive={activeCategory === key}
-              onClick={() => setActiveCategory(key)}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {categories.map(([key, category], index) => (
+            <div key={key} className={`animate-fadeInUp-delay-${index % 3 + 1}`}>
+              <CategoryCard
+                category={category}
+                isActive={activeCategory === key}
+                onClick={() => setActiveCategory(key)}
+              />
+            </div>
           ))}
         </div>
 
         {/* Active Category Details */}
-        <div className="bg-white/5 rounded-3xl border border-white/10 p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-4xl">{getScoreEmoji(activeData.score)}</span>
-            <h2 className="text-2xl font-bold text-white">{activeData.label}</h2>
+        <div className="result-card rounded-3xl p-8 animate-fadeInUp">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center animate-pulse-soft">
+              <span className="text-3xl">{getScoreEmoji(activeData.score)}</span>
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-white">{activeData.label}</h2>
+              <p className="text-gray-400 mt-1">{activeData.description}</p>
+            </div>
           </div>
 
           {/* Metrics Grid */}
@@ -233,10 +257,10 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
           {/* Insights */}
           {activeData.insights && (
             <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-white mb-4">AI Insikter</h3>
+              <h3 className="text-xl font-semibold text-white mb-4">AI Insights 🧠</h3>
               {activeData.insights.map((insight, index) => (
-                <div key={index} className="bg-white/5 rounded-xl p-4 border border-white/10">
-                  <p className="text-white/90">{insight}</p>
+                <div key={index} className="score-card rounded-2xl p-5 hover:scale-[1.02] transition-transform">
+                  <p className="text-white/90 leading-relaxed">{insight}</p>
                 </div>
               ))}
             </div>
@@ -244,16 +268,24 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
 
           {/* Premium Analysis Section */}
           {data.premiumAnalysis && activeCategory === 'problemSolution' && (
-            <div className="mt-8 p-6 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl border border-purple-500/50">
-              <h3 className="text-xl font-semibold text-white mb-4">🎯 Premium Analysis</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/10 rounded-lg p-4">
+            <div className="mt-8 result-card rounded-3xl p-8 bg-gradient-to-r from-purple-600/10 to-pink-600/10 animate-fadeInUp">
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
+                <span className="mr-3">🎯</span> Premium Analysis Available
+              </h3>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="score-card rounded-2xl p-6 hover:scale-[1.02] transition-all">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
+                    <span className="text-2xl">📊</span>
+                  </div>
                   <h4 className="font-semibold text-white mb-2">SWOT Analysis</h4>
-                  <p className="text-sm text-white/70">Detailed analysis available</p>
+                  <p className="text-sm text-gray-400">Complete strategic analysis</p>
                 </div>
-                <div className="bg-white/10 rounded-lg p-4">
-                  <h4 className="font-semibold text-white mb-2">Benchmarks</h4>
-                  <p className="text-sm text-white/70">Industry comparisons included</p>
+                <div className="score-card rounded-2xl p-6 hover:scale-[1.02] transition-all">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-4">
+                    <span className="text-2xl">📈</span>
+                  </div>
+                  <h4 className="font-semibold text-white mb-2">Industry Benchmarks</h4>
+                  <p className="text-sm text-gray-400">Compare against competitors</p>
                 </div>
               </div>
             </div>
@@ -262,11 +294,13 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
 
         {/* Actionable Insights Section - Full Width */}
         {data.actionableInsights && (
-          <div className="mt-12">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-white mb-4">🎯 Action Plan for Higher Valuation</h2>
-              <p className="text-lg text-white/70 max-w-2xl mx-auto">
-                Concrete actions based on your analysis that increase your chances of getting funding
+          <div className="mt-16 animate-fadeInUp-delay-1">
+            <div className="text-center mb-10">
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-4">
+                Action Plan for Higher Valuation 🎯
+              </h2>
+              <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+                Concrete actions that will significantly increase your chances of securing funding
               </p>
             </div>
             <ActionableInsights insights={data.actionableInsights} />
@@ -274,29 +308,35 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
         )}
 
         {/* Deep Analysis CTA */}
-        <div className="mt-12 text-center">
-          <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl p-8 border border-blue-500/50 max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold text-white mb-4">🧠 Want Even More Specific Recommendations?</h3>
-            <p className="text-white/80 mb-6">
-              Get ultra-specific, hands-on advice tailored to your exact situation. 
+        <div className="mt-16 text-center animate-fadeInUp-delay-2">
+          <div className="result-card rounded-3xl p-10 bg-gradient-to-r from-blue-600/10 to-purple-600/10 max-w-2xl mx-auto">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 mb-6 animate-pulse-soft">
+              <span className="text-4xl">🧠</span>
+            </div>
+            <h3 className="text-3xl font-bold text-white mb-4">Want Even More Specific Recommendations?</h3>
+            <p className="text-lg text-gray-400 mb-8">
+              Get ultra-personalized, actionable advice tailored to your exact business situation 
               <br />Answer 8 focused questions and receive actionable insights worth $1000s.
             </p>
             <button 
               onClick={() => window.location.href = '/deep-analysis-wizard'}
-              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all text-lg"
+              className="gradient-button px-10 py-5 text-white font-bold rounded-2xl hover:scale-105 transition-all text-lg inline-flex items-center space-x-3"
             >
-              🎯 Get Deep Analysis
+              <span className="text-2xl">🎯</span>
+              <span>Get Deep Analysis</span>
             </button>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-8 flex justify-center gap-4">
-          <button className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all">
-            Download report
+        <div className="mt-8 flex justify-center gap-6 pb-8">
+          <button className="gradient-button px-8 py-4 text-white font-semibold rounded-2xl hover:scale-105 transition-all inline-flex items-center space-x-2">
+            <span>📄</span>
+            <span>Download Report</span>
           </button>
-          <button className="px-8 py-3 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition-all">
-            Share results
+          <button className="result-card px-8 py-4 text-white font-semibold rounded-2xl hover:scale-105 transition-all inline-flex items-center space-x-2">
+            <span>🔗</span>
+            <span>Share Results</span>
           </button>
         </div>
       </div>

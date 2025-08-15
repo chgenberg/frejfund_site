@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { FaUpload, FaGlobe, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaUpload, FaGlobe, FaCheck, FaTimes, FaRocket, FaBriefcase, FaUsers, FaChartLine, FaLightbulb, FaStar } from 'react-icons/fa';
 
 interface SimplifiedBusinessWizardProps {
   open: boolean;
@@ -414,174 +414,191 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
   };
 
   const renderStep1 = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900">Welcome! Let's get started</h2>
+    <div className="space-y-6 animate-fadeIn">
+      {/* Header with floating icon */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4 floating-icon">
+          <FaRocket className="text-white text-3xl" />
+        </div>
+        <h2 className="text-3xl font-bold text-white mb-2">Welcome to Your Business Journey! 🚀</h2>
+        <p className="text-gray-400">Let's create something amazing together</p>
+      </div>
       
-      <div>
-        <label className="block text-sm font-medium text-gray-900 mb-2">
-          What's your name?
-        </label>
-        <input
-          type="text"
-          value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
-          placeholder="John Doe"
-        />
+      <div className="space-y-4">
+        <div className="group">
+          <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
+            What's your name? ✨
+          </label>
+          <input
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            className="modern-input w-full px-4 py-3 rounded-2xl text-white placeholder-gray-500 outline-none"
+            placeholder="John Doe"
+          />
+        </div>
+
+        <div className="group">
+          <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
+            What's your email? 📧
+          </label>
+          <input
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+            className="modern-input w-full px-4 py-3 rounded-2xl text-white placeholder-gray-500 outline-none"
+            placeholder="john@example.com"
+          />
+        </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-900 mb-2">
-          What's your email?
-        </label>
-        <input
-          type="email"
-          value={formData.email}
-          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
-          placeholder="john@example.com"
-        />
-      </div>
-
-      {/* Essential Business Information */}
-      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Tell us about your business</h3>
+      {/* Essential Business Information with glassmorphism card */}
+      <div className="wizard-card rounded-3xl p-6 mt-6">
+        <div className="flex items-center mb-4">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center mr-3">
+            <FaBriefcase className="text-white text-lg" />
+          </div>
+          <h3 className="text-xl font-semibold text-white">Tell us about your business</h3>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Business Stage <span className="text-red-500">*</span>
+          <div className="group">
+            <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
+              Business Stage <span className="text-pink-400">*</span>
             </label>
             <select
               value={formData.businessStage}
               onChange={(e) => setFormData(prev => ({ ...prev, businessStage: e.target.value }))}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+              className="modern-select w-full px-4 py-3 rounded-2xl text-white outline-none"
             >
-              <option value="">Select stage...</option>
-              <option value="idea">💡 Idea stage</option>
-              <option value="mvp">🛠️ Building MVP</option>
-              <option value="early-revenue">💰 Early revenue</option>
-              <option value="scaling">🚀 Scaling up</option>
+              <option value="" className="bg-gray-900">Select stage...</option>
+              <option value="idea" className="bg-gray-900">💡 Idea stage</option>
+              <option value="mvp" className="bg-gray-900">🛠️ Building MVP</option>
+              <option value="early-revenue" className="bg-gray-900">💰 Early revenue</option>
+              <option value="scaling" className="bg-gray-900">🚀 Scaling up</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Industry <span className="text-red-500">*</span>
+          <div className="group">
+            <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
+              Industry <span className="text-pink-400">*</span>
             </label>
             <select
               value={formData.industry}
               onChange={(e) => setFormData(prev => ({ ...prev, industry: e.target.value }))}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+              className="modern-select w-full px-4 py-3 rounded-2xl text-white outline-none"
             >
-              <option value="">Select industry...</option>
-              <option value="saas">💻 SaaS / Software</option>
-              <option value="ecommerce">🛒 E-commerce</option>
-              <option value="fintech">💳 Fintech</option>
-              <option value="healthtech">🏥 Healthtech</option>
-              <option value="edtech">📚 Edtech</option>
-              <option value="marketplace">🏪 Marketplace</option>
-              <option value="hardware">⚙️ Hardware / IoT</option>
-              <option value="consulting">🎯 Consulting / Services</option>
-              <option value="other">📦 Other</option>
+              <option value="" className="bg-gray-900">Select industry...</option>
+              <option value="saas" className="bg-gray-900">💻 SaaS / Software</option>
+              <option value="ecommerce" className="bg-gray-900">🛒 E-commerce</option>
+              <option value="fintech" className="bg-gray-900">💳 Fintech</option>
+              <option value="healthtech" className="bg-gray-900">🏥 Healthtech</option>
+              <option value="edtech" className="bg-gray-900">📚 Edtech</option>
+              <option value="marketplace" className="bg-gray-900">🏪 Marketplace</option>
+              <option value="hardware" className="bg-gray-900">⚙️ Hardware / IoT</option>
+              <option value="consulting" className="bg-gray-900">🎯 Consulting / Services</option>
+              <option value="other" className="bg-gray-900">📦 Other</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Target Market <span className="text-red-500">*</span>
+          <div className="group">
+            <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
+              Target Market <span className="text-pink-400">*</span>
             </label>
             <select
               value={formData.targetMarket}
               onChange={(e) => setFormData(prev => ({ ...prev, targetMarket: e.target.value }))}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+              className="modern-select w-full px-4 py-3 rounded-2xl text-white outline-none"
             >
-              <option value="">Select target market...</option>
-              <option value="smb">🏢 Small-Medium Business</option>
-              <option value="enterprise">🏛️ Enterprise</option>
-              <option value="consumers">👥 Consumers (B2C)</option>
-              <option value="government">🏛️ Government</option>
-              <option value="nonprofits">❤️ Non-profits</option>
+              <option value="" className="bg-gray-900">Select target market...</option>
+              <option value="smb" className="bg-gray-900">🏢 Small-Medium Business</option>
+              <option value="enterprise" className="bg-gray-900">🏛️ Enterprise</option>
+              <option value="consumers" className="bg-gray-900">👥 Consumers (B2C)</option>
+              <option value="government" className="bg-gray-900">🏛️ Government</option>
+              <option value="nonprofits" className="bg-gray-900">❤️ Non-profits</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Business Model <span className="text-red-500">*</span>
+          <div className="group">
+            <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
+              Business Model <span className="text-pink-400">*</span>
             </label>
             <select
               value={formData.businessModel}
               onChange={(e) => setFormData(prev => ({ ...prev, businessModel: e.target.value }))}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+              className="modern-select w-full px-4 py-3 rounded-2xl text-white outline-none"
             >
-              <option value="">Select business model...</option>
-              <option value="subscription">💰 Subscription / SaaS</option>
-              <option value="marketplace">🏪 Marketplace / Platform</option>
-              <option value="ecommerce">🛒 Product Sales</option>
-              <option value="advertising">📢 Advertising</option>
-              <option value="freemium">🎁 Freemium</option>
-              <option value="consulting">🎯 Service / Consulting</option>
-              <option value="licensing">📜 Licensing</option>
-              <option value="other">📦 Other</option>
+              <option value="" className="bg-gray-900">Select business model...</option>
+              <option value="subscription" className="bg-gray-900">💰 Subscription / SaaS</option>
+              <option value="marketplace" className="bg-gray-900">🏪 Marketplace / Platform</option>
+              <option value="ecommerce" className="bg-gray-900">🛒 Product Sales</option>
+              <option value="advertising" className="bg-gray-900">📢 Advertising</option>
+              <option value="freemium" className="bg-gray-900">🎁 Freemium</option>
+              <option value="consulting" className="bg-gray-900">🎯 Service / Consulting</option>
+              <option value="licensing" className="bg-gray-900">📜 Licensing</option>
+              <option value="other" className="bg-gray-900">📦 Other</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+          <div className="group">
+            <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
               Monthly Revenue
             </label>
             <select
               value={formData.monthlyRevenue}
               onChange={(e) => setFormData(prev => ({ ...prev, monthlyRevenue: e.target.value }))}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+              className="modern-select w-full px-4 py-3 rounded-2xl text-white outline-none"
             >
-              <option value="">Select revenue range...</option>
-              <option value="0">💡 No revenue yet</option>
-              <option value="1-1k">🌱 €1 - €1k</option>
-              <option value="1k-10k">📈 €1k - €10k</option>
-              <option value="10k-50k">🚀 €10k - €50k</option>
-              <option value="50k+">💰 €50k+</option>
+              <option value="" className="bg-gray-900">Select revenue range...</option>
+              <option value="0" className="bg-gray-900">💡 No revenue yet</option>
+              <option value="1-1k" className="bg-gray-900">🌱 €1 - €1k</option>
+              <option value="1k-10k" className="bg-gray-900">📈 €1k - €10k</option>
+              <option value="10k-50k" className="bg-gray-900">🚀 €10k - €50k</option>
+              <option value="50k+" className="bg-gray-900">💰 €50k+</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+          <div className="group">
+            <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
               Team Size
             </label>
             <select
               value={formData.teamSize}
               onChange={(e) => setFormData(prev => ({ ...prev, teamSize: e.target.value }))}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+              className="modern-select w-full px-4 py-3 rounded-2xl text-white outline-none"
             >
-              <option value="">Select team size...</option>
-              <option value="1">👤 Just me</option>
-              <option value="2-3">👥 2-3 people</option>
-              <option value="4-10">👥 4-10 people</option>
-              <option value="10+">👥 10+ people</option>
+              <option value="" className="bg-gray-900">Select team size...</option>
+              <option value="1" className="bg-gray-900">👤 Just me</option>
+              <option value="2-3" className="bg-gray-900">👥 2-3 people</option>
+              <option value="4-10" className="bg-gray-900">👥 4-10 people</option>
+              <option value="10+" className="bg-gray-900">👥 10+ people</option>
             </select>
           </div>
         </div>
       </div>
 
-      <div className="flex items-start space-x-3">
+      {/* Privacy checkbox with modern styling */}
+      <div className="flex items-start space-x-3 mt-6">
         <input
           type="checkbox"
           id="privacy"
           checked={formData.privacyAccepted}
           onChange={(e) => setFormData(prev => ({ ...prev, privacyAccepted: e.target.checked }))}
-          className="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+          className="mt-1 h-5 w-5 bg-transparent border-2 border-gray-400 rounded checked:bg-purple-500 checked:border-purple-500 focus:ring-2 focus:ring-purple-400 cursor-pointer"
         />
-        <label htmlFor="privacy" className="text-sm text-gray-900">
+        <label htmlFor="privacy" className="text-sm text-gray-300 cursor-pointer hover:text-white transition-colors">
           I agree to the{' '}
-          <a href="/integritet" target="_blank" className="text-purple-600 hover:underline font-medium">
+          <a href="/integritet" target="_blank" className="text-purple-400 hover:text-purple-300 hover:underline font-medium">
             Privacy Policy
           </a>
         </label>
       </div>
 
+      {/* Modern button with gradient */}
       <button
         onClick={() => setCurrentStep(2)}
         disabled={!formData.name || !formData.email || !formData.privacyAccepted || !formData.businessStage || !formData.industry || !formData.targetMarket || !formData.businessModel}
-        className="w-full bg-purple-600 text-white py-4 px-6 rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium text-lg transition-colors"
+        className="gradient-button w-full text-white py-4 px-6 rounded-2xl font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
       >
         Continue to Data Collection →
       </button>
@@ -589,85 +606,114 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
   );
 
   const renderStep2 = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Gather Additional Information</h2>
-        <p className="text-gray-600">
-          Help us provide even more personalized insights by sharing additional data about your business.
+    <div className="space-y-6 animate-fadeIn">
+      {/* Header with icon */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 mb-4 floating-icon">
+          <FaLightbulb className="text-white text-3xl" />
+        </div>
+        <h2 className="text-3xl font-bold text-white mb-2">Enhance Your Analysis 🎯</h2>
+        <p className="text-gray-400">
+          Share more details for hyper-personalized insights
           <br />
-          <span className="text-sm">💡 The more information you provide, the more specific our recommendations will be!</span>
+          <span className="text-sm text-purple-400">✨ Each data point makes your recommendations 25% more specific!</span>
         </p>
       </div>
 
-      {/* Information Quality Indicator */}
-      <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 border border-green-200">
-        <h3 className="font-semibold text-gray-900 mb-2">📊 Current Data Quality</h3>
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <FaCheck className="w-4 h-4 text-green-500" />
-            <span className="text-sm text-gray-700">Basic business information ✓</span>
+      {/* Information Quality Indicator with glassmorphism */}
+      <div className="wizard-card rounded-3xl p-6 bg-gradient-to-r from-purple-500/10 to-blue-500/10">
+        <h3 className="font-semibold text-white mb-4 flex items-center">
+          <span className="text-2xl mr-2">📊</span> Data Quality Score
+        </h3>
+        <div className="space-y-3">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+              <FaCheck className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-sm text-gray-300">Basic business information ✓</span>
           </div>
-          <div className="flex items-center space-x-2">
-            {formData.website ? <FaCheck className="w-4 h-4 text-green-500" /> : <span className="w-4 h-4 rounded-full border-2 border-gray-300"></span>}
-            <span className="text-sm text-gray-700">Website analysis {formData.website ? '✓' : '(optional but recommended)'}</span>
+          <div className="flex items-center space-x-3">
+            {formData.website ? (
+              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                <FaCheck className="w-4 h-4 text-white" />
+              </div>
+            ) : (
+              <div className="w-8 h-8 rounded-full border-2 border-gray-600"></div>
+            )}
+            <span className="text-sm text-gray-300">Website analysis {formData.website ? '✓' : <span className="text-purple-400">(+30% accuracy)</span>}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            {formData.uploadedFiles.length > 0 ? <FaCheck className="w-4 h-4 text-green-500" /> : <span className="w-4 h-4 rounded-full border-2 border-gray-300"></span>}
-            <span className="text-sm text-gray-700">Business documents {formData.uploadedFiles.length > 0 ? '✓' : '(optional but recommended)'}</span>
+          <div className="flex items-center space-x-3">
+            {formData.uploadedFiles.length > 0 ? (
+              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                <FaCheck className="w-4 h-4 text-white" />
+              </div>
+            ) : (
+              <div className="w-8 h-8 rounded-full border-2 border-gray-600"></div>
+            )}
+            <span className="text-sm text-gray-300">Business documents {formData.uploadedFiles.length > 0 ? '✓' : <span className="text-purple-400">(+40% accuracy)</span>}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            {formData.linkedinProfiles ? <FaCheck className="w-4 h-4 text-green-500" /> : <span className="w-4 h-4 rounded-full border-2 border-gray-300"></span>}
-            <span className="text-sm text-gray-700">Team analysis {formData.linkedinProfiles ? '✓' : '(optional)'}</span>
+          <div className="flex items-center space-x-3">
+            {formData.linkedinProfiles ? (
+              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                <FaCheck className="w-4 h-4 text-white" />
+              </div>
+            ) : (
+              <div className="w-8 h-8 rounded-full border-2 border-gray-600"></div>
+            )}
+            <span className="text-sm text-gray-300">Team analysis {formData.linkedinProfiles ? '✓' : <span className="text-gray-500">(optional)</span>}</span>
           </div>
         </div>
       </div>
       
-      <div>
-        <label className="block text-sm font-medium text-gray-900 mb-2">
-          <FaGlobe className="inline-block w-4 h-4 mr-1" />
+      {/* Website URL with modern styling */}
+      <div className="group">
+        <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
+          <FaGlobe className="inline-block w-4 h-4 mr-2" />
           Website URL
         </label>
         <input
           type="url"
           value={formData.website}
           onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+          className="modern-input w-full px-4 py-3 rounded-2xl text-white placeholder-gray-500 outline-none"
           placeholder="https://yourcompany.com"
         />
-        <p className="text-xs text-gray-600 mt-1">📈 <strong>Recommended:</strong> We'll analyze your value proposition, target market, and competitors</p>
+        <p className="text-xs text-purple-400 mt-2">📈 We'll analyze your value proposition & competitors</p>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-900 mb-2">
+      {/* LinkedIn profiles */}
+      <div className="group">
+        <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
+          <FaUsers className="inline-block w-4 h-4 mr-2" />
           LinkedIn profiles of founders/team
         </label>
         <input
           type="text"
           value={formData.linkedinProfiles}
           onChange={(e) => setFormData(prev => ({ ...prev, linkedinProfiles: e.target.value }))}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+          className="modern-input w-full px-4 py-3 rounded-2xl text-white placeholder-gray-500 outline-none"
           placeholder="LinkedIn URLs separated by commas"
         />
-        <p className="text-xs text-gray-600 mt-1">👥 <strong>Team insights:</strong> We'll assess founder-market fit and team strengths</p>
+        <p className="text-xs text-purple-400 mt-2">👥 We'll assess founder-market fit & team strengths</p>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-900 mb-2">
-          <FaUpload className="inline-block w-4 h-4 mr-1" />
+      {/* File upload with modern design */}
+      <div className="group">
+        <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
+          <FaUpload className="inline-block w-4 h-4 mr-2" />
           Upload business materials
         </label>
-        <div className="bg-blue-50 rounded-lg p-3 mb-3 border border-blue-200">
-          <p className="text-sm text-gray-700 font-medium mb-2">📋 Most valuable documents to upload:</p>
-          <ul className="text-xs text-gray-600 space-y-1">
-            <li>• <strong>Pitch deck</strong> - for complete business model analysis</li>
-            <li>• <strong>Financial projections</strong> - for unit economics review</li>
-            <li>• <strong>Customer interviews/surveys</strong> - for market validation insights</li>
-            <li>• <strong>Business plan</strong> - for comprehensive strategy review</li>
-            <li>• <strong>Competitive analysis</strong> - for positioning recommendations</li>
-          </ul>
+        <div className="wizard-card rounded-2xl p-4 mb-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+          <p className="text-sm text-white font-medium mb-3">📋 Most valuable documents:</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-300">
+            <div>• <strong className="text-purple-400">Pitch deck</strong> - business model</div>
+            <div>• <strong className="text-purple-400">Financials</strong> - unit economics</div>
+            <div>• <strong className="text-purple-400">Customer data</strong> - validation</div>
+            <div>• <strong className="text-purple-400">Business plan</strong> - strategy</div>
+          </div>
         </div>
         
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-500 transition-colors">
+        <div className="file-upload-zone rounded-2xl p-8 text-center cursor-pointer group-hover:border-purple-500">
           <input
             type="file"
             multiple
@@ -677,50 +723,61 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
             id="file-upload"
           />
           <label htmlFor="file-upload" className="cursor-pointer">
-            <FaUpload className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-            <p className="text-sm text-gray-800">Click to upload or drag and drop</p>
-            <p className="text-xs text-gray-500 mt-1">PDF, Word, or .txt documents</p>
+            <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4 floating-icon">
+              <FaUpload className="text-white text-2xl" />
+            </div>
+            <p className="text-sm text-white font-medium">Click to upload or drag and drop</p>
+            <p className="text-xs text-gray-400 mt-1">PDF, Word, or .txt documents</p>
           </label>
         </div>
         
         {formData.uploadedFiles.length > 0 && (
-          <div className="mt-3 space-y-2">
+          <div className="mt-4 space-y-2">
             {formData.uploadedFiles.map((file, index) => (
-              <div key={index} className="flex items-center space-x-2 text-sm text-gray-900">
-                <FaCheck className="w-4 h-4 text-green-500" />
-                <span>{file.name}</span>
+              <div key={index} className="flex items-center space-x-3 wizard-card rounded-xl p-3 bg-gradient-to-r from-green-500/10 to-blue-500/10">
+                <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                  <FaCheck className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-sm text-white truncate">{file.name}</span>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      <div className="flex space-x-3">
+      {/* Modern buttons */}
+      <div className="flex space-x-4 mt-8">
         <button
           onClick={() => setCurrentStep(1)}
-          className="flex-1 py-3 px-4 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-all"
+          className="flex-1 py-4 px-6 wizard-card rounded-2xl text-white font-semibold hover:bg-gray-800 transition-all"
         >
           ← Back
         </button>
         <button
           onClick={handleInitialAnalysis}
-          className="flex-1 py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all"
+          className="gradient-button flex-1 py-4 px-6 text-white font-semibold rounded-2xl transition-all flex items-center justify-center space-x-2"
         >
-          🚀 Start Analysis
+          <FaRocket className="text-lg" />
+          <span>Start Analysis</span>
         </button>
       </div>
     </div>
   );
 
   const renderAnalyzing = () => (
-    <div className="text-center py-12">
+    <div className="text-center py-12 animate-fadeIn">
+      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 mb-8 floating-icon">
+        <FaChartLine className="text-white text-3xl" />
+      </div>
+      
       <div className="relative w-32 h-32 mx-auto mb-8">
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600/20 via-cyan-600/20 to-blue-600/20 blur-xl animate-pulse"></div>
         <svg className="w-32 h-32 transform -rotate-90">
           <circle
             cx="64"
             cy="64"
             r="60"
-            stroke="#e5e7eb"
+            stroke="rgba(255, 255, 255, 0.1)"
             strokeWidth="8"
             fill="none"
           />
@@ -728,27 +785,27 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
             cx="64"
             cy="64"
             r="60"
-            stroke="url(#gradient)"
+            stroke="url(#analyzeGradient)"
             strokeWidth="8"
             fill="none"
             strokeDasharray={`${2 * Math.PI * 60}`}
             strokeDashoffset={`${2 * Math.PI * 60 * (1 - analysisProgress / 100)}`}
-            className="transition-all duration-300"
+            className="transition-all duration-300 filter drop-shadow-lg"
           />
           <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#9333ea" />
-              <stop offset="100%" stopColor="#ec4899" />
+            <linearGradient id="analyzeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#3b82f6" />
+              <stop offset="100%" stopColor="#06b6d4" />
             </linearGradient>
           </defs>
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xl font-bold text-gray-900">{Math.round(analysisProgress)}%</span>
+          <span className="text-2xl font-bold text-white">{Math.round(analysisProgress)}%</span>
         </div>
       </div>
       
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">Analyzing your business...</h3>
-      <p className="text-gray-800">This deep analysis may take a minute</p>
+      <h3 className="text-2xl font-semibold text-white mb-2">Analyzing your business data... 🔍</h3>
+      <p className="text-gray-400">Our AI is performing deep analysis of your materials</p>
     </div>
   );
 
@@ -796,33 +853,38 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           <span className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             {Math.round(completionProgress)}
           </span>
-          <span className="text-sm text-gray-600 font-medium">percent</span>
+          <span className="text-sm text-gray-400 font-medium">percent</span>
         </div>
       </div>
       
-      <h3 className="text-2xl font-bold text-gray-900 mb-3">Completing your analysis</h3>
-      <p className="text-gray-600 mb-8 font-medium animate-pulse">{completionStage}</p>
+      <h3 className="text-3xl font-bold text-white mb-3">Finalizing Your AI Analysis ✨</h3>
+      <div className="wizard-card rounded-2xl px-6 py-3 inline-block mb-8 shimmer-effect">
+        <p className="text-purple-400 font-medium animate-pulse">{completionStage}</p>
+      </div>
       
       {/* Modern progress stages */}
       <div className="max-w-lg mx-auto">
         <div className="relative">
           {/* Progress line background */}
-          <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 rounded-full -translate-y-1/2"></div>
+          <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-700 rounded-full -translate-y-1/2"></div>
           
-          {/* Active progress line */}
+          {/* Active progress line with glow */}
           <div 
-            className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full -translate-y-1/2 transition-all duration-500"
-            style={{ width: `${completionProgress}%` }}
+            className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full -translate-y-1/2 transition-all duration-500 shadow-glow"
+            style={{ 
+              width: `${completionProgress}%`,
+              boxShadow: '0 0 20px rgba(168, 85, 247, 0.6)'
+            }}
           ></div>
           
           {/* Stage dots */}
           <div className="relative flex justify-between">
             {[
-              { name: 'Start', threshold: 0 },
-              { name: 'Process', threshold: 25 },
-              { name: 'Analyze', threshold: 50 },
-              { name: 'Generate', threshold: 75 },
-              { name: 'Complete', threshold: 100 }
+              { name: 'Start', threshold: 0, icon: '🚀' },
+              { name: 'Process', threshold: 25, icon: '⚡' },
+              { name: 'Analyze', threshold: 50, icon: '🧠' },
+              { name: 'Generate', threshold: 75, icon: '✨' },
+              { name: 'Complete', threshold: 100, icon: '🎯' }
             ].map((stage, index) => (
               <div key={index} className="flex flex-col items-center">
                 <div className={`
@@ -857,21 +919,27 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
   );
 
   const renderFollowUp = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900">A few more questions</h2>
-      <p className="text-gray-800">Based on your materials, we need some clarification:</p>
+    <div className="space-y-6 animate-fadeIn">
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-teal-500 to-green-500 mb-4 floating-icon">
+          <FaLightbulb className="text-white text-3xl" />
+        </div>
+        <h2 className="text-3xl font-bold text-white mb-2">Final Details 🎯</h2>
+        <p className="text-gray-400">Let's fine-tune your analysis with a few more insights</p>
+      </div>
       
       <div className="space-y-4 max-h-96 overflow-y-auto">
         {followUpQuestions.map((question, index) => (
-          <div key={index}>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+          <div key={index} className="group">
+            <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
               {question}
             </label>
             <textarea
               value={followUpAnswers[`q${index}`] || ''}
               onChange={(e) => setFollowUpAnswers(prev => ({ ...prev, [`q${index}`]: e.target.value }))}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+              className="modern-input w-full px-4 py-3 rounded-2xl text-white placeholder-gray-500 outline-none resize-none"
               rows={3}
+              placeholder="Share your insights..."
             />
           </div>
         ))}
@@ -880,9 +948,10 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       <button
         onClick={() => handleFinalAnalysis()}
         disabled={Object.keys(followUpAnswers).length < followUpQuestions.length}
-        className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="gradient-button w-full py-4 px-6 text-white font-semibold rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
       >
-        Complete Analysis
+        <FaStar className="text-lg" />
+        <span>Complete Analysis</span>
       </button>
     </div>
   );
@@ -890,18 +959,27 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop with blur */}
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-hidden border border-gray-200">
-        <div className="p-6 overflow-y-auto max-h-[85vh] bg-white">
+      {/* Modal with modern design */}
+      <div className="relative wizard-card rounded-3xl shadow-2xl w-full mx-auto overflow-hidden animate-slideUp 
+        max-w-lg lg:max-w-2xl max-h-[90vh] md:max-h-[85vh]">
+        {/* Step indicator bar */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gray-800">
+          <div 
+            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+            style={{ width: `${(currentStep / 3) * 100}%` }}
+          />
+        </div>
+        
+        <div className="p-6 md:p-8 overflow-y-auto max-h-[88vh] md:max-h-[83vh]">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors p-2 rounded-full hover:bg-gray-800"
           >
-            <FaTimes className="w-6 h-6" />
+            <FaTimes className="w-5 h-5" />
           </button>
 
           {isAnalyzing ? renderAnalyzing() : 
