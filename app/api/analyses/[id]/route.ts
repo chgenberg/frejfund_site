@@ -41,4 +41,22 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
 		console.error('GET /api/analyses/[id] failed', err)
 		return NextResponse.json({ error: 'Failed to fetch analysis' }, { status: 500 })
 	}
+}
+
+export async function DELETE(_request: NextRequest, { params }: { params: { id: string } }) {
+	try {
+		const supabase = createRouteHandlerClient({ cookies })
+		const { data: { user } } = await supabase.auth.getUser()
+		if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+		// Ensure the analysis belongs to the user
+		const existing = await prisma.analysis.findFirst({ where: { id: params.id, userId: user.id } })
+		if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+		await prisma.analysis.delete({ where: { id: params.id } })
+		return NextResponse.json({ success: true })
+	} catch (err) {
+		console.error('DELETE /api/analyses/[id] failed', err)
+		return NextResponse.json({ error: 'Failed to delete analysis' }, { status: 500 })
+	}
 } 

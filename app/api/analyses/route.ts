@@ -41,4 +41,37 @@ export async function GET(_request: NextRequest) {
 		console.error('GET /api/analyses failed', err)
 		return NextResponse.json({ error: 'Failed to fetch analyses' }, { status: 500 })
 	}
+}
+
+export async function POST(request: NextRequest) {
+	try {
+		const supabase = createRouteHandlerClient({ cookies })
+		const { data: { user } } = await supabase.auth.getUser()
+		if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+		const body = await request.json()
+		const created = await prisma.analysis.create({
+			data: {
+				userId: user.id,
+				companyName: body.companyName || 'Unknown',
+				industry: body.industry ?? null,
+				score: typeof body.score === 'number' ? body.score : 0,
+				answers: body.answers || {},
+				insights: body.insights ?? null,
+				actionItems: body.actionItems ?? null,
+				isPremium: !!body.isPremium,
+				premiumAnalysis: body.premiumAnalysis ?? null,
+				title: body.title ?? `${body.companyName || 'Analysis'} - Business Analysis`,
+				description: body.description ?? (typeof body.score === 'number' ? `Score: ${body.score} / 100` : null),
+				ultraDeepAnalysis: body.ultraDeepAnalysis ?? null,
+				ultraDeepCreatedAt: body.ultraDeepAnalysis ? new Date() : null,
+				insightCount: body.insightCount ?? null,
+				dataQualityScore: body.dataQualityScore ?? null,
+			},
+		})
+		return NextResponse.json({ analysis: mapAnalysis(created) }, { status: 201 })
+	} catch (err) {
+		console.error('POST /api/analyses failed', err)
+		return NextResponse.json({ error: 'Failed to create analysis' }, { status: 500 })
+	}
 } 
