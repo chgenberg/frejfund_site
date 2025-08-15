@@ -40,3 +40,5 @@ aff/src/.env
 # typescript
 *.tsbuildinfo
 next-env.d.tstsconfig.tsbuildinfo
+
+/lib/generated/prisma

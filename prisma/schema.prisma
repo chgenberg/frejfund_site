@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Analysis {
+  id                 String    @id @default(uuid()) @db.Uuid
+  userId             String?   @map("user_id") @db.Uuid
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  companyName        String    @map("company_name")
+  industry           String?
+  score              Int
+  answers            Json
+  insights           Json?
+  actionItems        Json?     @map("action_items")
+  isPremium          Boolean   @default(false) @map("is_premium")
+  premiumAnalysis    Json?     @map("premium_analysis")
+  title              String?
+  description        String?
+  ultraDeepAnalysis  Json?     @map("ultra_deep_analysis")
+  ultraDeepCreatedAt DateTime? @map("ultra_deep_created_at")
+  insightCount       Int?      @map("insight_count")
+  dataQualityScore   Int?      @map("data_quality_score")
+  
+  payments           Payment[]
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@map("analyses")
+}
+
+model Payment {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  analysisId    String   @map("analysis_id") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at")
+  amount        Decimal  @db.Decimal(10, 2)
+  currency      String   @default("SEK")
+  paymentMethod String?  @map("payment_method")
+  paymentId     String?  @map("payment_id")
+  status        String   @default("pending")
+  
+  analysis      Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([analysisId])
+  @@index([status])
+  @@map("payments")
+}

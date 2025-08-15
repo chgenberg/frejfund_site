@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { prisma } from '../../../lib/prisma';
 
 interface SaveAnalysisRequest {
   companyName?: string;
@@ -20,45 +21,35 @@ interface SaveAnalysisRequest {
 export async function POST(request: NextRequest) {
   try {
     const data: SaveAnalysisRequest = await request.json();
+    
+    // Still use Supabase for auth until full migration
     const supabase = createRouteHandlerClient({ cookies });
-
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'You must be logged in to save analyses' }, { status: 401 });
     }
 
-    const insertPayload: any = {
-      user_id: user.id,
-      company_name: data.companyName || 'Unknown',
-      industry: data.industry,
-      score: data.score,
-      answers: data.answers,
-      insights: data.insights,
-      action_items: data.actionItems,
-      is_premium: data.isPremium,
-      premium_analysis: data.premiumAnalysis,
-      title: `${data.companyName || 'Analysis'} - Business Analysis`,
-      description: `Score: ${data.score ?? '-'} / 100`,
-    };
-
-    if (data.ultraDeepAnalysis) {
-      insertPayload.ultra_deep_analysis = data.ultraDeepAnalysis;
-      insertPayload.ultra_deep_created_at = new Date().toISOString();
-      if (typeof data.insightCount === 'number') insertPayload.insight_count = data.insightCount;
-      if (typeof data.dataQualityScore === 'number') insertPayload.data_quality_score = data.dataQualityScore;
-    }
-
-    const { data: analysis, error } = await supabase
-      .from('analyses')
-      .insert(insertPayload)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Supabase error:', error);
-      return NextResponse.json({ error: 'Could not save analysis' }, { status: 500 });
-    }
+    // Use Prisma for database operations
+    const analysis = await prisma.analysis.create({
+      data: {
+        userId: user.id,
+        companyName: data.companyName || 'Unknown',
+        industry: data.industry,
+        score: data.score || 0,
+        answers: data.answers || {},
+        insights: data.insights,
+        actionItems: data.actionItems,
+        isPremium: data.isPremium || false,
+        premiumAnalysis: data.premiumAnalysis,
+        title: `${data.companyName || 'Analysis'} - Business Analysis`,
+        description: `Score: ${data.score ?? '-'} / 100`,
+        ultraDeepAnalysis: data.ultraDeepAnalysis,
+        ultraDeepCreatedAt: data.ultraDeepAnalysis ? new Date() : null,
+        insightCount: data.insightCount,
+        dataQualityScore: data.dataQualityScore,
+      },
+    });
 
     return NextResponse.json({ success: true, analysis });
   } catch (error) {
