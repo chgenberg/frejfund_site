@@ -223,17 +223,17 @@ export default function BusinessPlanResult({ score, answers, feedback = {} }: Re
     }
 
     try {
-      const supabase = getSupabaseClient();
-      const { error } = await supabase
-        .from('analyses')
-        .insert([{
-          user_id: user.id,
-          company_name: typedAnswers.company_name,
+      const res = await fetch('/api/save-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          companyName: typedAnswers.company_name,
           score,
           answers,
-        }]);
+        })
+      })
+      if (!res.ok) throw new Error('Failed to save')
 
-      if (error) throw error;
       setSaveMessage('✅ Analysen har sparats');
     } catch (error) {
       setSaveMessage('❌ Det gick inte att spara analysen');

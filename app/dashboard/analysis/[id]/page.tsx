@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { getSupabaseClient, Analysis } from '../../../../lib/supabase'
 import BusinessPlanResult from '../../../components/BusinessPlanResult'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -14,11 +13,8 @@ export default function AnalysisDetailPage() {
   const router = useRouter()
   const params = useParams()
   const id = params.id as string
-  const [analysis, setAnalysis] = useState<Analysis | null>(null)
+  const [analysis, setAnalysis] = useState<any | null>(null)
   const [loading, setLoading] = useState(true)
-
-  // Get Supabase client once per render
-  const supabase = getSupabaseClient()
 
   useEffect(() => {
     if (id) {
@@ -28,26 +24,17 @@ export default function AnalysisDetailPage() {
 
   const fetchAnalysis = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
+      const res = await fetch(`/api/analyses/${id}`, { cache: 'no-store' })
+      if (res.status === 401) {
         router.push('/auth/login')
         return
       }
-
-      const { data, error } = await supabase
-        .from('analyses')
-        .select('*')
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .single()
-
-      if (error) throw error
-      if (!data) {
+      if (res.status === 404) {
         router.push('/dashboard')
         return
       }
-
-      setAnalysis(data)
+      const json = await res.json()
+      setAnalysis(json.analysis)
     } catch (error) {
       console.error('Error fetching analysis:', error)
       router.push('/dashboard')
@@ -57,7 +44,6 @@ export default function AnalysisDetailPage() {
   }
 
   const handleUpgradeToPremium = () => {
-    // Spara analysis ID för uppgradering efter betalning
     localStorage.setItem('upgradeAnalysisId', id)
     router.push('/kassa/checkout')
   }

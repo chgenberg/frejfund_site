@@ -258,24 +258,20 @@ export default function MobileOptimizedWizard({ open, onClose }: MobileOptimized
         localStorage.setItem('latestAnalysisResult', JSON.stringify(resultData));
         
         // Check if user is logged in and save to database
-        const supabase = getSupabaseClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          const { error } = await supabase
-            .from('analyses')
-            .insert({
-              user_id: user.id,
-              company_name: answers.company_name,
+        // Persist via API route (auth handled server-side)
+        try {
+          await fetch('/api/save-analysis', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              companyName: answers.company_name,
               score: analysisData.analysis.overallScore,
-              analysis_data: resultData,
               answers: answers,
-              created_at: new Date().toISOString()
-            });
-            
-          if (error) {
-            console.error('Error saving analysis:', error);
-          }
+              insights: analysisData.analysis.insights,
+            })
+          })
+        } catch (e) {
+          console.error('Error saving analysis via API:', e)
         }
         
         // Navigate to enhanced result page

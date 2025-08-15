@@ -5,7 +5,7 @@ import Image from 'next/image';
 import AuthModal from './AuthModal';
 import ProfileSettingsModal from './ProfileSettingsModal';
 import { usePathname, useRouter } from 'next/navigation';
-import { User } from '@supabase/supabase-js';
+type User = { id: string; email?: string | null }
 import { getSupabaseClient } from '../../lib/supabase';
 
 export default function OverlayNavbar() {

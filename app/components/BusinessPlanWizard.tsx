@@ -135,11 +135,10 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
 
   useEffect(() => {
     const checkUser = async () => {
-      const supabase = getSupabaseClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setIsLoggedIn(true);
-      }
+      try {
+        const res = await fetch('/api/analyses', { method: 'GET' })
+        if (res.status !== 401) setIsLoggedIn(true)
+      } catch {}
     };
     checkUser();
     
@@ -186,42 +185,40 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
 
   const saveAndAnalyze = async () => {
     try {
-      const supabase = getSupabaseClient();
       let userId = null;
-      let anonymousEmail = null;
+      let anonymousEmail = answers.email || null;
 
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        userId = user.id;
-      } else if (answers.email) {
-        anonymousEmail = answers.email;
-      }
-
-      const { data, error } = await supabase.from('analyses').insert({
-        user_id: userId,
-        company_name: answers.company_name,
-        company_value: answers.company_value,
-        customer_problem: answers.customer_problem,
-        problem_evidence: answers.problem_evidence,
-        market_gap: answers.market_gap,
-        solution: answers.solution,
-        why_now: answers.why_now,
-        target_customer: answers.target_customer,
-        market_size: answers.market_size,
-        market_size_estimate: answers.market_size_estimate,
-        market_trends: answers.market_trends,
-        traction: answers.traction,
-        revenue_block: answers.revenue_block,
-        runway: answers.runway,
-        growth_plan: answers.growth_plan,
-        milestones: JSON.stringify(answers.milestones),
-        team: answers.team,
-        founder_equity: answers.founder_equity,
-        founder_market_fit: JSON.stringify(answers.founder_market_fit),
-        created_at: new Date().toISOString(),
-        status: 'pending', // Or 'completed', 'failed'
-      });
+      const res = await fetch('/api/save-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          companyName: answers.company_name,
+          score: 0,
+          answers: {
+            company_value: answers.company_value,
+            customer_problem: answers.customer_problem,
+            problem_evidence: answers.problem_evidence,
+            market_gap: answers.market_gap,
+            solution: answers.solution,
+            why_now: answers.why_now,
+            target_customer: answers.target_customer,
+            market_size: answers.market_size,
+            market_size_estimate: answers.market_size_estimate,
+            market_trends: answers.market_trends,
+            traction: answers.traction,
+            revenue_block: answers.revenue_block,
+            runway: answers.runway,
+            growth_plan: answers.growth_plan,
+            milestones: answers.milestones,
+            team: answers.team,
+            founder_equity: answers.founder_equity,
+            founder_market_fit: answers.founder_market_fit,
+            submitted_at: new Date().toISOString(),
+            status: 'pending'
+          }
+        })
+      })
+      if (!res.ok) throw new Error('Failed to save analysis')
 
       // Spara txt-fil med alla svar
       fetch('/api/save-customer-data', {
@@ -234,12 +231,6 @@ export default function BusinessPlanWizard({ open, onClose }: BusinessPlanWizard
           answers
         })
       }).catch(err => console.error('save-customer-data error', err));
-
-      if (error) {
-        console.error('Error saving analysis:', error);
-        alert('Fel vid sparande av affärsplan.');
-        return;
-      }
 
       alert('Affärsplan sparad! Analysen genereras...');
       // Redirect to analysis page or show loading state

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { getSupabaseClient, Analysis } from '../../lib/supabase'
+import { Analysis } from '../../lib/supabase'
 import BusinessPlanWizard from '../components/BusinessPlanWizard'
 import ProfileSettingsModal from '../components/ProfileSettingsModal'
 import Link from 'next/link'
@@ -20,36 +20,20 @@ export default function Dashboard() {
   const [showProfile, setShowProfile] = useState(false)
 
   useEffect(() => {
-    checkUser()
     fetchAnalyses()
     // Scroll to top when dashboard loads
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
-  const checkUser = async () => {
-    const supabase = getSupabaseClient();
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      router.push('/auth/login')
-    } else {
-      setUserEmail(user.email || '')
-    }
-  }
-
   const fetchAnalyses = async () => {
     try {
-      const supabase = getSupabaseClient();
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-
-      const { data, error } = await supabase
-        .from('analyses')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setAnalyses(data || [])
+      const res = await fetch('/api/analyses', { cache: 'no-store' })
+      if (res.status === 401) {
+        router.push('/auth/login')
+        return
+      }
+      const json = await res.json()
+      setAnalyses(json.analyses || [])
     } catch (error) {
       console.error('Error fetching analyses:', error)
     } finally {
@@ -58,14 +42,13 @@ export default function Dashboard() {
   }
 
   const handleSignOut = async () => {
-    const supabase = getSupabaseClient();
-    await supabase.auth.signOut()
-    router.push('/')
+    // If Supabase auth remains, redirect to logout page
+    router.push('/auth/login')
   }
 
   const totalAnalyses = analyses.length
   const averageScore = analyses.length > 0 
-    ? Math.round(analyses.reduce((sum, a) => sum + a.score, 0) / analyses.length)
+    ? Math.round(analyses.reduce((sum, a) => sum + (a as any).score, 0) / analyses.length)
     : 0
 
   return (
@@ -131,7 +114,7 @@ export default function Dashboard() {
               <h3 className="text-white/60 text-sm mb-1">Senaste analysen</h3>
               <p className="text-3xl font-bold text-white">
                 {analyses[0]?.created_at 
-                  ? new Date(analyses[0].created_at).toLocaleDateString('sv-SE')
+                  ? new Date((analyses[0] as any).created_at as any).toLocaleDateString('sv-SE')
                   : '-'}
               </p>
             </div>
@@ -174,21 +157,21 @@ export default function Dashboard() {
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">
-                          {analysis.company_name}
+                          {(analysis as any).company_name}
                         </h3>
-                        <p className="text-white/60 text-sm">{analysis.industry}</p>
+                        <p className="text-white/60 text-sm">{(analysis as any).industry}</p>
                       </div>
                     </div>
                     
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-white/60 text-sm">Score</span>
-                        <span className="text-white font-semibold">{analysis.score}</span>
+                        <span className="text-white font-semibold">{(analysis as any).score}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-white/60 text-sm">Date</span>
                         <span className="text-white/80 text-sm">
-                          {new Date(analysis.created_at).toLocaleDateString('sv-SE')}
+                          {new Date((analysis as any).created_at as any).toLocaleDateString('sv-SE')}
                         </span>
                       </div>
                     </div>
