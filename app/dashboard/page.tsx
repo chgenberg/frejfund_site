@@ -74,7 +74,7 @@ export default function Dashboard() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                Tillbaka till startsidan
+                Back to homepage
               </Link>
               
               <div className="flex items-center gap-4">
@@ -91,7 +91,7 @@ export default function Dashboard() {
                   onClick={handleSignOut}
                   className="px-4 py-2 text-white/80 hover:text-white transition-colors font-semibold border border-white/20 rounded-lg"
                 >
-                  Logga ut
+                  Log out
                 </button>
               </div>
             </div>
@@ -103,15 +103,15 @@ export default function Dashboard() {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
-              <h3 className="text-white/60 text-sm mb-1">Totalt antal analyser</h3>
+              <h3 className="text-white/60 text-sm mb-1">Total analyses</h3>
               <p className="text-3xl font-bold text-white">{totalAnalyses}</p>
             </div>
             <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
-              <h3 className="text-white/60 text-sm mb-1">Genomsnittlig poäng</h3>
+              <h3 className="text-white/60 text-sm mb-1">Average score</h3>
               <p className="text-3xl font-bold text-white">{averageScore}</p>
             </div>
             <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
-              <h3 className="text-white/60 text-sm mb-1">Senaste analysen</h3>
+              <h3 className="text-white/60 text-sm mb-1">Latest analysis</h3>
               <p className="text-3xl font-bold text-white">
                 {analyses[0]?.created_at 
                   ? new Date((analyses[0] as any).created_at as any).toLocaleDateString('sv-SE')
@@ -126,7 +126,7 @@ export default function Dashboard() {
               onClick={() => setShowWizard(true)}
               className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
             >
-              Ny Analys
+              New Analysis
             </button>
           </div>
 
@@ -134,16 +134,16 @@ export default function Dashboard() {
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-              <p className="text-white/60 mt-4">Laddar analyser...</p>
+              <p className="text-white/60 mt-4">Loading analyses...</p>
             </div>
           ) : analyses.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-white/60">Du har inga sparade analyser än.</p>
+              <p className="text-white/60">You don’t have any saved analyses yet.</p>
               <button
                 onClick={() => setShowWizard(true)}
                 className="mt-4 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all"
               >
-                Skapa din första analys
+                Create your first analysis
               </button>
             </div>
           ) : (

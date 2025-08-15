@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { prisma } from '../../../../lib/prisma'
+import { analysisUpdateSchema } from '../../_utils/analysesSchemas'
 
 function mapAnalysis(a: any) {
 	return {
@@ -40,6 +41,48 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
 	} catch (err) {
 		console.error('GET /api/analyses/[id] failed', err)
 		return NextResponse.json({ error: 'Failed to fetch analysis' }, { status: 500 })
+	}
+}
+
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+	try {
+		const supabase = createRouteHandlerClient({ cookies })
+		const { data: { user } } = await supabase.auth.getUser()
+		if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+		const existing = await prisma.analysis.findFirst({ where: { id: params.id, userId: user.id } })
+		if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+		const bodyRaw = await request.json()
+		const parsed = analysisUpdateSchema.safeParse(bodyRaw)
+		if (!parsed.success) {
+			return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
+		}
+		const data = parsed.data
+
+		const updated = await prisma.analysis.update({
+			where: { id: params.id },
+			data: {
+				companyName: data.companyName ?? existing.companyName,
+				industry: data.industry ?? existing.industry,
+				score: data.score ?? existing.score,
+				answers: data.answers ?? existing.answers,
+				insights: data.insights ?? existing.insights,
+				actionItems: data.actionItems ?? existing.actionItems,
+				isPremium: data.isPremium ?? existing.isPremium,
+				premiumAnalysis: data.premiumAnalysis ?? existing.premiumAnalysis,
+				title: data.title ?? existing.title,
+				description: data.description ?? existing.description,
+				ultraDeepAnalysis: data.ultraDeepAnalysis ?? existing.ultraDeepAnalysis,
+				ultraDeepCreatedAt: data.ultraDeepAnalysis ? new Date() : existing.ultraDeepCreatedAt,
+				insightCount: data.insightCount ?? existing.insightCount,
+				dataQualityScore: data.dataQualityScore ?? existing.dataQualityScore,
+			},
+		})
+		return NextResponse.json({ analysis: mapAnalysis(updated) })
+	} catch (err) {
+		console.error('PUT /api/analyses/[id] failed', err)
+		return NextResponse.json({ error: 'Failed to update analysis' }, { status: 500 })
 	}
 }
 
