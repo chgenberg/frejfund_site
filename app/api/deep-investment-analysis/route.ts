@@ -18,8 +18,11 @@ export async function POST(request: Request) {
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    const { websiteData, fileContents, linkedinData, userInfo, businessInfo } = await request.json();
-    
+    const bodyJson = await request.json();
+    const { websiteData, fileContents, linkedinData } = bodyJson;
+    const userInfo = bodyJson.userInfo || { name: 'Unknown', email: `anon-${Date.now()}@example.com` };
+    const businessInfo = bodyJson.businessInfo || {};
+
     // Combine all content for analysis
     let combinedContent = `Business Analysis for ${userInfo.name} (${userInfo.email})\n\n`;
     
@@ -73,19 +76,36 @@ export async function POST(request: Request) {
       });
     }
 
-    async function generate(promptContent: string, strict = false) {
+    const safeParseJson = (txt: string) => {
+      try {
+        return JSON.parse(txt);
+      } catch (e) {
+        // Try to extract JSON object substring
+        const first = txt.indexOf('{');
+        const last = txt.lastIndexOf('}');
+        if (first !== -1 && last !== -1 && last > first) {
+          const sub = txt.slice(first, last + 1);
+          try { return JSON.parse(sub); } catch {}
+        }
+        return null;
+      }
+    };
+
+    async function generateOnce(promptContent: string, strict = false) {
       const res = await openai.chat.completions.create({
         model: aiConfig.models.deep,
         messages: [
-          { role: 'system', content: promptContent },
+          { role: 'system', content: promptContent + (strict ? '\nReturn ONLY valid minified JSON without markdown or extra text.' : '') },
           { role: 'user', content: combinedContent }
         ],
         temperature: strict ? aiConfig.temperature.strict : aiConfig.temperature.default,
         max_tokens: aiConfig.maxTokens,
         response_format: { type: 'json_object' }
       });
-      const txt = res.choices[0].message.content || '{}';
-      return JSON.parse(txt);
+      const txt = res.choices?.[0]?.message?.content || '{}';
+      const parsed = safeParseJson(txt);
+      if (!parsed) throw new Error('Failed to parse JSON from OpenAI');
+      return parsed;
     }
 
     const basePrompt = `You are an expert investment analyst with deep experience in early-stage startups. Analyze the provided business information comprehensively and generate PERSONALIZED, SPECIFIC actionable insights.
@@ -161,8 +181,23 @@ ALWAYS ask 3-5 follow-up questions if:
 
 Return a JSON object with the specified structure including "initialAnalysis" and "followUpQuestions" and ALWAYS include at least 3 items in initialAnalysis.actionableInsights.`;
 
-    let analysisData = await generate(basePrompt);
-    
+    let analysisData: any = null;
+    let attempt = 0;
+    let ok = false;
+    let lastError: any = null;
+    while (attempt < 3 && !ok) {
+      try {
+        analysisData = await generateOnce(basePrompt, attempt > 0);
+        ok = true;
+      } catch (e) {
+        lastError = e;
+        attempt++;
+      }
+    }
+    if (!ok) {
+      throw new Error(`OpenAI JSON parsing failed after retries: ${lastError?.message || lastError}`)
+    }
+
     // Validate with Zod and check min insights
     let valid = false;
     try {
@@ -172,9 +207,8 @@ Return a JSON object with the specified structure including "initialAnalysis" an
 
     if (!valid) {
       // Retry once with stricter instruction and lower temperature for determinism
-      const strictPrompt = basePrompt + `\n\nSTRICT MODE: If you do not have enough detailed data, make reasonable assumptions based on provided business stage, industry, and model, and STILL generate 3 actionable insights with concrete steps and metrics.`;
-      analysisData = await generate(strictPrompt, true);
       try {
+        analysisData = await generateOnce(basePrompt, true);
         initialAnalysisSchema.parse(analysisData);
         valid = hasMinInsights(analysisData, 'initialAnalysis', 3);
       } catch {}
