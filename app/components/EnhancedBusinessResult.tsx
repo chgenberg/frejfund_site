@@ -5,6 +5,63 @@ import 'react-circular-progressbar/dist/styles.css';
 import ActionableInsights from './ActionableInsights';
 import EnhancedMobileResult from './EnhancedMobileResult';
 
+// Modal component for high-score investor referral
+const InvestorReferralModal = ({ isOpen, onClose, onAccept, companyName, score }: any) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
+      
+      {/* Modal */}
+      <div className="relative max-w-lg w-full wizard-card rounded-3xl p-8 animate-slideUp">
+        {/* Confetti effect */}
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2">
+          <div className="text-6xl animate-bounce">🎉</div>
+        </div>
+        
+        <div className="text-center space-y-6">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+            Congratulations!
+          </h2>
+          
+          <div className="space-y-4">
+            <p className="text-lg text-white">
+              You scored an impressive <span className="font-bold text-2xl text-green-400">{score}/100</span>!
+            </p>
+            
+            <p className="text-gray-300 leading-relaxed">
+              Your business shows exceptional investment potential. Would you like us to share your contact information with Sweden's leading angel investor networks?
+            </p>
+            
+            <div className="p-4 bg-purple-500/10 rounded-2xl border border-purple-500/20">
+              <p className="text-sm text-gray-300">
+                <span className="font-semibold text-white">It's completely free.</span> We'll send your analysis summary to our network partners. We can only guarantee they'll receive your information - the rest is up to you!
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex gap-4 pt-4">
+            <button
+              onClick={onClose}
+              className="flex-1 px-6 py-3 rounded-2xl bg-gray-700 hover:bg-gray-600 text-white font-semibold transition-all"
+            >
+              No, thanks
+            </button>
+            <button
+              onClick={onAccept}
+              className="flex-1 px-6 py-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold transition-all shadow-lg shadow-green-500/25"
+            >
+              Yes, share my info! 🚀
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 interface ActionableInsight {
   title: string;
   impact: 'high' | 'medium' | 'low';
@@ -120,6 +177,8 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
   const [activeCategory, setActiveCategory] = useState('problemSolution');
   const [animatedScore, setAnimatedScore] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
+  const [hasShownReferral, setHasShownReferral] = useState(false);
   
   const categories = Object.entries(data.categories);
   const activeData = data.categories[activeCategory as keyof typeof data.categories];
@@ -132,12 +191,20 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
       if (start >= data.overallScore) {
         setAnimatedScore(data.overallScore);
         clearInterval(timer);
+        
+        // Show referral modal for high scores after animation completes
+        if (data.overallScore >= 80 && !hasShownReferral) {
+          setTimeout(() => {
+            setIsReferralModalOpen(true);
+            setHasShownReferral(true);
+          }, 1500); // Wait 1.5 seconds after score animation
+        }
       } else {
         setAnimatedScore(Math.floor(start));
       }
     }, 30);
     return () => clearInterval(timer);
-  }, [data.overallScore]);
+  }, [data.overallScore, hasShownReferral]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -177,6 +244,40 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
   if (isMobile) {
     return <EnhancedMobileResult data={data} />;
   }
+
+  const handleReferralAccept = async () => {
+    try {
+      // Get user data from localStorage or data prop
+      const userInfo = JSON.parse(localStorage.getItem('latestUserInfo') || '{}');
+      
+      const response = await fetch('/api/investor-referral', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          companyName: userInfo.name || userInfo.companyName || 'Company',
+          contactEmail: userInfo.email || '',
+          contactName: userInfo.founderName || userInfo.name || '',
+          score: data.overallScore,
+          analysisData: data
+        })
+      });
+
+      if (response.ok) {
+        setIsReferralModalOpen(false);
+        // Show success notification
+        const successDiv = document.createElement('div');
+        successDiv.className = 'fixed top-4 right-4 z-50 p-4 bg-green-500 text-white rounded-2xl shadow-lg animate-slideUp';
+        successDiv.innerHTML = '✅ Successfully shared with investor networks!';
+        document.body.appendChild(successDiv);
+        setTimeout(() => successDiv.remove(), 5000);
+      } else {
+        throw new Error('Failed to send referral');
+      }
+    } catch (error) {
+      console.error('Referral error:', error);
+      alert('Sorry, there was an error sending your referral. Please try again later.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
@@ -342,6 +443,17 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
           </button>
         </div>
       </div>
+
+      {/* Investor Referral Modal */}
+      {data.overallScore >= 80 && (
+        <InvestorReferralModal
+          isOpen={isReferralModalOpen}
+          onClose={() => setIsReferralModalOpen(false)}
+                     onAccept={handleReferralAccept}
+           companyName={JSON.parse(localStorage.getItem('latestUserInfo') || '{}').name || 'Your Company'}
+           score={animatedScore}
+        />
+      )}
     </div>
   );
 } 
