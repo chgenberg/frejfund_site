@@ -72,17 +72,17 @@ export default function PaymentSuccessPage() {
 
         {/* Main message */}
         <h1 className="text-5xl font-bold text-white mb-6 animate-slideUp">
-          Välkommen till eliten! 🎉
+          Welcome to the elite! 🎉
         </h1>
         
         <p className="text-2xl text-white/80 mb-8 animate-slideUp animation-delay-200">
-          Du tillhör nu de <span className="text-purple-400 font-bold">3%</span> av entreprenörer som faktiskt investerar i sin framgång
+          You are now part of the <span className="text-purple-400 font-bold">3%</span> of entrepreneurs who actually invest in their success
         </p>
 
         {/* Inspirational quote */}
         <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 mb-12 animate-slideUp animation-delay-400">
           <blockquote className="text-xl text-white/90 italic mb-4">
-            "De som är galna nog att tro att de kan förändra världen är de som faktiskt gör det."
+            "Those who are crazy enough to think they can change the world are the ones who actually do it."
           </blockquote>
           <cite className="text-white/60">- Steve Jobs</cite>
         </div>
@@ -92,20 +92,20 @@ export default function PaymentSuccessPage() {
           {[
             {
               step: '1',
-              title: 'AI-analys startar',
-              desc: 'Vår AI analyserar just nu din affärsplan med hjälp av data från 10,000+ framgångsrika startups',
+              title: 'AI analysis starts',
+              desc: 'Our AI is analyzing your business plan right now using data from 10,000+ successful startups',
               delay: '600'
             },
             {
               step: '2',
-              title: 'Premium-rapport',
-              desc: 'Inom 5 minuter får du tillgång till din personliga 50-sidors affärsanalys',
+              title: 'Premium report',
+              desc: 'Within 5 minutes you will get access to your personal 50-page business analysis',
               delay: '800'
             },
             {
               step: '3',
-              title: 'Expertsamtal',
-              desc: 'Vårt team kontaktar dig inom 24h för att boka ditt strategisamtal',
+              title: 'Expert call',
+              desc: 'Our team will contact you within 24 hours to book your strategy call',
               delay: '1000'
             }
           ].map((item) => (
@@ -124,19 +124,19 @@ export default function PaymentSuccessPage() {
 
         {/* Statistics to inspire */}
         <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 backdrop-blur-xl rounded-3xl p-8 border border-purple-500/20 mb-12 animate-slideUp animation-delay-1200">
-          <h2 className="text-2xl font-bold text-white mb-6">Företag som använt vår Premium-analys:</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">Companies that have used our Premium analysis:</h2>
           <div className="grid grid-cols-3 gap-8">
             <div>
               <div className="text-4xl font-bold text-purple-400">87%</div>
-              <div className="text-white/60">säkrade finansiering</div>
+              <div className="text-white/60">secured funding</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-pink-400">3.2x</div>
-              <div className="text-white/60">snabbare tillväxt</div>
+              <div className="text-white/60">faster growth</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-blue-400">92%</div>
-              <div className="text-white/60">överlevde 3+ år</div>
+              <div className="text-white/60">survived 3+ years</div>
             </div>
           </div>
         </div>
@@ -146,11 +146,11 @@ export default function PaymentSuccessPage() {
           onClick={() => router.push('/premium-analysis-result')}
           className="px-12 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-full hover:shadow-lg hover:scale-105 transition-all text-lg animate-slideUp animation-delay-1400"
         >
-          Gå till din Premium-analys →
+          Go to your Premium analysis →
         </button>
 
         <p className="text-white/40 text-sm mt-8 animate-slideUp animation-delay-1600">
-          Vi har skickat en bekräftelse till din e-post med alla detaljer
+          We have sent a confirmation to your email with all the details
         </p>
       </div>
 

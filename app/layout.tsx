@@ -12,12 +12,12 @@ import { setupAuthListener } from './lib/auth'
 const nunito = Nunito({ subsets: ['latin'], weight: ['400', '600', '700'] })
 
 export const metadata: Metadata = {
-  title: 'FrejFund - AI-driven affärsanalys för investeringar',
-  description: 'FrejFund använder AI för att analysera affärsplaner och matcha startups med rätt investerare. Få en objektiv bedömning på 10 minuter.',
+  title: 'FrejFund - AI-driven business analysis for investments',
+  description: 'FrejFund uses AI to analyze business plans and match startups with the right investors. Get an objective assessment in 10 minutes.',
   metadataBase: new URL('https://www.frejfund.com'),
   openGraph: {
-    title: 'FrejFund - AI-driven affärsanalys för investeringar',
-    description: 'Analysera din affärsidé och hitta rätt investerare med AI',
+    title: 'FrejFund - AI-driven business analysis for investments',
+    description: 'Analyze your business idea and find the right investors with AI',
     images: [
       {
         url: '/api/og',
@@ -26,13 +26,13 @@ export const metadata: Metadata = {
         alt: 'FrejFund AI Analysis',
       },
     ],
-    locale: 'sv_SE',
+    locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FrejFund - AI-driven affärsanalys',
-    description: 'Analysera din affärsidé och hitta rätt investerare',
+    title: 'FrejFund - AI-driven business analysis',
+    description: 'Analyze your business idea and find the right investors',
     images: ['/api/og'],
   },
 }
