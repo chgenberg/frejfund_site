@@ -61,7 +61,7 @@ const CategoryCard = ({ category, isActive, onClick }: any) => {
   return (
     <button
       onClick={onClick}
-      className={`category-badge p-6 rounded-3xl transition-all duration-300 relative overflow-hidden group ${
+      className={`category-badge p-6 rounded-3xl transition-all duration-300 relative overflow-hidden group h-44 w-full ${
         isActive 
           ? 'scale-105 border-white/30' 
           : 'hover:scale-[1.02]'
@@ -71,17 +71,17 @@ const CategoryCard = ({ category, isActive, onClick }: any) => {
         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 animate-pulse"></div>
       )}
       
-      <div className="relative z-10">
-        <div className="flex items-center justify-between mb-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-            <span className="text-2xl">{emoji}</span>
+      <div className="relative z-10 h-full flex flex-col">
+        <div className="flex items-center justify-between mb-3">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
+            <span className="text-xl">{emoji}</span>
           </div>
-          <div className="w-16 h-16">
+          <div className="w-14 h-14 flex-shrink-0">
             <CircularProgressbar
               value={category.score}
               text={`${category.score}`}
               styles={buildStyles({
-                textSize: '28px',
+                textSize: '26px',
                 pathColor: color,
                 textColor: '#fff',
                 trailColor: 'rgba(255, 255, 255, 0.1)',
@@ -89,8 +89,10 @@ const CategoryCard = ({ category, isActive, onClick }: any) => {
             />
           </div>
         </div>
-        <h3 className="text-lg font-semibold text-white mb-1 text-left">{category.label}</h3>
-        <p className="text-sm text-gray-400 text-left line-clamp-2">{category.description}</p>
+        <div className="flex-1 flex flex-col justify-start">
+          <h3 className="text-lg font-semibold text-white mb-1 text-left line-clamp-1">{category.label}</h3>
+          <p className="text-sm text-gray-400 text-left line-clamp-2">{category.description}</p>
+        </div>
       </div>
     </button>
   );
@@ -201,7 +203,7 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
                   pathTransitionDuration: 2,
                 })}
               />
-              <div className="absolute -bottom-12 left-0 right-0 text-center">
+              <div className="absolute -bottom-16 left-0 right-0 text-center">
                 <p className="text-2xl font-bold text-white mb-1">
                   {data.overallScore >= 75 ? '🚀 Investor Ready' :
                    data.overallScore >= 50 ? '⭐ Strong Potential' :
@@ -216,7 +218,7 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
         </div>
 
         {/* Category Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 mt-20">
           {categories.map(([key, category], index) => (
             <div key={key} className={`animate-fadeInUp-delay-${index % 3 + 1}`}>
               <CategoryCard
