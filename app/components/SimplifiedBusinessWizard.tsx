@@ -100,10 +100,10 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
     setIsAnalyzing(true);
     setAnalysisProgress(0);
     
-    // Simulate progress  
+    // Simulate progress (slower for GPT-5 processing)
     const progressInterval = setInterval(() => {
-      setAnalysisProgress(prev => Math.min(prev + 1.5, 90));
-    }, 1000);
+      setAnalysisProgress(prev => Math.min(prev + 0.8, 85));
+    }, 1500);
 
     try {
       // 1. Scrape website if provided
@@ -704,8 +704,8 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         </div>
       </div>
       
-      <h3 className="text-2xl font-semibold text-white mb-2">Analyzing your business data... 🔍</h3>
-      <p className="text-gray-400">Our AI is performing deep analysis of your materials</p>
+      <h3 className="text-2xl font-semibold text-white mb-2">GPT-5 is analyzing your business... 🧠</h3>
+      <p className="text-gray-400">Advanced AI creating comprehensive investment analysis</p>
     </div>
   );
 
