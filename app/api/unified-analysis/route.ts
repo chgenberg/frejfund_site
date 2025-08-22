@@ -91,25 +91,33 @@ export async function POST(request: Request) {
       }
     };
 
-    async function generateWithGPT5(prompt: string, strict = false) {
+    async function generateWithBestModel(prompt: string, strict = false) {
       const sys = `${prompt}\n\nMANDATORY REFERENCE GUIDELINES (AngelHive-inspired):\n${ANGELHIVE_GUIDELINES}\n\nUse these guidelines to structure and evaluate, but DO NOT output a summary of the guidelines. Output only the requested JSON fields.`
         + (strict ? '\nReturn ONLY valid minified JSON without markdown or extra text.' : '');
       
+      const modelName = aiConfig.models.final;
       const opts: any = {
-        model: 'gpt-5', // Force GPT-5 for entire flow
+        model: modelName,
         messages: [
           { role: 'system', content: sys },
           { role: 'user', content: combinedContent }
         ],
-        temperature: strict ? 0.3 : 0.5,
-        max_tokens: aiConfig.maxTokens, // Now 15000
-        response_format: { type: "json_object" } // Ensure JSON output
+        response_format: { type: "json_object" }
       };
+      
+      // GPT-5 models use different parameter names
+      if (modelName.startsWith('gpt-5')) {
+        opts.max_completion_tokens = aiConfig.maxTokens;
+        // GPT-5 doesn't support custom temperature - uses default (1.0)
+      } else {
+        opts.max_tokens = aiConfig.maxTokens;
+        opts.temperature = strict ? 0.3 : 0.5;
+      }
       
       const res = await openai.chat.completions.create(opts);
       const content = res.choices[0].message.content || '{}';
       const parsed = safeParseJson(content);
-      if (!parsed) throw new Error('Failed to parse JSON from GPT-5');
+      if (!parsed) throw new Error('Failed to parse JSON from AI model');
       return parsed;
     }
 
@@ -139,7 +147,7 @@ OUTPUT FORMAT:
 
 If you have enough data to provide 8-12 highly specific, metric-driven recommendations, set canProceedWithoutQuestions to true and provide minimal questions.`;
 
-    const questionResponse = await generateWithGPT5(questionPrompt);
+    const questionResponse = await generateWithBestModel(questionPrompt);
     
     // STEP 2: If questions were generated, simulate answering them with available data
     let followUpContent = '';
@@ -162,7 +170,7 @@ OUTPUT FORMAT:
   ]
 }`;
 
-      const answersResponse = await generateWithGPT5(autoAnswerPrompt);
+      const answersResponse = await generateWithBestModel(autoAnswerPrompt);
       
       if (answersResponse.answers) {
         answersResponse.answers.forEach((qa: any) => {
@@ -317,8 +325,8 @@ QUALITY STANDARDS:
 
     const fullContent = combinedContent + (followUpContent ? `\n\n${followUpContent}` : '');
     
-    // Generate comprehensive analysis with GPT-5
-    let finalAnalysis = await generateWithGPT5(finalPrompt);
+    // Generate comprehensive analysis with best available model
+    let finalAnalysis = await generateWithBestModel(finalPrompt);
 
     // Validate and ensure quality
     let valid = false;
@@ -331,7 +339,7 @@ QUALITY STANDARDS:
 
     if (!valid) {
       const strictPrompt = finalPrompt + `\n\nSTRICT MODE: You MUST provide 8-12 concrete, immediately actionable recommendations with detailed implementation plans, specific tools, metrics, and expected outcomes. Use the full token capacity to provide maximum value. Make reasonable assumptions if some data is missing but base recommendations on available evidence.`;
-      finalAnalysis = await generateWithGPT5(strictPrompt, true);
+      finalAnalysis = await generateWithBestModel(strictPrompt, true);
     }
 
     // Ensure minimum quality standards with enhanced fallbacks
@@ -461,7 +469,7 @@ QUALITY STANDARDS:
       ...insight,
       evidenceSource: insight.evidenceSource || 'General business context and industry best practices',
       targetMetric: insight.targetMetric || 'Qualitative improvement in business performance',
-             industryBenchmark: insight.industryBenchmark || `Industry best practices for ${businessInfo.industry || 'their'} companies`,
+      industryBenchmark: insight.industryBenchmark || `Industry best practices for ${businessInfo.industry || 'their'} companies`,
       toolsRequired: insight.toolsRequired || ['Standard business tools'],
       potentialPitfalls: insight.potentialPitfalls || ['Common implementation challenges'],
       successIndicators: insight.successIndicators || ['Positive business impact indicators'],
@@ -475,7 +483,7 @@ QUALITY STANDARDS:
         `Target Market: ${businessInfo.targetMarket || 'Broad market'} with ${businessInfo.businessModel || 'standard business model'}`,
         `Revenue: ${businessInfo.monthlyRevenue || 'Pre-revenue'} monthly with ${businessInfo.teamSize || 'small'} team`,
         `Industry: Operating in ${businessInfo.industry || 'competitive'} space`,
-                 `Growth Stage: ${businessInfo.stage === 'idea' ? 'Validation phase' : businessInfo.stage === 'mvp' ? 'Product development' : businessInfo.stage === 'early-revenue' ? 'Early traction' : 'Scaling phase'}`
+        `Growth Stage: ${businessInfo.stage === 'idea' ? 'Validation phase' : businessInfo.stage === 'mvp' ? 'Product development' : businessInfo.stage === 'early-revenue' ? 'Early traction' : 'Scaling phase'}`
       ];
     }
 
@@ -499,7 +507,7 @@ QUALITY STANDARDS:
     // Add enhanced sections if not present
     if (!finalAnalysis.analysis.competitiveAnalysis) {
       finalAnalysis.analysis.competitiveAnalysis = {
-                 mainCompetitors: [`Main ${businessInfo.industry || 'industry'} competitors in ${businessInfo.targetMarket || 'target market'}`],
+        mainCompetitors: [`Main ${businessInfo.industry || 'industry'} competitors in ${businessInfo.targetMarket || 'target market'}`],
         competitiveAdvantages: ['Unique positioning opportunity', 'Market timing advantage'],
         vulnerabilities: ['Need to establish market presence', 'Resource constraints vs established players'],
         differentiationStrategy: `Focus on ${businessInfo.targetMarket || 'specific market segment'} with superior ${businessInfo.businessModel || 'value delivery'}`
@@ -535,7 +543,7 @@ QUALITY STANDARDS:
       analysis: finalAnalysis.analysis,
       userInfo,
       dataQuality: 'comprehensive',
-      model: 'gpt-5',
+      model: aiConfig.models.final,
       tokenUsage: 'enhanced-capacity'
     });
 

@@ -3,7 +3,7 @@ export const aiConfig = {
     deep: process.env.AI_MODEL_DEEP || 'gpt-5-mini',
     final: process.env.AI_MODEL_FINAL || 'gpt-5',
     ultra: process.env.AI_MODEL_ULTRA || 'gpt-5',
-    general: process.env.AI_MODEL_GENERAL || 'gpt-5-mini'
+    general: process.env.AI_MODEL_GENERAL || 'gpt-5-nano'
   },
   temperature: {
     default: 0.7,
