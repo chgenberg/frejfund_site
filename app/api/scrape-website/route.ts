@@ -56,7 +56,21 @@ export async function POST(request: Request) {
   try {
     // Check for API key before instantiating OpenAI client
     if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
+      return NextResponse.json({ 
+        success: false,
+        error: 'OpenAI API key not configured (local dev mode)',
+        data: {
+          customer_pain: 'Local development - API analysis skipped',
+          solution: 'Website content extracted successfully',
+          elevator_pitch: 'Local development mode',
+          target_customer: 'API analysis requires Railway deployment',
+          unique_tech: null,
+          team: null,
+          revenue_model: null,
+          traction: null,
+          company_value: null
+        }
+      });
     }
 
     const openai = new OpenAI({

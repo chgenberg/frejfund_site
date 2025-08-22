@@ -1,1 +1,4 @@
-{}
+{
+  "/api/scrape-website/route": "app/api/scrape-website/route.js",
+  "/api/test-api-key/route": "app/api/test-api-key/route.js"
+}
