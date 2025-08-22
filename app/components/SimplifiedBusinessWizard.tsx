@@ -118,18 +118,41 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         websiteData = await websiteResponse.json();
       }
 
-      // 2. Process uploaded files
+      // 2. Process uploaded files with error handling
       const fileContents = [];
       for (const file of formData.uploadedFiles) {
-        const fileFormData = new FormData();
-        fileFormData.append('file', file);
-        
-        const fileResponse = await fetch('/api/process-file', {
-          method: 'POST',
-          body: fileFormData
-        });
-        const fileData = await fileResponse.json();
-        fileContents.push(fileData);
+        try {
+          const fileFormData = new FormData();
+          fileFormData.append('file', file);
+          
+          const fileResponse = await fetch('/api/process-file', {
+            method: 'POST',
+            body: fileFormData
+          });
+          const fileData = await fileResponse.json();
+          
+          if (fileData.success) {
+            fileContents.push(fileData);
+          } else {
+            console.warn('File processing failed:', fileData.error);
+            // Add placeholder for failed file
+            fileContents.push({
+              success: false,
+              fileName: file.name,
+              content: `[File upload failed: ${file.name}]`,
+              type: file.type
+            });
+          }
+        } catch (fileError) {
+          console.warn('File processing error:', fileError);
+          // Continue without this file
+          fileContents.push({
+            success: false,
+            fileName: file.name,
+            content: `[File processing error: ${file.name}]`,
+            type: file.type
+          });
+        }
       }
 
       // 3. Scrape LinkedIn profiles if provided
