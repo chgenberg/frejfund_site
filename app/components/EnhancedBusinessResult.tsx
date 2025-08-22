@@ -82,6 +82,7 @@ interface CategoryScore {
 
 interface ResultData {
   overallScore: number;
+  companyContext?: string[];
   categories: {
     problemSolution: CategoryScore;
     marketTiming: CategoryScore;
@@ -287,6 +288,23 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
           <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-8">
             Investment Analysis! ✨
           </h1>
+          
+          {/* Company Context */}
+          {data.companyContext && data.companyContext.length > 0 && (
+            <div className="max-w-2xl mx-auto mb-8 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+              <h2 className="text-lg font-semibold text-white mb-4 flex items-center justify-center">
+                <span className="mr-2">🏢</span> Company Context
+              </h2>
+              <ul className="space-y-2 text-left">
+                {data.companyContext.map((point: string, index: number) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-2 h-2 bg-purple-400 rounded-full mt-2"></span>
+                    <span className="text-white/80 text-sm">{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           
           <div className="inline-block">
             <div className="w-48 h-48 relative">

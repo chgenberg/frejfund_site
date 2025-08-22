@@ -9,6 +9,8 @@ interface ActionableInsight {
   implementation: string[];
   expectedResult: string;
   investorPerspective: string;
+  evidenceSource?: string;
+  targetMetric?: string;
   _source?: string;
 }
 
@@ -42,6 +44,11 @@ export default function ActionableInsights({ insights }: { insights: ActionableI
                     General advice
                   </span>
                 )}
+                {insight._source === 'contextual-fallback' && (
+                  <span className="px-2 py-1 text-xs bg-blue-500/20 text-blue-300 rounded-full border border-blue-500/30">
+                    Context-based
+                  </span>
+                )}
                 {insight._source === 'ai-generated' && (
                   <span className="px-2 py-1 text-xs bg-green-500/20 text-green-300 rounded-full border border-green-500/30">
                     AI-personalized
@@ -64,6 +71,22 @@ export default function ActionableInsights({ insights }: { insights: ActionableI
               <h4 className="text-sm font-semibold text-white/60 mb-2">Challenge</h4>
               <p className="text-white/90">{insight.description}</p>
             </div>
+
+            {/* Evidence Source */}
+            {insight.evidenceSource && (
+              <div className="bg-blue-500/10 rounded-xl p-4">
+                <h4 className="text-sm font-semibold text-blue-400 mb-1">📊 Based on</h4>
+                <p className="text-white/80 text-sm italic">{insight.evidenceSource}</p>
+              </div>
+            )}
+
+            {/* Target Metric */}
+            {insight.targetMetric && (
+              <div className="bg-purple-500/10 rounded-xl p-4">
+                <h4 className="text-sm font-semibold text-purple-400 mb-1">🎯 Success metric</h4>
+                <p className="text-white/80 text-sm font-medium">{insight.targetMetric}</p>
+              </div>
+            )}
 
             {/* Implementation Steps */}
             <div>

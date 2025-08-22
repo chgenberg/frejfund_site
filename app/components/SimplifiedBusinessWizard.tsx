@@ -68,11 +68,6 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
-  const [isCompletingAnalysis, setIsCompletingAnalysis] = useState(false);
-  const [completionProgress, setCompletionProgress] = useState(0);
-  const [completionStage, setCompletionStage] = useState('');
-  const [followUpQuestions, setFollowUpQuestions] = useState<FollowUpQuestion[]>([]);
-  
   // Form data
   const [formData, setFormData] = useState({
     name: '',
@@ -90,8 +85,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
     teamSize: '' // e.g., "1", "2-5", "6-10", "10+"
   });
   
-  // Follow-up answers
-  const [followUpAnswers, setFollowUpAnswers] = useState<Record<string, string>>({});
+
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -108,7 +102,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
     
     // Simulate progress  
     const progressInterval = setInterval(() => {
-      setAnalysisProgress(prev => Math.min(prev + 2, 90));
+      setAnalysisProgress(prev => Math.min(prev + 1.5, 90));
     }, 1000);
 
     try {
@@ -149,8 +143,8 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         linkedinData = await linkedinResponse.json();
       }
 
-      // 4. Deep analysis with AI
-      const analysisResponse = await fetch('/api/deep-investment-analysis', {
+      // 4. UNIFIED COMPREHENSIVE ANALYSIS with GPT-5
+      const analysisResponse = await fetch('/api/unified-analysis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -173,17 +167,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       });
 
       if (!analysisResponse.ok) {
-        // Backend failed (e.g., 500). Proceed with fallback deep questions so user can continue.
-        clearInterval(progressInterval);
-        setIsAnalyzing(false);
-        const fallbackQs: FollowUpQuestion[] = [
-          { id: 'main_challenge', title: 'What is your biggest business challenge right now?', subtitle: 'The specific obstacle preventing your next level of growth', placeholder: 'e.g., We close only 15% of qualified leads because our demo-to-decision takes 3 months' },
-          { id: 'customer_segments', title: 'Describe your most profitable customer types', subtitle: 'Include company size, industry, and what they pay you', placeholder: 'e.g., Mid-size law firms (50-200 emp) pay €2,400/month for compliance automation' },
-          { id: 'six_month_goal', title: 'What specific goal do you want to achieve in 6 months?', subtitle: 'Something measurable that would significantly impact your business', placeholder: 'e.g., Increase MRR from €45K to €120K by closing 3 enterprise deals' },
-        ];
-        setFollowUpQuestions(fallbackQs);
-        setCurrentStep(3);
-        return;
+        throw new Error('Analysis failed');
       }
       
       const analysisData = await analysisResponse.json();
@@ -191,7 +175,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       clearInterval(progressInterval);
       setAnalysisProgress(100);
       
-      // 5. Save initial analysis to database
+      // 5. Save comprehensive analysis to database
       let analysisId = null;
       try {
         const saveRes = await fetch('/api/analyses', {
@@ -200,15 +184,17 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           body: JSON.stringify({
             companyName: formData.name || 'Unknown Company',
             industry: formData.industry || 'Unknown',
-            score: analysisData.overallScore || 50,
+            score: analysisData.analysis?.overallScore || 75,
             answers: {
               ...formData,
               websiteData: websiteData?.success ? websiteData.data : null,
               linkedinData: linkedinData?.success ? linkedinData.data : null,
               fileContents
             },
-            insights: analysisData.actionableInsights || [],
-            dataQualityScore: computeDataQualityScore(formData, websiteData, linkedinData, fileContents)
+            insights: analysisData.analysis?.actionableInsights || [],
+            dataQualityScore: computeDataQualityScore(formData, websiteData, linkedinData, fileContents),
+            comprehensiveAnalysis: analysisData.analysis,
+            model: 'gpt-5'
           })
         });
 
@@ -216,121 +202,71 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           const analysis = await saveRes.json();
           analysisId = analysis.id;
           localStorage.setItem('currentAnalysisId', analysisId);
-          console.log('✅ Analysis saved to database with ID:', analysisId);
-        } else {
-          console.warn('⚠️ Failed to save analysis to database, continuing with localStorage only');
+          console.log('✅ Comprehensive analysis saved to database with ID:', analysisId);
         }
       } catch (error) {
         console.warn('⚠️ Database save failed, continuing with localStorage only:', error);
       }
       
-      // Normalize questions utility
-      const normalizeQuestions = (items: any[]): FollowUpQuestion[] => {
-        return (items || []).map((q: any, idx: number) => {
-          if (q && typeof q === 'object' && ('title' in q)) return q as FollowUpQuestion;
-          return { id: `q_${idx + 1}`, title: String(q) } as FollowUpQuestion;
-        });
-      };
-
-      // If AI needs follow-up questions, or generate them if missing
-      try {
-        const initialQuestionsRaw = Array.isArray(analysisData.followUpQuestions) ? analysisData.followUpQuestions : [];
-        let questionsToAsk: FollowUpQuestion[] = normalizeQuestions(initialQuestionsRaw);
-        if (questionsToAsk.length === 0) {
-          const genRes = await fetch('/api/generate-deep-questions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ previousAnalysis: analysisData })
-          });
-          if (genRes.ok) {
-            const genJson = await genRes.json();
-            const apiQs = Array.isArray(genJson.questions) ? genJson.questions : [];
-            questionsToAsk = normalizeQuestions(apiQs);
-          }
-        }
-        if (questionsToAsk.length > 0) {
-          setFollowUpQuestions(questionsToAsk);
-          setCurrentStep(3);
-          setIsAnalyzing(false);
-        } else {
-          // No questions at all; redirect to result page for the created analysis id (avoid mock localStorage)
-          const storedAnalysisId = localStorage.getItem('currentAnalysisId') || analysisId;
-          if (storedAnalysisId) {
-            window.location.href = `/result/${storedAnalysisId}`;
-          } else {
-            // Fallback only if no id is available
-            const transformedData = transformAnalysisToResultFormat(analysisData);
-            localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
-            window.location.href = '/result';
-          }
-        }
-      } catch (e) {
-        console.warn('Could not prepare follow-up questions:', e);
-        const storedAnalysisId = localStorage.getItem('currentAnalysisId') || analysisId;
-        if (storedAnalysisId) {
-          window.location.href = `/result/${storedAnalysisId}`;
-        } else {
-          const transformedData = transformAnalysisToResultFormat(analysisData);
-          localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
-          window.location.href = '/result';
-        }
+      // Transform to enhanced result format and go directly to results
+      const transformedData = transformAnalysisToEnhancedFormat(analysisData);
+      localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
+      
+      // Go directly to results - no follow-up questions
+      const storedAnalysisId = localStorage.getItem('currentAnalysisId') || analysisId;
+      if (storedAnalysisId) {
+        window.location.href = `/result/${storedAnalysisId}`;
+      } else {
+        window.location.href = '/result';
       }
       
     } catch (error) {
       console.error('Analysis error:', error);
       clearInterval(progressInterval);
       setIsAnalyzing(false);
+      alert('An error occurred during analysis. Please try again.');
     }
   };
 
-  const transformAnalysisToResultFormat = (analysisData: any) => {
-    // Transform AI analysis to expected result format
-    const analysis = analysisData.analysis || analysisData.initialAnalysis || {};
-    
-    // Debug logging to show if insights are AI-generated or fallback
-    const hasAIInsights = analysis.actionableInsights && analysis.actionableInsights.length > 0;
-    console.log('🔍 Analysis Debug:', {
-      hasAIInsights,
-      insightCount: hasAIInsights ? analysis.actionableInsights.length : 0,
-      source: hasAIInsights ? 'AI-generated' : 'Fallback',
-      firstInsightTitle: hasAIInsights ? analysis.actionableInsights[0]?.title : 'Using fallbacks'
-    });
+  const transformAnalysisToEnhancedFormat = (analysisData: any) => {
+    const analysis = analysisData.analysis || {};
     
     return {
-      overallScore: analysis.overallScore || Math.floor(Math.random() * 20 + 70), // 70-90
+      overallScore: analysis.overallScore || Math.floor(Math.random() * 20 + 75),
+      companyContext: analysis.companyContext || [],
       categories: {
         problemSolution: { 
-          score: analysis.problemSolutionScore || Math.floor(Math.random() * 20 + 75), 
+          score: analysis.categoryScores?.problemSolutionScore || analysis.problemSolutionScore || Math.floor(Math.random() * 20 + 75), 
           label: "Problem-Solution Fit", 
           description: "How well you solve a real problem",
           insights: analysis.problemInsights || ["Strong problem understanding", "Clear value proposition"]
         },
         marketTiming: { 
-          score: analysis.marketScore || Math.floor(Math.random() * 20 + 70), 
+          score: analysis.categoryScores?.marketScore || analysis.marketScore || Math.floor(Math.random() * 20 + 70), 
           label: "Market & Timing", 
           description: "Right solution at the right time",
           insights: analysis.marketInsights || ["Growing market", "Favorable macro trends"]
         },
         moatCompetition: { 
-          score: analysis.competitiveScore || Math.floor(Math.random() * 20 + 65), 
+          score: analysis.categoryScores?.competitiveScore || analysis.competitiveScore || Math.floor(Math.random() * 20 + 65), 
           label: "Moat & Competition", 
           description: "How defensible is your position",
           insights: analysis.moatInsights || ["Moderate barriers to entry", "Need to strengthen IP protection"]
         },
         tractionKpi: { 
-          score: analysis.tractionScore || Math.floor(Math.random() * 20 + 80), 
+          score: analysis.categoryScores?.tractionScore || analysis.tractionScore || Math.floor(Math.random() * 20 + 80), 
           label: "Traction & KPI Progress", 
           description: "Evidence of success and momentum",
           insights: analysis.tractionInsights || ["Strong growth", "Good customer metrics"]
         },
         unitEconomics: { 
-          score: analysis.financialScore || Math.floor(Math.random() * 20 + 70), 
+          score: analysis.categoryScores?.financialScore || analysis.financialScore || Math.floor(Math.random() * 20 + 70), 
           label: "Unit Economics", 
           description: "Business model sustainability",
           insights: analysis.financialInsights || ["Good LTV:CAC ratio", "Improvement potential in margins"]
         },
         teamExecution: { 
-          score: analysis.teamScore || Math.floor(Math.random() * 20 + 80), 
+          score: analysis.categoryScores?.teamScore || analysis.teamScore || Math.floor(Math.random() * 20 + 80), 
           label: "Team & Execution", 
           description: "Right team for the task",
           insights: analysis.teamInsights || ["Experienced team", "Complementary competencies"]
@@ -342,7 +278,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           insights: analysis.healthInsights || ["Adequate runway", "Controlled burn rate"]
         },
         riskCompliance: { 
-          score: analysis.riskScore || Math.floor(Math.random() * 20 + 70), 
+          score: analysis.categoryScores?.riskScore || analysis.riskScore || Math.floor(Math.random() * 20 + 70), 
           label: "Risk & Compliance", 
           description: "Risk management and compliance",
           insights: analysis.riskInsights || ["Main risks identified", "Mitigation plans in place"]
@@ -354,56 +290,9 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           insights: analysis.pitchInsights || ["Engaging story", "Professional presentation"]
         }
       },
-      actionableInsights: analysis.actionableInsights?.length > 0 ? analysis.actionableInsights.map((insight: any) => ({
-        ...insight,
-        _source: 'ai-generated'
-      })) : [
-        {
-          title: "Validate your value proposition with target customers",
-          _source: "contextual-fallback",
-          impact: "high" as const,
-          timeframe: "2-3 weeks",
-          description: "Interview 10-15 potential customers to validate your business concept and refine your value proposition.",
-          implementation: [
-            "Create a list of 20+ potential customers in your target market",
-            "Schedule 30-minute interviews asking about their current pain points",
-            "Test 2-3 different value propositions and measure responses",
-            "Document specific language customers use to describe their problems"
-          ],
-          expectedResult: "Clear understanding of customer language, pain points, and willingness to pay for your solution",
-          investorPerspective: "Investors want to see evidence of customer validation and product-market fit before investing."
-        },
-        {
-          title: "Build a simple MVP to test core assumptions",
-          _source: "contextual-fallback",
-          impact: "high" as const,
-          timeframe: "4-6 weeks",
-          description: "Create a minimal viable product focusing on your core value proposition to test with real users.",
-          implementation: [
-            "Define the single most important problem your product solves",
-            "Build the simplest version that demonstrates this value",
-            "Get 20+ users to test your MVP and provide feedback",
-            "Track key metrics: user engagement, retention, and feedback scores"
-          ],
-          expectedResult: "Validated product concept with real user data and testimonials",
-          investorPerspective: "Early traction and user validation significantly increase investment attractiveness and valuation."
-        },
-        {
-          title: "Develop a clear go-to-market strategy",
-          _source: "contextual-fallback",
-          impact: "medium" as const,
-          timeframe: "2-4 weeks",
-          description: "Create a detailed plan for how you'll acquire your first 100 customers.",
-          implementation: [
-            "Identify 3-5 specific customer acquisition channels to test",
-            "Calculate customer acquisition costs for each channel",
-            "Create content and messaging for your top 2 channels",
-            "Set up tracking and analytics to measure channel performance"
-          ],
-          expectedResult: "Clear roadmap to profitability with validated customer acquisition strategies",
-          investorPerspective: "Investors need to see a scalable path to customer acquisition and revenue growth."
-        }
-      ],
+      actionableInsights: analysis.actionableInsights || [],
+      executiveSummary: analysis.executiveSummary,
+      investmentThesis: analysis.investmentThesis,
       answers: {
         customer_problem: analysis.customerPain || "Customer problem analysis",
         solution: analysis.solution || "Solution description", 
@@ -414,7 +303,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         traction: analysis.growthStrategy || "Traction analysis"
       },
       feedback: {
-        strengths: analysis.executiveSummary || "Strong analysis completed",
+        strengths: analysis.executiveSummary || "Strong comprehensive analysis completed",
         weaknesses: analysis.riskAssessment || "Areas for improvement identified",
         opportunities: analysis.investmentThesis || "Growth opportunities available",
         threats: analysis.riskAssessment || "Manageable risks identified"
@@ -422,144 +311,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
     };
   };
 
-  const handleFinalAnalysis = async (initialAnalysis?: any) => {
-    if (initialAnalysis) {
-      // Direct result from initial analysis
-      const analysisId = localStorage.getItem('currentAnalysisId');
-      if (analysisId) {
-        window.location.href = `/result/${analysisId}`;
-      } else {
-        const transformedData = transformAnalysisToResultFormat(initialAnalysis);
-        localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
-        window.location.href = '/result';
-      }
-      return;
-    }
-
-    // Show completion progress
-    setIsCompletingAnalysis(true);
-    setCompletionProgress(0);
-    setCompletionStage('Initializing AI analysis...');
-
-    // Smooth progress animation over 45 seconds
-    const totalDuration = 45000; // 45 seconds
-    const updateInterval = 100; // Update every 100ms for smooth animation
-    const totalSteps = totalDuration / updateInterval;
-    let currentStep = 0;
-    
-    // Progress stages with better distribution
-    const progressStages = [
-      { threshold: 15, stage: 'Processing your answers...' },
-      { threshold: 30, stage: 'Analyzing business model...' },
-      { threshold: 45, stage: 'Evaluating market potential...' },
-      { threshold: 60, stage: 'Comparing with industry benchmarks...' },
-      { threshold: 75, stage: 'Generating investment recommendations...' },
-      { threshold: 88, stage: 'Creating detailed insights...' },
-      { threshold: 96, stage: 'Finalizing analysis report...' }
-    ];
-
-    // Smooth progress animation
-    const progressInterval = setInterval(() => {
-      currentStep++;
-      
-      // Calculate progress using easing function for natural feel
-      const linearProgress = currentStep / totalSteps;
-      const easedProgress = 1 - Math.pow(1 - linearProgress, 3); // Cubic ease-in-out
-      const currentProgress = Math.min(easedProgress * 98, 98); // Cap at 98% until API completes
-      
-      setCompletionProgress(currentProgress);
-      
-      // Update stage based on progress
-      const currentStage = progressStages.find((stage, index) => {
-        const nextStage = progressStages[index + 1];
-        return currentProgress >= stage.threshold && (!nextStage || currentProgress < nextStage.threshold);
-      });
-      
-      if (currentStage) {
-        setCompletionStage(currentStage.stage);
-      }
-      
-      // Stop at 98% until API completes
-      if (currentProgress >= 98) {
-        clearInterval(progressInterval);
-      }
-    }, updateInterval);
-
-    try {
-      // Make the actual API call
-      const analysisData = await fetch('/api/complete-analysis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          followUpAnswers,
-          userEmail: formData.email
-        })
-      }).then(res => res.json());
-
-      // Complete progress smoothly to 100%
-      clearInterval(progressInterval);
-      
-      // Get current progress value before animating to 100%
-      setCompletionProgress(prev => {
-        const finalProgress = prev;
-        
-        // Animate from current progress to 100%
-        const finalSteps = 10;
-        let finalStep = 0;
-        
-        const finalInterval = setInterval(() => {
-          finalStep++;
-          const progress = finalProgress + ((100 - finalProgress) * finalStep / finalSteps);
-          setCompletionProgress(progress);
-          
-          if (finalStep >= finalSteps) {
-            clearInterval(finalInterval);
-            setCompletionStage('Analysis complete! Redirecting...');
-            
-            // Wait a moment to show completion
-            setTimeout(async () => {
-              try {
-                // Update the existing analysis record with ultra deep results if available
-                const analysisId = localStorage.getItem('currentAnalysisId');
-                if (analysisId) {
-                  const updateRes = await fetch(`/api/analyses/${analysisId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      ultraDeepAnalysis: analysisData?.analysis || analysisData?.finalAnalysis || null,
-                      insightCount: (analysisData?.analysis?.actionableInsights || analysisData?.finalAnalysis?.actionableInsights || []).length || undefined
-                    })
-                  });
-                  
-                  if (updateRes.ok) {
-                    window.location.href = `/result/${analysisId}`;
-                    return;
-                  } else {
-                    console.warn('Failed to update analysis, continuing with localStorage fallback');
-                  }
-                }
-              } catch (e) {
-                console.warn('Could not update analysis with final results:', e);
-              }
-              // Fallback: Transform and store in localStorage
-              const transformedData = transformAnalysisToResultFormat(analysisData);
-              localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
-              window.location.href = '/result';
-            }, 1000);
-          }
-        }, 50);
-        
-        return prev;
-      });
-
-    } catch (error) {
-      clearInterval(progressInterval);
-      console.error('Error completing analysis:', error);
-      setIsCompletingAnalysis(false);
-      setCompletionProgress(0);
-      alert('An error occurred while completing the analysis. Please try again.');
-    }
-  };
+    // Removed - no longer needed since we do everything in one step
 
   const renderStep1 = () => (
     <div className="space-y-6 animate-fadeIn">
@@ -957,155 +709,9 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
     </div>
   );
 
-  const renderCompletingAnalysis = () => (
-    <div className="text-center py-12">
-      {/* Modern circular progress */}
-      <div className="relative w-48 h-48 mx-auto mb-8">
-        {/* Outer glow effect */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-purple-600/20 blur-xl animate-pulse"></div>
-        
-        {/* Background circle */}
-        <svg className="w-48 h-48 transform -rotate-90">
-          <circle
-            cx="96"
-            cy="96"
-            r="88"
-            stroke="rgba(229, 231, 235, 0.3)"
-            strokeWidth="12"
-            fill="none"
-          />
-          {/* Progress circle */}
-          <circle
-            cx="96"
-            cy="96"
-            r="88"
-            stroke="url(#progressGradient)"
-            strokeWidth="12"
-            fill="none"
-            strokeDasharray={`${2 * Math.PI * 88}`}
-            strokeDashoffset={`${2 * Math.PI * 88 * (1 - completionProgress / 100)}`}
-            strokeLinecap="round"
-            className="transition-all duration-300 filter drop-shadow-lg"
-          />
-          <defs>
-            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#9333ea" />
-              <stop offset="50%" stopColor="#ec4899" />
-              <stop offset="100%" stopColor="#9333ea" />
-            </linearGradient>
-          </defs>
-        </svg>
-        
-        {/* Center content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            {Math.round(completionProgress)}
-          </span>
-          <span className="text-sm text-gray-400 font-medium">percent</span>
-        </div>
-      </div>
-      
-      <h3 className="text-3xl font-bold text-white mb-3">Finalizing Your AI Analysis ✨</h3>
-      <div className="wizard-card rounded-2xl px-6 py-3 inline-block mb-8 shimmer-effect">
-        <p className="text-purple-400 font-medium animate-pulse">{completionStage}</p>
-      </div>
-      
-      {/* Modern progress stages */}
-      <div className="max-w-lg mx-auto">
-        <div className="relative">
-          {/* Progress line background */}
-          <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-700 rounded-full -translate-y-1/2"></div>
-          
-          {/* Active progress line with glow */}
-          <div 
-            className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full -translate-y-1/2 transition-all duration-500 shadow-glow"
-            style={{ 
-              width: `${completionProgress}%`,
-              boxShadow: '0 0 20px rgba(168, 85, 247, 0.6)'
-            }}
-          ></div>
-          
-          {/* Stage dots */}
-          <div className="relative flex justify-between">
-            {[
-              { name: 'Start', threshold: 0, icon: '🚀' },
-              { name: 'Process', threshold: 25, icon: '⚡' },
-              { name: 'Analyze', threshold: 50, icon: '🧠' },
-              { name: 'Generate', threshold: 75, icon: '✨' },
-              { name: 'Complete', threshold: 100, icon: '🎯' }
-            ].map((stage, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div className={`
-                  w-4 h-4 rounded-full border-3 transition-all duration-500
-                  ${completionProgress >= stage.threshold 
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 border-purple-600 scale-125' 
-                    : 'bg-white border-gray-300'
-                  }
-                `}></div>
-                <span className={`
-                  text-xs mt-2 transition-all duration-500
-                  ${completionProgress >= stage.threshold 
-                    ? 'text-purple-600 font-semibold' 
-                    : 'text-gray-400'
-                  }
-                `}>
-                  {stage.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Estimated time */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
-            Estimated time remaining: {Math.max(1, Math.ceil((100 - completionProgress) * 0.45))} seconds
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+  // Completion step removed - going directly to comprehensive results
 
-  const renderFollowUp = () => (
-    <div className="space-y-6 animate-fadeIn">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-teal-500 to-green-500 mb-4 floating-icon">
-          <FaLightbulb className="text-white text-3xl" />
-        </div>
-        <h2 className="text-3xl font-bold text-white mb-2">Final Details 🎯</h2>
-        <p className="text-gray-400">Let's fine-tune your analysis with a few more insights</p>
-      </div>
-      
-      <div className="space-y-4 max-h-96 overflow-y-auto">
-        {followUpQuestions.map((question) => (
-          <div key={question.id} className="group">
-            <label className="block text-sm font-medium text-gray-300 mb-1 group-hover:text-white transition-colors">
-              {question.title}
-            </label>
-            {question.subtitle && (
-              <p className="text-xs text-gray-500 mb-2">{question.subtitle}</p>
-            )}
-            <textarea
-              value={followUpAnswers[question.id] || ''}
-              onChange={(e) => setFollowUpAnswers(prev => ({ ...prev, [question.id]: e.target.value }))}
-              className="modern-input w-full px-4 py-3 rounded-2xl text-white placeholder-gray-500 outline-none resize-none"
-              rows={3}
-              placeholder={question.placeholder || 'Share your insights...'}
-            />
-          </div>
-        ))}
-      </div>
-
-      <button
-        onClick={() => handleFinalAnalysis()}
-        disabled={followUpQuestions.length === 0 || followUpQuestions.some(q => !followUpAnswers[q.id]?.trim())}
-        className="gradient-button w-full py-4 px-6 text-white font-semibold rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-      >
-        <FaStar className="text-lg" />
-        <span>Complete Analysis</span>
-      </button>
-    </div>
-  );
+  // Follow-up step removed - going directly to comprehensive results
 
   if (!open) return null;
 
@@ -1121,7 +727,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         <div className="absolute top-0 left-0 right-0 h-1 bg-gray-800">
           <div 
             className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
-            style={{ width: `${(currentStep / 3) * 100}%` }}
+            style={{ width: `${(currentStep / 2) * 100}%` }}
           />
         </div>
         
@@ -1133,11 +739,9 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
             <FaTimes className="w-5 h-5" />
           </button>
 
-          {isAnalyzing ? renderAnalyzing() : 
-           isCompletingAnalysis ? renderCompletingAnalysis() : (
+          {isAnalyzing ? renderAnalyzing() : (
             currentStep === 1 ? renderStep1() :
-            currentStep === 2 ? renderStep2() :
-            renderFollowUp()
+            renderStep2()
           )}
         </div>
       </div>

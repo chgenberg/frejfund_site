@@ -7,7 +7,10 @@ export const actionableInsightSchema = z.object({
   description: z.string().optional(),
   implementation: z.array(z.string()).optional(),
   expectedResult: z.string().optional(),
-  investorPerspective: z.string().optional()
+  investorPerspective: z.string().optional(),
+  evidenceSource: z.string().optional(),
+  targetMetric: z.string().optional(),
+  _source: z.string().optional()
 });
 
 export const initialAnalysisSchema = z.object({
@@ -49,6 +52,7 @@ export const initialAnalysisSchema = z.object({
 
 export const finalAnalysisSchema = z.object({
   analysis: z.object({
+    companyContext: z.array(z.string()).optional(),
     overallScore: z.number().optional(),
     executiveSummary: z.string().optional(),
     investmentThesis: z.string().optional(),
@@ -79,7 +83,16 @@ export const finalAnalysisSchema = z.object({
     healthInsights: z.array(z.string()).optional(),
     riskInsights: z.array(z.string()).optional(),
     pitchInsights: z.array(z.string()).optional(),
-    actionableInsights: z.array(actionableInsightSchema).optional()
+    actionableInsights: z.array(actionableInsightSchema).optional(),
+    categoryScores: z.object({
+      problemSolutionScore: z.number().optional(),
+      marketScore: z.number().optional(),
+      competitiveScore: z.number().optional(),
+      tractionScore: z.number().optional(),
+      financialScore: z.number().optional(),
+      teamScore: z.number().optional(),
+      riskScore: z.number().optional()
+    }).optional()
   })
 });
 
