@@ -15,6 +15,8 @@ interface ActionableInsight {
   toolsRequired?: string[];
   potentialPitfalls?: string[];
   successIndicators?: string[];
+  difficultyLevel?: 'easy' | 'moderate' | 'hard' | 'extremely hard';
+  failureRisk?: string;
   _source?: string;
 }
 
@@ -22,6 +24,13 @@ const impactColors = {
   high: 'from-red-500 to-orange-500',
   medium: 'from-yellow-500 to-amber-500',
   low: 'from-blue-500 to-cyan-500'
+};
+
+const difficultyColors = {
+  easy: 'from-green-500 to-emerald-500',
+  moderate: 'from-yellow-500 to-orange-500', 
+  hard: 'from-orange-500 to-red-500',
+  'extremely hard': 'from-red-600 to-red-800'
 };
 
 const impactLabels = {
@@ -53,6 +62,11 @@ export default function ActionableInsights({ insights }: { insights: ActionableI
                     Context-based
                   </span>
                 )}
+                {insight._source === 'critical-fallback' && (
+                  <span className="px-3 py-1 text-xs bg-red-500/20 text-red-300 rounded-full border border-red-500/30">
+                    Critical reality
+                  </span>
+                )}
                 {insight._source === 'ai-generated' && (
                   <span className="px-3 py-1 text-xs bg-green-500/20 text-green-300 rounded-full border border-green-500/30">
                     AI-personalized
@@ -63,6 +77,11 @@ export default function ActionableInsights({ insights }: { insights: ActionableI
                 <span className={`px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r ${impactColors[insight.impact]} text-white`}>
                   {impactLabels[insight.impact]}
                 </span>
+                {insight.difficultyLevel && (
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${difficultyColors[insight.difficultyLevel]} text-white`}>
+                    {insight.difficultyLevel}
+                  </span>
+                )}
                 <span className="text-sm text-white/60 font-medium">{insight.timeframe}</span>
               </div>
             </div>
@@ -72,9 +91,17 @@ export default function ActionableInsights({ insights }: { insights: ActionableI
           <div className="p-6 space-y-6">
             {/* Description */}
             <div>
-              <h4 className="text-sm font-semibold text-white/60 mb-3">🎯 Challenge & Opportunity</h4>
+              <h4 className="text-sm font-semibold text-white/60 mb-3">🎯 Reality Check</h4>
               <p className="text-white/90 leading-relaxed">{insight.description}</p>
             </div>
+
+            {/* Failure Risk Warning */}
+            {insight.failureRisk && (
+              <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/20">
+                <h4 className="text-sm font-semibold text-red-400 mb-2">⚠️ Failure risk</h4>
+                <p className="text-white/85 text-sm leading-relaxed">{insight.failureRisk}</p>
+              </div>
+            )}
 
             {/* Key Metrics Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -98,7 +125,7 @@ export default function ActionableInsights({ insights }: { insights: ActionableI
             {/* Industry Benchmark */}
             {insight.industryBenchmark && (
               <div className="bg-cyan-500/10 rounded-xl p-4">
-                <h4 className="text-sm font-semibold text-cyan-400 mb-2">📈 Industry benchmark</h4>
+                <h4 className="text-sm font-semibold text-cyan-400 mb-2">📈 Industry reality</h4>
                 <p className="text-white/80 text-sm">{insight.industryBenchmark}</p>
               </div>
             )}
@@ -152,7 +179,7 @@ export default function ActionableInsights({ insights }: { insights: ActionableI
               {/* Potential Pitfalls */}
               {insight.potentialPitfalls && insight.potentialPitfalls.length > 0 && (
                 <div className="bg-red-500/10 rounded-xl p-4">
-                  <h4 className="text-sm font-semibold text-red-400 mb-3">⚠️ Avoid these pitfalls</h4>
+                  <h4 className="text-sm font-semibold text-red-400 mb-3">⚠️ Common pitfalls</h4>
                   <ul className="space-y-2">
                     {insight.potentialPitfalls.map((pitfall, idx) => (
                       <li key={idx} className="flex items-start gap-2">

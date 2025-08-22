@@ -14,6 +14,8 @@ export const actionableInsightSchema = z.object({
   toolsRequired: z.array(z.string()).optional(),
   potentialPitfalls: z.array(z.string()).optional(),
   successIndicators: z.array(z.string()).optional(),
+  difficultyLevel: z.union([z.literal('easy'), z.literal('moderate'), z.literal('hard'), z.literal('extremely hard'), z.string()]).optional(),
+  failureRisk: z.string().optional(),
   _source: z.string().optional()
 });
 
@@ -97,30 +99,9 @@ export const finalAnalysisSchema = z.object({
       teamScore: z.number().optional(),
       riskScore: z.number().optional()
     }).optional(),
-    competitiveAnalysis: z.object({
-      mainCompetitors: z.array(z.string()).optional(),
-      competitiveAdvantages: z.array(z.string()).optional(),
-      vulnerabilities: z.array(z.string()).optional(),
-      differentiationStrategy: z.string().optional()
-    }).optional(),
-    financialProjections: z.object({
-      revenueScenarios: z.object({
-        conservative: z.string().optional(),
-        realistic: z.string().optional(),
-        optimistic: z.string().optional()
-      }).optional(),
-      keyMetrics: z.object({
-        targetCAC: z.string().optional(),
-        targetLTV: z.string().optional(),
-        paybackPeriod: z.string().optional(),
-        grossMargin: z.string().optional()
-      }).optional()
-    }).optional(),
-    growthRoadmap: z.object({
-      next30Days: z.array(z.string()).optional(),
-      next90Days: z.array(z.string()).optional(),
-      next12Months: z.array(z.string()).optional()
-    }).optional()
+    redFlags: z.array(z.string()).optional(),
+    competitiveThreats: z.array(z.string()).optional(),
+    realityCheck: z.string().optional()
   })
 });
 

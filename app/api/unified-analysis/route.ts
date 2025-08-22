@@ -181,147 +181,124 @@ OUTPUT FORMAT:
     }
 
     // STEP 3: Generate comprehensive final analysis with expanded capacity
-    const finalPrompt = `You are an expert investment analyst with 15+ years experience in early-stage startups. Perform a COMPREHENSIVE, DETAILED investment assessment using ALL available information. You have extensive space to provide maximum value.
+    const finalPrompt = `You are a BRUTALLY HONEST investment analyst with 15+ years experience in early-stage startups. You have seen thousands of pitches and know what separates winners from losers. Perform a COMPREHENSIVE, CRITICAL investment assessment using ALL available information.
 
-CRITICAL REQUIREMENTS:
+CRITICAL HONESTY REQUIREMENTS:
 
-1. **COMPANY CONTEXT**: Start with 5-bullet company overview (stage, industry, target market, business model, revenue, team)
+1. **BE BRUTALLY HONEST**: Most startups fail. Don't sugarcoat problems. If something is weak, say it clearly.
 
-2. **ULTRA-DETAILED ACTIONABLE INSIGHTS**: Generate 8-12 SPECIFIC, TAILORED actionable insights that:
-   - REFERENCE specific details from their website/docs/data (cite extensively with "from website: ..." or "from docs: ...")
-   - INCLUDE concrete numbers, metrics, and targets relevant to their situation
-   - MENTION their actual industry, stage, customers, and business model specifics
-   - PROVIDE comprehensive step-by-step implementation with specific tools, owners, and detailed timeframes
-   - SHOW clear ROI/impact with measurable outcomes and industry benchmarks
-   - INCLUDE real examples from similar companies or industry best practices
-   - PROVIDE detailed rationale for why this specific action matters for their exact situation
+2. **SCORING REALITY CHECK**: 
+   - 90-100: Exceptional (top 1% of startups you've seen)
+   - 80-89: Very strong (top 5-10%)
+   - 70-79: Good but needs work (top 20%)
+   - 60-69: Significant issues (needs major improvements)
+   - 50-59: Weak (high risk of failure)
+   - Below 50: Not investment ready
 
-3. **INDUSTRY-SPECIFIC DEEP DIVE**:
-   - SaaS: Detailed churn analysis, CAC optimization by channel, LTV improvement tactics, expansion revenue playbooks, customer success frameworks
-   - E-commerce: Comprehensive CRO strategy, AOV optimization tactics, inventory management, conversion funnel analysis, retention programs
-   - Marketplace: Supply/demand growth loops, take rate optimization, liquidity strategies, network effects, chicken-egg solutions
-   - Idea/MVP: Detailed validation framework, interview scripts, success criteria, pivot triggers, MVP feature prioritization
+3. **COMPANY CONTEXT**: Start with 5-bullet company overview (stage, industry, target market, business model, revenue, team)
 
-4. **COMPREHENSIVE COMPETITIVE INTELLIGENCE**:
-   - Identify and analyze 3-5 specific competitors
-   - Detailed competitive positioning strategy
-   - Specific differentiation tactics with proof points
-   - Competitive pricing analysis and recommendations
+4. **ULTRA-CRITICAL ACTIONABLE INSIGHTS**: Generate 8-12 SPECIFIC, TAILORED insights that:
+   - IDENTIFY real weaknesses and gaps without softening language
+   - REFERENCE specific problems from their website/docs/data (cite with "from website: ..." or "from docs: ...")
+   - INCLUDE harsh but necessary truths about their situation
+   - MENTION actual competitive threats and disadvantages
+   - PROVIDE tough love recommendations with specific metrics
+   - SHOW realistic timelines and difficulty levels
+   - BE SPECIFIC about what could go wrong and why most startups in their situation fail
 
-5. **DETAILED FINANCIAL MODELING**:
-   - Unit economics breakdown with improvement levers
-   - Revenue projection scenarios (conservative, realistic, optimistic)
-   - Cost structure optimization recommendations
-   - Funding requirements with detailed use of proceeds
+5. **INDUSTRY-SPECIFIC BRUTAL TRUTH**:
+   - SaaS: Call out if CAC is too high, churn unsustainable, or LTV calculations are fantasy
+   - E-commerce: Highlight margin compression, inventory risks, customer acquisition challenges
+   - Marketplace: Address chicken-egg problems, liquidity issues, winner-take-all dynamics
+   - Idea/MVP: Emphasize validation gaps, market size reality, execution risks
 
-6. **RISK MITIGATION PLAYBOOK**:
-   - Identify 5-7 specific risks with probability and impact assessment
-   - Detailed mitigation strategies for each risk
-   - Early warning indicators and trigger points
-   - Contingency plans
+6. **COMPETITIVE REALITY CHECK**:
+   - Identify WHY they might lose to competitors
+   - Point out competitive advantages they DON'T have
+   - Highlight market timing risks and threats
+   - Be specific about what makes them vulnerable
 
-7. **GO-TO-MARKET MASTERPLAN**:
-   - Customer acquisition strategy by channel with expected CAC
-   - Sales process optimization with conversion targets
-   - Marketing strategy with specific tactics and budgets
-   - Partnership and business development opportunities
+7. **FINANCIAL BRUTAL HONESTY**:
+   - Call out unrealistic projections
+   - Highlight cash burn risks and runway concerns
+   - Point out unit economics that don't work
+   - Be realistic about funding challenges
 
-8. **OPERATIONAL EXCELLENCE ROADMAP**:
-   - Team scaling plan with specific roles and timelines
-   - Technology and infrastructure requirements
-   - Process optimization opportunities
-   - Key performance indicators and tracking systems
+8. **TEAM ASSESSMENT WITHOUT SUGAR-COATING**:
+   - Identify skill gaps and experience deficits
+   - Point out founder-market fit issues
+   - Highlight execution risks based on team composition
 
-FORBIDDEN GENERICS (ABSOLUTELY DO NOT USE):
-- "Build strategic partnerships"
-- "Strengthen competitive moat" 
-- "Implement data-driven tracking"
-- "Focus on customer acquisition"
-- "Improve unit economics"
-- Any advice applicable to any company without specific reference to their situation
+FORBIDDEN OPTIMISTIC LANGUAGE:
+- "Strong potential" (unless truly exceptional)
+- "Promising opportunity" (be specific about challenges)
+- "With some improvements" (be direct about what's broken)
+- Any generic positive language that doesn't reflect reality
 
-EVIDENCE REQUIREMENTS:
-- Every insight must cite specific sources from their provided data
-- Include industry statistics and benchmarks where relevant
-- Reference similar companies' success stories
-- Provide concrete examples and case studies
+REQUIRED CRITICAL LANGUAGE:
+- "Significant risk that..."
+- "Major concern about..."
+- "Critical gap in..."
+- "Unrealistic assumption about..."
+- "Competitive disadvantage because..."
 
 OUTPUT FORMAT STRICTLY:
 {
   "analysis": {
-    "companyContext": [string], // 5 detailed bullets about their specific situation
-    "executiveSummary": string, // 3-4 comprehensive sentences
-    "investmentThesis": string, // Detailed investment case with specifics
-    "marketOpportunity": string, // Comprehensive market analysis with TAM/SAM
-    "customerPain": string, // Detailed pain point analysis with quantification
-    "solution": string, // Comprehensive solution analysis with differentiation
-    "competitivePosition": string, // Detailed competitive analysis with named competitors
-    "teamAssessment": string, // Comprehensive team analysis including founder-market fit
-    "financialAnalysis": string, // Detailed financial analysis with projections
-    "riskAssessment": string, // Comprehensive risk analysis with mitigation strategies
-    "growthStrategy": string, // Detailed 12-month growth plan
-    "fundingAnalysis": string, // Comprehensive funding strategy and use of proceeds
+    "companyContext": [string], // 5 bullets including critical assessment
+    "executiveSummary": string, // Include both positives AND major concerns
+    "investmentThesis": string, // Honest case including significant risks
+    "marketOpportunity": string, // Realistic market analysis with threats
+    "customerPain": string, // Honest assessment of pain validation
+    "solution": string, // Critical analysis including weaknesses
+    "competitivePosition": string, // Honest competitive disadvantages
+    "teamAssessment": string, // Critical team analysis with skill gaps
+    "financialAnalysis": string, // Brutal honesty about unit economics
+    "riskAssessment": string, // Major risks with high probability of occurrence
+    "growthStrategy": string, // Realistic growth challenges
+    "fundingAnalysis": string, // Honest funding difficulty assessment
     "actionableInsights": [
       {
-        "title": string, // Specific, actionable title
+        "title": string, // Direct, sometimes uncomfortable truth
         "impact": "high" | "medium" | "low",
-        "timeframe": string, // Specific timeframe (e.g., "2-3 weeks", "30 days")
-        "description": string, // Detailed description of the challenge/opportunity
-        "implementation": [string], // 5-8 detailed implementation steps with specific tools and methods
-        "expectedResult": string, // Detailed expected outcome with specific metrics
-        "investorPerspective": string, // Why investors care about this specific action
-        "evidenceSource": string, // Specific source from their data that supports this recommendation
-        "targetMetric": string, // Specific measurable goal (e.g., "Increase conversion from 2% to 5%")
-        "industryBenchmark": string, // Relevant industry benchmark or best practice
-        "toolsRequired": [string], // Specific tools, software, or resources needed
-        "potentialPitfalls": [string], // 2-3 common mistakes to avoid
-        "successIndicators": [string], // 2-3 early signals that this is working
+        "timeframe": string, // Realistic timeframes (often longer than hoped)
+        "description": string, // Critical assessment of the problem/gap
+        "implementation": [string], // 5-8 detailed steps including difficult parts
+        "expectedResult": string, // Realistic outcome with failure possibilities
+        "investorPerspective": string, // What investors will actually think (often critical)
+        "evidenceSource": string, // What data reveals the problem
+        "targetMetric": string, // Challenging but achievable goals
+        "industryBenchmark": string, // How they compare (often unfavorably)
+        "toolsRequired": [string], // Specific tools needed
+        "potentialPitfalls": [string], // High-probability failure modes
+        "successIndicators": [string], // Early signals (set realistic expectations)
+        "difficultyLevel": "easy" | "moderate" | "hard" | "extremely hard",
+        "failureRisk": string, // Honest assessment of what could go wrong
         "_source": "ai-generated"
       }
     ],
-    "overallScore": number, // 0-100 based on comprehensive analysis
+    "overallScore": number, // REALISTIC score based on actual evidence
     "categoryScores": {
-      "problemSolutionScore": number,
-      "marketScore": number,
-      "competitiveScore": number,
-      "tractionScore": number,
-      "financialScore": number,
-      "teamScore": number,
-      "riskScore": number
+      "problemSolutionScore": number, // Often lower than founders think
+      "marketScore": number, // Account for competition and timing
+      "competitiveScore": number, // Usually lower due to established players
+      "tractionScore": number, // Based on real metrics, not vanity metrics
+      "financialScore": number, // Honest unit economics assessment
+      "teamScore": number, // Critical skill gap analysis
+      "riskScore": number // High risk for most early-stage companies
     },
-    "competitiveAnalysis": {
-      "mainCompetitors": [string], // 3-5 specific competitor names
-      "competitiveAdvantages": [string], // 3-5 specific advantages they have
-      "vulnerabilities": [string], // 2-3 areas where competitors are stronger
-      "differentiationStrategy": string // Detailed strategy to stand out
-    },
-    "financialProjections": {
-      "revenueScenarios": {
-        "conservative": string,
-        "realistic": string, 
-        "optimistic": string
-      },
-      "keyMetrics": {
-        "targetCAC": string,
-        "targetLTV": string,
-        "paybackPeriod": string,
-        "grossMargin": string
-      }
-    },
-    "growthRoadmap": {
-      "next30Days": [string], // 3-5 immediate actions
-      "next90Days": [string], // 3-5 short-term goals  
-      "next12Months": [string] // 3-5 long-term objectives
-    }
+    "redFlags": [string], // 3-5 major concerns that could kill the business
+    "competitiveThreats": [string], // 3-5 ways competitors could destroy them
+    "realityCheck": string // Harsh but necessary truth about their situation
   }
 }
 
 QUALITY STANDARDS:
-- Each actionable insight should be 200-400 words of detailed, specific guidance
-- Include real industry examples and case studies where possible
-- Provide specific tools, methodologies, and frameworks
-- Reference actual metrics and benchmarks from their industry
-- Make every recommendation immediately implementable with clear success criteria`;
+- Each insight should address real problems, not imaginary ones
+- Include failure statistics for similar companies
+- Reference actual market data and competitive threats
+- Make recommendations that acknowledge the high probability of failure
+- Be specific about what separates winners from the 90% that fail`;
 
     const fullContent = combinedContent + (followUpContent ? `\n\n${followUpContent}` : '');
     
@@ -338,11 +315,11 @@ QUALITY STANDARDS:
     } catch {}
 
     if (!valid) {
-      const strictPrompt = finalPrompt + `\n\nSTRICT MODE: You MUST provide 8-12 concrete, immediately actionable recommendations with detailed implementation plans, specific tools, metrics, and expected outcomes. Use the full token capacity to provide maximum value. Make reasonable assumptions if some data is missing but base recommendations on available evidence.`;
+      const strictPrompt = finalPrompt + `\n\nSTRICT MODE: You MUST provide 8-12 BRUTALLY HONEST, critical recommendations that address real problems and failure risks. Don't hold back - investors need to know the truth. Include specific failure statistics and competitive threats.`;
       finalAnalysis = await generateWithBestModel(strictPrompt, true);
     }
 
-    // Ensure minimum quality standards with enhanced fallbacks
+    // Ensure minimum quality standards with critical fallbacks
     if (!finalAnalysis.analysis) {
       finalAnalysis.analysis = {};
     }
@@ -350,7 +327,7 @@ QUALITY STANDARDS:
     if (!finalAnalysis.analysis.actionableInsights || finalAnalysis.analysis.actionableInsights.length < 6) {
       finalAnalysis.analysis.actionableInsights = finalAnalysis.analysis.actionableInsights || [];
       
-      // Add comprehensive fallbacks based on business info
+      // Add critical fallbacks based on business info
       const stage = businessInfo.stage || 'unknown';
       const industry = businessInfo.industry || 'unknown';
       const revenue = businessInfo.monthlyRevenue || '0';
@@ -358,185 +335,177 @@ QUALITY STANDARDS:
       while (finalAnalysis.analysis.actionableInsights.length < 8) {
         if (stage === 'idea' && finalAnalysis.analysis.actionableInsights.length === 0) {
           finalAnalysis.analysis.actionableInsights.push({
-            title: `Execute comprehensive ${industry} market validation program`,
+            title: `Critical reality check: 90% of ${industry} ideas fail without proper validation`,
             impact: 'high',
             timeframe: '4-6 weeks',
-            description: `As an idea-stage ${industry} company, you need systematic validation before building to avoid the 70% failure rate of startups that skip this step.`,
+            description: `Your idea-stage ${industry} company faces the harsh reality that 9 out of 10 startups fail, often because they build something nobody wants. You need brutal market validation, not optimistic assumptions.`,
             implementation: [
-              'Define your Ideal Customer Profile (ICP) with 8-10 specific characteristics',
-              'Recruit 25-30 potential customers matching your ICP through LinkedIn, industry forums, and referrals',
-              'Conduct 45-minute problem interviews using the "Mom Test" methodology',
-              'Quantify the current cost of their problem in time and money',
-              'Test 3 different value propositions and measure emotional response',
-              'Document specific language customers use to describe their pain',
-              'Validate willingness to pay with pricing sensitivity analysis',
-              'Create detailed customer personas based on interview data'
+              'Interview 30+ potential customers (not friends/family) who match your exact target profile',
+              'Ask hard questions: "What do you currently spend on this problem?" and "Would you pay €X for this solution?"',
+              'Test your core assumption with a smoke test or landing page (measure actual behavior, not opinions)',
+              'Quantify the real cost of their current solution in time and money',
+              'Get 3-5 potential customers to commit to paying before you build anything',
+              'Research why similar companies in your space have failed',
+              'Validate that your target market is large enough and growing',
+              'Identify the #1 reason customers would NOT buy your solution'
             ],
-            expectedResult: 'Clear evidence of market demand with 80%+ of interviews confirming significant pain, validated pricing model, and refined value proposition',
-            investorPerspective: 'Systematic market validation reduces investment risk and demonstrates founder discipline and market understanding',
-            evidenceSource: `Business stage (${stage}) and industry context (${industry})`,
-            targetMetric: '80%+ of customer interviews confirm significant pain point worth €500+ annually',
-            industryBenchmark: 'Successful startups conduct 20-30 customer interviews before building MVP',
-            toolsRequired: ['Calendly for scheduling', 'Zoom for interviews', 'Notion for documentation', 'LinkedIn Sales Navigator'],
-            potentialPitfalls: ['Leading questions that bias responses', 'Talking to friends/family instead of real prospects', 'Skipping pain quantification'],
-            successIndicators: ['Customers volunteer to pay before product exists', 'Consistent language across interviews', 'Referrals to other potential customers'],
-            _source: 'contextual-fallback'
+            expectedResult: 'Either validated demand with paying customers lined up, or pivot/kill the idea before wasting more time and money',
+            investorPerspective: 'Most investors have seen hundreds of unvalidated ideas fail. Without customer validation, this is just an expensive hobby.',
+            evidenceSource: `Idea stage in competitive ${industry} market with high failure rates`,
+            targetMetric: 'Get 5+ customers to commit to paying €500+ before building MVP',
+            industryBenchmark: `85% of ${industry} startups fail due to lack of market need - successful ones validate first`,
+            toolsRequired: ['LinkedIn Sales Navigator', 'Typeform', 'Calendly', 'Landing page builder', 'Payment processor for pre-orders'],
+            potentialPitfalls: ['Asking leading questions', 'Confusing interest with intent to buy', 'Targeting too broad a market', 'Ignoring negative feedback'],
+            successIndicators: ['Customers ask when they can start using it', 'Word-of-mouth referrals happen naturally', 'People offer to pay before you ask'],
+            difficultyLevel: 'extremely hard',
+            failureRisk: 'High probability of discovering no real market demand exists, requiring major pivot or shutdown',
+            _source: 'critical-fallback'
           });
         } else if (stage === 'mvp' && finalAnalysis.analysis.actionableInsights.length <= 1) {
           finalAnalysis.analysis.actionableInsights.push({
-            title: `Implement advanced ${industry} user feedback and analytics system`,
+            title: `MVP reality check: Product-market fit is harder than you think`,
             impact: 'high',
-            timeframe: '2-3 weeks',
-            description: `Your MVP-stage ${industry} business needs systematic user behavior tracking to optimize product-market fit and prepare for scaling.`,
+            timeframe: '6-8 weeks',
+            description: `Your MVP-stage ${industry} business is in the danger zone where 70% of companies burn through funding without finding PMF. You need honest user feedback, not vanity metrics.`,
             implementation: [
-              'Install comprehensive analytics: Mixpanel/Amplitude for user behavior, Hotjar for session recordings',
-              'Set up cohort analysis tracking weekly/monthly retention rates',
-              'Implement in-app feedback collection with NPS surveys and feature request voting',
-              'Create user interview pipeline: 5 users per week, 30-minute sessions',
-              'Track key activation metrics: time-to-first-value, feature adoption rates',
-              'Build automated email sequences for user onboarding and engagement',
-              'Set up A/B testing framework for key user flows',
-              'Create weekly metrics review process with product team'
+              'Track brutal honesty metrics: daily/weekly active users, not just signups',
+              'Measure real retention: 30% of users should return within 7 days for B2B, 20% for B2C',
+              'Conduct exit interviews with churned users to understand why they left',
+              'A/B test core features ruthlessly - remove anything that doesn\'t drive retention',
+              'Set up cohort analysis to see if newer users perform better than older ones',
+              'Implement NPS surveys but focus on detractors (score 0-6) - they tell the truth',
+              'Track time-to-first-value and optimize ruthlessly (should be under 5 minutes for SaaS)',
+              'Monitor support tickets for recurring complaints about usability or value'
             ],
-            expectedResult: 'Data-driven product optimization with 40%+ improvement in user activation and 25% increase in retention within 60 days',
-            investorPerspective: 'Shows systematic approach to product-market fit optimization and data-driven decision making',
-            evidenceSource: `MVP stage requiring user feedback optimization in ${industry}`,
-            targetMetric: 'Achieve 40%+ weekly retention rate and 20%+ monthly retention rate',
-            industryBenchmark: `Top ${industry} companies achieve 35%+ weekly retention in MVP stage`,
-            toolsRequired: ['Mixpanel/Amplitude', 'Hotjar', 'Typeform', 'Calendly', 'Intercom'],
-            potentialPitfalls: ['Tracking vanity metrics instead of actionable insights', 'Over-engineering analytics before PMF', 'Ignoring qualitative feedback'],
-            successIndicators: ['Users return without prompting', 'Organic referrals increase', 'Feature requests align with roadmap'],
-            _source: 'contextual-fallback'
+            expectedResult: 'Either clear evidence of PMF (40%+ weekly retention, organic growth) or data showing you need to pivot',
+            investorPerspective: 'MVPs without clear PMF signals are red flags. Most investors have seen too many "almost there" stories that never materialize.',
+            evidenceSource: `MVP stage in ${industry} where most companies struggle to find PMF`,
+            targetMetric: 'Achieve 40%+ weekly retention and 25%+ monthly retention, or prepare to pivot',
+            industryBenchmark: `Top ${industry} MVPs see 35%+ weekly retention; below 20% indicates serious PMF issues`,
+            toolsRequired: ['Mixpanel/Amplitude', 'Hotjar', 'Intercom', 'Typeform', 'Cohort analysis tools'],
+            potentialPitfalls: ['Focusing on vanity metrics like page views', 'Ignoring user feedback', 'Building features instead of fixing core value prop'],
+            successIndicators: ['Users complain when the product is down', 'Organic referrals increase weekly', 'Support tickets about "how to do more" not "how to use"'],
+            difficultyLevel: 'extremely hard',
+            failureRisk: 'Very high chance of discovering fundamental product-market mismatch requiring major pivot',
+            _source: 'critical-fallback'
           });
         } else if ((stage === 'early-revenue' || revenue !== '0') && finalAnalysis.analysis.actionableInsights.length <= 2) {
           finalAnalysis.analysis.actionableInsights.push({
-            title: `Optimize ${industry} unit economics for Series A readiness`,
+            title: `Unit economics reality: Your numbers probably don't work yet`,
             impact: 'high',
-            timeframe: '3-4 weeks',
-            description: `Your early-revenue ${industry} business needs investor-grade unit economics clarity to attract Series A funding and optimize growth efficiency.`,
+            timeframe: '4-6 weeks',
+            description: `Early-revenue ${industry} companies often have broken unit economics hidden by founder optimism. 60% of Series A rejections are due to unsustainable economics.`,
             implementation: [
-              'Calculate true Customer Acquisition Cost (CAC) by channel: paid ads, organic, referral, sales',
-              'Implement cohort-based Lifetime Value (LTV) analysis using 6-12 month data',
-              'Document detailed gross margin structure including all variable costs',
-              'Analyze customer retention curves and identify churn patterns',
-              'Calculate payback period by customer segment and acquisition channel',
-              'Measure expansion revenue potential through upsell/cross-sell analysis',
-              'Build financial dashboard with weekly CAC, LTV, and churn tracking',
-              'Create scenario models for different growth rates and their capital requirements',
-              'Benchmark against industry standards and identify optimization opportunities'
+              'Calculate REAL Customer Acquisition Cost including founder time, failed experiments, and hidden costs',
+              'Measure actual LTV using cohort analysis - don\'t use averages or projections',
+              'Include ALL costs in gross margin: support, infrastructure, payment processing, refunds',
+              'Track churn by cohort and identify if it\'s getting worse over time',
+              'Calculate payback period using actual retention curves, not linear projections',
+              'Analyze if your best customers are profitable or if you\'re subsidizing growth',
+              'Model scenarios where CAC increases 2-3x (normal as you scale)',
+              'Stress test your model: what happens if churn doubles or LTV halves?',
+              'Compare your metrics to failed companies in your space'
             ],
-            expectedResult: 'Investor-ready financial model with LTV:CAC > 3, payback < 18 months, and clear path to profitability',
-            investorPerspective: 'Unit economics are the foundation of Series A investment decisions - clarity here increases valuation and reduces due diligence time',
-            evidenceSource: `Early revenue stage (${revenue} monthly) requiring investment readiness`,
-            targetMetric: 'Achieve LTV:CAC ratio > 3.0 and CAC payback period < 18 months',
-            industryBenchmark: `Top ${industry} companies maintain LTV:CAC > 3 and payback < 12-18 months`,
-            toolsRequired: ['ChartMogul/ProfitWell', 'Excel/Google Sheets', 'Stripe/payment analytics', 'Customer success platform'],
-            potentialPitfalls: ['Using blended metrics instead of cohort analysis', 'Ignoring hidden costs in CAC calculation', 'Overestimating LTV without churn data'],
-            successIndicators: ['Consistent month-over-month improvement in key metrics', 'Investor meetings focus on growth rather than unit economics', 'Clear visibility into profitability timeline'],
-            _source: 'contextual-fallback'
+            expectedResult: 'Either investor-ready unit economics (LTV:CAC > 3, payback < 18 months) or brutal reality that the model needs fundamental changes',
+            investorPerspective: 'Unit economics that don\'t work at small scale will be disastrous at large scale. Most early-revenue companies are fooling themselves.',
+            evidenceSource: `Early revenue stage (${revenue}) where unit economics often don't work`,
+            targetMetric: 'Achieve LTV:CAC > 3 and payback < 18 months, or admit the model is broken',
+            industryBenchmark: `Failed ${industry} companies average LTV:CAC of 1.5-2; successful ones maintain > 3`,
+            toolsRequired: ['Spreadsheet modeling', 'Customer analytics', 'Cohort analysis tools', 'Financial tracking'],
+            potentialPitfalls: ['Using blended averages instead of cohort reality', 'Ignoring customer support costs', 'Optimistic churn assumptions'],
+            successIndicators: ['Metrics improve month-over-month', 'Unit economics work without founder subsidies', 'Confident about scaling costs'],
+            difficultyLevel: 'extremely hard',
+            failureRisk: 'High probability of discovering unit economics don\'t work, requiring business model changes or shutdown',
+            _source: 'critical-fallback'
           });
         } else {
-          // Generic high-quality fallback for other stages
+          // Critical fallback for scaling stage
           finalAnalysis.analysis.actionableInsights.push({
-            title: `Accelerate ${industry} growth with systematic optimization framework`,
+            title: `Scaling reality check: Growth at all costs is a dangerous myth`,
             impact: 'high',
-            timeframe: '2-4 weeks',
-            description: `Your ${stage}-stage ${industry} business needs systematic growth optimization to maximize efficiency and prepare for next funding round.`,
+            timeframe: '3-4 weeks',
+            description: `Your ${stage}-stage ${industry} business faces the scaling trap where 80% of companies burn out trying to grow too fast without sustainable foundations.`,
             implementation: [
-              'Implement weekly growth review process with key stakeholders',
-              'Set up automated reporting dashboard for North Star metrics',
-              'Create experimentation framework with hypothesis-driven testing',
-              'Establish customer feedback loops and systematic improvement process',
-              'Build competitive intelligence monitoring system',
-              'Optimize conversion funnel with A/B testing program'
+              'Audit your current growth metrics for sustainability vs vanity',
+              'Calculate the true cost of your growth including hidden operational debt',
+              'Identify which growth channels will break first as you scale',
+              'Model your team scaling needs and associated burn rate increases',
+              'Stress test your technology and operations for 10x current volume',
+              'Analyze your best customers to see if they\'re replicable or outliers'
             ],
-            expectedResult: 'Predictable growth optimization with 20-30% improvement in key metrics',
-            investorPerspective: 'Shows operational maturity and systematic approach to scaling',
-            evidenceSource: `${stage} stage requiring systematic optimization in ${industry}`,
-            targetMetric: 'Achieve 20%+ month-over-month improvement in North Star metric',
-            industryBenchmark: `Leading ${industry} companies see 15-25% monthly improvement through systematic optimization`,
-            toolsRequired: ['Analytics platform', 'A/B testing tools', 'Dashboard software'],
-            potentialPitfalls: ['Optimizing too many variables simultaneously', 'Focusing on vanity metrics', 'Changing strategy too frequently'],
-            successIndicators: ['Consistent improvement in key metrics', 'Faster decision-making process', 'Increased team alignment'],
-            _source: 'contextual-fallback'
+            expectedResult: 'Sustainable growth plan or reality check that current trajectory leads to burnout',
+            investorPerspective: 'Investors have seen too many companies grow themselves into bankruptcy. Sustainable growth beats hockey stick fantasies.',
+            evidenceSource: `Scaling stage challenges in competitive ${industry} market`,
+            targetMetric: 'Maintain or improve unit economics while scaling 3x',
+            industryBenchmark: `Most ${industry} companies see deteriorating metrics during rapid scaling`,
+            toolsRequired: ['Financial modeling', 'Operational analytics', 'Team planning tools'],
+            potentialPitfalls: ['Growing faster than operations can handle', 'Ignoring unit economics degradation', 'Hiring too fast'],
+            successIndicators: ['Metrics stay stable during growth', 'Operations scale smoothly', 'Team productivity maintained'],
+            difficultyLevel: 'extremely hard',
+            failureRisk: 'High risk of operational breakdown or cash burn leading to down round or failure',
+            _source: 'critical-fallback'
           });
         }
       }
     }
 
-    // Ensure all insights have enhanced fields
+    // Ensure all insights have enhanced fields with critical perspective
     finalAnalysis.analysis.actionableInsights = finalAnalysis.analysis.actionableInsights.map((insight: any) => ({
       ...insight,
-      evidenceSource: insight.evidenceSource || 'General business context and industry best practices',
-      targetMetric: insight.targetMetric || 'Qualitative improvement in business performance',
-      industryBenchmark: insight.industryBenchmark || `Industry best practices for ${businessInfo.industry || 'their'} companies`,
-      toolsRequired: insight.toolsRequired || ['Standard business tools'],
-      potentialPitfalls: insight.potentialPitfalls || ['Common implementation challenges'],
-      successIndicators: insight.successIndicators || ['Positive business impact indicators'],
+      evidenceSource: insight.evidenceSource || 'General startup failure patterns and industry data',
+      targetMetric: insight.targetMetric || 'Metric improvement needed for survival',
+      industryBenchmark: insight.industryBenchmark || `Most ${businessInfo.industry || 'similar'} companies fail at this stage`,
+      toolsRequired: insight.toolsRequired || ['Basic business tools'],
+      potentialPitfalls: insight.potentialPitfalls || ['High probability of execution failure'],
+      successIndicators: insight.successIndicators || ['Rare positive outcome indicators'],
+      difficultyLevel: insight.difficultyLevel || 'hard',
+      failureRisk: insight.failureRisk || 'Significant risk of failure without proper execution',
       _source: insight._source || 'ai-generated'
     }));
 
-    // Ensure comprehensive structure exists
-    if (!finalAnalysis.analysis.companyContext) {
-      finalAnalysis.analysis.companyContext = [
-        `Stage: ${businessInfo.stage || 'Not specified'} company in ${businessInfo.industry || 'unspecified industry'}`,
-        `Target Market: ${businessInfo.targetMarket || 'Broad market'} with ${businessInfo.businessModel || 'standard business model'}`,
-        `Revenue: ${businessInfo.monthlyRevenue || 'Pre-revenue'} monthly with ${businessInfo.teamSize || 'small'} team`,
-        `Industry: Operating in ${businessInfo.industry || 'competitive'} space`,
-        `Growth Stage: ${businessInfo.stage === 'idea' ? 'Validation phase' : businessInfo.stage === 'mvp' ? 'Product development' : businessInfo.stage === 'early-revenue' ? 'Early traction' : 'Scaling phase'}`
-      ];
-    }
-
-    // Ensure scores exist
-    if (!finalAnalysis.analysis.overallScore) {
-      finalAnalysis.analysis.overallScore = Math.floor(Math.random() * 20 + 70); // 70-90
-    }
+         // Ensure realistic scoring (not inflated)
+     if (!finalAnalysis.analysis.overallScore) {
+       // More realistic scoring based on stage
+       let baseScore = 50; // Start pessimistic
+       if (businessInfo.stage === 'scaling' && businessInfo.monthlyRevenue !== '0') baseScore = 65;
+       else if (businessInfo.stage === 'early-revenue') baseScore = 60;
+       else if (businessInfo.stage === 'mvp') baseScore = 55;
+       
+       finalAnalysis.analysis.overallScore = Math.floor(Math.random() * 15 + baseScore); // More realistic range
+     }
 
     if (!finalAnalysis.analysis.categoryScores) {
       finalAnalysis.analysis.categoryScores = {
-        problemSolutionScore: Math.floor(Math.random() * 20 + 75),
-        marketScore: Math.floor(Math.random() * 20 + 70),
-        competitiveScore: Math.floor(Math.random() * 20 + 65),
-        tractionScore: Math.floor(Math.random() * 20 + 80),
-        financialScore: Math.floor(Math.random() * 20 + 70),
-        teamScore: Math.floor(Math.random() * 20 + 80),
-        riskScore: Math.floor(Math.random() * 20 + 70)
+        problemSolutionScore: Math.floor(Math.random() * 25 + 55), // 55-80 (more realistic)
+        marketScore: Math.floor(Math.random() * 20 + 50), // 50-70 (markets are competitive)
+        competitiveScore: Math.floor(Math.random() * 15 + 45), // 45-60 (most have weak competitive position)
+        tractionScore: Math.floor(Math.random() * 30 + 40), // 40-70 (varies widely)
+        financialScore: Math.floor(Math.random() * 20 + 50), // 50-70 (unit economics usually need work)
+        teamScore: Math.floor(Math.random() * 25 + 60), // 60-85 (teams often stronger than business)
+        riskScore: Math.floor(Math.random() * 15 + 30) // 30-45 (early stage is high risk)
       };
     }
 
-    // Add enhanced sections if not present
-    if (!finalAnalysis.analysis.competitiveAnalysis) {
-      finalAnalysis.analysis.competitiveAnalysis = {
-        mainCompetitors: [`Main ${businessInfo.industry || 'industry'} competitors in ${businessInfo.targetMarket || 'target market'}`],
-        competitiveAdvantages: ['Unique positioning opportunity', 'Market timing advantage'],
-        vulnerabilities: ['Need to establish market presence', 'Resource constraints vs established players'],
-        differentiationStrategy: `Focus on ${businessInfo.targetMarket || 'specific market segment'} with superior ${businessInfo.businessModel || 'value delivery'}`
-      };
-    }
+         // Add critical sections
+     if (!finalAnalysis.analysis.redFlags) {
+       finalAnalysis.analysis.redFlags = [
+         `${businessInfo.stage || 'Early'} stage companies in ${businessInfo.industry || 'competitive markets'} face high competition and customer acquisition challenges`,
+         'Limited runway and need for external funding creates execution pressure',
+         'Market timing and economic conditions could impact growth trajectory'
+       ];
+     }
 
-    if (!finalAnalysis.analysis.financialProjections) {
-      finalAnalysis.analysis.financialProjections = {
-        revenueScenarios: {
-          conservative: 'Steady growth with market validation',
-          realistic: 'Strong growth with successful execution',
-          optimistic: 'Rapid scaling with market leadership'
-        },
-        keyMetrics: {
-          targetCAC: 'Industry-appropriate customer acquisition cost',
-          targetLTV: 'Sustainable lifetime value ratios',
-          paybackPeriod: 'Efficient capital recovery timeline',
-          grossMargin: 'Healthy margin structure'
-        }
-      };
-    }
+     if (!finalAnalysis.analysis.competitiveThreats) {
+       finalAnalysis.analysis.competitiveThreats = [
+         `Established ${businessInfo.industry || 'industry'} players with deeper pockets and market presence`,
+         'New entrants with better funding or technology advantages',
+         'Market consolidation reducing opportunities for smaller players'
+       ];
+     }
 
-    if (!finalAnalysis.analysis.growthRoadmap) {
-      finalAnalysis.analysis.growthRoadmap = {
-        next30Days: ['Immediate priority actions', 'Quick wins implementation', 'Foundation building'],
-        next90Days: ['Strategic initiatives launch', 'System optimization', 'Market expansion prep'],
-        next12Months: ['Scale operations', 'Market leadership establishment', 'Next funding preparation']
-      };
-    }
+     if (!finalAnalysis.analysis.realityCheck) {
+       finalAnalysis.analysis.realityCheck = `As a ${businessInfo.stage || 'early'}-stage ${businessInfo.industry || 'technology'} company, you face significant challenges including market competition, funding pressure, and execution risks. Success requires exceptional execution and some luck.`;
+     }
 
     return NextResponse.json({ 
       success: true, 
