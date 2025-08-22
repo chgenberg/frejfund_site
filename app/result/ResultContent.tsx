@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import BusinessPlanResult from '../components/BusinessPlanResult';
+import InteractiveBusinessResult from '../components/InteractiveBusinessResult';
 import EnhancedBusinessResult from '../components/EnhancedBusinessResult';
 import { testData } from './testData';
 import { premiumTestData } from './premiumTestData';

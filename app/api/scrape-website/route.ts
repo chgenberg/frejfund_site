@@ -7,11 +7,21 @@ import { JSDOM } from 'jsdom';
 function normalizeUrl(url: string): string {
   if (!url) return '';
   
-  // Remove whitespace
+  // Remove whitespace and common prefixes people might add
+  url = url.trim().toLowerCase();
+  
+  // Fix common typos (comma instead of dot)
+  url = url.replace(/,/g, '.');
+  
+  // Remove common prefixes that aren't protocols
+  url = url.replace(/^(website:|site:|url:)/i, '');
   url = url.trim();
   
-  // If it already has protocol, use as is
-  if (url.startsWith('http://') || url.startsWith('https://')) {
+  // If it already has protocol, use as is (but ensure https)
+  if (url.startsWith('http://')) {
+    return url.replace('http://', 'https://'); // Prefer https
+  }
+  if (url.startsWith('https://')) {
     return url;
   }
   
@@ -20,13 +30,26 @@ function normalizeUrl(url: string): string {
     return `https://${url}`;
   }
   
-  // For bare domains (like "example.com" or "example.se"), add https://
+  // For bare domains, add https://www. for better compatibility
+  if (url.includes('.') && !url.includes('://') && !url.includes('/')) {
+    // Check if it already starts with subdomain
+    const parts = url.split('.');
+    if (parts.length === 2) {
+      // Bare domain like "torget.se" -> "https://www.torget.se"
+      return `https://www.${url}`;
+    } else {
+      // Already has subdomain like "app.example.com" -> "https://app.example.com"
+      return `https://${url}`;
+    }
+  }
+  
+  // Handle URLs with paths
   if (url.includes('.') && !url.includes('://')) {
     return `https://${url}`;
   }
   
-  // Fallback: add https://
-  return `https://${url}`;
+  // Fallback: add https://www.
+  return `https://www.${url}`;
 }
 
 export async function POST(request: Request) {
@@ -157,9 +180,57 @@ export async function POST(request: Request) {
 
     } catch (error: any) {
       console.error('❌ Scraping failed:', error.message);
-      return NextResponse.json({ 
-        error: 'Failed to scrape website: ' + (error.message || 'Unknown error')
-      }, { status: 400 });
+      
+      // Try without www. if the original attempt failed
+      if (targetUrl.includes('www.')) {
+        const fallbackUrl = targetUrl.replace('www.', '');
+        console.log('🔄 Retrying without www:', fallbackUrl);
+        
+        try {
+          const fallbackResponse = await axios.get(fallbackUrl, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            },
+            timeout: 10000,
+            maxRedirects: 5
+          });
+          
+          // Process the fallback response
+          const cleanedHtml = fallbackResponse.data
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+          
+          const dom = new JSDOM(cleanedHtml, { resources: "usable" });
+          const document = dom.window.document;
+          
+          const title = document.querySelector('title')?.textContent?.trim() || '';
+          const headings: string[] = [];
+          document.querySelectorAll('h1, h2, h3').forEach(el => {
+            const text = el.textContent?.trim();
+            if (text && text.length > 5) headings.push(text);
+          });
+          
+          scrapedContent = [title, ...headings.slice(0, 5)].filter(Boolean).join('\n\n');
+          console.log('✅ Fallback scraping successful');
+          
+        } catch (fallbackError) {
+          console.error('❌ Fallback scraping also failed:', fallbackError);
+          return NextResponse.json({ 
+            error: 'Website not accessible',
+            message: 'Could not access the website. Please check the URL and try again.',
+            url: targetUrl,
+            details: error.message || 'Connection failed'
+          }, { status: 400 });
+        }
+      } else {
+        return NextResponse.json({ 
+          error: 'Website not accessible',
+          message: 'Could not access the website. Please check the URL and try again.',
+          url: targetUrl,
+          details: error.message || 'Connection failed'
+        }, { status: 400 });
+      }
     }
 
     if (!scrapedContent || scrapedContent.length < 50) {

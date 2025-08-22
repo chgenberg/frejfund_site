@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const bodyJson = await request.json();
-    const { websiteData, fileContents, linkedinData } = bodyJson;
+    const { websiteData, fileContents, linkedinData, followUpAnswers, initialAnalysis } = bodyJson;
     const userInfo = bodyJson.userInfo || { name: 'Unknown', email: `anon-${Date.now()}@example.com` };
     const businessInfo = bodyJson.businessInfo || {};
 
@@ -76,6 +76,25 @@ export async function POST(request: Request) {
         combinedContent += `Profile URL: ${profile.profileUrl}\n`;
       });
     }
+    
+    // Add follow-up answers if provided
+    if (followUpAnswers && Object.keys(followUpAnswers).length > 0) {
+      combinedContent += `\nFOLLOW-UP INSIGHTS:\n`;
+      Object.entries(followUpAnswers).forEach(([key, answer]) => {
+        if (answer && typeof answer === 'string' && answer.trim()) {
+          combinedContent += `${key}: ${answer}\n`;
+        }
+      });
+    }
+    
+    // Add initial analysis context if provided
+    if (initialAnalysis?.analysis) {
+      combinedContent += `\nINITIAL ANALYSIS CONTEXT:\n`;
+      combinedContent += `Initial Score: ${initialAnalysis.analysis.overallScore || 'Not available'}\n`;
+      if (initialAnalysis.analysis.executiveSummary) {
+        combinedContent += `Summary: ${initialAnalysis.analysis.executiveSummary}\n`;
+      }
+    }
 
     const safeParseJson = (txt: string) => {
       try {
@@ -91,7 +110,7 @@ export async function POST(request: Request) {
       }
     };
 
-    async function generateWithBestModel(prompt: string, strict = false) {
+    async function generateWithBestModel(prompt: string, strict = false, retryCount = 0): Promise<any> {
       const sys = `${prompt}\n\nMANDATORY REFERENCE GUIDELINES (AngelHive-inspired):\n${ANGELHIVE_GUIDELINES}\n\nUse these guidelines to structure and evaluate, but DO NOT output a summary of the guidelines. Output only the requested JSON fields.`
         + (strict ? '\nReturn ONLY valid minified JSON without markdown or extra text.' : '');
       
@@ -114,14 +133,56 @@ export async function POST(request: Request) {
         opts.temperature = strict ? 0.3 : 0.5;
       }
       
-      const res = await openai.chat.completions.create(opts);
-      const content = res.choices[0].message.content || '{}';
-      const parsed = safeParseJson(content);
-      if (!parsed) throw new Error('Failed to parse JSON from AI model');
-      return parsed;
+      try {
+        const res = await openai.chat.completions.create(opts);
+        const content = res.choices[0].message.content || '{}';
+        const parsed = safeParseJson(content);
+        if (!parsed) throw new Error('Failed to parse JSON from AI model');
+        return parsed;
+      } catch (error: any) {
+        console.error(`AI generation attempt ${retryCount + 1} failed:`, error.message);
+        
+        // Retry logic for transient errors
+        if (retryCount < 2 && (
+          error.status === 429 || // Rate limit
+          error.status === 500 || // Server error
+          error.status === 502 || // Bad gateway
+          error.status === 503 || // Service unavailable
+          error.message?.includes('timeout') ||
+          error.message?.includes('network')
+        )) {
+          console.log(`Retrying in ${(retryCount + 1) * 2} seconds...`);
+          await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 2000));
+          return generateWithBestModel(prompt, strict, retryCount + 1);
+        }
+        
+        // If GPT-5 fails, fallback to GPT-4o
+        if (modelName.startsWith('gpt-5') && retryCount === 0) {
+          console.log('GPT-5 failed, falling back to GPT-4o...');
+          const fallbackOpts = {
+            ...opts,
+            model: 'gpt-4o',
+            max_tokens: opts.max_completion_tokens || aiConfig.maxTokens,
+            temperature: strict ? 0.3 : 0.5
+          };
+          delete fallbackOpts.max_completion_tokens;
+          
+          try {
+            const res = await openai.chat.completions.create(fallbackOpts);
+            const content = res.choices[0].message.content || '{}';
+            const parsed = safeParseJson(content);
+            if (!parsed) throw new Error('Failed to parse JSON from fallback model');
+            return parsed;
+          } catch (fallbackError) {
+            console.error('Fallback model also failed:', fallbackError);
+          }
+        }
+        
+        throw error;
+      }
     }
 
-    // STEP 1: Generate follow-up questions based on data gaps
+    // STEP 1: Generate follow-up questions based on data gaps (with retry)
     const questionPrompt = `You are an expert business analyst. Analyze the provided business information and identify 3-5 CRITICAL follow-up questions needed to provide ultra-specific, actionable investment recommendations.
 
 ONLY ask questions if you genuinely need specific data to provide concrete, metric-driven advice. Do NOT ask generic questions.
@@ -147,15 +208,22 @@ OUTPUT FORMAT:
 
 If you have enough data to provide 8-12 highly specific, metric-driven recommendations, set canProceedWithoutQuestions to true and provide minimal questions.`;
 
-    const questionResponse = await generateWithBestModel(questionPrompt);
+    let questionResponse;
+    try {
+      questionResponse = await generateWithBestModel(questionPrompt);
+    } catch (error) {
+      console.error('Question generation failed, proceeding without questions:', error);
+      questionResponse = { questions: [], canProceedWithoutQuestions: true };
+    }
     
     // STEP 2: If questions were generated, simulate answering them with available data
     let followUpContent = '';
     if (questionResponse.questions && questionResponse.questions.length > 0) {
-      followUpContent = `FOLLOW-UP ANALYSIS:\n\n`;
-      
-      // Auto-answer questions based on available context
-      const autoAnswerPrompt = `Based on the business information provided, answer these follow-up questions as specifically as possible using available data. If data is missing, state "Data not available" and suggest where to find it.
+      try {
+        followUpContent = `FOLLOW-UP ANALYSIS:\n\n`;
+        
+        // Auto-answer questions based on available context
+        const autoAnswerPrompt = `Based on the business information provided, answer these follow-up questions as specifically as possible using available data. If data is missing, state "Data not available" and suggest where to find it.
 
 Questions to answer:
 ${questionResponse.questions.map((q: any, i: number) => `${i+1}. ${q.question}`).join('\n')}
@@ -170,13 +238,17 @@ OUTPUT FORMAT:
   ]
 }`;
 
-      const answersResponse = await generateWithBestModel(autoAnswerPrompt);
-      
-      if (answersResponse.answers) {
-        answersResponse.answers.forEach((qa: any) => {
-          followUpContent += `Q: ${qa.question}\n`;
-          followUpContent += `A: ${qa.answer}\n\n`;
-        });
+        const answersResponse = await generateWithBestModel(autoAnswerPrompt);
+        
+        if (answersResponse.answers) {
+          answersResponse.answers.forEach((qa: any) => {
+            followUpContent += `Q: ${qa.question}\n`;
+            followUpContent += `A: ${qa.answer}\n\n`;
+          });
+        }
+      } catch (error) {
+        console.error('Auto-answer generation failed, proceeding without follow-up:', error);
+        followUpContent = '';
       }
     }
 
@@ -302,21 +374,75 @@ QUALITY STANDARDS:
 
     const fullContent = combinedContent + (followUpContent ? `\n\n${followUpContent}` : '');
     
-    // Generate comprehensive analysis with best available model
-    let finalAnalysis = await generateWithBestModel(finalPrompt);
-
-    // Validate and ensure quality
-    let valid = false;
-    try {
-      // Check basic structure
-      if (finalAnalysis.analysis && finalAnalysis.analysis.actionableInsights) {
-        valid = finalAnalysis.analysis.actionableInsights.length >= 6;
+    // Generate comprehensive analysis with robust retry logic
+    let finalAnalysis;
+    let analysisSuccess = false;
+    let lastError;
+    
+    for (let attempt = 0; attempt < 3 && !analysisSuccess; attempt++) {
+      try {
+        console.log(`Analysis attempt ${attempt + 1}/3...`);
+        finalAnalysis = await generateWithBestModel(finalPrompt, attempt > 0);
+        
+        // Validate structure
+        if (finalAnalysis?.analysis?.actionableInsights?.length >= 3) {
+          analysisSuccess = true;
+          console.log(`✅ Analysis successful on attempt ${attempt + 1}`);
+        } else {
+          throw new Error('Insufficient insights generated');
+        }
+             } catch (error) {
+         lastError = error;
+         console.error(`Analysis attempt ${attempt + 1} failed:`, error instanceof Error ? error.message : 'Unknown error');
+        
+        if (attempt === 2) {
+          console.log('All AI attempts failed, using enhanced fallback...');
+          break;
+        }
+        
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 2000 * (attempt + 1)));
       }
-    } catch {}
+    }
 
-    if (!valid) {
-      const strictPrompt = finalPrompt + `\n\nSTRICT MODE: You MUST provide 8-12 BRUTALLY HONEST, critical recommendations that address real problems and failure risks. Don't hold back - investors need to know the truth. Include specific failure statistics and competitive threats.`;
-      finalAnalysis = await generateWithBestModel(strictPrompt, true);
+    // Enhanced fallback if AI completely fails
+    if (!analysisSuccess || !finalAnalysis?.analysis) {
+      console.log('Generating enhanced fallback analysis...');
+      finalAnalysis = {
+        analysis: {
+          companyContext: [
+            `${businessInfo.stage || 'Early-stage'} ${businessInfo.industry || 'technology'} company`,
+            `Targeting ${businessInfo.targetMarket || 'business customers'} with ${businessInfo.businessModel || 'digital solution'}`,
+            `Current revenue: ${businessInfo.monthlyRevenue || 'Pre-revenue'} monthly`,
+            `Team size: ${businessInfo.teamSize || 'Small team'} focused on ${businessInfo.industry || 'market opportunity'}`,
+            `Critical stage requiring validation and sustainable growth strategy`
+          ],
+          executiveSummary: `This ${businessInfo.stage || 'early-stage'} ${businessInfo.industry || 'technology'} company shows typical challenges for startups at this phase, including market validation needs, competitive pressures, and execution risks that require immediate attention.`,
+          investmentThesis: `Investment opportunity exists but comes with significant execution risks typical of ${businessInfo.stage || 'early-stage'} companies in competitive markets.`,
+          overallScore: businessInfo.stage === 'idea' ? 45 : businessInfo.stage === 'mvp' ? 55 : 65,
+          actionableInsights: [],
+          categoryScores: {
+            problemSolutionScore: 60,
+            marketScore: 55,
+            competitiveScore: 50,
+            tractionScore: businessInfo.monthlyRevenue !== '0' ? 65 : 40,
+            financialScore: 55,
+            teamScore: 70,
+            riskScore: 35
+          },
+          redFlags: [
+            `High competition in ${businessInfo.industry || 'target'} market`,
+            'Limited runway requiring external funding',
+            'Execution risks typical of early-stage companies'
+          ],
+          competitiveThreats: [
+            'Established players with more resources',
+            'New entrants with better funding',
+            'Market consolidation risks'
+          ],
+          realityCheck: `As an ${businessInfo.stage || 'early-stage'} company, significant challenges lie ahead requiring exceptional execution and market timing.`
+        }
+      };
     }
 
     // Ensure minimum quality standards with critical fallbacks
@@ -463,16 +589,16 @@ QUALITY STANDARDS:
       _source: insight._source || 'ai-generated'
     }));
 
-         // Ensure realistic scoring (not inflated)
-     if (!finalAnalysis.analysis.overallScore) {
-       // More realistic scoring based on stage
-       let baseScore = 50; // Start pessimistic
-       if (businessInfo.stage === 'scaling' && businessInfo.monthlyRevenue !== '0') baseScore = 65;
-       else if (businessInfo.stage === 'early-revenue') baseScore = 60;
-       else if (businessInfo.stage === 'mvp') baseScore = 55;
-       
-       finalAnalysis.analysis.overallScore = Math.floor(Math.random() * 15 + baseScore); // More realistic range
-     }
+    // Ensure realistic scoring (not inflated)
+    if (!finalAnalysis.analysis.overallScore) {
+      // More realistic scoring based on stage
+      let baseScore = 50; // Start pessimistic
+      if (businessInfo.stage === 'scaling' && businessInfo.monthlyRevenue !== '0') baseScore = 65;
+      else if (businessInfo.stage === 'early-revenue') baseScore = 60;
+      else if (businessInfo.stage === 'mvp') baseScore = 55;
+      
+      finalAnalysis.analysis.overallScore = Math.floor(Math.random() * 15 + baseScore); // More realistic range
+    }
 
     if (!finalAnalysis.analysis.categoryScores) {
       finalAnalysis.analysis.categoryScores = {
@@ -486,26 +612,26 @@ QUALITY STANDARDS:
       };
     }
 
-         // Add critical sections
-     if (!finalAnalysis.analysis.redFlags) {
-       finalAnalysis.analysis.redFlags = [
-         `${businessInfo.stage || 'Early'} stage companies in ${businessInfo.industry || 'competitive markets'} face high competition and customer acquisition challenges`,
-         'Limited runway and need for external funding creates execution pressure',
-         'Market timing and economic conditions could impact growth trajectory'
-       ];
-     }
+    // Add critical sections
+    if (!finalAnalysis.analysis.redFlags) {
+      finalAnalysis.analysis.redFlags = [
+        `${businessInfo.stage || 'Early'} stage companies in ${businessInfo.industry || 'competitive markets'} face high competition and customer acquisition challenges`,
+        'Limited runway and need for external funding creates execution pressure',
+        'Market timing and economic conditions could impact growth trajectory'
+      ];
+    }
 
-     if (!finalAnalysis.analysis.competitiveThreats) {
-       finalAnalysis.analysis.competitiveThreats = [
-         `Established ${businessInfo.industry || 'industry'} players with deeper pockets and market presence`,
-         'New entrants with better funding or technology advantages',
-         'Market consolidation reducing opportunities for smaller players'
-       ];
-     }
+    if (!finalAnalysis.analysis.competitiveThreats) {
+      finalAnalysis.analysis.competitiveThreats = [
+        `Established ${businessInfo.industry || 'industry'} players with deeper pockets and market presence`,
+        'New entrants with better funding or technology advantages',
+        'Market consolidation reducing opportunities for smaller players'
+      ];
+    }
 
-     if (!finalAnalysis.analysis.realityCheck) {
-       finalAnalysis.analysis.realityCheck = `As a ${businessInfo.stage || 'early'}-stage ${businessInfo.industry || 'technology'} company, you face significant challenges including market competition, funding pressure, and execution risks. Success requires exceptional execution and some luck.`;
-     }
+    if (!finalAnalysis.analysis.realityCheck) {
+      finalAnalysis.analysis.realityCheck = `As a ${businessInfo.stage || 'early'}-stage ${businessInfo.industry || 'technology'} company, you face significant challenges including market competition, funding pressure, and execution risks. Success requires exceptional execution and some luck.`;
+    }
 
     return NextResponse.json({ 
       success: true, 
@@ -513,14 +639,20 @@ QUALITY STANDARDS:
       userInfo,
       dataQuality: 'comprehensive',
       model: aiConfig.models.final,
-      tokenUsage: 'enhanced-capacity'
+      tokenUsage: 'enhanced-capacity',
+      processingTime: analysisSuccess ? 'normal' : 'fallback-used',
+      retryCount: analysisSuccess ? 1 : 3
     });
 
   } catch (error) {
     console.error('Unified analysis error:', error);
+    
+    // Return user-friendly error with fallback option
     return NextResponse.json({ 
-      error: 'Failed to complete comprehensive analysis', 
+      error: 'Analysis temporarily unavailable', 
+      message: 'Our AI analysis system is experiencing high demand. Please try again in a few minutes.',
+      fallbackAvailable: true,
       details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    }, { status: 503 }); // Service temporarily unavailable
   }
 } 

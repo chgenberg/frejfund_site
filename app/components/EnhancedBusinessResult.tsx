@@ -428,26 +428,7 @@ export default function EnhancedBusinessResult({ data }: { data: ResultData }) {
           </div>
         )}
 
-        {/* Deep Analysis CTA */}
-        <div className="mt-16 text-center animate-fadeInUp-delay-2">
-          <div className="result-card rounded-3xl p-10 bg-gradient-to-r from-blue-600/10 to-purple-600/10 max-w-2xl mx-auto">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 mb-6 animate-pulse-soft">
-              <span className="text-4xl">🧠</span>
-            </div>
-            <h3 className="text-3xl font-bold text-white mb-4">Want Even More Specific Recommendations?</h3>
-            <p className="text-lg text-gray-400 mb-8">
-              Get ultra-personalized, actionable advice tailored to your exact business situation 
-              <br />Answer 8 focused questions and receive actionable insights worth $1000s.
-            </p>
-            <button 
-              onClick={() => window.location.href = '/deep-analysis-wizard'}
-              className="gradient-button px-10 py-5 text-white font-bold rounded-2xl hover:scale-105 transition-all text-lg inline-flex items-center space-x-3"
-            >
-              <span className="text-2xl">🎯</span>
-              <span>Get Deep Analysis</span>
-            </button>
-          </div>
-        </div>
+
 
         {/* Action Buttons */}
         <div className="mt-8 flex justify-center gap-6 pb-8">

@@ -68,6 +68,10 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [initialAnalysis, setInitialAnalysis] = useState<any>(null);
+  const [followUpQuestions, setFollowUpQuestions] = useState<FollowUpQuestion[]>([]);
+  const [followUpAnswers, setFollowUpAnswers] = useState<Record<string, string>>({});
+  const [isCompletingAnalysis, setIsCompletingAnalysis] = useState(false);
   // Form data
   const [formData, setFormData] = useState({
     name: '',
@@ -106,16 +110,36 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
     }, 1500);
 
     try {
-      // 1. Scrape website if provided
+      // 1. Scrape website if provided (with error handling)
       let websiteData = null;
       if (formData.website) {
-        const normalizedUrl = normalizeUrl(formData.website);
-        const websiteResponse = await fetch('/api/scrape-website', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: normalizedUrl })
-        });
-        websiteData = await websiteResponse.json();
+        try {
+          const normalizedUrl = normalizeUrl(formData.website);
+          const websiteResponse = await fetch('/api/scrape-website', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: normalizedUrl })
+          });
+          
+          if (websiteResponse.ok) {
+            websiteData = await websiteResponse.json();
+          } else {
+            const errorData = await websiteResponse.json();
+            console.warn('Website scraping failed:', errorData.message || errorData.error);
+            websiteData = { 
+              success: false, 
+              error: errorData.message || 'Could not access website',
+              url: normalizedUrl 
+            };
+          }
+        } catch (websiteError) {
+          console.warn('Website scraping error:', websiteError);
+          websiteData = { 
+            success: false, 
+            error: 'Network error accessing website',
+            url: formData.website 
+          };
+        }
       }
 
       // 2. Process uploaded files with error handling
@@ -166,8 +190,8 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         linkedinData = await linkedinResponse.json();
       }
 
-      // 4. UNIFIED COMPREHENSIVE ANALYSIS with GPT-5
-      const analysisResponse = await fetch('/api/unified-analysis', {
+      // 4. Initial analysis to generate follow-up questions
+      const analysisResponse = await fetch('/api/deep-investment-analysis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -190,16 +214,73 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       });
 
       if (!analysisResponse.ok) {
-        throw new Error('Analysis failed');
+        const errorData = await analysisResponse.json();
+        clearInterval(progressInterval);
+        setIsAnalyzing(false);
+        
+        // User-friendly error handling
+        if (analysisResponse.status === 503) {
+          alert('Our AI analysis system is experiencing high demand. Please try again in a few minutes. Your data has been saved.');
+        } else if (analysisResponse.status === 429) {
+          alert('Too many analysis requests. Please wait a moment and try again.');
+        } else {
+          alert('Analysis failed. Please check your internet connection and try again.');
+        }
+        return;
       }
       
       const analysisData = await analysisResponse.json();
       
       clearInterval(progressInterval);
       setAnalysisProgress(100);
+      setIsAnalyzing(false);
       
-      // 5. Save comprehensive analysis to database
-      let analysisId = null;
+      // Store initial analysis and show follow-up questions
+      setInitialAnalysis(analysisData);
+      setFollowUpQuestions(analysisData.followUpQuestions || []);
+      setCurrentStep(3); // Move to follow-up questions step
+      
+    } catch (error) {
+      console.error('Analysis error:', error);
+      clearInterval(progressInterval);
+      setIsAnalyzing(false);
+      alert('An error occurred during analysis. Please try again.');
+    }
+  };
+
+  const handleFinalAnalysis = async () => {
+    setIsCompletingAnalysis(true);
+    
+    try {
+      // Use unified-analysis for the final comprehensive analysis
+      const response = await fetch('/api/unified-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userInfo: {
+            name: formData.name,
+            email: formData.email
+          },
+          businessInfo: {
+            stage: formData.businessStage,
+            industry: formData.industry,
+            targetMarket: formData.targetMarket,
+            businessModel: formData.businessModel,
+            monthlyRevenue: formData.monthlyRevenue,
+            teamSize: formData.teamSize
+          },
+          followUpAnswers,
+          initialAnalysis
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Analysis failed');
+      }
+
+      const finalData = await response.json();
+      
+      // Save to database
       try {
         const saveRes = await fetch('/api/analyses', {
           method: 'POST',
@@ -207,47 +288,40 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
           body: JSON.stringify({
             companyName: formData.name || 'Unknown Company',
             industry: formData.industry || 'Unknown',
-            score: analysisData.analysis?.overallScore || 75,
+            score: finalData.analysis?.overallScore || 75,
             answers: {
               ...formData,
-              websiteData: websiteData?.success ? websiteData.data : null,
-              linkedinData: linkedinData?.success ? linkedinData.data : null,
-              fileContents
+              followUpAnswers
             },
-            insights: analysisData.analysis?.actionableInsights || [],
-            dataQualityScore: computeDataQualityScore(formData, websiteData, linkedinData, fileContents),
-            comprehensiveAnalysis: analysisData.analysis,
+            insights: finalData.analysis?.actionableInsights || [],
+            comprehensiveAnalysis: finalData.analysis,
             model: 'gpt-5'
           })
         });
 
         if (saveRes.ok) {
           const analysis = await saveRes.json();
-          analysisId = analysis.id;
-          localStorage.setItem('currentAnalysisId', analysisId);
-          console.log('✅ Comprehensive analysis saved to database with ID:', analysisId);
+          localStorage.setItem('currentAnalysisId', analysis.id);
         }
       } catch (error) {
-        console.warn('⚠️ Database save failed, continuing with localStorage only:', error);
+        console.warn('Database save failed:', error);
       }
       
-      // Transform to enhanced result format and go directly to results
-      const transformedData = transformAnalysisToEnhancedFormat(analysisData);
+      // Transform and navigate to results
+      const transformedData = transformAnalysisToEnhancedFormat(finalData);
       localStorage.setItem('latestAnalysisResult', JSON.stringify(transformedData));
       
-      // Go directly to results - no follow-up questions
-      const storedAnalysisId = localStorage.getItem('currentAnalysisId') || analysisId;
-      if (storedAnalysisId) {
-        window.location.href = `/result/${storedAnalysisId}`;
+      const analysisId = localStorage.getItem('currentAnalysisId');
+      if (analysisId) {
+        window.location.href = `/result/${analysisId}`;
       } else {
         window.location.href = '/result';
       }
       
     } catch (error) {
-      console.error('Analysis error:', error);
-      clearInterval(progressInterval);
-      setIsAnalyzing(false);
-      alert('An error occurred during analysis. Please try again.');
+      console.error('Final analysis error:', error);
+      setIsCompletingAnalysis(false);
+      alert('Failed to complete analysis. Please try again.');
     }
   };
 
@@ -314,8 +388,14 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         }
       },
       actionableInsights: analysis.actionableInsights || [],
-      executiveSummary: analysis.executiveSummary,
-      investmentThesis: analysis.investmentThesis,
+      analysis: {
+        executiveSummary: analysis.executiveSummary,
+        investmentThesis: analysis.investmentThesis,
+        marketOpportunity: analysis.marketOpportunity,
+        redFlags: analysis.redFlags || [],
+        competitiveThreats: analysis.competitiveThreats || [],
+        realityCheck: analysis.realityCheck
+      },
       answers: {
         customer_problem: analysis.customerPain || "Customer problem analysis",
         solution: analysis.solution || "Solution description", 
@@ -729,12 +809,85 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
       
       <h3 className="text-2xl font-semibold text-white mb-2">GPT-5 is analyzing your business... 🧠</h3>
       <p className="text-gray-400">Advanced AI creating comprehensive investment analysis</p>
+      <div className="mt-4 text-center">
+        <div className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-500/10 rounded-full border border-blue-500/20">
+          <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+          <span className="text-sm text-blue-300">
+            {analysisProgress < 30 ? 'Gathering business data...' :
+             analysisProgress < 60 ? 'Running AI analysis...' :
+             analysisProgress < 85 ? 'Generating insights...' :
+             'Finalizing results...'}
+          </span>
+        </div>
+        <p className="text-xs text-gray-500 mt-2">
+          GPT-5 analysis takes 60-90 seconds for maximum quality
+        </p>
+      </div>
     </div>
   );
 
-  // Completion step removed - going directly to comprehensive results
+  const renderFollowUp = () => (
+    <div className="space-y-6 animate-fadeIn">
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4 floating-icon">
+          <FaLightbulb className="text-white text-2xl" />
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">Almost There!</h2>
+        <p className="text-gray-400">A few targeted questions to maximize your analysis quality</p>
+      </div>
 
-  // Follow-up step removed - going directly to comprehensive results
+      <div className="space-y-4">
+        {followUpQuestions.map((question, index) => (
+          <div key={question.id} className="group">
+            <label className="block text-sm font-medium text-gray-300 mb-2 group-hover:text-white transition-colors">
+              {index + 1}. {question.title}
+              {question.subtitle && <span className="text-gray-500 block text-xs mt-1">{question.subtitle}</span>}
+            </label>
+            <textarea
+              value={followUpAnswers[question.id] || ''}
+              onChange={(e) => setFollowUpAnswers(prev => ({ ...prev, [question.id]: e.target.value }))}
+              className="modern-input w-full px-4 py-3 rounded-2xl text-white placeholder-gray-500 outline-none resize-none"
+              placeholder={question.placeholder || 'Your answer...'}
+              rows={3}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className="flex space-x-4 mt-8">
+        <button
+          onClick={() => setCurrentStep(2)}
+          className="flex-1 py-4 px-6 wizard-card rounded-2xl text-white font-semibold hover:bg-gray-800 transition-all"
+        >
+          ← Back
+        </button>
+        <button
+          onClick={handleFinalAnalysis}
+          className="gradient-button flex-1 py-4 px-6 text-white font-semibold rounded-2xl transition-all flex items-center justify-center space-x-2"
+        >
+          <FaRocket className="text-lg" />
+          <span>Complete Analysis</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderCompletingAnalysis = () => (
+    <div className="text-center py-12 animate-fadeIn">
+      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 mb-8 floating-icon">
+        <FaStar className="text-white text-3xl" />
+      </div>
+      
+      <h2 className="text-2xl font-bold text-white mb-4">Finalizing Your Analysis</h2>
+      <p className="text-gray-400 mb-8">GPT-5 is generating your comprehensive investment report...</p>
+      
+      <div className="w-16 h-16 mx-auto">
+        <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500/30 border-t-purple-500"></div>
+      </div>
+      
+      <p className="text-sm text-purple-400 mt-6">This may take 60-90 seconds for maximum quality</p>
+    </div>
+  );
 
   if (!open) return null;
 
@@ -750,7 +903,7 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
         <div className="absolute top-0 left-0 right-0 h-1 bg-gray-800">
           <div 
             className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
-            style={{ width: `${(currentStep / 2) * 100}%` }}
+            style={{ width: `${(currentStep / 3) * 100}%` }}
           />
         </div>
         
@@ -762,9 +915,11 @@ export default function SimplifiedBusinessWizard({ open, onClose }: SimplifiedBu
             <FaTimes className="w-5 h-5" />
           </button>
 
-          {isAnalyzing ? renderAnalyzing() : (
+          {isAnalyzing ? renderAnalyzing() : 
+           isCompletingAnalysis ? renderCompletingAnalysis() : (
             currentStep === 1 ? renderStep1() :
-            renderStep2()
+            currentStep === 2 ? renderStep2() :
+            renderFollowUp()
           )}
         </div>
       </div>
