@@ -220,3 +220,86 @@ Notes:
   - final: gpt-5
   - ultra: gpt-5
   - general: gpt-5-mini 
+
+
+SECTION 4 — BOX-STYLE ASCII DIAGRAM
+------------------------------------
+
++-------------------------------+
+| User Inputs                   |
+| - Wizard (website, files,     |
+|   LinkedIn, business info)    |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| API: /api/deep-investment-    |
+| analysis (model: gpt-5-mini)  |
+| - Builds combinedContent      |
+| - Returns initialAnalysis +   |
+|   followUpQuestions           |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Global Session (server)       |
+| analysisContext[email] = {    |
+|  initialAnalysis,             |
+|  followUpQuestions,           |
+|  combinedContent, userInfo    |
+| }                             |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Frontend collects             |
+| followUpAnswers               |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| API: /api/complete-analysis   |
+| (model: gpt-5)                |
+| - System: basePrompt +        |
+|   AngelHive-inspired          |
+|   guidelines                  |
+| - User: combinedContent,      |
+|   initialAnalysis,            |
+|   followUp Q/A                |
+| - Validate JSON (Zod)         |
+| - Ensure 3–6 actionable       |
+|   insights (tag _source)      |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Response                      |
+| { success, analysis,          |
+|   userInfo }                  |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Frontend Store                |
+| localStorage.latestAnalysis   |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| /result (client page)         |
+| - Load latestAnalysis         |
+| - If categories present →     |
+|   EnhancedBusinessResult      |
+| - Else → BusinessPlanResult   |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| EnhancedBusinessResult        |
+| - Overall score (gauge)       |
+| - Category grid (9 cards)     |
+| - Active category details     |
+| - ActionableInsights list     |
+| - Deep Analysis CTA           |
+| - Investor referral modal     |
++-------------------------------+ 
