@@ -8,13 +8,12 @@ import {
   ChartBarIcon, 
   LightBulbIcon, 
   ExclamationTriangleIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   UserGroupIcon,
   CurrencyDollarIcon,
   ShieldCheckIcon,
   SparklesIcon,
   DocumentTextIcon,
-  ArrowTrendingUpIcon,
   BanknotesIcon,
   FireIcon
 } from '@heroicons/react/24/outline';
@@ -62,7 +61,7 @@ interface ResultData {
 const tabs = [
   { id: 'overview', label: 'Overview', icon: ChartBarIcon },
   { id: 'insights', label: 'Action Plan', icon: LightBulbIcon },
-  { id: 'scores', label: 'Score Breakdown', icon: TrendingUpIcon },
+  { id: 'scores', label: 'Score Breakdown', icon: ArrowTrendingUpIcon },
   { id: 'risks', label: 'Risks & Reality Check', icon: ExclamationTriangleIcon },
   { id: 'financials', label: 'Financial Analysis', icon: CurrencyDollarIcon },
 ];
@@ -501,7 +500,7 @@ export default function InteractiveBusinessResult({ data, userInfo }: { data: Re
                 {data.analysis?.marketOpportunity && (
                   <div className="wizard-card p-6 rounded-2xl">
                     <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                      <TrendingUpIcon className="w-6 h-6 text-purple-400" />
+                      <ArrowTrendingUpIcon className="w-6 h-6 text-purple-400" />
                       Market Opportunity
                     </h3>
                     <p className="text-gray-300 leading-relaxed">{data.analysis.marketOpportunity}</p>
