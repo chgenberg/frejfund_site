@@ -1,0 +1,222 @@
+==============================
+Result Page: Prompt & Structure (August 2025)
+==============================
+
+This document exports the current prompt used to generate the final result (resultatsidan) and describes how the result page is built, including an ASCII flow/schema.
+
+
+SECTION 1 — Complete Analysis Prompt (server)
+---------------------------------------------
+File: app/api/complete-analysis/route.ts
+
+Model used via aiConfig: aiConfig.models.final (default: gpt-5)
+Temperature: aiConfig.temperature.final (default: 0.5)
+Max tokens cap: aiConfig.maxTokens (default: 6000)
+
+System message composition:
+- Base prompt (see below)
+- Appended guidelines block:
+  "MANDATORY REFERENCE GUIDELINES (AngelHive-inspired):\n${ANGELHIVE_GUIDELINES}\n\nUse these guidelines to structure and evaluate, but DO NOT output a summary of the guidelines. Output only the requested JSON fields."
+- When strict retry is used, an additional sentence is appended:
+  "Return ONLY valid minified JSON without markdown or extra text."
+
+User message composition:
+"Initial Analysis Context:\n${context.combinedContent}\n\nInitial Analysis Results:\n${JSON.stringify(context.initialAnalysis, null, 2)}\n\n${followUpContent}"
+- followUpContent is built from client provided follow-up answers, resolved against the follow-up question titles.
+
+Validation:
+- Validated with Zod (finalAnalysisSchema)
+- Must include >= 3 actionable insights, else a strict retry is attempted, else fallback insights are injected
+- Insights are tagged with _source: 'ai-generated' or 'fallback'
+
+Exact Base Prompt:
+------------------
+You are an expert investment analyst. You have already performed an initial analysis and asked follow-up questions. Now complete your comprehensive investment assessment using all available information.
+
+Before analysis, briefly restate a 5-bullet "Company context" using stage, industry, target market, business model, revenue, team. Keep it concise.
+
+CRITICAL REQUIREMENT FOR PERSONALIZED ACTIONABLE INSIGHTS:
+You MUST generate 4-6 SPECIFIC, TAILORED actionable insights based on THIS EXACT COMPANY'S situation. 
+
+FORBIDDEN - DO NOT use generic advice like:
+- "Quantify customer pain in monetary terms"
+- "Build strategic partnerships early" 
+- "Strengthen your competitive moat"
+- "Implement data-driven growth tracking"
+- Any advice that could apply to any company without referencing this company's specifics
+
+REQUIRED - Generate insights that are:
+1. SPECIFIC to their industry/business model mentioned
+2. REFERENCE their actual target customers described
+3. USE their specific challenges/opportunities identified  
+4. MENTION their actual product/service details
+5. TAILORED to their current stage and context
+6. INCLUDE specific numbers/metrics relevant to their situation
+7. CITE brief snippets from website/docs when used (e.g., "from website: ...")
+
+IF SaaS with revenue > 0 → include churn, CAC, LTV, payback, expansion. If e‑commerce → CRO metrics and concrete tests. If marketplace → supply/demand tactics and loop design. If idea/MVP → validation plan with timelines and success thresholds.
+
+OUTPUT FORMAT STRICTLY:
+{
+  "analysis": {
+    "executiveSummary": string,
+    "investmentThesis": string,
+    "marketOpportunity": string,
+    "customerPain": string,
+    "solution": string,
+    "competitivePosition": string,
+    "teamAssessment": string,
+    "financialAnalysis": string,
+    "riskAssessment": string,
+    "growthStrategy": string,
+    "fundingAnalysis": string,
+    "actionableInsights": [
+      {
+        "title": string,
+        "impact": "high" | "medium" | "low",
+        "timeframe": string,
+        "description": string,
+        "implementation": [string],
+        "expectedResult": string,
+        "investorPerspective": string,
+        "_source": "ai-generated"
+      }
+    ]
+  }
+}
+
+Strict retry addendum (on failure):
+"STRICT MODE: If some details are missing, make reasonable assumptions and STILL provide 4-6 concrete, immediately actionable recommendations with steps, tools, metrics and expected outcomes."
+
+
+SECTION 2 — Result Page Structure (frontend)
+--------------------------------------------
+Entry page:
+- File: app/result/page.tsx
+- Dynamically imports ResultContent with SSR disabled to ensure client-only rendering.
+
+Main container:
+- File: app/result/ResultContent.tsx
+- Loads result data in this order:
+  1) Query param id (placeholder, not currently pulling from backend here)
+  2) localStorage key: 'latestAnalysisResult'
+  3) If none, shows a button to load test data (for dev)
+- Decides between two render paths:
+  - EnhancedBusinessResult (new enhanced structure) when resultData.categories and resultData.overallScore exist
+  - BusinessPlanResult (legacy) otherwise
+
+Enhanced result component:
+- File: app/components/EnhancedBusinessResult.tsx
+- Expects shape:
+  {
+    overallScore: number,
+    categories: {
+      problemSolution: { score, label, description, metrics?, insights? },
+      marketTiming: {...},
+      moatCompetition: {...},
+      tractionKpi: {...},
+      unitEconomics: {...},
+      teamExecution: {...},
+      financialHealth: {...},
+      riskCompliance: {...},
+      storytellingDeck: {...}
+    },
+    actionableInsights?: ActionableInsight[]
+  }
+
+- ActionableInsight:
+  {
+    title: string,
+    impact: 'high' | 'medium' | 'low',
+    timeframe: string,
+    description: string,
+    implementation: string[],
+    expectedResult: string,
+    investorPerspective: string,
+    _source?: 'ai-generated' | 'fallback' | 'contextual-fallback'
+  }
+
+- Layout overview:
+  - Header: Circular overall score with label (Investor Ready / Strong Potential / ...)
+  - Category Grid: 9 category cards with individual scores
+  - Active Category Details: description + optional metrics grid + textual AI insights
+  - Actionable Insights Section: full-width list rendered by ActionableInsights component
+  - Deep Analysis CTA: button linking to /deep-analysis-wizard
+  - Action Buttons: (Download Report / Share Results)
+  - Investor Referral Modal: auto-shown if overallScore ≥ 80 (opt-in to share with investor networks)
+
+Actionable insights renderer:
+- File: app/components/ActionableInsights.tsx
+- Renders each insight card with a badge if _source is 'fallback' (General advice) or 'ai-generated' (AI-personalized)
+
+Legacy result component (fallback):
+- File: app/components/BusinessPlanResult.tsx (not detailed here, only used if enhanced structure missing)
+
+
+SECTION 3 — ASCII Flow / Schema
+--------------------------------
+High-level data and UI flow:
+
+[User inputs] 
+   │
+   ├─> /api/deep-investment-analysis (POST)
+   │     - Model: aiConfig.models.deep (default: gpt-5-mini)
+   │     - Produces: initialAnalysis + (optional) followUpQuestions
+   │     - Stores in global: analysisContext[userEmail] = { initialAnalysis, followUpQuestions, combinedContent, userInfo }
+   │
+   ├─> Frontend collects follow-up answers (SimplifiedBusinessWizard)
+   │
+   ├─> /api/complete-analysis (POST)
+   │     - Model: aiConfig.models.final (default: gpt-5)
+   │     - System: Base Prompt + AngelHive-inspired guidelines
+   │     - User: combinedContent + initialAnalysis + followUp Q/A
+   │     - Validates JSON → ensures 3–6 actionableInsights
+   │     - Tags insights with _source ('ai-generated' or 'fallback')
+   │     - Returns { success, analysis, userInfo }
+   │
+   ├─> Frontend transforms/saves
+   │     - Stores result locally under 'latestAnalysisResult'
+   │     - Optionally updates /api/analyses/:id with ultraDeepAnalysis
+   │
+   └─> /result (client page)
+         - Loads 'latestAnalysisResult' from localStorage
+         - If enhanced shape → EnhancedBusinessResult
+         - Else → BusinessPlanResult (legacy)
+
+Data shape (final analysis — used by UI):
+{
+  analysis: {
+    executiveSummary: string,
+    investmentThesis: string,
+    marketOpportunity: string,
+    customerPain: string,
+    solution: string,
+    competitivePosition: string,
+    teamAssessment: string,
+    financialAnalysis: string,
+    riskAssessment: string,
+    growthStrategy: string,
+    fundingAnalysis: string,
+    actionableInsights: ActionableInsight[]
+  }
+}
+
+ActionableInsight:
+{
+  title: string,
+  impact: 'high' | 'medium' | 'low',
+  timeframe: string,
+  description: string,
+  implementation: string[],
+  expectedResult: string,
+  investorPerspective: string,
+  _source?: 'ai-generated' | 'fallback' | 'contextual-fallback'
+}
+
+Notes:
+- Guidelines used are embedded from app/api/_utils/angelhive_static.ts (AngelHive-inspired distilled framework)
+- Current defaults (aiConfig):
+  - deep: gpt-5-mini
+  - final: gpt-5
+  - ultra: gpt-5
+  - general: gpt-5-mini 
