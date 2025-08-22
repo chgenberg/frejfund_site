@@ -55,7 +55,7 @@ function normalizeUrl(url: string): string {
 export async function POST(request: Request) {
   try {
     // Check for API key before instantiating OpenAI client
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('5vcA')) {
       return NextResponse.json({ 
         success: false,
         error: 'OpenAI API key not configured (local dev mode)',
