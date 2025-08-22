@@ -14,7 +14,7 @@ export const aiConfig = {
   maxTokens: (() => {
     const raw = process.env.AI_MAX_TOKENS;
     const parsed = raw && /^\d+$/.test(raw) ? parseInt(raw, 10) : undefined;
-    const val = typeof parsed === 'number' && isFinite(parsed) && parsed > 0 ? parsed : 6000;
-    return Math.min(16000, val);
+    const val = typeof parsed === 'number' && isFinite(parsed) && parsed > 0 ? parsed : 15000;
+    return Math.min(32000, val);
   })()
 }; 

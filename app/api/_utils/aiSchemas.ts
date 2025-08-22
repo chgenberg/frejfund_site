@@ -10,6 +10,10 @@ export const actionableInsightSchema = z.object({
   investorPerspective: z.string().optional(),
   evidenceSource: z.string().optional(),
   targetMetric: z.string().optional(),
+  industryBenchmark: z.string().optional(),
+  toolsRequired: z.array(z.string()).optional(),
+  potentialPitfalls: z.array(z.string()).optional(),
+  successIndicators: z.array(z.string()).optional(),
   _source: z.string().optional()
 });
 
@@ -92,6 +96,30 @@ export const finalAnalysisSchema = z.object({
       financialScore: z.number().optional(),
       teamScore: z.number().optional(),
       riskScore: z.number().optional()
+    }).optional(),
+    competitiveAnalysis: z.object({
+      mainCompetitors: z.array(z.string()).optional(),
+      competitiveAdvantages: z.array(z.string()).optional(),
+      vulnerabilities: z.array(z.string()).optional(),
+      differentiationStrategy: z.string().optional()
+    }).optional(),
+    financialProjections: z.object({
+      revenueScenarios: z.object({
+        conservative: z.string().optional(),
+        realistic: z.string().optional(),
+        optimistic: z.string().optional()
+      }).optional(),
+      keyMetrics: z.object({
+        targetCAC: z.string().optional(),
+        targetLTV: z.string().optional(),
+        paybackPeriod: z.string().optional(),
+        grossMargin: z.string().optional()
+      }).optional()
+    }).optional(),
+    growthRoadmap: z.object({
+      next30Days: z.array(z.string()).optional(),
+      next90Days: z.array(z.string()).optional(),
+      next12Months: z.array(z.string()).optional()
     }).optional()
   })
 });

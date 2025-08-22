@@ -102,7 +102,7 @@ export async function POST(request: Request) {
           { role: 'user', content: combinedContent }
         ],
         temperature: strict ? 0.3 : 0.5,
-        max_tokens: 8000,
+        max_tokens: aiConfig.maxTokens, // Now 15000
         response_format: { type: "json_object" } // Ensure JSON output
       };
       
@@ -137,7 +137,7 @@ OUTPUT FORMAT:
   "canProceedWithoutQuestions": boolean
 }
 
-If you have enough data to provide 4-6 highly specific, metric-driven recommendations, set canProceedWithoutQuestions to true and provide minimal questions.`;
+If you have enough data to provide 8-12 highly specific, metric-driven recommendations, set canProceedWithoutQuestions to true and provide minimal questions.`;
 
     const questionResponse = await generateWithGPT5(questionPrompt);
     
@@ -172,73 +172,106 @@ OUTPUT FORMAT:
       }
     }
 
-    // STEP 3: Generate comprehensive final analysis
-    const finalPrompt = `You are an expert investment analyst. Perform a COMPREHENSIVE investment assessment using ALL available information.
+    // STEP 3: Generate comprehensive final analysis with expanded capacity
+    const finalPrompt = `You are an expert investment analyst with 15+ years experience in early-stage startups. Perform a COMPREHENSIVE, DETAILED investment assessment using ALL available information. You have extensive space to provide maximum value.
 
 CRITICAL REQUIREMENTS:
 
 1. **COMPANY CONTEXT**: Start with 5-bullet company overview (stage, industry, target market, business model, revenue, team)
 
-2. **EVIDENCE-BASED INSIGHTS**: Generate 5-7 SPECIFIC, TAILORED actionable insights that:
-   - REFERENCE specific details from their website/docs/data (cite with "from website: ..." or "from docs: ...")
+2. **ULTRA-DETAILED ACTIONABLE INSIGHTS**: Generate 8-12 SPECIFIC, TAILORED actionable insights that:
+   - REFERENCE specific details from their website/docs/data (cite extensively with "from website: ..." or "from docs: ...")
    - INCLUDE concrete numbers, metrics, and targets relevant to their situation
    - MENTION their actual industry, stage, customers, and business model specifics
-   - PROVIDE step-by-step implementation with tools, owners, and timeframes
-   - SHOW clear ROI/impact with measurable outcomes
+   - PROVIDE comprehensive step-by-step implementation with specific tools, owners, and detailed timeframes
+   - SHOW clear ROI/impact with measurable outcomes and industry benchmarks
+   - INCLUDE real examples from similar companies or industry best practices
+   - PROVIDE detailed rationale for why this specific action matters for their exact situation
 
-3. **INDUSTRY-SPECIFIC DEPTH**:
-   - SaaS: Include churn, CAC, LTV, payback, expansion metrics and tactics
-   - E-commerce: CRO metrics, AOV, inventory turns, conversion optimization
-   - Marketplace: Supply/demand balance, take rate, liquidity metrics
-   - Idea/MVP: Validation plan with interview targets and success criteria
+3. **INDUSTRY-SPECIFIC DEEP DIVE**:
+   - SaaS: Detailed churn analysis, CAC optimization by channel, LTV improvement tactics, expansion revenue playbooks, customer success frameworks
+   - E-commerce: Comprehensive CRO strategy, AOV optimization tactics, inventory management, conversion funnel analysis, retention programs
+   - Marketplace: Supply/demand growth loops, take rate optimization, liquidity strategies, network effects, chicken-egg solutions
+   - Idea/MVP: Detailed validation framework, interview scripts, success criteria, pivot triggers, MVP feature prioritization
 
-4. **FORBIDDEN GENERICS** - DO NOT use:
-   - "Build strategic partnerships"
-   - "Strengthen competitive moat" 
-   - "Implement data-driven tracking"
-   - Any advice applicable to any company
+4. **COMPREHENSIVE COMPETITIVE INTELLIGENCE**:
+   - Identify and analyze 3-5 specific competitors
+   - Detailed competitive positioning strategy
+   - Specific differentiation tactics with proof points
+   - Competitive pricing analysis and recommendations
 
-5. **MANDATORY SECTIONS**:
-   - Executive Summary (2-3 sentences)
-   - Investment Thesis (why invest now)
-   - Market Opportunity (TAM/SAM with specifics)
-   - Competitive Position (vs named competitors)
-   - Team Assessment (founder-market fit)
-   - Financial Analysis (unit economics, runway)
-   - Risk Assessment (top 3 risks + mitigation)
-   - Growth Strategy (next 12 months)
-   - Funding Analysis (amount needed, use of funds)
+5. **DETAILED FINANCIAL MODELING**:
+   - Unit economics breakdown with improvement levers
+   - Revenue projection scenarios (conservative, realistic, optimistic)
+   - Cost structure optimization recommendations
+   - Funding requirements with detailed use of proceeds
+
+6. **RISK MITIGATION PLAYBOOK**:
+   - Identify 5-7 specific risks with probability and impact assessment
+   - Detailed mitigation strategies for each risk
+   - Early warning indicators and trigger points
+   - Contingency plans
+
+7. **GO-TO-MARKET MASTERPLAN**:
+   - Customer acquisition strategy by channel with expected CAC
+   - Sales process optimization with conversion targets
+   - Marketing strategy with specific tactics and budgets
+   - Partnership and business development opportunities
+
+8. **OPERATIONAL EXCELLENCE ROADMAP**:
+   - Team scaling plan with specific roles and timelines
+   - Technology and infrastructure requirements
+   - Process optimization opportunities
+   - Key performance indicators and tracking systems
+
+FORBIDDEN GENERICS (ABSOLUTELY DO NOT USE):
+- "Build strategic partnerships"
+- "Strengthen competitive moat" 
+- "Implement data-driven tracking"
+- "Focus on customer acquisition"
+- "Improve unit economics"
+- Any advice applicable to any company without specific reference to their situation
+
+EVIDENCE REQUIREMENTS:
+- Every insight must cite specific sources from their provided data
+- Include industry statistics and benchmarks where relevant
+- Reference similar companies' success stories
+- Provide concrete examples and case studies
 
 OUTPUT FORMAT STRICTLY:
 {
   "analysis": {
-    "companyContext": [string], // 5 bullets
-    "executiveSummary": string,
-    "investmentThesis": string,
-    "marketOpportunity": string,
-    "customerPain": string,
-    "solution": string,
-    "competitivePosition": string,
-    "teamAssessment": string,
-    "financialAnalysis": string,
-    "riskAssessment": string,
-    "growthStrategy": string,
-    "fundingAnalysis": string,
+    "companyContext": [string], // 5 detailed bullets about their specific situation
+    "executiveSummary": string, // 3-4 comprehensive sentences
+    "investmentThesis": string, // Detailed investment case with specifics
+    "marketOpportunity": string, // Comprehensive market analysis with TAM/SAM
+    "customerPain": string, // Detailed pain point analysis with quantification
+    "solution": string, // Comprehensive solution analysis with differentiation
+    "competitivePosition": string, // Detailed competitive analysis with named competitors
+    "teamAssessment": string, // Comprehensive team analysis including founder-market fit
+    "financialAnalysis": string, // Detailed financial analysis with projections
+    "riskAssessment": string, // Comprehensive risk analysis with mitigation strategies
+    "growthStrategy": string, // Detailed 12-month growth plan
+    "fundingAnalysis": string, // Comprehensive funding strategy and use of proceeds
     "actionableInsights": [
       {
-        "title": string,
+        "title": string, // Specific, actionable title
         "impact": "high" | "medium" | "low",
-        "timeframe": string,
-        "description": string,
-        "implementation": [string],
-        "expectedResult": string,
-        "investorPerspective": string,
-        "evidenceSource": string, // What data this is based on
-        "targetMetric": string, // Specific goal/KPI to achieve
+        "timeframe": string, // Specific timeframe (e.g., "2-3 weeks", "30 days")
+        "description": string, // Detailed description of the challenge/opportunity
+        "implementation": [string], // 5-8 detailed implementation steps with specific tools and methods
+        "expectedResult": string, // Detailed expected outcome with specific metrics
+        "investorPerspective": string, // Why investors care about this specific action
+        "evidenceSource": string, // Specific source from their data that supports this recommendation
+        "targetMetric": string, // Specific measurable goal (e.g., "Increase conversion from 2% to 5%")
+        "industryBenchmark": string, // Relevant industry benchmark or best practice
+        "toolsRequired": [string], // Specific tools, software, or resources needed
+        "potentialPitfalls": [string], // 2-3 common mistakes to avoid
+        "successIndicators": [string], // 2-3 early signals that this is working
         "_source": "ai-generated"
       }
     ],
-    "overallScore": number,
+    "overallScore": number, // 0-100 based on comprehensive analysis
     "categoryScores": {
       "problemSolutionScore": number,
       "marketScore": number,
@@ -247,9 +280,40 @@ OUTPUT FORMAT STRICTLY:
       "financialScore": number,
       "teamScore": number,
       "riskScore": number
+    },
+    "competitiveAnalysis": {
+      "mainCompetitors": [string], // 3-5 specific competitor names
+      "competitiveAdvantages": [string], // 3-5 specific advantages they have
+      "vulnerabilities": [string], // 2-3 areas where competitors are stronger
+      "differentiationStrategy": string // Detailed strategy to stand out
+    },
+    "financialProjections": {
+      "revenueScenarios": {
+        "conservative": string,
+        "realistic": string, 
+        "optimistic": string
+      },
+      "keyMetrics": {
+        "targetCAC": string,
+        "targetLTV": string,
+        "paybackPeriod": string,
+        "grossMargin": string
+      }
+    },
+    "growthRoadmap": {
+      "next30Days": [string], // 3-5 immediate actions
+      "next90Days": [string], // 3-5 short-term goals  
+      "next12Months": [string] // 3-5 long-term objectives
     }
   }
-}`;
+}
+
+QUALITY STANDARDS:
+- Each actionable insight should be 200-400 words of detailed, specific guidance
+- Include real industry examples and case studies where possible
+- Provide specific tools, methodologies, and frameworks
+- Reference actual metrics and benchmarks from their industry
+- Make every recommendation immediately implementable with clear success criteria`;
 
     const fullContent = combinedContent + (followUpContent ? `\n\n${followUpContent}` : '');
     
@@ -261,93 +325,159 @@ OUTPUT FORMAT STRICTLY:
     try {
       // Check basic structure
       if (finalAnalysis.analysis && finalAnalysis.analysis.actionableInsights) {
-        valid = finalAnalysis.analysis.actionableInsights.length >= 4;
+        valid = finalAnalysis.analysis.actionableInsights.length >= 6;
       }
     } catch {}
 
     if (!valid) {
-      const strictPrompt = finalPrompt + `\n\nSTRICT MODE: You MUST provide 5-7 concrete, immediately actionable recommendations with specific steps, tools, metrics, and expected outcomes. Make reasonable assumptions if some data is missing.`;
+      const strictPrompt = finalPrompt + `\n\nSTRICT MODE: You MUST provide 8-12 concrete, immediately actionable recommendations with detailed implementation plans, specific tools, metrics, and expected outcomes. Use the full token capacity to provide maximum value. Make reasonable assumptions if some data is missing but base recommendations on available evidence.`;
       finalAnalysis = await generateWithGPT5(strictPrompt, true);
     }
 
-    // Ensure minimum quality standards
+    // Ensure minimum quality standards with enhanced fallbacks
     if (!finalAnalysis.analysis) {
       finalAnalysis.analysis = {};
     }
     
-    if (!finalAnalysis.analysis.actionableInsights || finalAnalysis.analysis.actionableInsights.length < 4) {
+    if (!finalAnalysis.analysis.actionableInsights || finalAnalysis.analysis.actionableInsights.length < 6) {
       finalAnalysis.analysis.actionableInsights = finalAnalysis.analysis.actionableInsights || [];
       
-      // Add high-quality fallbacks based on business info
+      // Add comprehensive fallbacks based on business info
       const stage = businessInfo.stage || 'unknown';
       const industry = businessInfo.industry || 'unknown';
+      const revenue = businessInfo.monthlyRevenue || '0';
       
-      while (finalAnalysis.analysis.actionableInsights.length < 5) {
-        if (stage === 'idea') {
+      while (finalAnalysis.analysis.actionableInsights.length < 8) {
+        if (stage === 'idea' && finalAnalysis.analysis.actionableInsights.length === 0) {
           finalAnalysis.analysis.actionableInsights.push({
-            title: `Validate ${industry} market demand with 20 customer interviews`,
+            title: `Execute comprehensive ${industry} market validation program`,
             impact: 'high',
-            timeframe: '3-4 weeks',
-            description: `As an ${stage}-stage ${industry} company, you need concrete validation before building.`,
+            timeframe: '4-6 weeks',
+            description: `As an idea-stage ${industry} company, you need systematic validation before building to avoid the 70% failure rate of startups that skip this step.`,
             implementation: [
-              'Recruit 20 target customers matching your ICP',
-              'Conduct 30-minute problem interviews',
-              'Quantify current solution costs and pain points',
-              'Test 3 different value propositions'
+              'Define your Ideal Customer Profile (ICP) with 8-10 specific characteristics',
+              'Recruit 25-30 potential customers matching your ICP through LinkedIn, industry forums, and referrals',
+              'Conduct 45-minute problem interviews using the "Mom Test" methodology',
+              'Quantify the current cost of their problem in time and money',
+              'Test 3 different value propositions and measure emotional response',
+              'Document specific language customers use to describe their pain',
+              'Validate willingness to pay with pricing sensitivity analysis',
+              'Create detailed customer personas based on interview data'
             ],
-            expectedResult: 'Clear evidence of market demand and optimal positioning',
-            investorPerspective: 'Shows systematic approach to market validation',
-            evidenceSource: 'Business stage and industry context',
-            targetMetric: '80%+ of interviews confirm significant pain point',
+            expectedResult: 'Clear evidence of market demand with 80%+ of interviews confirming significant pain, validated pricing model, and refined value proposition',
+            investorPerspective: 'Systematic market validation reduces investment risk and demonstrates founder discipline and market understanding',
+            evidenceSource: `Business stage (${stage}) and industry context (${industry})`,
+            targetMetric: '80%+ of customer interviews confirm significant pain point worth €500+ annually',
+            industryBenchmark: 'Successful startups conduct 20-30 customer interviews before building MVP',
+            toolsRequired: ['Calendly for scheduling', 'Zoom for interviews', 'Notion for documentation', 'LinkedIn Sales Navigator'],
+            potentialPitfalls: ['Leading questions that bias responses', 'Talking to friends/family instead of real prospects', 'Skipping pain quantification'],
+            successIndicators: ['Customers volunteer to pay before product exists', 'Consistent language across interviews', 'Referrals to other potential customers'],
             _source: 'contextual-fallback'
           });
-        } else if (stage === 'early-revenue') {
+        } else if (stage === 'mvp' && finalAnalysis.analysis.actionableInsights.length <= 1) {
           finalAnalysis.analysis.actionableInsights.push({
-            title: `Optimize ${industry} unit economics for investor readiness`,
+            title: `Implement advanced ${industry} user feedback and analytics system`,
             impact: 'high',
             timeframe: '2-3 weeks',
-            description: `Your ${industry} business needs clear unit economics to attract investment.`,
+            description: `Your MVP-stage ${industry} business needs systematic user behavior tracking to optimize product-market fit and prepare for scaling.`,
             implementation: [
-              'Calculate true CAC by channel (paid, organic, referral)',
-              'Measure LTV using cohort analysis (6-12 months)',
-              'Document gross margin structure',
-              'Set target metrics: LTV:CAC > 3, Payback < 18 months'
+              'Install comprehensive analytics: Mixpanel/Amplitude for user behavior, Hotjar for session recordings',
+              'Set up cohort analysis tracking weekly/monthly retention rates',
+              'Implement in-app feedback collection with NPS surveys and feature request voting',
+              'Create user interview pipeline: 5 users per week, 30-minute sessions',
+              'Track key activation metrics: time-to-first-value, feature adoption rates',
+              'Build automated email sequences for user onboarding and engagement',
+              'Set up A/B testing framework for key user flows',
+              'Create weekly metrics review process with product team'
             ],
-            expectedResult: 'Investor-grade financial clarity and optimization roadmap',
-            investorPerspective: 'Unit economics are fundamental for investment decisions',
-            evidenceSource: 'Revenue stage and business model',
-            targetMetric: 'LTV:CAC ratio > 3.0',
+            expectedResult: 'Data-driven product optimization with 40%+ improvement in user activation and 25% increase in retention within 60 days',
+            investorPerspective: 'Shows systematic approach to product-market fit optimization and data-driven decision making',
+            evidenceSource: `MVP stage requiring user feedback optimization in ${industry}`,
+            targetMetric: 'Achieve 40%+ weekly retention rate and 20%+ monthly retention rate',
+            industryBenchmark: `Top ${industry} companies achieve 35%+ weekly retention in MVP stage`,
+            toolsRequired: ['Mixpanel/Amplitude', 'Hotjar', 'Typeform', 'Calendly', 'Intercom'],
+            potentialPitfalls: ['Tracking vanity metrics instead of actionable insights', 'Over-engineering analytics before PMF', 'Ignoring qualitative feedback'],
+            successIndicators: ['Users return without prompting', 'Organic referrals increase', 'Feature requests align with roadmap'],
+            _source: 'contextual-fallback'
+          });
+        } else if ((stage === 'early-revenue' || revenue !== '0') && finalAnalysis.analysis.actionableInsights.length <= 2) {
+          finalAnalysis.analysis.actionableInsights.push({
+            title: `Optimize ${industry} unit economics for Series A readiness`,
+            impact: 'high',
+            timeframe: '3-4 weeks',
+            description: `Your early-revenue ${industry} business needs investor-grade unit economics clarity to attract Series A funding and optimize growth efficiency.`,
+            implementation: [
+              'Calculate true Customer Acquisition Cost (CAC) by channel: paid ads, organic, referral, sales',
+              'Implement cohort-based Lifetime Value (LTV) analysis using 6-12 month data',
+              'Document detailed gross margin structure including all variable costs',
+              'Analyze customer retention curves and identify churn patterns',
+              'Calculate payback period by customer segment and acquisition channel',
+              'Measure expansion revenue potential through upsell/cross-sell analysis',
+              'Build financial dashboard with weekly CAC, LTV, and churn tracking',
+              'Create scenario models for different growth rates and their capital requirements',
+              'Benchmark against industry standards and identify optimization opportunities'
+            ],
+            expectedResult: 'Investor-ready financial model with LTV:CAC > 3, payback < 18 months, and clear path to profitability',
+            investorPerspective: 'Unit economics are the foundation of Series A investment decisions - clarity here increases valuation and reduces due diligence time',
+            evidenceSource: `Early revenue stage (${revenue} monthly) requiring investment readiness`,
+            targetMetric: 'Achieve LTV:CAC ratio > 3.0 and CAC payback period < 18 months',
+            industryBenchmark: `Top ${industry} companies maintain LTV:CAC > 3 and payback < 12-18 months`,
+            toolsRequired: ['ChartMogul/ProfitWell', 'Excel/Google Sheets', 'Stripe/payment analytics', 'Customer success platform'],
+            potentialPitfalls: ['Using blended metrics instead of cohort analysis', 'Ignoring hidden costs in CAC calculation', 'Overestimating LTV without churn data'],
+            successIndicators: ['Consistent month-over-month improvement in key metrics', 'Investor meetings focus on growth rather than unit economics', 'Clear visibility into profitability timeline'],
             _source: 'contextual-fallback'
           });
         } else {
+          // Generic high-quality fallback for other stages
           finalAnalysis.analysis.actionableInsights.push({
-            title: `Accelerate ${industry} growth with data-driven optimization`,
+            title: `Accelerate ${industry} growth with systematic optimization framework`,
             impact: 'high',
-            timeframe: '1-2 weeks',
-            description: `Your ${stage} ${industry} business needs systematic growth tracking.`,
+            timeframe: '2-4 weeks',
+            description: `Your ${stage}-stage ${industry} business needs systematic growth optimization to maximize efficiency and prepare for next funding round.`,
             implementation: [
-              'Implement cohort analysis tracking',
-              'Set up automated reporting dashboard',
-              'Define North Star metric and key drivers',
-              'Create weekly growth review process'
+              'Implement weekly growth review process with key stakeholders',
+              'Set up automated reporting dashboard for North Star metrics',
+              'Create experimentation framework with hypothesis-driven testing',
+              'Establish customer feedback loops and systematic improvement process',
+              'Build competitive intelligence monitoring system',
+              'Optimize conversion funnel with A/B testing program'
             ],
-            expectedResult: 'Predictable growth and clear optimization levers',
-            investorPerspective: 'Shows operational maturity and scalability',
-            evidenceSource: 'Business stage and growth needs',
-            targetMetric: 'Month-over-month growth rate improvement',
+            expectedResult: 'Predictable growth optimization with 20-30% improvement in key metrics',
+            investorPerspective: 'Shows operational maturity and systematic approach to scaling',
+            evidenceSource: `${stage} stage requiring systematic optimization in ${industry}`,
+            targetMetric: 'Achieve 20%+ month-over-month improvement in North Star metric',
+            industryBenchmark: `Leading ${industry} companies see 15-25% monthly improvement through systematic optimization`,
+            toolsRequired: ['Analytics platform', 'A/B testing tools', 'Dashboard software'],
+            potentialPitfalls: ['Optimizing too many variables simultaneously', 'Focusing on vanity metrics', 'Changing strategy too frequently'],
+            successIndicators: ['Consistent improvement in key metrics', 'Faster decision-making process', 'Increased team alignment'],
             _source: 'contextual-fallback'
           });
         }
       }
     }
 
-    // Ensure all insights have required fields and source tags
+    // Ensure all insights have enhanced fields
     finalAnalysis.analysis.actionableInsights = finalAnalysis.analysis.actionableInsights.map((insight: any) => ({
       ...insight,
-      evidenceSource: insight.evidenceSource || 'General business context',
-      targetMetric: insight.targetMetric || 'Qualitative improvement',
+      evidenceSource: insight.evidenceSource || 'General business context and industry best practices',
+      targetMetric: insight.targetMetric || 'Qualitative improvement in business performance',
+             industryBenchmark: insight.industryBenchmark || `Industry best practices for ${businessInfo.industry || 'their'} companies`,
+      toolsRequired: insight.toolsRequired || ['Standard business tools'],
+      potentialPitfalls: insight.potentialPitfalls || ['Common implementation challenges'],
+      successIndicators: insight.successIndicators || ['Positive business impact indicators'],
       _source: insight._source || 'ai-generated'
     }));
+
+    // Ensure comprehensive structure exists
+    if (!finalAnalysis.analysis.companyContext) {
+      finalAnalysis.analysis.companyContext = [
+        `Stage: ${businessInfo.stage || 'Not specified'} company in ${businessInfo.industry || 'unspecified industry'}`,
+        `Target Market: ${businessInfo.targetMarket || 'Broad market'} with ${businessInfo.businessModel || 'standard business model'}`,
+        `Revenue: ${businessInfo.monthlyRevenue || 'Pre-revenue'} monthly with ${businessInfo.teamSize || 'small'} team`,
+        `Industry: Operating in ${businessInfo.industry || 'competitive'} space`,
+                 `Growth Stage: ${businessInfo.stage === 'idea' ? 'Validation phase' : businessInfo.stage === 'mvp' ? 'Product development' : businessInfo.stage === 'early-revenue' ? 'Early traction' : 'Scaling phase'}`
+      ];
+    }
 
     // Ensure scores exist
     if (!finalAnalysis.analysis.overallScore) {
@@ -366,12 +496,47 @@ OUTPUT FORMAT STRICTLY:
       };
     }
 
+    // Add enhanced sections if not present
+    if (!finalAnalysis.analysis.competitiveAnalysis) {
+      finalAnalysis.analysis.competitiveAnalysis = {
+                 mainCompetitors: [`Main ${businessInfo.industry || 'industry'} competitors in ${businessInfo.targetMarket || 'target market'}`],
+        competitiveAdvantages: ['Unique positioning opportunity', 'Market timing advantage'],
+        vulnerabilities: ['Need to establish market presence', 'Resource constraints vs established players'],
+        differentiationStrategy: `Focus on ${businessInfo.targetMarket || 'specific market segment'} with superior ${businessInfo.businessModel || 'value delivery'}`
+      };
+    }
+
+    if (!finalAnalysis.analysis.financialProjections) {
+      finalAnalysis.analysis.financialProjections = {
+        revenueScenarios: {
+          conservative: 'Steady growth with market validation',
+          realistic: 'Strong growth with successful execution',
+          optimistic: 'Rapid scaling with market leadership'
+        },
+        keyMetrics: {
+          targetCAC: 'Industry-appropriate customer acquisition cost',
+          targetLTV: 'Sustainable lifetime value ratios',
+          paybackPeriod: 'Efficient capital recovery timeline',
+          grossMargin: 'Healthy margin structure'
+        }
+      };
+    }
+
+    if (!finalAnalysis.analysis.growthRoadmap) {
+      finalAnalysis.analysis.growthRoadmap = {
+        next30Days: ['Immediate priority actions', 'Quick wins implementation', 'Foundation building'],
+        next90Days: ['Strategic initiatives launch', 'System optimization', 'Market expansion prep'],
+        next12Months: ['Scale operations', 'Market leadership establishment', 'Next funding preparation']
+      };
+    }
+
     return NextResponse.json({ 
       success: true, 
       analysis: finalAnalysis.analysis,
       userInfo,
       dataQuality: 'comprehensive',
-      model: 'gpt-5'
+      model: 'gpt-5',
+      tokenUsage: 'enhanced-capacity'
     });
 
   } catch (error) {
