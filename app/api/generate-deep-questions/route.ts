@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { rateLimit, getIp } from '../_utils/rateLimit';
+import { ANGELHIVE_GUIDELINES } from '../_utils/angelhive_static';
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,6 +26,9 @@ export async function POST(request: NextRequest) {
     });
 
     const systemPrompt = `You are an expert business analyst who specializes in conducting deep-dive interviews to gather critical business intelligence. Your job is to analyze existing business information and generate 6-8 highly targeted follow-up questions.
+
+AngelHive-inspired guidelines to consider (do not restate, just use to shape questions):
+${ANGELHIVE_GUIDELINES}
 
 CRITICAL REQUIREMENTS:
 
@@ -62,14 +66,7 @@ RESPONSE FORMAT: Return a JSON object with this structure:
       "placeholder": "Detailed example answer that shows what kind of specificity you're looking for"
     }
   ]
-}
-
-EXAMPLES OF GOOD QUESTIONS (tailored to their context):
-- "Your [specific industry] customers mentioned [specific problem]. What's the #1 objection they raise during sales calls, and what's your current success rate overcoming it?"
-- "Since you're competing with [specific competitor], what's your process for demonstrating ROI to prospects who are currently using [competitor's solution]?"
-- "You mentioned [specific revenue/growth metric]. What's the biggest bottleneck preventing you from doubling that in the next 6 months?"
-
-Generate 6-8 questions that will unlock the most valuable insights for creating ultra-specific business recommendations.`;
+}`;
 
     const userPrompt = `Based on this company's existing analysis, generate personalized follow-up questions:
 
@@ -97,11 +94,13 @@ ${previousAnalysis.websiteData ? JSON.stringify(previousAnalysis.websiteData) : 
 Generate 6-8 highly specific questions that will help create ultra-personalized recommendations for THIS EXACT company. Focus on areas where you need more detail to provide concrete, hands-on advice.`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
       ],
+      temperature: 0.4,
+      max_tokens: 1200
     });
 
     const response = completion.choices[0]?.message?.content;

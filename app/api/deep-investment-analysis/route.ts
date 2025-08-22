@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 import { initialAnalysisSchema, hasMinInsights } from '../_utils/aiSchemas';
 import { aiConfig } from '../_utils/aiConfig';
 import { rateLimit, getIp } from '../_utils/rateLimit';
+import { ANGELHIVE_GUIDELINES } from '../_utils/angelhive_static';
 
 export async function POST(request: Request) {
   try {
@@ -92,12 +93,15 @@ export async function POST(request: Request) {
     };
 
     async function generateOnce(promptContent: string, strict = false) {
+      const fullSystem = `${promptContent}\n\nMANDATORY REFERENCE GUIDELINES (AngelHive-inspired):\n${ANGELHIVE_GUIDELINES}\n\nUse these guidelines to structure and evaluate, but DO NOT output a summary of the guidelines. Output only the requested JSON fields.`;
       const opts: any = {
         model: aiConfig.models.deep,
         messages: [
-          { role: 'system', content: promptContent + (strict ? '\nReturn ONLY valid minified JSON without markdown or extra text.' : '') },
+          { role: 'system', content: fullSystem + (strict ? '\nReturn ONLY valid minified JSON without markdown or extra text.' : '') },
           { role: 'user', content: combinedContent }
         ],
+        temperature: strict ? aiConfig.temperature.strict : aiConfig.temperature.default,
+        max_tokens: aiConfig.maxTokens
       };
       const res = await openai.chat.completions.create(opts);
       const txt = res.choices?.[0]?.message?.content || '{}';

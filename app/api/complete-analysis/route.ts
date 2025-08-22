@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 import { finalAnalysisSchema, hasMinInsights } from '../_utils/aiSchemas';
 import { aiConfig } from '../_utils/aiConfig';
 import { rateLimit, getIp } from '../_utils/rateLimit';
+import { ANGELHIVE_GUIDELINES } from '../_utils/angelhive_static';
 
 export async function POST(request: Request) {
   try {
@@ -36,17 +37,37 @@ export async function POST(request: Request) {
       followUpContent += `A: ${answer}\n\n`;
     });
 
+    const safeParseJson = (txt: string) => {
+      try {
+        return JSON.parse(txt);
+      } catch (e) {
+        const first = txt.indexOf('{');
+        const last = txt.lastIndexOf('}');
+        if (first !== -1 && last !== -1 && last > first) {
+          const sub = txt.slice(first, last + 1);
+          try { return JSON.parse(sub); } catch {}
+        }
+        return null;
+      }
+    };
+
     async function generate(prompt: string, strict = false) {
+      const sys = `${prompt}\n\nMANDATORY REFERENCE GUIDELINES (AngelHive-inspired):\n${ANGELHIVE_GUIDELINES}\n\nUse these guidelines to structure and evaluate, but DO NOT output a summary of the guidelines. Output only the requested JSON fields.`
+        + (strict ? '\nReturn ONLY valid minified JSON without markdown or extra text.' : '');
       const opts: any = {
         model: aiConfig.models.final,
         messages: [
-          { role: 'system', content: prompt + (strict ? '\nReturn ONLY valid minified JSON without markdown or extra text.' : '') },
+          { role: 'system', content: sys },
           { role: 'user', content: `Initial Analysis Context:\n${context.combinedContent}\n\nInitial Analysis Results:\n${JSON.stringify(context.initialAnalysis, null, 2)}\n\n${followUpContent}` }
         ],
+        temperature: strict ? aiConfig.temperature.strict : aiConfig.temperature.final,
+        max_tokens: aiConfig.maxTokens
       };
       const res = await openai.chat.completions.create(opts);
       const content = res.choices[0].message.content || '{}';
-      return JSON.parse(content);
+      const parsed = safeParseJson(content);
+      if (!parsed) throw new Error('Failed to parse JSON from OpenAI');
+      return parsed;
     }
 
     const basePrompt = `You are an expert investment analyst. You have already performed an initial analysis and asked follow-up questions. Now complete your comprehensive investment assessment using all available information.
@@ -54,7 +75,7 @@ export async function POST(request: Request) {
 Before analysis, briefly restate a 5-bullet "Company context" using stage, industry, target market, business model, revenue, team. Keep it concise.
 
 CRITICAL REQUIREMENT FOR PERSONALIZED ACTIONABLE INSIGHTS:
-You MUST generate 3-5 SPECIFIC, TAILORED actionable insights based on THIS EXACT COMPANY'S situation. 
+You MUST generate 4-6 SPECIFIC, TAILORED actionable insights based on THIS EXACT COMPANY'S situation. 
 
 FORBIDDEN - DO NOT use generic advice like:
 - "Quantify customer pain in monetary terms"
@@ -72,7 +93,36 @@ REQUIRED - Generate insights that are:
 6. INCLUDE specific numbers/metrics relevant to their situation
 7. CITE brief snippets from website/docs when used (e.g., "from website: ...")
 
-IF SaaS with revenue > 0 → include churn, CAC, LTV, payback, expansion. If e‑commerce → CRO metrics and concrete tests. If marketplace → supply/demand tactics and loop design. If idea/MVP → validation plan with timelines and success thresholds.`
+IF SaaS with revenue > 0 → include churn, CAC, LTV, payback, expansion. If e‑commerce → CRO metrics and concrete tests. If marketplace → supply/demand tactics and loop design. If idea/MVP → validation plan with timelines and success thresholds.
+
+OUTPUT FORMAT STRICTLY:
+{
+  "analysis": {
+    "executiveSummary": string,
+    "investmentThesis": string,
+    "marketOpportunity": string,
+    "customerPain": string,
+    "solution": string,
+    "competitivePosition": string,
+    "teamAssessment": string,
+    "financialAnalysis": string,
+    "riskAssessment": string,
+    "growthStrategy": string,
+    "fundingAnalysis": string,
+    "actionableInsights": [
+      {
+        "title": string,
+        "impact": "high" | "medium" | "low",
+        "timeframe": string,
+        "description": string,
+        "implementation": [string],
+        "expectedResult": string,
+        "investorPerspective": string,
+        "_source": "ai-generated"
+      }
+    ]
+  }
+}`;
 
     let finalAnalysis = await generate(basePrompt);
 
@@ -83,7 +133,7 @@ IF SaaS with revenue > 0 → include churn, CAC, LTV, payback, expansion. If e�
     } catch {}
 
     if (!valid) {
-      const strict = basePrompt + `\n\nSTRICT MODE: If some details are missing, make reasonable assumptions and STILL provide 3-5 concrete, immediately actionable recommendations with steps, tools, metrics and expected outcomes.`;
+      const strict = basePrompt + `\n\nSTRICT MODE: If some details are missing, make reasonable assumptions and STILL provide 4-6 concrete, immediately actionable recommendations with steps, tools, metrics and expected outcomes.`;
       finalAnalysis = await generate(strict, true);
       try {
         finalAnalysisSchema.parse(finalAnalysis);
@@ -103,9 +153,15 @@ IF SaaS with revenue > 0 → include churn, CAC, LTV, payback, expansion. If e�
           description: 'Establish clear CAC/LTV, gross margin and payback calculations.',
           implementation: ['Instrument analytics', 'Define formulae', 'Validate with sample cohorts'],
           expectedResult: 'Investor-grade clarity on business model performance',
-          investorPerspective: 'Demonstrates operating discipline and scalability'
+          investorPerspective: 'Demonstrates operating discipline and scalability',
+          _source: 'fallback'
         });
       }
+    } else {
+      // Ensure source tag
+      try {
+        finalAnalysis.analysis.actionableInsights = (finalAnalysis.analysis.actionableInsights || []).map((it: any) => ({ ...it, _source: it._source || 'ai-generated' }));
+      } catch {}
     }
 
     // Clean up stored context
